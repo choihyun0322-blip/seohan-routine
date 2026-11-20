@@ -1,0 +1,16 @@
+{
+  "name": "우리집 살림 관제소",
+  "short_name": "살림 관제소",
+  "description": "재택·출근 루틴과 주기 케어, 장보기·레시피·생필품 재고를 한 화면에서 — 남편과 실시간 동기화",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#FAF6EF",
+  "theme_color": "#FAF6EF",
+  "lang": "ko",
+  "icons": [
+    { "src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
