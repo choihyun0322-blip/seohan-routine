@@ -1655,7 +1655,7 @@ function viewStockForm(id, draft) {
       '</select></div>') +
     '<div class="toggle" style="border-top:1px dashed var(--line)"><div class="t"><b>개수 관리 사용</b><small>켜면 5·4·3처럼 숫자로 조절해요 (부족 기준은 적정량에 맞춤)</small></div>' +
     '<button class="sw ' + (useCount ? 'on' : '') + '" data-act="stocknumtoggle" data-id="' + id + '"><i></i></button></div>' +
-    '<div class="note">' + (useCount ? '숫자가 <b>0</b>이면 없음, <b>' + thr + '개 이하</b>면 부족으로 표시되고 구매리스트에 담을 수 있어요.' + (/칫쇱/.test(String(nm)) ? ' 칫쇱은 <b>3개 이상</b>이면 충분이에요.' : '') : '충분 / 부족 / 없음 3단으로 관리해요. 개수까지 세고 싶은 품목은 위 토글을 켜세요.') + '</div>',
+    '<div class="note">' + (useCount ? '숫자가 <b>0</b>이면 없음, <b>' + thr + '개 이하</b>면 부족으로 표시되고 구매리스트에 담을 수 있어요.' + (/칫솔/.test(String(nm)) ? ' 칫솔은 <b>3개 이상</b>이면 충분이에요.' : '') : '충분 / 부족 / 없음 3단으로 관리해요. 개수까지 세고 싶은 품목은 위 토글을 켜세요.') + '</div>',
     '<button class="btn sm" data-act="stocksave" data-id="' + id + '">저장</button><button class="btn coral" data-act="stockdelete" data-id="' + id + '">삭제</button>');
 }
 function viewPantryForm(id) {
@@ -2280,3 +2280,5 @@ window.__home = {
 };
 
 document.addEventListener('DOMContentLoaded', boot);
+
+/* cache-bust: 2026-11-21 부족 기준·레시피 재료 판정 수정 */
