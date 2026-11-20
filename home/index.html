@@ -208,16 +208,28 @@ h1{font-size:21px;font-weight:800;letter-spacing:-.9px;line-height:1.15;white-sp
 .empty{padding:18px 6px;text-align:center;font-size:11.5px;font-weight:600;color:#B7AC9C;letter-spacing:-.2px}
 
 /* pantry */
+.pgroups{display:flex;flex-direction:column;gap:9px}
+.pgroup{min-width:0}
+.pgroup-h{display:flex;align-items:center;gap:6px;margin-bottom:5px;font-size:10px;font-weight:800;color:#9C9285;letter-spacing:-.2px}
+.pgroup-h .pc{background:#F5F1E8;color:#A79C8D;border-radius:6px;padding:1px 5px;font-size:9px;font-weight:800;font-feature-settings:'tnum'}
 .pantry{display:flex;flex-wrap:wrap;gap:5px}
 .pchip{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;padding:6px 7px 6px 8px;border-radius:9px;background:#FBF8F2;border:1px solid var(--line-soft);color:var(--ink2);letter-spacing:-.25px}
 .pchip .e{font-size:11px}
 .pchip .dd2{font-size:9px;font-weight:800;color:#94A48E;font-feature-settings:'tnum'}
 .pchip .dd2.mid{color:var(--amber)}
 .pchip .dd2.bad{color:var(--coral)}
-.pchip .x{color:#C6BBAE;font-weight:800;font-size:10px;padding:0 0 0 2px}
-.padd{display:flex;gap:5px;margin-top:9px}
-.padd input{flex:1;min-width:0;border:1px solid var(--line);background:#FFFDFA;border-radius:9px;padding:8px 9px;font-size:12.5px;font-weight:600;outline:none}
+.pchip:active{background:var(--sage-soft);border-color:var(--sage-line)}
+.padd{display:flex;gap:5px;margin-top:9px;flex-wrap:wrap}
+.padd input{flex:1 1 130px;min-width:0;border:1px solid var(--line);background:#FFFDFA;border-radius:9px;padding:8px 9px;font-size:12.5px;font-weight:600;outline:none}
 .padd input[type=date]{flex:0 0 118px;font-size:11px;color:var(--sub)}
+.padd select{flex:0 0 auto;border:1px solid var(--line);background:#FFFDFA;border-radius:9px;padding:8px 4px;font-size:11.5px;font-weight:800;color:var(--sage-d)}
+.stepsview p{font-size:12.5px;line-height:1.68;font-weight:600;color:var(--ink2);margin-bottom:7px;letter-spacing:-.2px;word-break:keep-all}
+.stepsview p:last-child{margin-bottom:0}
+.cnt{min-width:26px;text-align:center;font-size:11px;font-weight:800;font-feature-settings:'tnum';color:var(--ink2);background:#FBF8F2;border:1px solid var(--line);border-radius:7px;padding:4px 2px}
+.cnt.low{background:var(--amber-soft);border-color:var(--amber-line);color:var(--amber-d)}
+.cnt.none{background:var(--coral-soft);border-color:var(--coral-line);color:var(--coral-d)}
+.cnt.enough{background:var(--sage-soft);border-color:var(--sage-line);color:var(--sage-d)}
+.ctr{font-size:12px!important;font-weight:800!important;padding:5px 8px!important;line-height:1}
 
 /* recipes */
 .recgrid{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin-top:10px}
@@ -369,6 +381,7 @@ h1{font-size:21px;font-weight:800;letter-spacing:-.9px;line-height:1.15;white-sp
         <button class="seg" data-act="mode" data-mode="office">🏢 출근</button>
       </div>
       <button class="sync" data-act="share" id="syncPill" title="공유 링크 복사"><span class="sdot" id="syncDot"></span><span id="syncTxt">🔄 남편과 동기화</span></button>
+      <button class="gear" data-act="reload" title="새로고침 (캐시 무시)">🔄</button>
       <button class="gear" data-act="settings">⚙️</button>
     </div>
   </header>
@@ -446,10 +459,17 @@ h1{font-size:21px;font-weight:800;letter-spacing:-.9px;line-height:1.15;white-sp
           <h2>🍳 냉장고 재료 &amp; 레시피</h2>
           <span class="chip sage" id="recChip">0개 맞춤</span>
         </div>
-        <div class="wlabel"><span class="l">🧊 냉장고 보유 재료</span><span class="r" id="pantryHint">재료를 누르면 삭제</span></div>
-        <div class="pantry" id="pantry"></div>
+        <div class="wlabel"><span class="l">🧊 보관 구역별 재료</span><span class="r" id="pantryHint">재료를 누르면 구역·유통기한 수정</span></div>
+        <div class="pgroups" id="pantry"></div>
         <div class="padd">
           <input id="pantryInput" type="text" placeholder="재료 추가 (예: 애호박)">
+          <select id="pantryZone" title="보관 구역">
+            <option value="auto">자동</option>
+            <option value="fridge">❄️ 냉장</option>
+            <option value="freezer">🧊 냉동</option>
+            <option value="room">🌡️ 실온</option>
+            <option value="seasoning">🧂 조미료</option>
+          </select>
           <input id="pantryExp" type="date">
           <button class="qadd" data-act="pantryadd">＋</button>
         </div>
@@ -461,9 +481,7 @@ h1{font-size:21px;font-weight:800;letter-spacing:-.9px;line-height:1.15;white-sp
         <div class="filters" id="recFilters" style="margin-bottom:10px">
           <button class="fchip on" data-act="recfilter" data-rf="all">전체</button>
           <button class="fchip" data-act="recfilter" data-rf="ready">바로 가능 ✅</button>
-          <button class="fchip" data-act="recfilter" data-rf="내 레시피">내 레시피 ⭐</button>
-          <button class="fchip" data-act="recfilter" data-rf="유아식">유아식</button>
-          <button class="fchip" data-act="recfilter" data-rf="집밥">집밥</button>
+          <button class="fchip" data-act="recfilter" data-rf="mine">내 레시피 ⭐</button>
         </div>
         <div class="recgrid" id="recList"></div>
         <div class="card-foot">
@@ -503,6 +521,6 @@ h1{font-size:21px;font-weight:800;letter-spacing:-.9px;line-height:1.15;white-sp
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<script src="app.js"></script>
+<script src="app.js?v=105513"></script>
 </body>
 </html>
