@@ -4663,20 +4663,17 @@ function gscanParse(lines) {
   }
   if (chosen) { res.product = chosen.text; res.productLine = chosen.i; }
 
-  /* 이름 정리 */
+  /* 이름 정리: 상품명 앞에 브랜드가 또 나오면 한 번만 남긴다 */
   if (res.brand && res.product) {
     const bn = res.brand.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    res.product = res.product.replace(new RegExp(bn, "gi"), " ").replace(/\s+/g, " ").trim();
+    res.product = res.product.replace(new RegExp("^\\s*" + bn + "\\s*", "i"), "").trim();
   }
   res.product = res.product.replace(/^[:：\-–—·|]+|[:：\-–—·|]+$/g, "").trim();
-  if (res.brand && res.product && gscanNorm(res.product).indexOf(gscanNorm(res.brand.name)) === 0) {
-    res.product = res.product.slice(res.brand.name.length).trim();
-  }
   return res;
 }
 
 /* 대괄호 속 라틴 글자(예: (106) → (ICE)) 한 번 더 읽기 */
-async function gscanRepairParen(worker, img, lines, idx, product) {
+async function gscanRepairParen(worker, img, lines, idx, product, k) {
   const m = String(product || "").match(/^[\(\[]([^\)\]]{0,8})[\)\]]?/);
   if (!m) return product;
   if (/^[A-Z]{2,6}$/.test(m[1])) return product;
@@ -4685,8 +4682,9 @@ async function gscanRepairParen(worker, img, lines, idx, product) {
   const w = l.words.find(x => /^[\(\[]/.test(String(x.text || "").trim()));
   if (!w) return product;
   const bb = w.bbox;
+  const f = k && k > 0 ? 1 / k : 1;                  // OCR 좌표 → 원본 좌표 (축소 배율의 역수)
   try {
-    const cv = gscanCanvas(img, bb.x0 - 2, bb.y0 - 3, (bb.x1 - bb.x0) + 4, (bb.y1 - bb.y0) + 6, 8);
+    const cv = gscanCanvas(img, bb.x0 * f - 3, bb.y0 * f - 4, (bb.x1 - bb.x0) * f + 6, (bb.y1 - bb.y0) * f + 8, 8);
     await worker.setParameters({ tessedit_pageseg_mode: "7" });
     const r = await worker.recognize(cv, {});
     const txt = String((r && r.data && r.data.text) || "").replace(/\s+/g, "");
@@ -4722,15 +4720,12 @@ function gscanPreview() {
   if (det) det.textContent = "이 바코드로 매장에서 스캔됩니다 · 다르면 위 칸에서 고쳐 주세요";
   box.classList.add("on");
 }
-function gscanFill(res, img, file) {
+function gscanFill(res, img) {
   const got = [];
   if (res.barcode) { $("#gBarcode").value = res.barcode; got.push("바코드"); }
   if (res.exp) { $("#gExp").value = res.exp; got.push("유효기간"); }
   if (res.brand) { $("#gBrand").value = res.brand.short || ""; }
-  let name = "";
-  if (res.brand && res.product && gscanNorm(res.product).indexOf(gscanNorm(res.brand.name)) < 0) name = res.brand.name + " " + res.product;
-  else if (res.brand) name = res.brand.name + (res.product ? "" : "");
-  else if (res.product) name = res.product;
+  const name = [res.brand ? res.brand.name : "", res.product || ""].filter(Boolean).join(" ").trim();
   if (name) { $("#gName").value = name; got.push("상품명"); }
   if (res.orderNo && !($("#gOrder").value || "").trim()) $("#gOrder").value = res.orderNo;
   if (!res.barcode && img) {
@@ -4778,22 +4773,22 @@ async function gscanRun(file) {
         }
       }
     });
-    const out = await worker.recognize(img, {}, { blocks: true });
+    // 아이폰 캡처(≈2800px)는 그대로 읽는다. 카메라 원본(4000px↑)만 2400px로 줄여 속도를 챙긴다.
+    const maxDim = Math.max(img.naturalWidth, img.naturalHeight);
+    const k = maxDim > 3000 ? 2400 / maxDim : 1;      // OCR 좌표 → 원본 좌표 배율
+    const ocrInput = k < 1 ? gscanCanvas(img, 0, 0, img.naturalWidth, img.naturalHeight, k) : img;
+    const out = await worker.recognize(ocrInput, {}, { blocks: true });
     const msOcr = Date.now() - tDecode - msDecode;
     const lines = [];
     ((out.data && out.data.blocks) || []).forEach(b => (b.paragraphs || []).forEach(p => (p.lines || []).forEach(l => {
       if (l && l.text && l.text.trim()) lines.push(l);
     })));
     const res = gscanParse(lines);
-    if (!res.barcode && code && code.value) res.barcode = code.value;
-    if (res.barcode && code && code.value && res.barcode !== code.value) {
-      // 디코더가 읽은 실제 바코드를 우선한다
-      res.barcode = code.value;
-    }
+    if (code && code.value) res.barcode = code.value;   // 디코더가 읽은 실제 바코드가 우선
     if (res.productLine >= 0 && res.product) {
-      res.product = await gscanRepairParen(worker, img, lines, res.productLine, res.product);
+      res.product = await gscanRepairParen(worker, img, lines, res.productLine, res.product, k);
     }
-    const got = gscanFill(res, img, file);
+    const got = gscanFill(res, img);
     window.__gscanLast = { decodeMs: msDecode, ocrMs: msOcr, code: code, result: res };
     toast(got.length ? "캡처에서 " + got.join("·") + "을 채웠어요" : "읽어낸 값이 없어요 — 직접 적어 주세요");
   } catch (e) {
