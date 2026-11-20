@@ -1996,11 +1996,15 @@ function renderAuthUi() {
     act = "login";
   } else if (signed && !keyReady()) {
     show = true;
-    text = pendingRemote
-      ? "🔑 서버에 암호로 잠긴 장부가 있어요 — 열쇠를 넣어 주세요"
-      : "🔑 암호 열쇠를 만들면 서버에 암호문으로 저장돼요";
-    label = pendingRemote ? "열쇠 넣기" : "열쇠 만들기";
-    act = pendingRemote ? "unlock" : "newkey";
+    if (typeof remoteChecked !== "undefined" && !remoteChecked) {
+      text = "🔑 서버에 저장된 장부를 확인하는 중이에요…";
+    } else {
+      text = pendingRemote
+        ? "🔑 서버에 암호로 잠긴 장부가 있어요 — 열쇠를 넣어 주세요"
+        : "🔑 암호 열쇠를 만들면 서버에 암호문으로 저장돼요";
+      label = pendingRemote ? "열쇠 넣기" : "열쇠 만들기";
+      act = pendingRemote ? "unlock" : "newkey";
+    }
   }
   if (bar) {
     bar.classList.toggle("off", !show);
@@ -2062,6 +2066,8 @@ function bindAuth() {
     if (!confirm("이 기기에서 암호 열쇠를 지울까요?\n\n서버의 암호문은 그대로 남고, 다시 열려면 열쇠를 새로 넣어야 합니다.")) return;
     await forgetKey();
     renderAuthUi();
+    const mg = $("#mKeyManage");
+    if (mg && mg.classList.contains("on")) openKeyManager();
     toast("이 기기에서 열쇠를 지웠어요");
   });
   const chg = $("#keyChange");
@@ -2213,6 +2219,7 @@ let syncKind = "connecting";
 let dbStarted = false;
 let handling = Promise.resolve();
 let remotePlainSeen = false;
+let remoteChecked = false;   /* 서버 장부를 한 번이라도 확인했는지 */
 
 function setSync(kind, text) {
   syncKind = kind;
@@ -2260,7 +2267,6 @@ function startDb() {
     console.warn("read denied", err);
     setSync("err", "서버 접근 거부 — 로그인/권한 확인");
   });
-
   inboxRef.on("child_added", snap => {
     const v = snap.val();
     const n = ingestInboxItem(v, snap.key);
@@ -2292,6 +2298,7 @@ function handleRemoteRaw(raw) {
 }
 
 async function processRemote(raw) {
+  if (!remoteChecked) { remoteChecked = true; renderAuthUi(); }
   if (!raw) {
     if (keyReady()) queuePush();
     return;
