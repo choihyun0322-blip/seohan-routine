@@ -14,6 +14,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@zip.js/zip.js@2.7.52/dist/zip-full.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js" defer></script>
 <style>
 /* ============ tokens ============ */
@@ -57,7 +58,16 @@ select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,#A
 .sdot.on{background:#6FA077;box-shadow:0 0 0 3.5px rgba(111,160,119,.16)}
 .sdot.off{background:#D2A24A;box-shadow:0 0 0 3.5px rgba(210,162,74,.15)}
 .sdot.err{background:var(--coral);box-shadow:0 0 0 3.5px rgba(210,105,79,.15)}
-@media(max-width:559px){.only-desk{display:none}.hd{padding-bottom:10px}.hd h1{font-size:15.5px;letter-spacing:-.6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.logo{width:40px;height:40px;border-radius:13px;font-size:20px}.sync{padding:9px;gap:0}.sync #syncTxt{display:none}.icobtn{width:34px;height:34px;border-radius:11px;font-size:15px}}
+/* ---------- 구글 로그인 · 암호화 ---------- */
+.acct{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:9px 12px;font-size:11.5px;font-weight:800;color:var(--sage-d);box-shadow:var(--shadow);white-space:nowrap}
+.acct .atx{max-width:104px;overflow:hidden;text-overflow:ellipsis}
+.authbar{display:flex;align-items:center;gap:8px;background:#FFF8E8;border:1px solid #F0DDB0;border-radius:14px;padding:9px 10px;margin:0 2px 10px;box-shadow:var(--shadow)}
+.authbar.off{display:none}
+.authbar .atext{font-size:11px;font-weight:700;color:#8A6A22;line-height:1.45;flex:1;min-width:0}
+.authbar .btn{flex:0 0 auto}
+.sm-sheet{max-width:430px}
+.hint.warn{color:#B4744F;background:#FDF3EC;border:1px solid #F3DCCD;border-radius:10px;padding:8px 9px;margin-top:8px}
+@media(max-width:559px){.only-desk{display:none}.hd{padding-bottom:10px}.hd h1{font-size:15.5px;letter-spacing:-.6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.logo{width:40px;height:40px;border-radius:13px;font-size:20px}.sync{padding:9px;gap:0}.sync #syncTxt{display:none}.icobtn{width:34px;height:34px;border-radius:11px;font-size:15px}.hd-r{gap:4px}.acct{padding:9px;gap:0}.acct .atx{display:none}}
 @media(min-width:900px){.hd h1{font-size:27px}.logo{width:54px;height:54px;font-size:26px;border-radius:18px}.hd{padding-bottom:18px}}
 
 /* ============ kpis ============ */
@@ -530,11 +540,17 @@ body.locked .app,body.locked .toast{visibility:hidden}
     </div>
     <div class="hd-r">
       <button class="sync" id="btnSync" title="동기화 상태"><span class="sdot" id="syncDot"></span><span id="syncTxt">연결 중</span></button>
+      <button class="acct" id="btnAuth" title="구글 로그인">🔒 로그인</button>
       <button class="icobtn" id="btnRefresh" title="새로고침 — 최신 버전으로 다시 열기" aria-label="새로고침">🔄</button>
       <button class="icobtn" id="btnShortcut" title="아이폰 단축어 설정" aria-label="아이폰 단축어 설정">📱</button>
       <button class="icobtn" id="btnSettings" title="설정" aria-label="설정">⚙️</button>
     </div>
   </header>
+
+  <div class="authbar off" id="authBar">
+    <span class="atext" id="authBarText"></span>
+    <button class="btn pri sm" id="btnAuthLogin" data-act="login">구글 로그인</button>
+  </div>
 
   <nav class="tabs" id="tabs" aria-label="지갑 탭">
     <button data-tab="ledger" class="on">💸 가계부</button>
@@ -787,6 +803,7 @@ body.locked .app,body.locked .toast{visibility:hidden}
   <div class="sheet-h"><b>📱 아이폰 단축어 1분 설정</b><button class="x" data-close>✕</button></div>
   <div class="sheet-b">
     <div class="banner info">결제 문자나 카드 알림이 오면 <b>자동으로 가계부에 기록</b>돼요. 서버 주소만 단축어에 붙여 넣으면 끝입니다.</div>
+    <div class="banner warn" id="scNote"></div>
     <div class="fld"><label>1) 이 주소를 복사</label>
       <div class="codebox" id="scUrl"></div>
       <div style="display:flex;gap:6px;margin-top:7px;flex-wrap:wrap">
@@ -917,6 +934,14 @@ body.locked .app,body.locked .toast{visibility:hidden}
         <button class="btn ghost sm" id="btnPullNow">서버에서 받기</button>
       </div>
     </div>
+    <div class="fld"><label>🔐 계정 · 암호화</label>
+      <div id="setAuthInfo" class="hint"></div>
+      <div style="display:flex;gap:6px;margin-top:7px;flex-wrap:wrap">
+        <button class="btn ghost sm" id="btnAuthToggle">구글 로그인</button>
+        <button class="btn ghost sm" id="btnKeyManage">새 열쇠 만들기</button>
+      </div>
+      <div class="hint">로그인한 계정만 DB를 읽고 쓸 수 있고, 장부 내용은 이 기기에서 AES-GCM으로 암호화한 뒤에만 서버에 올라갑니다.</div>
+    </div>
     <div class="fld"><label>가계부 내역 지우기</label>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn coral sm" id="btnWipeOpen">🗑 내역 지우기</button>
@@ -1033,6 +1058,44 @@ body.locked .app,body.locked .toast{visibility:hidden}
     <button class="btn pri" id="bigBack">닫기</button>
   </div>
 </div>
+
+<!-- 암호 열쇠 만들기 -->
+<div class="mask" id="mKey"><div class="sheet sm-sheet">
+  <div class="sheet-h"><b>🔑 암호 열쇠 만들기</b><button class="x" data-close>✕</button></div>
+  <div class="sheet-b">
+    <div class="hint" id="keyMsg"></div>
+    <div class="fld"><label>열쇠 (8자 이상)</label><input id="keyNew" type="password" autocomplete="new-password" placeholder="예: seohan-home-2026!"></div>
+    <div class="fld"><label>한 번 더</label><input id="keyNew2" type="password" autocomplete="new-password"></div>
+    <label class="qchk"><input type="checkbox" id="keyRemember" checked> 이 기기에서 기억 (다시 안 물어봐요)</label>
+    <div class="hint warn">⚠️ 열쇠를 잊으면 서버의 암호문은 아무도 풀 수 없어요. 이 기기에는 열쇠가 남지만, 기기를 바꾸기 전에 열쇠를 꼭 기억해 두세요.</div>
+  </div>
+  <div class="sheet-f"><button class="btn ghost" data-close>취소</button><button class="btn pri" id="keySave">암호화 켜기</button></div>
+</div></div>
+
+<!-- 암호 열쇠 넣기 -->
+<div class="mask" id="mUnlock"><div class="sheet sm-sheet">
+  <div class="sheet-h"><b>🔓 암호 열쇠 넣기</b><button class="x" data-close>✕</button></div>
+  <div class="sheet-b">
+    <div class="hint" id="unlockMsg"></div>
+    <div class="fld"><label>열쇠</label><input id="unlockPass" type="password" autocomplete="current-password"></div>
+    <label class="qchk"><input type="checkbox" id="unlockRemember" checked> 이 기기에서 기억</label>
+    <div class="hint" id="unlockHint"></div>
+    <div class="lockerr" id="unlockErr"></div>
+  </div>
+  <div class="sheet-f"><button class="btn ghost" data-close>나중에</button><button class="btn pri" id="unlockGo">열기</button></div>
+</div></div>
+
+<!-- 열쇠 관리 -->
+<div class="mask" id="mKeyManage"><div class="sheet sm-sheet">
+  <div class="sheet-h"><b>🔐 암호 열쇠 관리</b><button class="x" data-close>✕</button></div>
+  <div class="sheet-b">
+    <div class="hint" id="keyManageInfo"></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
+      <button class="btn ghost sm" id="keyChange">새 열쇠로 바꾸기</button>
+      <button class="btn ghost sm" id="keyForget">이 기기에서 열쇠 지우기</button>
+    </div>
+  </div>
+</div></div>
 
 <div class="lockmask" id="lockScreen">
   <div class="lockbox" id="lockBox">
@@ -1701,106 +1764,501 @@ function addTxn(t, opts) {
   return item;
 }
 
-/* ==== 20-sync.js ==== */
+/* ==== 15-auth.js ==== */
 /* ============================================================
-   sync: Firebase RTDB 실시간 + localStorage 백업
+   auth: 구글 로그인으로 DB 잠금 + 암호 열쇠 관리
+   - 로그인 전에는 Firebase DB에 아무것도 읽고 쓰지 않는다.
+   - 허용된 구글 계정만 통과 (DB 규칙에서도 같은 이메일만 통과).
    ============================================================ */
-let fbApp = null, db = null, stateRef = null, inboxRef = null;
-let syncKind = "connecting";
-let remoteReady = [];
+const ALLOWED_EMAILS = ["choihyun0322@gmail.com"];
 
-function setSync(kind, text) {
-  syncKind = kind;
-  const dot = $("#syncDot"), dot2 = $("#syncDot2"), txt = $("#syncTxt"), foot = $("#footSync");
-  const cls = kind === "on" ? "on" : kind === "local" ? "off" : kind === "err" ? "err" : "";
-  if (dot) dot.className = "sdot " + cls;
-  if (dot2) dot2.className = "sdot " + cls;
-  if (txt) txt.textContent = text || (kind === "on" ? "실시간 동기화" : kind === "local" ? "이 기기에만" : "연결 중");
-  if (foot) foot.textContent = kind === "on" ? "실시간 동기화 중" : kind === "local" ? "이 기기에 저장 중" : "동기화 확인 중";
-  const info = $("#setSyncInfo");
-  if (info) {
-    info.innerHTML = "상태: <b>" + esc(text || kind) + "</b> · 방 <b>" + esc(Room) + "</b><br>" +
-      "마지막 저장 " + (state.updatedAt ? new Date(state.updatedAt).toLocaleString("ko-KR") : "없음");
-  }
+let authUser = null;
+let authState = "init";   /* init | off(no sdk) | noncrypto | out | in | denied */
+let authBusy = false;
+let pendingRemote = null; /* 열쇠가 없어 못 연 서버 봉투 */
+
+function emailAllowed(email) {
+  return ALLOWED_EMAILS.indexOf(String(email || "").toLowerCase()) >= 0;
 }
+function signedIn() { return authState === "in" && !!authUser; }
 
-const doPush = function () {
-  if (!stateRef) return;
-  try {
-    const payload = JSON.parse(JSON.stringify(state));
-    payload.updatedAt = state.updatedAt || Date.now();
-    lastPushedAt = payload.updatedAt;
-    stateRef.set(payload, err => {
-      if (err) {
-        setSync("err", "동기화 실패");
-        console.warn("push failed", err);
-      } else {
-        setSync("on", "실시간 동기화");
-      }
-    });
-  } catch (e) {
-    console.warn("push error", e);
+/* ---------- 시작 ---------- */
+function initAuth() {
+  renderAuthUi();
+  if (!window.firebase || !firebase.auth) {
+    authState = "off";
+    setSync("local", "이 기기에만 저장");
+    renderAuthUi();
+    return;
   }
-};
-const queuePush = debounce(function () { doPush(); }, 600);
-
-function adoptRemote(remote) {
-  applyingRemote = true;
-  const keepKt = state.ktChecks;
-  stateMigrated = false;
-  state = normalizeState(remote);
-  if (remote && remote.ktChecks) state.ktChecks = remote.ktChecks; else state.ktChecks = keepKt || {};
-  saveLocal();
-  applyingRemote = false;
-  if (stateMigrated) { state.updatedAt = Date.now(); saveLocal(); doPush(); }
-  if (typeof renderAll === "function") renderAll();
-}
-
-function initSync() {
-  setSync("connecting", "연결 중");
-  if (!window.firebase || !firebase.database) {
-    setSync("local", "이 기기에만");
+  if (!cryptoSupported()) {
+    authState = "noncrypto";
+    setSync("local", "암호화 불가 · 이 기기에만");
+    renderAuthUi();
     return;
   }
   try {
     if (!firebase.apps || !firebase.apps.length) fbApp = firebase.initializeApp(FIREBASE_CONFIG);
     else fbApp = firebase.app();
+  } catch (e) {
+    console.warn("firebase init failed", e);
+    authState = "off";
+    setSync("local", "이 기기에만 저장");
+    renderAuthUi();
+    return;
+  }
+  firebase.auth().onAuthStateChanged(async user => {
+    if (user && emailAllowed(user.email)) {
+      authUser = user;
+      authState = "in";
+      renderAuthUi();
+      setSync("connecting", "로그인됨 · 연결 중");
+      await restoreKeyLocal();
+      if (!signedIn()) return;
+      startDb();                 /* 20-sync.js */
+      if (!keyReady()) { setSync("locked", "암호 열쇠 필요"); }
+      renderAuthUi();
+    } else if (user) {
+      authUser = null;
+      authState = "denied";
+      try { await firebase.auth().signOut(); } catch (e) {}
+      teardownDb();
+      setSync("local", "허용되지 않은 계정");
+      toast("이 계정은 허용되지 않았어요 — 최현 님 구글 계정으로 로그인해 주세요");
+      renderAuthUi();
+    } else {
+      authUser = null;
+      authState = "out";
+      teardownDb();
+      setSync("local", "로그인 전 · 이 기기에만");
+      renderAuthUi();
+    }
+  });
+}
+
+/* ---------- 로그인 / 로그아웃 ---------- */
+async function loginGoogle() {
+  if (authBusy) return;
+  if (!window.firebase || !firebase.auth) { toast("지금은 로그인을 쓸 수 없어요"); return; }
+  authBusy = true;
+  renderAuthUi();
+  try {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
+    await firebase.auth().signInWithPopup(provider);
+  } catch (e) {
+    const code = String((e && e.code) || "");
+    if (/popup|blocked|cancell|operation-not-supported|unauthorized-domain|web-storage/i.test(code)) {
+      try { await firebase.auth().signInWithRedirect(new firebase.auth.GoogleAuthProvider()); return; }
+      catch (e2) { console.warn("redirect failed", e2); }
+    }
+    toast("로그인이 안 됐어요" + (e && e.code ? " (" + e.code + ")" : ""));
+    console.warn("login failed", e);
+  } finally {
+    authBusy = false;
+    renderAuthUi();
+  }
+}
+async function logoutGoogle() {
+  if (!window.firebase || !firebase.auth) return;
+  if (authState === "noncrypto" || authState === "off") return;
+  if (!confirm("구글 로그인을 풀까요?\n\n로그인을 풀면 이 기기에는 계속 저장되지만 서버 동기화는 멈춥니다. 암호 열쇠는 이 기기에 남습니다.")) return;
+  await firebase.auth().signOut();
+  toast("로그인을 풀었어요 — 이 기기에만 저장합니다");
+}
+
+/* ---------- 암호 열쇠 만들기 / 풀기 ---------- */
+let keySetupMode = "new";
+function openKeySetup(msg, mode) {
+  if (!cryptoSupported()) { toast("이 주소에서는 암호화를 쓸 수 없어요 — https 주소로 열어 주세요"); return; }
+  keySetupMode = mode === "change" ? "change" : "new";
+  const m = $("#keyMsg");
+  if (m) m.innerHTML = msg || "서버에 올라가는 가계부 내용을 이 열쇠로 암호화해요. <b>8자 이상</b>으로 정해 주세요 (길수록 좋아요).";
+  const a = $("#keyNew"), b = $("#keyNew2");
+  if (a) a.value = "";
+  if (b) b.value = "";
+  openModal("mKey");
+  setTimeout(() => { const el = $("#keyNew"); if (el) el.focus(); }, 150);
+}
+async function saveKeySetup() {
+  const a = ($("#keyNew") && $("#keyNew").value) || "";
+  const b = ($("#keyNew2") && $("#keyNew2").value) || "";
+  if (String(a).length < 8) { toast("열쇠는 8자 이상으로 정해 주세요"); return; }
+  if (a !== b) { toast("두 번 넣은 열쇠가 달라요"); return; }
+  if (!cryptoSupported()) { toast("이 주소에서는 암호화를 쓸 수 없어요 — https 주소로 열어 주세요"); return; }
+  const remember = !$("#keyRemember") || $("#keyRemember").checked;
+  const oldKey = cryptoKey, oldParams = cryptoParams;
+  try {
+    await setupKey(a, remember);
+  } catch (e) {
+    console.warn("key setup failed", e);
+    toast("열쇠를 만들지 못했어요");
+    return;
+  }
+  const changing = keySetupMode === "change";
+  keySetupMode = "new";
+  if ($("#keyNew")) $("#keyNew").value = "";
+  if ($("#keyNew2")) $("#keyNew2").value = "";
+  closeModal("mKey");
+  if (changing && stateRef) {
+    try {
+      await pushState();
+      await verifySealed();
+    } catch (e) {
+      cryptoKey = oldKey;
+      cryptoParams = oldParams;
+      toast("새 열쇠로 올리지 못해 예전 열쇠로 되돌렸어요");
+      renderAuthUi();
+      return;
+    }
+    renderAuthUi();
+    toast("🔑 새 열쇠로 다시 암호화했어요");
+    return;
+  }
+  renderAuthUi();
+  toast("🔐 암호 열쇠를 만들었어요 — 서버에는 암호문만 저장됩니다");
+  await afterKeyReady();
+}
+function openUnlock(msg) {
+  const m = $("#unlockMsg");
+  if (m) m.textContent = msg || "이 방의 장부는 암호로 잠겨 있어요. 열쇠를 넣어 주세요.";
+  const p = $("#unlockPass");
+  if (p) p.value = "";
+  const hint = $("#unlockHint");
+  if (hint) hint.textContent = pendingRemote && pendingRemote.updatedAt
+    ? "서버 봉투 " + new Date(pendingRemote.updatedAt).toLocaleString("ko-KR") + " · 열쇠는 서버로 보내지 않아요"
+    : "열쇠는 서버로 보내지 않아요";
+  openModal("mUnlock");
+  setTimeout(() => { const el = $("#unlockPass"); if (el) el.focus(); }, 150);
+}
+async function doUnlock() {
+  const pass = ($("#unlockPass") && $("#unlockPass").value) || "";
+  if (!pass) { toast("열쇠를 넣어 주세요"); return; }
+  const env = isEnvelope(pendingRemote) ? pendingRemote : null;
+  const saved = loadKeyLocal();
+  const salt = (env && env.salt) || (saved && saved.salt);
+  const iter = (env && env.iter) || (saved && saved.iter);
+  if (!salt) { toast("열쇠 정보를 찾지 못했어요 — 새 열쇠를 만들어 주세요"); return; }
+  try {
+    await unlockKey(pass, salt, iter);
+    if (env) await openEnvelope(env, cryptoKey);   /* 틀린 열쇠면 여기서 실패 */
+  } catch (e) {
+    cryptoKey = null;
+    cryptoParams = null;
+    const err = $("#unlockErr");
+    if (err) err.textContent = "열쇠가 맞지 않아요 — 다시 넣어 주세요";
+    toast("열쇠가 맞지 않아요");
+    return;
+  }
+  const remember = !$("#unlockRemember") || $("#unlockRemember").checked;
+  if (remember && cryptoKey) {
+    try { saveKeyLocal(bytesToB64(await crypto.subtle.exportKey("raw", cryptoKey)), cryptoParams); } catch (e) {}
+  }
+  if ($("#unlockPass")) $("#unlockPass").value = "";
+  const err = $("#unlockErr");
+  if (err) err.textContent = "";
+  closeModal("mUnlock");
+  renderAuthUi();
+  toast("🔓 열쇠를 풀었어요");
+  await afterKeyReady();
+}
+async function openKeyManager() {
+  const box = $("#keyManageInfo");
+  if (box) {
+    box.innerHTML =
+      "계정: <b>" + esc(signedIn() ? authUser.email : "로그인 안 됨") + "</b><br>" +
+      "암호 열쇠: <b>" + (keyReady() ? "이 기기에서 열려 있음" : "잠김 / 없음") + "</b><br>" +
+      "서버 저장: <b>" + (keyReady() && syncKind === "on" ? "암호문으로 동기화 중" : "동기화 안 됨") + "</b>";
+  }
+  openModal("mKeyManage");
+}
+
+/* ---------- 화면 ---------- */
+function renderAuthUi() {
+  const bar = $("#authBar");
+  const signed = signedIn();
+  let show = false, text = "", label = "", act = "";
+  if (authState === "off") {
+    show = true;
+    text = "서버 동기화를 쓸 수 없는 환경이에요 — 이 기기에만 저장합니다";
+  } else if (authState === "noncrypto") {
+    show = true;
+    text = "https 주소로 열어야 암호화 동기화를 켤 수 있어요 — 지금은 이 기기에만 저장합니다";
+  } else if (authState === "denied") {
+    show = true;
+    text = "허용되지 않은 구글 계정이에요 — 최현 님 계정으로 로그인해 주세요";
+    label = "다시 로그인";
+    act = "login";
+  } else if (authState === "out") {
+    show = true;
+    text = "🔐 구글 로그인하면 암호화된 장부가 서버에 백업돼요 (지금은 이 기기에만)";
+    label = authBusy ? "로그인 중…" : "구글 로그인";
+    act = "login";
+  } else if (signed && !keyReady()) {
+    show = true;
+    text = pendingRemote
+      ? "🔑 서버에 암호로 잠긴 장부가 있어요 — 열쇠를 넣어 주세요"
+      : "🔑 암호 열쇠를 만들면 서버에 암호문으로 저장돼요";
+    label = pendingRemote ? "열쇠 넣기" : "열쇠 만들기";
+    act = pendingRemote ? "unlock" : "newkey";
+  }
+  if (bar) {
+    bar.classList.toggle("off", !show);
+    const t = $("#authBarText");
+    if (t) t.textContent = text;
+    const b = $("#btnAuthLogin");
+    if (b) {
+      b.textContent = label || "";
+      b.style.display = label ? "" : "none";
+      b.disabled = authBusy;
+      b.setAttribute("data-act", act);
+    }
+  }
+  const chip = $("#btnAuth");
+  if (chip) {
+    chip.innerHTML = signed
+      ? '<span class="aic">✅</span><span class="atx">' + esc(String(authUser.email).split("@")[0]) + "</span>"
+      : '<span class="aic">🔒</span><span class="atx">로그인</span>';
+    chip.title = signed ? String(authUser.email) + " 로 로그인됨" : "구글 로그인으로 서버 동기화";
+  }
+  const info = $("#setAuthInfo");
+  if (info) {
+    const lines = [];
+    lines.push("계정: <b>" + esc(signed ? authUser.email : (authState === "out" ? "로그인 안 됨" : "사용 안 함")) + "</b>");
+    lines.push("암호 열쇠: <b>" + (keyReady() ? "이 기기에서 열려 있음" : "없음/잠김") + "</b>");
+    lines.push("서버 저장: <b>" + (keyReady() && syncKind === "on" ? "AES-GCM 암호문" : "안 함") + "</b>");
+    info.innerHTML = lines.join("<br>");
+  }
+  const tb = $("#btnAuthToggle");
+  if (tb) tb.textContent = signed ? "로그아웃" : "구글 로그인";
+  const kb = $("#btnKeyManage");
+  if (kb) kb.textContent = keyReady() ? "열쇠 관리" : "새 열쇠 만들기";
+}
+
+function bindAuth() {
+  const login = $("#btnAuthLogin");
+  if (login) login.addEventListener("click", () => {
+    const act = login.getAttribute("data-act");
+    if (act === "newkey") openKeySetup();
+    else if (act === "unlock") openUnlock();
+    else loginGoogle();
+  });
+  const chip = $("#btnAuth");
+  if (chip) chip.addEventListener("click", () => { if (!signedIn()) loginGoogle(); else openSettings(); });
+  const tg = $("#btnAuthToggle");
+  if (tg) tg.addEventListener("click", () => { if (signedIn()) logoutGoogle(); else loginGoogle(); });
+  const km = $("#btnKeyManage");
+  if (km) km.addEventListener("click", () => { if (keyReady()) openKeyManager(); else openKeySetup(); });
+  const ks = $("#keySave");
+  if (ks) ks.addEventListener("click", saveKeySetup);
+  const ug = $("#unlockGo");
+  if (ug) ug.addEventListener("click", doUnlock);
+  const up = $("#unlockPass");
+  if (up) up.addEventListener("keydown", ev => { if (ev.key === "Enter") { ev.preventDefault(); doUnlock(); } });
+  const k2 = $("#keyNew2");
+  if (k2) k2.addEventListener("keydown", ev => { if (ev.key === "Enter") { ev.preventDefault(); saveKeySetup(); } });
+  const forget = $("#keyForget");
+  if (forget) forget.addEventListener("click", async () => {
+    if (!confirm("이 기기에서 암호 열쇠를 지울까요?\n\n서버의 암호문은 그대로 남고, 다시 열려면 열쇠를 새로 넣어야 합니다.")) return;
+    await forgetKey();
+    renderAuthUi();
+    toast("이 기기에서 열쇠를 지웠어요");
+  });
+  const chg = $("#keyChange");
+  if (chg) chg.addEventListener("click", () => {
+    if (!keyReady()) { openKeySetup(); return; }
+    closeModal("mKeyManage");
+    openKeySetup("새 열쇠를 정해 주세요. 지금 서버 장부를 새 열쇠로 다시 암호화해 올립니다.", "change");
+  });
+}
+
+/* ==== 16-crypto.js ==== */
+/* ============================================================
+   E2E 암호화 — PBKDF2(SHA-256, 210k) + AES-GCM 256
+   장부는 브라우저 안에서 봉인한 뒤에만 서버로 올라간다.
+   서버(Firebase)에는 {enc, salt, iv, ct} 봉투만 남고 내용은 안 보인다.
+   ============================================================ */
+const CRYPTO_ITER = 210000;
+const LS_KEY = "wallet-key-v2:";
+let cryptoKey = null;                       /* CryptoKey (AES-GCM) */
+let cryptoParams = null;                    /* {salt, iter} */
+
+function cryptoSupported() {
+  try {
+    return !!(window.crypto && window.crypto.subtle && window.crypto.subtle.deriveKey && window.crypto.subtle.encrypt);
+  } catch (e) { return false; }
+}
+function bytesToB64(buf) {
+  const u = new Uint8Array(buf);
+  let s = "";
+  for (let i = 0; i < u.length; i++) s += String.fromCharCode(u[i]);
+  return btoa(s);
+}
+function b64ToBytes(str) {
+  const bin = atob(String(str || ""));
+  const u = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+  return u;
+}
+function randB64(n) {
+  const a = new Uint8Array(n);
+  if (window.crypto && crypto.getRandomValues) crypto.getRandomValues(a);
+  else for (let i = 0; i < n; i++) a[i] = Math.floor(Math.random() * 256);
+  return bytesToB64(a);
+}
+async function deriveKey(pass, saltB64, iter) {
+  const base = await crypto.subtle.importKey(
+    "raw", new TextEncoder().encode(String(pass)), "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey(
+    { name: "PBKDF2", salt: b64ToBytes(saltB64), iterations: num(iter) || CRYPTO_ITER, hash: "SHA-256" },
+    base, { name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]);
+}
+/* 장부 상태 → 봉투 */
+async function sealState(s) {
+  if (!cryptoKey || !cryptoParams) throw new Error("no-key");
+  const iv = randB64(12);
+  const ct = await crypto.subtle.encrypt(
+    { name: "AES-GCM", iv: b64ToBytes(iv) }, cryptoKey,
+    new TextEncoder().encode(JSON.stringify(s)));
+  return {
+    v: 1,
+    enc: "AES-GCM",
+    kdf: "PBKDF2-SHA256",
+    iter: cryptoParams.iter,
+    salt: cryptoParams.salt,
+    iv: iv,
+    ct: bytesToB64(ct),
+    updatedAt: num(s.updatedAt) || Date.now(),
+    sealedAt: Date.now()
+  };
+}
+async function openEnvelope(env, key, params) {
+  const k = key || cryptoKey;
+  if (!k) throw new Error("no-key");
+  const plain = await crypto.subtle.decrypt(
+    { name: "AES-GCM", iv: b64ToBytes(env.iv) }, k, b64ToBytes(env.ct));
+  const obj = JSON.parse(new TextDecoder().decode(plain));
+  return obj;
+}
+function isEnvelope(v) {
+  return !!(v && typeof v === "object" && v.enc === "AES-GCM" && v.ct && v.iv && v.salt);
+}
+
+/* ---------- 이 기기에 열쇠 기억 ---------- */
+function saveKeyLocal(rawB64, params) {
+  try {
+    localStorage.setItem(LS_KEY + Room, JSON.stringify({
+      k: rawB64, salt: params.salt, iter: params.iter, at: Date.now()
+    }));
+  } catch (e) {}
+}
+function loadKeyLocal() {
+  try {
+    const raw = localStorage.getItem(LS_KEY + Room);
+    if (!raw) return null;
+    const o = JSON.parse(raw);
+    if (!o || !o.k || !o.salt) return null;
+    return { k: String(o.k), salt: String(o.salt), iter: num(o.iter) || CRYPTO_ITER };
+  } catch (e) { return null; }
+}
+function dropKeyLocal() {
+  try { localStorage.removeItem(LS_KEY + Room); } catch (e) {}
+}
+async function importRawKey(rawB64) {
+  return crypto.subtle.importKey("raw", b64ToBytes(rawB64), { name: "AES-GCM" }, true, ["encrypt", "decrypt"]);
+}
+async function restoreKeyLocal() {
+  if (!cryptoSupported()) return false;
+  const saved = loadKeyLocal();
+  if (!saved) return false;
+  try {
+    cryptoKey = await importRawKey(saved.k);
+    cryptoParams = { salt: saved.salt, iter: saved.iter };
+    return true;
+  } catch (e) { console.warn("key restore failed", e); return false; }
+}
+/* 새 열쇠 만들기 */
+async function setupKey(pass, remember) {
+  if (!cryptoSupported()) throw new Error("no-crypto");
+  const salt = randB64(16), iter = CRYPTO_ITER;
+  const key = await deriveKey(pass, salt, iter);
+  const raw = await crypto.subtle.exportKey("raw", key);
+  cryptoKey = key;
+  cryptoParams = { salt: salt, iter: iter };
+  if (remember !== false) saveKeyLocal(bytesToB64(raw), cryptoParams);
+  return true;
+}
+/* 저장된/서버의 salt로 열쇠 풀기 */
+async function unlockKey(pass, salt, iter) {
+  const key = await deriveKey(pass, salt, iter || CRYPTO_ITER);
+  cryptoKey = key;
+  cryptoParams = { salt: salt, iter: num(iter) || CRYPTO_ITER };
+  return key;
+}
+async function forgetKey() {
+  cryptoKey = null;
+  cryptoParams = null;
+  dropKeyLocal();
+}
+function keyReady() { return !!(cryptoKey && cryptoParams); }
+
+/* ==== 20-sync.js ==== */
+/* ============================================================
+   sync: Firebase RTDB (구글 로그인 + AES-GCM 봉투) + localStorage 백업
+   - 로그인 전에는 DB를 열지 않는다 (stateRef 없음 → 아무 요청도 안 나감)
+   - 암호 열쇠가 없으면 올리지 않는다 (평문 유출 방지)
+   ============================================================ */
+let fbApp = null, db = null, stateRef = null, inboxRef = null;
+let syncKind = "connecting";
+let dbStarted = false;
+let handling = Promise.resolve();
+let remotePlainSeen = false;
+
+function setSync(kind, text) {
+  syncKind = kind;
+  const dot = $("#syncDot"), dot2 = $("#syncDot2"), txt = $("#syncTxt"), foot = $("#footSync");
+  const cls = kind === "on" ? "on" : kind === "err" ? "err" : kind === "locked" ? "err" : "off";
+  if (dot) dot.className = "sdot " + cls;
+  if (dot2) dot2.className = "sdot " + cls;
+  const def = kind === "on" ? "실시간 동기화"
+    : kind === "local" ? "이 기기에만"
+    : kind === "locked" ? "암호 열쇠 필요"
+    : kind === "err" ? "동기화 오류" : "연결 중";
+  if (txt) txt.textContent = text || def;
+  if (foot) foot.textContent = kind === "on" ? "서버에 암호문으로 동기화 중" : kind === "local" ? "이 기기에 저장 중" : (text || def);
+  const info = $("#setSyncInfo");
+  if (info) {
+    info.innerHTML = "상태: <b>" + esc(text || def) + "</b> · 방 <b>" + esc(Room) + "</b><br>" +
+      "서버 저장: <b>" + (syncKind === "on" ? "AES-GCM 암호문" : "안 함") + "</b><br>" +
+      "마지막 저장 " + (state.updatedAt ? new Date(state.updatedAt).toLocaleString("ko-KR") : "없음");
+  }
+}
+
+/* ---------- DB 열기 / 닫기 ---------- */
+function startDb() {
+  if (dbStarted || !authUser) return;
+  try {
     db = firebase.database();
     stateRef = db.ref("rooms/" + Room + "/state");
     inboxRef = db.ref("rooms/" + Room + "/inbox");
   } catch (e) {
-    console.warn("firebase init failed", e);
-    setSync("local", "이 기기에만");
+    console.warn("db init failed", e);
+    setSync("err", "DB 연결 실패");
     return;
   }
+  dbStarted = true;
 
   db.ref(".info/connected").on("value", snap => {
     if (snap.val() === true) {
-      if (syncKind !== "on") setSync("on", "실시간 동기화");
+      setSync(keyReady() ? "on" : "locked", keyReady() ? "실시간 동기화 · 암호문" : "암호 열쇠 필요");
     } else {
       setSync("local", "오프라인 저장 중");
     }
   });
 
-  let first = true;
-  stateRef.on("value", snap => {
-    const remote = snap.val();
-    if (first) {
-      first = false;
-      if (!remote || !remote.updatedAt) {
-        touch(); doPush();
-      } else if ((remote.updatedAt || 0) > (state.updatedAt || 0) + 500) {
-        adoptRemote(remote);
-      } else if ((remote.updatedAt || 0) < (state.updatedAt || 0) - 500) {
-        doPush();
-      } else {
-        adoptRemote(remote);
-      }
-      return;
-    }
-    if (!remote) { doPush(); return; }
-    if (Math.abs((remote.updatedAt || 0) - lastPushedAt) < 20) return; // 내가 방금 올린 것
-    if ((remote.updatedAt || 0) > (state.updatedAt || 0) + 400) adoptRemote(remote);
+  stateRef.on("value", snap => handleRemoteRaw(snap.val()), err => {
+    console.warn("read denied", err);
+    setSync("err", "서버 접근 거부 — 로그인/권한 확인");
   });
 
   inboxRef.on("child_added", snap => {
@@ -1812,13 +2270,162 @@ function initSync() {
       renderAll();
       toast("📱 결제 " + n + "건을 자동으로 기록했어요");
     }
-  });
+  }, () => {});
 
-  // 앱을 다시 열 때 남아 있는 inbox 비우기 (이벤트를 놓친 경우)
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") drainInbox();
   });
   setTimeout(drainInbox, 1200);
+}
+
+function teardownDb() {
+  try { if (stateRef) stateRef.off(); } catch (e) {}
+  try { if (inboxRef) inboxRef.off(); } catch (e) {}
+  stateRef = null;
+  inboxRef = null;
+  dbStarted = false;
+}
+
+/* ---------- 서버 값 처리 (직렬화) ---------- */
+function handleRemoteRaw(raw) {
+  handling = handling.then(() => processRemote(raw)).catch(e => console.warn("remote handle failed", e));
+}
+
+async function processRemote(raw) {
+  if (!raw) {
+    if (keyReady()) queuePush();
+    return;
+  }
+  if (raw.updatedAt && lastPushedAt && Math.abs(num(raw.updatedAt) - lastPushedAt) < 20) return; /* 내가 방금 올린 것 */
+
+  let data = null, plain = false;
+  if (isEnvelope(raw)) {
+    if (!cryptoKey) {
+      pendingRemote = raw;
+      setSync("locked", "암호 열쇠 필요");
+      renderAuthUi();
+      openUnlock("이 방의 장부는 암호로 잠겨 있어요. 열쇠를 넣어 주세요.");
+      return;
+    }
+    try {
+      data = await openEnvelope(raw, cryptoKey, cryptoParams);
+    } catch (e) {
+      pendingRemote = raw;
+      cryptoKey = null; cryptoParams = null;
+      setSync("locked", "열쇠가 맞지 않음");
+      renderAuthUi();
+      openUnlock("열쇠가 맞지 않아요 — 다시 넣어 주세요.");
+      return;
+    }
+  } else if (raw && (raw.txns || raw.cards || raw.updatedAt)) {
+    data = raw;
+    plain = true;
+    remotePlainSeen = true;
+  } else {
+    return;
+  }
+  pendingRemote = null;
+  const remoteAt = num(data.updatedAt);
+  if (remoteAt > num(state.updatedAt) + 400) {
+    adoptRemote(data);
+  } else if (remoteAt < num(state.updatedAt) - 400) {
+    if (keyReady()) queuePush(); else setSync("locked", "암호 열쇠 필요 (올릴 준비됨)");
+  } else if (plain && keyReady()) {
+    queuePush();   /* 같은 내용인데 서버가 평문 → 암호문으로 덮어쓰기(마이그레이션) */
+  }
+  renderAuthUi();
+}
+
+function adoptRemote(remote) {
+  applyingRemote = true;
+  const keepKt = state.ktChecks;
+  stateMigrated = false;
+  state = normalizeState(remote);
+  if (remote && remote.ktChecks) state.ktChecks = remote.ktChecks; else state.ktChecks = keepKt || {};
+  saveLocal();
+  applyingRemote = false;
+  if (typeof renderAll === "function") renderAll();
+}
+
+/* ---------- 올리기 (항상 봉투) ---------- */
+function pushState() {
+  return new Promise((resolve, reject) => {
+    if (!stateRef) return reject(new Error("no-db"));
+    if (!cryptoKey) return reject(new Error("no-key"));
+    (async () => {
+      const payload = JSON.parse(JSON.stringify(state));
+      payload.updatedAt = state.updatedAt || Date.now();
+      const env = await sealState(payload);
+      lastPushedAt = payload.updatedAt;
+      await stateRef.set(env);
+      setSync("on", "실시간 동기화 · 암호문");
+      resolve(env);
+    })().catch(e => {
+      console.warn("push failed", e);
+      setSync("err", "동기화 실패");
+      reject(e);
+    });
+  });
+}
+const doPush = function () {
+  if (!stateRef) return;
+  if (!cryptoKey) { setSync("locked", "암호 열쇠 필요"); return; }
+  pushState().catch(() => {});
+};
+const queuePush = debounce(function () { doPush(); }, 600);
+
+async function verifySealed() {
+  if (!stateRef) return false;
+  try {
+    const snap = await stateRef.once("value");
+    const ok = isEnvelope(snap.val());
+    if (ok) setSync("on", "실시간 동기화 · 서버엔 암호문");
+    return ok;
+  } catch (e) { return false; }
+}
+
+/* 열쇠가 준비된 직후: 서버 평문 → 암호문 마이그레이션 */
+async function afterKeyReady() {
+  renderAuthUi();
+  if (!stateRef) { setSync("local", "로그인하면 암호화 동기화"); return; }
+  setSync("connecting", "암호화 확인 중");
+  try {
+    const snap = await stateRef.once("value");
+    const raw = snap.val();
+    if (raw && !isEnvelope(raw)) {
+      const data = normalizeState(raw);
+      if (num(data.updatedAt) >= num(state.updatedAt) - 400) adoptRemote(data);
+      await pushState();
+      const ok = await verifySealed();
+      if (ok) toast("🔐 서버의 평문 장부를 암호문으로 바꿨어요");
+      else toast("암호화 저장을 확인하지 못했어요 — [지금 올리기]를 눌러 주세요");
+    } else if (raw) {
+      handleRemoteRaw(raw);
+    } else {
+      await pushState();
+      await verifySealed();
+    }
+  } catch (e) {
+    console.warn("afterKeyReady failed", e);
+    setSync("err", "암호화 동기화 실패");
+    toast("서버에 암호문을 올리지 못했어요 — [지금 올리기]를 다시 눌러 주세요");
+  }
+  renderAuthUi();
+}
+
+/* ---------- 수동 ---------- */
+function pullNow() {
+  if (!stateRef) { toast("로그인하면 서버 장부를 받을 수 있어요"); return; }
+  stateRef.once("value").then(snap => {
+    if (!snap.val()) { toast("서버에 저장된 장부가 없어요 — 지금 올릴게요"); doPush(); return; }
+    handleRemoteRaw(snap.val());
+    toast("서버 기록으로 맞췄어요");
+  }).catch(e => { toast("받기 실패: " + (e && e.message ? e.message : "권한 없음")); });
+}
+function pushNow() {
+  if (!stateRef) { toast("로그인하면 서버로 올릴 수 있어요"); return; }
+  if (!cryptoKey) { toast("암호 열쇠를 먼저 만들어 주세요"); renderAuthUi(); return; }
+  pushState().then(() => toast("암호문으로 서버에 올렸어요")).catch(() => toast("올리기 실패 — 잠시 뒤 다시"));
 }
 
 function drainInbox() {
@@ -1835,16 +2442,6 @@ function drainInbox() {
   }).catch(() => {});
 }
 
-function pullNow() {
-  if (!stateRef) { toast("동기화가 꺼져 있어요 (이 기기에만 저장)"); return; }
-  stateRef.once("value").then(snap => {
-    const remote = snap.val();
-    if (!remote) { toast("서버에 저장된 장부가 없어요 — 지금 올릴게요"); doPush(); return; }
-    adoptRemote(remote);
-    toast("서버 기록으로 맞췄어요");
-  }).catch(e => { toast("받기 실패: " + e.message); });
-}
-
 function inboxUrl() {
   return FIREBASE_CONFIG.databaseURL + "/rooms/" + encodeURIComponent(Room) + "/inbox.json";
 }
@@ -1853,6 +2450,12 @@ function shareUrl() {
   u.search = "?room=" + encodeURIComponent(Room);
   u.hash = "";
   return u.toString();
+}
+
+/* 테스트/디버그용 */
+function rawRemote() {
+  if (!stateRef) return Promise.resolve(null);
+  return stateRef.once("value").then(s => s.val());
 }
 
 /* ==== 30-render.js ==== */
@@ -1902,8 +2505,9 @@ function renderAll() {
   renderFoot();
   syncMonthNav();
   setTab(uiTab, true);
-  setSync(syncKind === "on" ? "on" : syncKind === "local" ? "local" : "connecting");
+  setSync(syncKind);
   if (typeof applyLockState === "function") applyLockState();
+  if (typeof renderAuthUi === "function") renderAuthUi();
 }
 
 function syncMonthNav() {
@@ -2986,6 +3590,7 @@ function openSettings() {
   $("#setRoom").value = Room;
   $("#setShare").textContent = shareUrl();
   setSync(syncKind === "on" ? "on" : syncKind === "local" ? "local" : "connecting");
+  if (typeof renderAuthUi === "function") renderAuthUi();
   renderSettingsPin();
   openModal("mSettings");
 }
@@ -2997,7 +3602,7 @@ function bindSettings() {
     location.href = location.pathname + "?room=" + encodeURIComponent(v);
   });
   $("#btnCopyShare").addEventListener("click", () => copyText(shareUrl(), "공유 링크를 복사했어요"));
-  $("#btnPushNow").addEventListener("click", () => { touch(); doPush(); toast("서버에 올렸어요"); });
+  $("#btnPushNow").addEventListener("click", pushNow);
   $("#btnPullNow").addEventListener("click", pullNow);
   $("#btnExport").addEventListener("click", () => {
     downloadBlob("wallet-" + new Date().toISOString().slice(0, 10) + ".json", JSON.stringify(state, null, 2));
@@ -3239,6 +3844,12 @@ function togglePin(on) {
 /* ---------- 단축어 ---------- */
 function openShortcut() {
   $("#scUrl").textContent = inboxUrl();
+  const note = $("#scNote");
+  if (note) {
+    note.innerHTML = signedIn()
+      ? "🔐 서버는 <b>로그인한 최현 님 계정만</b> 받도록 잠겨 있어요. 아이폰 단축어는 로그인 정보 없이 보내므로 이 주소로는 <b>401로 거부</b>됩니다. 단축어 자동 기록을 쓰려면 <b>쓰기 전용 통로</b>를 따로 여는 방법이 있어요 — 열면 아무나 결제 한 줄을 넣을 수 있게 되니 원하실 때만 말씀해 주세요."
+      : "🔐 로그인 전에는 서버로 아무것도 보내지 않아요. 구글 로그인 + 암호 열쇠를 만들면 동기화가 켜집니다. (이 주소는 이제 로그인 없이 쓰면 401로 거부돼요)";
+  }
   openModal("mShortcut");
 }
 function bindShortcut() {
@@ -3248,14 +3859,11 @@ function bindShortcut() {
   $("#btnCopyScJson").addEventListener("click", () => copyText('{"raw":"[KB국민] 11/20 12,500원 스타벅스"}', "JSON 예시를 복사했어요"));
   $("#btnTestInbox").addEventListener("click", async () => {
     const btn = $("#btnTestInbox");
+    if (!signedIn() || !inboxRef) { toast("구글 로그인하면 테스트할 수 있어요"); return; }
     btn.disabled = true;
     btn.innerHTML = '<span class="loader"></span>보내는 중';
     try {
-      const r = await fetch(inboxUrl(), {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ raw: "[테스트] " + (new Date().getMonth() + 1) + "/" + new Date().getDate() + " 1,000원 편의점" })
-      });
-      if (!r.ok) throw new Error("HTTP " + r.status);
+      await inboxRef.push({ raw: "[테스트] " + (new Date().getMonth() + 1) + "/" + new Date().getDate() + " 1,000원 편의점" });
       toast("보냈어요 — 잠시 뒤 자동으로 기록됩니다");
       setTimeout(drainInbox, 900);
     } catch (e) {
@@ -3359,7 +3967,12 @@ function bindDelegates() {
   }
   const roomTag = $("#roomTag");
   if (roomTag) roomTag.addEventListener("click", () => copyText(shareUrl(), "공유 링크를 복사했어요"));
-  $("#btnSync").addEventListener("click", () => { doPush(); toast(syncKind === "on" ? "동기화 중이에요" : "이 기기에 저장 중이에요"); });
+  $("#btnSync").addEventListener("click", () => {
+    if (!signedIn()) { toast("구글 로그인하면 서버와 암호화 동기화돼요"); loginGoogle(); return; }
+    if (!keyReady()) { toast("암호 열쇠를 먼저 만들어 주세요"); openKeySetup(); return; }
+    doPush();
+    toast(syncKind === "on" ? "암호문으로 동기화 중이에요" : "이 기기에 저장 중이에요");
+  });
 }
 
 /* ==== 45-picks.js ==== */
@@ -4083,6 +4696,23 @@ function parseWorkbook(wb) {
   const existing = {};
   state.txns.forEach(t => { existing[t.date + "|" + t.amount + "|" + normKey(t.memo)] = 1; });
 
+  /* 금액이 ＋/− 둘 다 섞여 있는 표면 부호가 방향을 말해 준다 (타입 열이 '이체' 하나뿐인 표) */
+  let sawPlus = false, sawMinus = false;
+  for (let r0 = best.header + 1; r0 < rows.length; r0++) {
+    const row0 = rows[r0] || [];
+    const cells = [];
+    if (idx.amount != null) cells.push(row0[idx.amount]);
+    if (idx.amountIn != null) cells.push(row0[idx.amountIn]);
+    if (idx.amountOut != null) cells.push(row0[idx.amountOut]);
+    cells.forEach(c => {
+      const s = String(c == null ? "" : c).trim();
+      if (!/[\d]/.test(s)) return;
+      if (/^[-−]/.test(s)) sawMinus = true;
+      else if (num(s.replace(/[^\d.\-]/g, "")) > 0) sawPlus = true;
+    });
+  }
+  const mixedSign = sawPlus && sawMinus;
+
   const out = [];
   let excluded = 0, dup = 0, income = 0;
   for (let r = best.header + 1; r < rows.length; r++) {
@@ -4111,7 +4741,10 @@ function parseWorkbook(wb) {
     if (!date) { excluded++; continue; }
     const amount = Math.abs(plainAmount);
     if (!amount) continue;
-    const type = forcedIncome ? "income" : rowTypeOf(typeVal, rawAmount, memo, catVal);
+    const type = forcedIncome ? "income"
+      : (/수입|지출|입금|출금|결제|승인|충전|급여|이자|환불|캐시백/.test(String(typeVal || ""))
+        ? rowTypeOf(typeVal, rawAmount, memo, catVal)
+        : (mixedSign ? (plainAmount < 0 ? "expense" : "income") : rowTypeOf(typeVal, rawAmount, memo, catVal)));
     const key = date + "|" + amount + "|" + normKey(memo);
     const cat = type === "income" ? incomeCat(memo, catVal) : guessCategory(memo, catVal);
     const cardRaw = idx.card != null ? row[idx.card] : "";
@@ -4745,8 +5378,9 @@ function boot() {
   bindOcr();
   bindPicks();
   bindPickOcr();
+  bindAuth();
   renderAll();
-  initSync();
+  initAuth();          /* 로그인 확인 → 로그인 뒤에만 DB 연결 */
 
   window.addEventListener("load", () => {
     drawBarcodes();
@@ -4812,7 +5446,35 @@ function boot() {
     setTab: function (t) { setTab(t, true); },
     get tab() { return uiTab; },
     setMonth: function (m) { uiMonth = m; rememberMonth(); renderAll(); },
-    get month() { return uiMonth; }
+    get month() { return uiMonth; },
+
+    /* 보안 */
+    get authState() { return authState; },
+    get authEmail() { return authUser ? authUser.email : null; },
+    get keyReady() { return keyReady(); },
+    get syncKind() { return syncKind; },
+    login: loginGoogle,
+    logout: logoutGoogle,
+    setKey: function (pass, remember) { return setupKey(pass, remember !== false).then(() => afterKeyReady()); },
+    unlockWith: async function (pass) {
+      const env = isEnvelope(pendingRemote) ? pendingRemote : null;
+      const saved = loadKeyLocal() || {};
+      await unlockKey(pass, (env && env.salt) || saved.salt, (env && env.iter) || saved.iter);
+      if (env) await openEnvelope(env, cryptoKey);
+      saveKeyLocal(bytesToB64(await crypto.subtle.exportKey("raw", cryptoKey)), cryptoParams);
+      await afterKeyReady();
+      return true;
+    },
+    forgetKey: forgetKey,
+    cryptoSupported: cryptoSupported,
+    sealState: sealState,
+    openEnvelope: openEnvelope,
+    isEnvelope: isEnvelope,
+    pushState: pushState,
+    pullRemote: rawRemote,
+    afterKeyReady: afterKeyReady,
+    openKeySetup: openKeySetup,
+    openUnlock: openUnlock
   };
 }
 
