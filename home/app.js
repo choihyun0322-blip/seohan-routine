@@ -647,9 +647,22 @@ function allRecipes() {
 function isNum(it) { return !!(it && it.useCount); }
 function stockCount(it) { const c = Number(it && it.count); return Number.isFinite(c) ? Math.max(0, Math.round(c)) : 0; }
 function stockMax(it) { const m = Number(it && it.max); return Number.isFinite(m) && m > 0 ? Math.round(m) : 10; }
-function levelFromCount(c) { return c <= 0 ? 'none' : (c <= 5 ? 'low' : 'enough'); }
-function stockLevel(it) { if (!it) return 'enough'; return isNum(it) ? levelFromCount(stockCount(it)) : (it.level || 'enough'); }
-function countFromLevel(l) { return l === 'none' ? 0 : (l === 'low' ? 2 : 6); }
+/* 부족으로 볼 남은 개수 — 품목의 적정량(max)에 맞춰 정한다.
+   칫솔처럼 적정량이 작은 품목은 2개 이하일 때만 부족, 휴지·물티슈 같은 대용량은 max의 40%(최대 5개). */
+function lowThreshold(it) {
+  const m = stockMax(it);
+  if (it && /칫솔/.test(String(it.name))) return Math.min(2, m);      // 칫솔 2종: 3개 이상이면 충분
+  if (m <= 6) return Math.min(2, m);                                 // 적정량이 작은 품목도 2개 기준
+  return Math.max(2, Math.min(5, Math.floor(m * 0.4)));              // 대용량: max 10 → 4개, max 20 → 5개
+}
+function levelFromCount(c, it) {
+  const n = Number(c);
+  const cnt = Number.isFinite(n) ? Math.max(0, Math.round(n)) : 0;
+  if (cnt <= 0) return 'none';
+  return cnt <= lowThreshold(it) ? 'low' : 'enough';
+}
+function stockLevel(it) { if (!it) return 'enough'; return isNum(it) ? levelFromCount(stockCount(it), it) : (it.level || 'enough'); }
+function countFromLevel(l, it) { const v = l === 'none' ? 0 : (l === 'low' ? 2 : 6); return Math.min(v, Math.max(1, stockMax(it))); }
 
 /* ---------------- migration (이름 기반 자동 분류 · 칫솔 2종 · 수량 관리) ---------------- */
 function migrate(st) {
@@ -670,17 +683,17 @@ function migrate(st) {
     const nm = pair[0], n = pair[1];
     const hit = st.stock.find(x => norm(x.name) === norm(nm));
     if (!hit) {
-      st.stock.push({ id: uid('k'), emoji: '🪥', name: nm, level: levelFromCount(n), ord: 90 + st.stock.length, useCount: true, count: n, max: 5 });
+      st.stock.push({ id: uid('k'), emoji: '🪥', name: nm, level: levelFromCount(n, { name: nm, max: 5 }), ord: 90 + st.stock.length, useCount: true, count: n, max: 5 });
       ch = true;
     } else if (!isNum(hit)) {
-      hit.useCount = true; hit.count = n; hit.max = 5; hit.level = levelFromCount(n); ch = true;
+      hit.useCount = true; hit.count = n; hit.max = 5; hit.level = levelFromCount(n, hit); ch = true;
     }
   });
   // 3) 대량 소모품은 숫자 카운터로
   st.stock.forEach(s => {
     if (!isNum(s) && /(휴지|물티슈|키친타올|봉지|마스크|기저귀|칫솔)/.test(String(s.name))) {
       s.useCount = true; s.max = Math.max(1, Number(s.max) || 10);
-      s.count = countFromLevel(s.level || 'enough'); ch = true;
+      s.count = countFromLevel(s.level || 'enough', s); ch = true;
     }
   });
   // 4) 예전 기본 이모지(🧴)로 굳은 품목을 이름에 맞는 이모지로 교체
@@ -690,6 +703,12 @@ function migrate(st) {
       const g = guessEmoji(it.name);
       if (g !== '🧴') { it.emoji = g; ch = true; }
     }
+  });
+  // 5) 수량 품목의 부족 기준을 적정량(max)에 맞춰 다시 계산 (칫솔 3개 = 충분)
+  st.stock.forEach(s => {
+    if (!isNum(s)) return;
+    const lv = levelFromCount(stockCount(s), s);
+    if (s.level !== lv) { s.level = lv; ch = true; }
   });
   st.v = STATE_VERSION;
   return ch;
@@ -715,7 +734,7 @@ function normalize(st, skipMigrate) {
   st.stock.forEach(s => {
     if (!s.emoji) s.emoji = guessEmoji(s.name);
     if (!s.level) s.level = 'enough';
-    if (isNum(s) && !Number.isFinite(Number(s.count))) s.count = countFromLevel(s.level);
+    if (isNum(s) && !Number.isFinite(Number(s.count))) s.count = countFromLevel(s.level, s);
   });
   if (!skipMigrate && migrate(st)) migrated = true;
   if (st.day !== todayISO()) { st.day = todayISO(); st.checks = {}; }
@@ -932,7 +951,7 @@ function putPantryFromShopping(s, name) {
 function putBackStock(s, name) {
   const it = s.stock.find(x => norm(x.name) === norm(name));
   if (it) {
-    if (isNum(it)) { it.count = stockMax(it); it.level = levelFromCount(it.count); return { msg: it.name + ' ' + it.count + '개로 채웠어요' }; }
+    if (isNum(it)) { it.count = stockMax(it); it.level = levelFromCount(it.count, it); return { msg: it.name + ' ' + it.count + '개로 채웠어요' }; }
     it.level = 'enough';
     return { msg: it.name + ' 재고를 충분으로 바꿨어요' };
   }
@@ -947,7 +966,7 @@ function useLinkedStock(s, careItem) {
   if (!it) return null;
   if (isNum(it)) {
     it.count = Math.max(0, stockCount(it) - 1);
-    it.level = levelFromCount(it.count);
+    it.level = levelFromCount(it.count, it);
     return { name: it.name, left: it.count };
   }
   it.level = it.level === 'enough' ? 'low' : 'none';
@@ -1153,8 +1172,10 @@ function renderShop() {
 }
 
 /* ---------------- render : pantry (구역별) + recipes ---------------- */
+/* 레시피 재료로 인정하는 것은 냉장고·식자재(state.pantry)뿐.
+   장보기 목록(state.shopping)은 아직 사지 않은 것이라 재료로 치지 않는다. */
 function ownedItems() {
-  return state.pantry.concat(state.shopping.filter(i => i.cat === 'food'));
+  return state.pantry.slice();
 }
 function matchRecipe(r, owned) {
   let have = 0; const miss = [];
@@ -1618,8 +1639,10 @@ function viewStockForm(id, draft) {
   modalView = { k: 'stockform', id };
   const d = draft || {};
   const useCount = d.useCount != null ? d.useCount : isNum(s);
-  const count = d.count != null ? d.count : (isNum(s) ? stockCount(s) : countFromLevel(s.level || 'enough'));
+  const count = d.count != null ? d.count : (isNum(s) ? stockCount(s) : countFromLevel(s.level || 'enough', s));
   const max = d.max != null ? d.max : stockMax(s);
+  const nm = d.name != null ? d.name : s.name;
+  const thr = lowThreshold({ name: nm, max: max });
   const level = d.level || s.level || 'enough';
   openModal('생필품 수정',
     '<div class="row2"><div class="field"><label>이름</label><input id="sName" type="text" value="' + esc(d.name != null ? d.name : s.name) + '"></div>' +
@@ -1630,9 +1653,9 @@ function viewStockForm(id, draft) {
       : '<div class="field"><label>재고 상태</label><select id="sLvl">' +
       ['none', 'low', 'enough'].map(l => '<option value="' + l + '"' + (level === l ? ' selected' : '') + '>' + LVL[l].t + '</option>').join('') +
       '</select></div>') +
-    '<div class="toggle" style="border-top:1px dashed var(--line)"><div class="t"><b>개수 관리 사용</b><small>켜면 5·4·3처럼 숫자로 조절해요 (5개 이하 = 부족)</small></div>' +
+    '<div class="toggle" style="border-top:1px dashed var(--line)"><div class="t"><b>개수 관리 사용</b><small>켜면 5·4·3처럼 숫자로 조절해요 (부족 기준은 적정량에 맞춤)</small></div>' +
     '<button class="sw ' + (useCount ? 'on' : '') + '" data-act="stocknumtoggle" data-id="' + id + '"><i></i></button></div>' +
-    '<div class="note">' + (useCount ? '숫자가 <b>0</b>이면 없음, <b>5 이하</b>면 부족으로 표시되고 구매리스트에 담을 수 있어요.' : '충분 / 부족 / 없음 3단으로 관리해요. 개수까지 세고 싶은 품목은 위 토글을 켜세요.') + '</div>',
+    '<div class="note">' + (useCount ? '숫자가 <b>0</b>이면 없음, <b>' + thr + '개 이하</b>면 부족으로 표시되고 구매리스트에 담을 수 있어요.' + (/칫쇱/.test(String(nm)) ? ' 칫쇱은 <b>3개 이상</b>이면 충분이에요.' : '') : '충분 / 부족 / 없음 3단으로 관리해요. 개수까지 세고 싶은 품목은 위 토글을 켜세요.') + '</div>',
     '<button class="btn sm" data-act="stocksave" data-id="' + id + '">저장</button><button class="btn coral" data-act="stockdelete" data-id="' + id + '">삭제</button>');
 }
 function viewPantryForm(id) {
@@ -2075,7 +2098,7 @@ document.addEventListener('click', e => {
       let out = '';
       mutate(s => {
         const it = s.stock.find(x => x.id === id); if (!it) return;
-        if (isNum(it)) { it.count = Math.max(0, stockCount(it) - 1); it.level = levelFromCount(it.count); }
+        if (isNum(it)) { it.count = Math.max(0, stockCount(it) - 1); it.level = levelFromCount(it.count, it); }
         else { it.level = it.level === 'enough' ? 'low' : 'none'; }
         out = it.name + (isNum(it) ? ' — ' + it.count + '개 남았어요' : ' — ' + (LVL[it.level] || LVL.enough).t);
       });
@@ -2086,7 +2109,7 @@ document.addEventListener('click', e => {
       let out = '';
       mutate(s => {
         const it = s.stock.find(x => x.id === id); if (!it) return;
-        if (isNum(it)) { it.count = stockMax(it); it.level = levelFromCount(it.count); out = it.name + ' — ' + it.count + '개로 채웠어요'; }
+        if (isNum(it)) { it.count = stockMax(it); it.level = levelFromCount(it.count, it); out = it.name + ' — ' + it.count + '개로 채웠어요'; }
         else { it.level = 'enough'; out = it.name + ' — 충분 🟢'; }
       });
       toast(out); haptic();
@@ -2095,7 +2118,7 @@ document.addEventListener('click', e => {
     case 'stocknumon': {
       mutate(s => {
         const it = s.stock.find(x => x.id === id); if (!it) return;
-        it.useCount = true; it.count = countFromLevel(it.level || 'enough'); it.max = stockMax(it); it.level = levelFromCount(it.count);
+        it.useCount = true; it.count = countFromLevel(it.level || 'enough', it); it.max = stockMax(it); it.level = levelFromCount(it.count, it);
       });
       toast('숫자로 셀 수 있어요 — －/＋ 로 조절하세요');
       break;
@@ -2108,13 +2131,13 @@ document.addEventListener('click', e => {
         emoji: $('#sEmoji') ? $('#sEmoji').value : it.emoji,
         level: $('#sLvl') ? $('#sLvl').value : it.level,
         useCount: !isNum(it),
-        count: $('#sCount') ? Number($('#sCount').value) : (isNum(it) ? stockCount(it) : countFromLevel(it.level || 'enough')),
+        count: $('#sCount') ? Number($('#sCount').value) : (isNum(it) ? stockCount(it) : countFromLevel(it.level || 'enough', it)),
         max: $('#sMax') ? Number($('#sMax').value) : stockMax(it)
       };
       mutate(s => {
         const x = s.stock.find(y => y.id === id); if (!x) return;
         x.useCount = draft.useCount;
-        if (draft.useCount) { x.count = Number.isFinite(draft.count) ? draft.count : countFromLevel(x.level || 'enough'); x.max = draft.max || 10; x.level = levelFromCount(x.count); }
+        if (draft.useCount) { x.count = Number.isFinite(draft.count) ? draft.count : countFromLevel(x.level || 'enough', x); x.max = draft.max || 10; x.level = levelFromCount(x.count, x); }
       }, { quiet: true });
       viewStockForm(id, draft);
       break;
@@ -2138,7 +2161,7 @@ document.addEventListener('click', e => {
           it.useCount = true;
           it.count = Math.max(0, Number($('#sCount') ? $('#sCount').value : stockCount(it)) || 0);
           it.max = Math.max(1, Number($('#sMax') ? $('#sMax').value : stockMax(it)) || 10);
-          it.level = levelFromCount(it.count);
+          it.level = levelFromCount(it.count, it);
         } else {
           it.useCount = false;
           it.level = $('#sLvl') ? $('#sLvl').value : (it.level || 'enough');
