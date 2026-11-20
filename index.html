@@ -692,6 +692,523 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important}
 }
+
+/* ===== 🔤 Sight Words (11월 EOS 복습 놀이) ===== */
+.tab-btn[data-tab="sight"] .tab-count{background:#ffe6f1; color:#a01a5f}
+.tab-btn.is-on[data-tab="sight"]{
+  border-color:#ffd0e4; background:linear-gradient(180deg,#fff,#ffe8f3); color:#a01a5f;
+  box-shadow:0 4px 0 rgba(236,72,153,.16), 0 10px 22px rgba(236,72,153,.16);
+}
+.tab-btn.is-on[data-tab="sight"] .tab-count{background:#ffd3e6; color:#a01a5f}
+.tab-btn.done-all[data-tab="sight"]:not(.is-on){border-color:#ffd0e4; background:#fff5fa; color:#a01a5f}
+
+.card-sight-hero{
+  background:linear-gradient(150deg,#fff 0%,#fffaf6 42%,#ffe9f4 100%);
+  border:2px solid #ffd6e7;
+}
+.hero-chip.sight{background:#ffe3f0; color:#a01a5f}
+.depart-chip.sight{background:#efecff; color:#5b46c9}
+.hero-big.sight .of{font-size:.52em; color:#a0a0b8}
+.progress-fill.sight-fill{background:linear-gradient(90deg,#f472b6,#a855f7)}
+
+/* 놀이 모드 전환 */
+.mode-switch{
+  display:flex; gap:.3rem; margin-top:.6rem; padding:.2rem;
+  background:#f7f4ff; border-radius:16px; box-shadow:inset 0 1px 3px rgba(42,42,60,.06);
+}
+.mode-btn{
+  flex:1 1 0; min-width:0; display:flex; align-items:center; justify-content:center; gap:.3rem;
+  padding:.45rem .4rem; border-radius:13px; cursor:pointer;
+  font-size:.8rem; font-weight:900; color:#8d8da6;
+  transition:background .16s ease, color .16s ease, box-shadow .16s ease, transform .1s ease;
+}
+.mode-btn .mode-emoji{font-size:1.05rem; line-height:1}
+.mode-btn .mode-text{white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.mode-btn.is-on{background:#fff; color:#a01a5f; box-shadow:0 2px 0 rgba(42,42,60,.10)}
+.mode-btn:active{transform:translateY(1px)}
+.sight-queue{font-size:.72rem; font-weight:800; color:var(--ink-faint); line-height:1.4; margin-top:.5rem}
+.sight-queue b{color:#a01a5f}
+
+/* 놀이 판 */
+.card-sight-game{display:flex; flex-direction:column}
+.sight-ask{display:flex; align-items:center; gap:.6rem; min-height:0}
+.sight-audio{
+  flex:0 0 auto; width:3.5rem; height:3.5rem; border-radius:50%; cursor:pointer;
+  display:grid; place-items:center; font-size:1.6rem; line-height:1;
+  background:linear-gradient(180deg,#ffe3f0,#ffc7e2); color:#a01a5f;
+  box-shadow:0 4px 0 #f3a8cd, 0 8px 18px rgba(236,72,153,.18);
+  transition:transform .1s ease, box-shadow .1s ease;
+}
+.sight-audio:active{transform:translateY(2px); box-shadow:0 2px 0 #f3a8cd}
+.sight-audio.pulse{animation:swPulse 1.5s ease-in-out infinite}
+@keyframes swPulse{
+  0%,100%{box-shadow:0 4px 0 #f3a8cd, 0 0 0 0 rgba(244,114,182,.42)}
+  50%{box-shadow:0 4px 0 #f3a8cd, 0 0 0 12px rgba(244,114,182,0)}
+}
+.sight-asktext{min-width:0; flex:1 1 auto}
+.sight-pic{font-size:2rem; line-height:1.05; margin-bottom:.15rem}
+.sight-pic[hidden]{display:none}
+.sight-sentence{
+  font-size:clamp(1.05rem,1.8vw,1.4rem); font-weight:900; letter-spacing:-.01em;
+  line-height:1.35; color:var(--ink); word-break:break-word;
+}
+.sight-sentence .sw{color:#d81b7a; border-bottom:3px solid #ffc7e2; padding:0 .1em; border-radius:3px}
+.sight-sentence .blank{
+  display:inline-block; min-width:3.4em; border-bottom:4px solid #8b5cf6; border-radius:3px;
+  background:#f5f1ff; color:#8b5cf6; text-align:center;
+}
+.sight-hint{font-size:.78rem; font-weight:800; color:var(--ink-faint); margin-top:.2rem}
+
+.sight-options{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.5rem; margin-top:.65rem; flex:0 0 auto}
+.opt-btn{
+  min-height:clamp(3.2rem,6.4vh,4.4rem); border-radius:18px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; padding:.3rem .5rem;
+  font-size:clamp(1.15rem,2.1vw,1.7rem); font-weight:900; letter-spacing:-.02em;
+  background:#fff; color:var(--ink); border:3px solid #ece7f8;
+  box-shadow:0 4px 0 rgba(42,42,60,.06);
+  transition:transform .1s ease, background .16s ease, border-color .16s ease, box-shadow .1s ease, opacity .2s ease;
+  word-break:break-word;
+}
+.opt-btn:active{transform:translateY(2px); box-shadow:0 2px 0 rgba(42,42,60,.06)}
+.opt-btn.is-right{
+  background:linear-gradient(180deg,#effdf4,#d9fbe6); border-color:#7fdc9f; color:#12693c;
+  box-shadow:0 4px 0 rgba(34,197,94,.24);
+}
+.opt-btn.is-wrong{
+  background:linear-gradient(180deg,#fff3f3,#ffe0e0); border-color:#ffb4b4; color:#b91c1c;
+  animation:swShake .42s ease;
+}
+.opt-btn.is-dim{opacity:.42}
+.opt-btn:disabled{cursor:default}
+@keyframes swShake{
+  0%,100%{transform:translateX(0)} 20%{transform:translateX(-7px)}
+  40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(3px)}
+}
+.opt-btn .opt-emoji{font-size:.8em; margin-right:.25em}
+
+.sight-feedback{
+  display:flex; align-items:center; gap:.55rem; margin-top:.6rem;
+  padding:.5rem .6rem; border-radius:16px; background:#f6fbf7; border:2px solid #d9f2e2;
+  animation:swPop .24s ease;
+}
+.sight-feedback[hidden]{display:none}
+.sight-feedback.bad{background:#fff7f7; border-color:#ffdede}
+.sight-feedback .fb-emoji{font-size:1.5rem; line-height:1; flex:0 0 auto}
+.sight-feedback .fb-body{min-width:0; flex:1 1 auto}
+.sight-feedback .fb-title{font-size:.86rem; font-weight:900; color:#12693c}
+.sight-feedback.bad .fb-title{color:#b91c1c}
+.sight-feedback .fb-line{font-size:.82rem; font-weight:800; color:var(--ink-soft); line-height:1.35; margin-top:.1rem}
+.sight-feedback .fb-line .sw{color:#d81b7a; border-bottom:2px solid #ffc7e2}
+@keyframes swPop{from{transform:scale(.96); opacity:0} to{transform:scale(1); opacity:1}}
+
+.sight-tools{display:flex; align-items:center; justify-content:space-between; gap:.5rem; margin-top:auto; padding-top:.55rem}
+.sight-tools .ghost-btn{align-self:center}
+.sight-score{font-size:.76rem; font-weight:900; color:var(--ink-faint); font-variant-numeric:tabular-nums; text-align:right}
+
+/* 단어판 */
+.card-sight-board{display:flex; flex-direction:column; min-height:0}
+.word-grid{
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.35rem;
+  margin-top:.45rem; max-height:min(34vh,300px); overflow-y:auto; padding:2px;
+  -webkit-overflow-scrolling:touch;
+}
+.w-card{
+  display:flex; flex-direction:column; gap:.12rem; min-width:0;
+  padding:.32rem .34rem .3rem; border-radius:14px; border:2px solid #efeaf9; background:#fff;
+  box-shadow:0 2px 0 rgba(42,42,60,.04);
+}
+.w-card.is-known{border-color:#cdeedd; background:#f6fdf9}
+.w-card.is-open{border-color:#e9b8d3; background:#fff7fb; box-shadow:0 0 0 3px rgba(244,114,182,.16)}
+.w-main{
+  display:flex; align-items:center; justify-content:space-between; gap:.2rem; cursor:pointer;
+  text-align:left; min-width:0;
+}
+.w-main .w-text{
+  font-size:.98rem; font-weight:900; letter-spacing:-.02em; white-space:nowrap;
+  overflow:hidden; text-overflow:ellipsis;
+}
+.w-main .w-stars{font-size:.6rem; letter-spacing:-.06em; color:#f59e0b; flex:0 0 auto}
+.w-state{
+  align-self:flex-start; font-size:.62rem; font-weight:900; padding:.1rem .38rem; border-radius:999px;
+  cursor:pointer; background:#f1eeff; color:#5b46c9; border:0; line-height:1.5;
+}
+.w-card.is-known .w-state{background:#dcfce8; color:#0f7a44}
+.w-card.is-open .w-main .w-text{color:#a01a5f}
+
+.word-detail{
+  margin-top:.45rem; border-top:2px dashed #efeaf9; padding-top:.45rem;
+  max-height:min(30vh,270px); overflow-y:auto;
+}
+.word-detail[hidden]{display:none}
+.wd-head{display:flex; align-items:center; justify-content:space-between; gap:.4rem}
+.wd-word{font-size:1.1rem; font-weight:900; color:#a01a5f; letter-spacing:-.02em}
+.wd-ko{font-size:.72rem; font-weight:800; color:var(--ink-faint)}
+.wd-del{
+  font-size:.72rem; font-weight:900; padding:.16rem .45rem; border-radius:9px;
+  border:2px solid #ffd9d9; background:#fff5f5; color:#c81e1e; cursor:pointer; flex:0 0 auto;
+}
+.wd-pics{display:flex; flex-wrap:wrap; gap:.25rem; margin-top:.35rem}
+.wd-pic{
+  font-size:.7rem; font-weight:800; padding:.14rem .4rem; border-radius:9px;
+  background:#f7f4ff; color:#4b3fa8; border:0; cursor:pointer;
+}
+.wd-pic .e{font-size:.9rem; margin-right:.1rem}
+.wd-list{display:flex; flex-direction:column; gap:.22rem; margin-top:.4rem}
+.wd-line{
+  display:flex; align-items:center; gap:.35rem; width:100%; text-align:left; cursor:pointer;
+  padding:.26rem .4rem; border-radius:11px; background:#fbfaff; border:2px solid transparent;
+  font-size:.78rem; font-weight:800; color:var(--ink-soft); line-height:1.3;
+}
+.wd-line:active{border-color:#e6e2f3}
+.wd-line .e{font-size:.95rem; flex:0 0 auto}
+.wd-line .t{min-width:0; flex:1 1 auto}
+.wd-line .t .sw{color:#d81b7a; font-weight:900}
+.wd-line .snd{flex:0 0 auto; font-size:.75rem; opacity:.6}
+
+/* 새 단어 추가 */
+.card-sight-add .sight-add-form{margin-top:.35rem; display:flex; flex-direction:column; gap:.5rem}
+.card-sight-add .sight-add-form[hidden]{display:none}
+.field textarea{
+  font-family:inherit; font-size:.92rem; font-weight:800; color:var(--ink);
+  padding:.5rem .6rem; border-radius:12px; border:2px solid #e6e2f3; background:#fbfaff;
+  width:100%; resize:vertical; line-height:1.4;
+}
+.field textarea:focus{outline:none; border-color:#8b5cf6; background:#fff}
+
+/* 정답 도장 연출 */
+.sight-stamp{
+  position:absolute; inset:0; display:grid; place-items:center; pointer-events:none; z-index:5;
+}
+.sight-stamp .st{
+  width:5.4rem; height:5.4rem; border-radius:50%; background:rgba(255,255,255,.9);
+  display:grid; place-items:center; box-shadow:0 10px 26px rgba(42,42,60,.18);
+  animation:swStamp .85s cubic-bezier(.34,1.56,.64,1) both;
+}
+.sight-stamp .st svg{width:3.6rem; height:3.6rem}
+@keyframes swStamp{
+  0%{transform:scale(.2) rotate(-18deg); opacity:0}
+  55%{transform:scale(1.12) rotate(6deg); opacity:1}
+  100%{transform:scale(1) rotate(0deg); opacity:0}
+}
+.stamp.bonus{position:relative}
+.stamp.bonus::after{
+  content:'⭐'; position:absolute; right:-.2rem; top:-.25rem; font-size:.72rem;
+  filter:drop-shadow(0 1px 1px rgba(0,0,0,.2));
+}
+
+/* 가로 태블릿: 3열 */
+@media (min-width:900px) and (orientation:landscape){
+  .panel-sight .board{grid-template-columns:minmax(0,.94fr) minmax(0,1.2fr) minmax(0,1.02fr); align-items:stretch}
+  .panel-sight .col{height:100%}
+  .panel-sight .card-sight-game{height:100%}
+  .panel-sight .card-sight-board{flex:1 1 auto}
+  .panel-sight .card-sight-hero{padding-bottom:.9rem}
+  .sight-options{gap:.45rem; margin-top:.5rem; flex:1 1 auto; align-content:center; grid-auto-rows:minmax(2.9rem,6.2rem)}
+  .opt-btn{min-height:clamp(2.9rem,5.4vh,3.9rem)}
+  .panel-sight .card-sight-board .word-grid{max-height:none; flex:1 1 auto; min-height:0}
+  .panel-sight .card-sight-board .word-detail{flex:0 0 auto}
+}
+@media (orientation:landscape) and (max-height:880px){
+  .panel-sight .sight-audio{width:3rem; height:3rem; font-size:1.35rem}
+  .sight-pic{font-size:1.6rem}
+  .sight-sentence{font-size:clamp(.98rem,1.55vw,1.22rem)}
+  .opt-btn{min-height:2.9rem; font-size:clamp(1.05rem,1.8vw,1.45rem); border-radius:15px}
+  .mode-switch{margin-top:.45rem}
+  .mode-btn{padding:.36rem .35rem; font-size:.74rem}
+  .word-grid{max-height:min(30vh,240px)}
+  .word-detail{max-height:min(26vh,210px)}
+  .sight-queue{font-size:.68rem; margin-top:.4rem}
+  .sight-tools{padding-top:.4rem}
+}
+@media (orientation:portrait){
+  .sight-options{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .opt-btn{min-height:3.6rem; font-size:1.5rem}
+  .word-grid{grid-template-columns:repeat(3,minmax(0,1fr)); max-height:none}
+  .word-detail{max-height:none}
+  .sight-audio{width:4rem; height:4rem; font-size:1.8rem}
+  .sight-pic{font-size:2.4rem}
+  .sight-sentence{font-size:1.28rem}
+}
+@media (max-width:520px){
+  .word-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .opt-btn{min-height:3.1rem; font-size:1.2rem}
+  .sight-audio{width:3.2rem; height:3.2rem; font-size:1.4rem}
+  .sight-sentence{font-size:1.02rem}
+}
+
+/* ===== 💬 생활 영어 회화 ===== */
+.check-row{grid-template-columns:auto minmax(0,1fr) auto auto}
+.talk-btn{
+  flex:0 0 auto; width:2.2rem; height:2.2rem; border-radius:11px; border:0; cursor:pointer;
+  display:grid; place-items:center; font-size:1rem; line-height:1;
+  background:#f1eeff; color:#5b46c9;
+  transition:transform .1s ease, background .15s ease;
+}
+.talk-btn:active{transform:translateY(1px); background:#e6e0ff}
+.check-row.done .talk-btn{background:#eef7f1}
+.check-list.compact .talk-btn{width:1.95rem; height:1.95rem; font-size:.9rem; border-radius:10px}
+.check-row .talk-btn{grid-column:3}
+.check-row .mark{grid-column:4}
+
+.talk-panel{width:min(94vw,31rem)}
+.talk-body{gap:.65rem}
+.talk-head{display:flex; align-items:center; gap:.45rem; flex-wrap:wrap}
+.talk-kind{
+  font-size:.7rem; font-weight:900; color:#5b46c9; background:#f1eeff;
+  padding:.2rem .55rem; border-radius:999px; white-space:nowrap;
+}
+.talk-item{font-size:.98rem; font-weight:900; letter-spacing:-.02em; min-width:0}
+.talk-card{
+  position:relative; border-radius:18px; padding:.7rem 2.6rem .75rem .85rem;
+  border:2px solid #ffe0ef; background:linear-gradient(160deg,#fffafc,#fff4f9);
+}
+.talk-card.kid{border-color:#ded7ff; background:linear-gradient(160deg,#fbfaff,#f4f0ff)}
+.talk-who{display:flex; align-items:center; gap:.35rem; font-size:.74rem; font-weight:900; color:#a01a5f; letter-spacing:.01em}
+.talk-card.kid .talk-who{color:#4b3fa8}
+.talk-who .who-emoji{font-size:1rem; line-height:1}
+.talk-en{font-size:1.08rem; font-weight:900; line-height:1.32; color:var(--ink); margin-top:.32rem; letter-spacing:-.01em}
+.talk-ko{font-size:.82rem; font-weight:800; color:var(--ink-faint); margin-top:.22rem; line-height:1.35}
+.talk-say{
+  position:absolute; right:.6rem; top:.6rem; width:2.5rem; height:2.5rem; border-radius:50%;
+  border:0; cursor:pointer; display:grid; place-items:center; font-size:1.15rem;
+  background:#fff; box-shadow:0 3px 0 rgba(42,42,60,.08), 0 6px 14px rgba(42,42,60,.08);
+}
+.talk-say:active{transform:translateY(1px); box-shadow:0 1px 0 rgba(42,42,60,.08)}
+.talk-actions{display:flex; gap:.5rem; flex-wrap:wrap}
+.talk-actions .primary-btn{display:inline-flex; align-items:center; gap:.35rem}
+
+@media (orientation:landscape) and (max-height:880px){
+  .check-row .talk-btn{width:1.95rem; height:1.95rem; font-size:.9rem}
+  .talk-en{font-size:1rem}
+}
+@media (max-width:520px){
+  .check-row .talk-btn{width:1.9rem; height:1.9rem; font-size:.85rem; border-radius:9px}
+  .talk-en{font-size:.98rem}
+  .talk-say{width:2.2rem; height:2.2rem; font-size:1rem}
+}
+
+/* ============================================================
+   루틴 타일 레이아웃 — 상단은 슬림, 루틴은 큼직한 카드 그리드
+   ============================================================ */
+
+/* ---- 루틴 카드 = 큼직한 타일 ---- */
+.card-morning, .card-evening{display:flex; flex-direction:column; min-height:0}
+.card-morning .check-list, .card-evening .check-list{
+  display:grid; gap:.6rem; flex:1 1 auto; min-height:0; align-content:stretch;
+}
+.card-morning .check-list{grid-template-columns:repeat(3,minmax(0,1fr)); grid-auto-rows:minmax(0,1fr)}
+.card-evening .check-list{grid-template-columns:repeat(4,minmax(0,1fr)); grid-auto-rows:minmax(0,1fr)}
+
+.card-morning .check-row, .card-evening .check-row{
+  display:grid; align-items:center; justify-items:center; gap:.25rem;
+  grid-template-columns:2.1rem minmax(0,1fr) 2.1rem;
+  grid-template-rows:minmax(0,1fr) auto;
+  grid-template-areas:"pic pic pic" ". label talk";
+  width:100%; height:100%; min-height:0;
+  padding:.45rem .45rem .4rem; border-radius:22px; text-align:center;
+  background:#fbfaff; border:2px solid #f1eefc;
+}
+.card-morning .check-row .pic, .card-evening .check-row .pic{
+  grid-area:pic; width:100%; height:100%; border-radius:17px;
+  background:#f4f2ff;
+}
+.card-morning .check-row .pic svg, .card-evening .check-row .pic svg{width:70%; height:70%}
+.card-morning .check-row .label, .card-evening .check-row .label{
+  grid-area:label; font-size:clamp(.72rem,1.02vw,.94rem); font-weight:900; line-height:1.2;
+  text-align:center; color:var(--ink); padding:.1rem 0 .05rem; min-width:0; overflow-wrap:anywhere;
+}
+.card-morning .check-row .talk-btn, .card-evening .check-row .talk-btn{
+  grid-area:talk; align-self:end; justify-self:end; width:1.85rem; height:1.85rem; font-size:.85rem;
+}
+.card-morning .check-row .mark, .card-evening .check-row .mark{
+  position:absolute; top:.4rem; right:.4rem; width:2rem; height:2rem; background:rgba(255,255,255,.92);
+}
+.card-morning .check-row .mark .nb, .card-evening .check-row .mark .nb{width:1.5rem; height:1.5rem}
+.card-morning .check-row .mark .ok, .card-evening .check-row .mark .ok{width:1rem; height:1rem}
+.card-morning .check-row .now-tag, .card-evening .check-row .now-tag{
+  top:.45rem; left:.45rem; right:auto;
+}
+.card-morning .check-row.done, .card-evening .check-row.done{background:#eafaf0}
+.card-morning .check-row.now, .card-evening .check-row.now{background:#fffbeb}
+
+/* 루틴 카드 머리말은 한 줄로 슬림하게 */
+.card-morning .card-head, .card-evening .card-head{margin-bottom:.35rem}
+.card-morning .mini-progress, .card-evening .mini-progress{margin-bottom:.45rem}
+.card-morning .done-note, .card-evening .done-note{margin-top:.35rem}
+
+/* 방과 후 숙제는 세로 목록 그대로, 조금 크게 */
+.card-homework{display:flex; flex-direction:column; min-height:0}
+.card-homework .check-list{flex:1 1 auto; min-height:0; overflow:auto; gap:.3rem}
+.card-homework .check-row{min-height:2.9rem}
+
+/* ---- 가로 태블릿: 상단 슬림 + 메인 타일 ---- */
+@media (min-width:900px) and (orientation:landscape){
+  .panel-morning .col, .panel-evening .col{display:contents}
+
+  .panel-morning .board{
+    display:grid;
+    grid-template-columns:minmax(0,1.14fr) minmax(0,1fr) minmax(0,.9fr) minmax(0,1fr);
+    grid-template-rows:clamp(10.4rem,24vh,13rem) auto minmax(0,1fr);
+    grid-template-areas:
+      "hero weather date supplies"
+      "routine routine routine stamps"
+      "routine routine routine affirm";
+    align-items:stretch; height:100%;
+  }
+  .panel-morning .card-hero{grid-area:hero}
+  .panel-morning .card-weather{grid-area:weather}
+  .panel-morning .card-date{grid-area:date}
+  .panel-morning .card-supplies{grid-area:supplies}
+  .panel-morning .card-morning{grid-area:routine}
+  .panel-morning .stamp-slot{grid-area:stamps}
+  .panel-morning .card-affirm{grid-area:affirm}
+
+  .panel-evening .board{
+    display:grid;
+    grid-template-columns:minmax(0,1.14fr) minmax(0,.88fr) minmax(0,.92fr) minmax(0,1.16fr);
+    grid-template-rows:clamp(8.2rem,19.5vh,9.6rem) minmax(0,1fr);
+    grid-template-areas:
+      "evehero tomorrow stamps homework"
+      "eveevening eveevening eveevening eveevening";
+    align-items:stretch; height:100%;
+  }
+  .panel-evening .card-evening-hero{grid-area:evehero}
+  .panel-evening .card-tomorrow{grid-area:tomorrow}
+  .panel-evening .stamp-slot{grid-area:stamps}
+  .panel-evening .card-homework{grid-area:homework}
+  .panel-evening .card-evening{grid-area:eveevening}
+
+  /* ---- 상단 슬림 카드 ---- */
+  .panel-morning .card-hero{padding:.55rem .7rem .6rem}
+  .panel-morning .card-hero .hero-big{font-size:clamp(1.4rem,3.1vh,1.85rem); margin-top:.1rem}
+  .panel-morning .card-hero .hero-sub{font-size:.7rem}
+  .panel-morning .card-hero .progress{margin-top:.35rem}
+  .panel-morning .card-hero .now-box{margin-top:.3rem; padding:.24rem .3rem .28rem; border-radius:13px; gap:.35rem}
+  .panel-morning .card-hero .now-pic{width:2.5rem; height:2.5rem}
+  .panel-morning .card-hero .now-text strong{font-size:.8rem}
+  .panel-morning .card-hero .now-time{font-size:.66rem}
+  .panel-morning .card-hero .now-check{width:1.9rem; height:1.9rem}
+  .panel-morning .card-hero .progress-meta{font-size:.62rem}
+
+  .panel-morning .card-weather{padding:.5rem .6rem .55rem; display:flex; flex-direction:column; overflow:hidden}
+  .panel-morning .card-weather .card-head{margin-bottom:.15rem}
+  .panel-morning .card-weather .card-head h2{font-size:.86rem}
+  .panel-morning .card-weather .head-sub{display:none}
+  .panel-morning .card-weather .mini-btn{padding:.25rem .5rem; font-size:.68rem}
+  .panel-morning .card-weather .weather-main{gap:.3rem}
+  .panel-morning .card-weather .weather-icon{width:2.1rem; height:2.1rem}
+  .panel-morning .card-weather .weather-temp{font-size:1.4rem}
+  .panel-morning .card-weather .weather-desc{font-size:.66rem}
+  .panel-morning .card-weather .weather-range{font-size:.6rem}
+  .panel-morning .card-weather .weather-clothes{font-size:.66rem; margin-top:.2rem; line-height:1.25; max-height:2.6em; overflow:hidden}
+  .panel-morning .card-weather .weather-meta{display:none}
+
+  .panel-morning .card-date{padding:.5rem .55rem .55rem; overflow:hidden}
+  .panel-morning .card-date .card-head{margin-bottom:.2rem}
+  .panel-morning .card-date .card-head h2{font-size:.86rem}
+  .panel-morning .card-date .count-pill{font-size:.66rem; padding:.12rem .45rem}
+  .panel-morning .card-date .date-row{gap:.25rem}
+  .panel-morning .card-date .date-cell{padding:.22rem .1rem .28rem; border-radius:11px}
+  .panel-morning .card-date .date-cell .rel{font-size:.56rem}
+  .panel-morning .card-date .date-cell .wd{font-size:.98rem}
+  .panel-morning .card-date .date-cell .md{font-size:.6rem}
+  .panel-morning .card-date .date-sentence{
+    font-size:.63rem; margin-top:.3rem; line-height:1.25; display:-webkit-box;
+    -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+  }
+
+  .panel-morning .card-supplies{padding:.55rem .6rem .6rem; display:flex; flex-direction:column; min-height:0}
+  .panel-morning .card-supplies .card-head{margin-bottom:.25rem}
+  .panel-morning .card-supplies .supplies-today{font-size:.68rem}
+  .panel-morning .card-supplies .supply-list{gap:.22rem}
+  .panel-morning .card-supplies .supply-chip{min-height:2rem; font-size:.72rem; padding:.15rem .3rem}
+  .panel-morning .card-supplies .supply-chip .pic.sm{width:1.5rem; height:1.5rem}
+  .panel-morning .card-supplies .supplies-week{
+    font-size:.6rem; gap:.05rem; margin-top:.3rem; overflow:hidden;
+  }
+  .panel-morning .card-supplies .supplies-week li{padding:.05rem .1rem}
+  .panel-morning .card-supplies .supplies-common{font-size:.6rem; margin-top:.2rem}
+
+  .panel-morning .card-affirm{
+    padding:.7rem .75rem; display:flex; flex-direction:column; justify-content:center; text-align:center;
+    background:linear-gradient(160deg,#fff,#fffaf0 60%,#fff2d2);
+  }
+  .panel-morning .card-affirm .card-head{justify-content:center; margin-bottom:.45rem}
+  .panel-morning .card-affirm .card-head h2{font-size:.8rem; color:#96650a}
+  .panel-morning .card-affirm .affirm-text{
+    font-size:clamp(1rem,2.1vh,1.25rem); line-height:1.45; font-weight:900; color:#7a4a00; word-break:keep-all;
+  }
+  .panel-morning .card-affirm .affirm-text::before{content:'“'; display:block; font-size:1.6rem; line-height:.6; color:#f3c94a; margin-bottom:.2rem}
+  .panel-morning .card-affirm .affirm-text::after{content:'”'; display:block; font-size:1.6rem; line-height:.4; color:#f3c94a; margin-top:.15rem}
+
+  /* 도장 카드: 왼쪽 사이드 슬림 카드 */
+  .panel-morning .card-week{padding:.55rem .6rem .6rem}
+  .panel-morning .card-week .card-head{margin-bottom:.3rem}
+  .panel-morning .card-week .stamp{width:2rem; height:2rem}
+  .panel-morning .card-week .stamp svg{width:1.5rem; height:1.5rem}
+  .panel-morning .card-week .stamp-row{min-height:2.1rem; gap:.22rem}
+  .panel-morning .card-week .week-day .bar{height:1.55rem}
+  .panel-morning .card-week .week-head{margin-top:.35rem; font-size:.64rem}
+  .panel-morning .card-week .stamp-empty{font-size:.62rem}
+
+  /* ---- 방과 후: 상단 4칸 ---- */
+  .panel-evening .card-evening-hero{padding:.55rem .7rem .6rem; display:flex; flex-direction:column; justify-content:center}
+  .panel-evening .card-evening-hero .hero-big{font-size:clamp(1.35rem,2.9vh,1.7rem); margin-top:.1rem}
+  .panel-evening .card-evening-hero .hero-sub{font-size:.7rem}
+  .panel-evening .card-evening-hero .progress{margin-top:.3rem}
+  .panel-evening .card-evening-hero .eve-note{font-size:.66rem; margin-top:.3rem}
+
+  .panel-evening .card-tomorrow{padding:.55rem .6rem .6rem}
+  .panel-evening .card-tomorrow .supplies-today{font-size:.68rem}
+  .panel-evening .card-tomorrow .supply-list{gap:.22rem}
+  .panel-evening .card-tomorrow .supply-chip{min-height:2rem; font-size:.72rem; padding:.15rem .3rem}
+  .panel-evening .card-tomorrow .supply-chip .pic.sm{width:1.5rem; height:1.5rem}
+  .panel-evening .card-tomorrow .supplies-common{font-size:.62rem}
+
+  .panel-evening .card-week{padding:.55rem .6rem .6rem}
+  .panel-evening .card-week .card-head{margin-bottom:.25rem}
+  .panel-evening .card-week .stamp{width:1.95rem; height:1.95rem}
+  .panel-evening .card-week .stamp svg{width:1.45rem; height:1.45rem}
+  .panel-evening .card-week .stamp-row{min-height:2rem; gap:.2rem}
+  .panel-evening .card-week .stamp-empty{font-size:.6rem}
+  .panel-evening .card-week .week-head, .panel-evening .card-week .week-strip{display:none}
+
+  .panel-evening .card-homework{padding:.5rem .55rem .55rem}
+  .panel-evening .card-homework .card-head{margin-bottom:.25rem}
+  .panel-evening .card-homework .mini-progress{display:none}
+  .panel-evening .card-homework .check-list{
+    display:grid; grid-template-columns:1fr 1fr; gap:.22rem; overflow:auto;
+  }
+  .panel-evening .card-homework .check-row{
+    min-height:2.05rem; padding:.12rem .28rem .12rem .22rem; border-radius:12px; gap:.3rem;
+    grid-template-columns:1.35rem minmax(0,1fr) auto 1.3rem;
+  }
+  .panel-evening .card-homework .check-row .pic{width:1.35rem; height:1.35rem; border-radius:.45rem; grid-area:auto}
+  .panel-evening .card-homework .check-row .pic svg{width:100%; height:100%}
+  .panel-evening .card-homework .check-row .label{font-size:.62rem; line-height:1.15; text-align:left; grid-area:auto}
+  .panel-evening .card-homework .check-row .mark{position:static; width:1.35rem; height:1.35rem; grid-area:auto}
+  .panel-evening .card-homework .check-row .mark .nb{width:1.02rem; height:1.02rem}
+  .panel-evening .card-homework .check-row .talk-btn{position:static; width:1.25rem; height:1.25rem; font-size:.66rem; grid-area:auto; border-radius:8px; align-self:center; justify-self:center}
+  .panel-evening .card-homework .done-note{display:none}
+
+  .card-morning .check-list{gap:.5rem}
+  .card-evening .check-list{gap:.5rem}
+  .card-morning .check-row .pic svg, .card-evening .check-row .pic svg{width:68%; height:68%}
+}
+
+/* 태블릿 세로: 타일 2열 */
+@media (orientation:portrait){
+  .card-morning .check-list{grid-template-columns:repeat(2,minmax(0,1fr)); grid-auto-rows:minmax(9rem,auto)}
+  .card-evening .check-list{grid-template-columns:repeat(2,minmax(0,1fr)); grid-auto-rows:minmax(9rem,auto)}
+  .card-morning .check-row .label, .card-evening .check-row .label{font-size:.95rem}
+  .card-morning .check-row .pic svg, .card-evening .check-row .pic svg{width:64%; height:64%}
+  .card-morning .check-row .talk-btn, .card-evening .check-row .talk-btn{width:2.1rem; height:2.1rem; font-size:.95rem}
+}
+@media (max-width:520px){
+  .card-morning .check-list, .card-evening .check-list{grid-auto-rows:minmax(7rem,auto); gap:.45rem}
+  .card-morning .check-row .label, .card-evening .check-row .label{font-size:.8rem}
+  .card-morning .check-row, .card-evening .check-row{padding:.35rem .3rem .3rem; border-radius:17px}
+}
 </style>
 </head>
 <body>
@@ -741,6 +1258,12 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
         <span class="tab-emoji" aria-hidden="true">🌙</span>
         <span class="tab-label" data-i18n="tabEvening">방과 후</span>
         <span class="tab-count" id="tabEveningCount">0 / 12</span>
+      </button>
+      <button class="tab-btn" id="tabSight" type="button" role="tab"
+              aria-selected="false" aria-controls="panelSight" data-tab="sight" tabindex="-1">
+        <span class="tab-emoji" aria-hidden="true">🔤</span>
+        <span class="tab-label" data-i18n="tabSight">Sight Words</span>
+        <span class="tab-count" id="tabSightCount">0 / 15</span>
       </button>
     </div>
   </nav>
@@ -959,7 +1482,178 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
       </div>
     </div>
 
+    <!-- ===== Sight Words 탭 ===== -->
+    <div class="panel panel-sight" id="panelSight" role="tabpanel" aria-labelledby="tabSight" hidden>
+      <div class="board">
+
+        <div class="col col-a">
+
+          <!-- 놀이 요약 + 모드 전환 -->
+          <section class="card card-sight-hero" aria-labelledby="sightHeroTitle">
+            <div class="hero-top">
+              <h2 class="hero-chip sight" id="sightHeroTitle">🔤 Sight Words</h2>
+              <span class="depart-chip sight" id="sightMasterChip">⭐ 0 / 15</span>
+            </div>
+            <div class="hero-big sight" id="sightBig">0 <span class="of">/ 5</span></div>
+            <div class="hero-sub" id="sightSub">—</div>
+            <div class="progress">
+              <div class="progress-track"><div class="progress-fill sight-fill" id="sightFill"></div></div>
+              <div class="progress-meta">
+                <span id="sightLeft">0</span>
+                <span class="progress-pct" id="sightPct">0%</span>
+                <span id="sightRight">5</span>
+              </div>
+            </div>
+
+            <div class="mode-switch" id="sightModeSwitch" role="group" aria-label="놀이 모드">
+              <button class="mode-btn is-on" type="button" id="modeListen" data-mode="listen" aria-pressed="true">
+                <span class="mode-emoji" aria-hidden="true">🔊</span>
+                <span class="mode-text" data-i18n="modeListen">듣고 단어 콕!</span>
+              </button>
+              <button class="mode-btn" type="button" id="modeFill" data-mode="fill" aria-pressed="false">
+                <span class="mode-emoji" aria-hidden="true">📖</span>
+                <span class="mode-text" data-i18n="modeFill">문장 빈칸 놀이</span>
+              </button>
+            </div>
+            <p class="sight-queue" id="sightQueue"></p>
+          </section>
+
+          <div class="stamp-slot" id="stampSlotSight"></div>
+
+        </div>
+
+        <div class="col col-b">
+
+          <!-- 놀이 판 -->
+          <section class="card card-sight-game" aria-labelledby="sightGameTitle">
+            <div class="card-head">
+              <h2 id="sightGameTitle" data-i18n="sightGameTitle">단어 놀이</h2>
+              <span class="count-pill" id="sightSetPill">1 / 5</span>
+            </div>
+
+            <div class="sight-ask">
+              <button class="sight-audio" id="sightAudio" type="button" data-i18n-aria="sightListenAria" aria-label="다시 듣기">
+                <span aria-hidden="true">🔊</span>
+              </button>
+              <div class="sight-asktext">
+                <p class="sight-pic" id="sightPic" aria-hidden="true"></p>
+                <p class="sight-sentence" id="sightSentence"></p>
+                <p class="sight-hint" id="sightHint"></p>
+              </div>
+            </div>
+
+            <div class="sight-options" id="sightOptions" role="group" aria-label="단어 카드"></div>
+
+            <div class="sight-feedback" id="sightFeedback" hidden>
+              <span class="fb-emoji" id="sightFbEmoji" aria-hidden="true">🎉</span>
+              <div class="fb-body">
+                <p class="fb-title" id="sightFbTitle"></p>
+                <p class="fb-line" id="sightFbLine"></p>
+              </div>
+              <button class="mini-btn" id="sightFbSpeak" type="button">🔊 <span data-i18n="speak">읽어줘</span></button>
+            </div>
+
+            <div class="sight-tools">
+              <button class="ghost-btn" id="sightNext" type="button" data-i18n="sightNext">다음 문제 →</button>
+              <span class="sight-score" id="sightScore"></span>
+            </div>
+          </section>
+
+        </div>
+
+        <div class="col col-c">
+
+          <!-- 단어 카드 모아보기 -->
+          <section class="card card-sight-board" aria-labelledby="sightBoardTitle">
+            <div class="card-head">
+              <h2 id="sightBoardTitle">11월 단어 15개</h2>
+              <span class="count-pill soft" id="sightBoardCount">15</span>
+            </div>
+            <p class="hint" data-i18n="sightBoardHint">단어를 누르면 소리가 나고, 교재 문장 8개가 펼쳐져요.</p>
+            <div class="word-grid" id="wordGrid"></div>
+            <div class="word-detail" id="wordDetail" hidden></div>
+          </section>
+
+          <!-- 새 단어 추가 -->
+          <section class="card card-sight-add" aria-labelledby="sightAddTitle">
+            <div class="card-head">
+              <h2 id="sightAddTitle" data-i18n="sightAddTitle">새 단어 추가</h2>
+              <button class="mini-btn" id="btnToggleAdd" type="button" aria-expanded="false">열기</button>
+            </div>
+            <div class="sight-add-form" id="sightAddForm" hidden>
+              <div class="field-row">
+                <label class="field"><span data-i18n="sightAddWord">영어 단어</span>
+                  <input type="text" id="sightNewWord" maxlength="24" placeholder="e.g. look" autocomplete="off" autocapitalize="off">
+                </label>
+                <label class="field"><span data-i18n="sightAddKo">뜻 (선택)</span>
+                  <input type="text" id="sightNewKo" maxlength="24" placeholder="보아요" autocomplete="off">
+                </label>
+              </div>
+              <label class="field"><span data-i18n="sightAddEx">교재 문장 (한 줄에 하나, 최대 8개)</span>
+                <textarea id="sightNewEx" rows="3" maxlength="600" placeholder="Look at me.&#10;Look at the sky."></textarea>
+              </label>
+              <button class="primary-btn" id="btnAddWord" type="button" data-i18n="sightAddSave">단어 추가</button>
+              <p class="hint" data-i18n="sightAddHint">문장을 비워 두면 듣고 고르기 놀이에만 나와요. 넣은 단어는 목록에서 ✕로 지울 수 있어요.</p>
+            </div>
+          </section>
+
+        </div>
+
+      </div>
+    </div>
+
   </main>
+</div>
+
+<!-- 💬 생활 영어 회화 -->
+<div class="modal" id="talkModal" hidden>
+  <div class="modal-backdrop" data-talk-close="1"></div>
+  <div class="modal-panel talk-panel" role="dialog" aria-modal="true" aria-labelledby="talkTitle">
+    <header class="modal-head">
+      <h2 id="talkTitle" data-i18n="talkTitle">💬 생활 영어</h2>
+      <button class="icon-btn small" type="button" data-talk-close="1" data-i18n-aria="talkClose" aria-label="닫기">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true">
+          <line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line>
+        </svg>
+      </button>
+    </header>
+
+    <div class="modal-body talk-body">
+      <div class="talk-head">
+        <span class="talk-kind" id="talkKind">☀️ 아침 루틴</span>
+        <strong class="talk-item" id="talkItem">—</strong>
+      </div>
+
+      <div class="talk-card mom">
+        <div class="talk-who">
+          <span class="who-emoji" aria-hidden="true">👩</span>
+          <span class="who-label" data-i18n="talkMom">Mom says</span>
+        </div>
+        <p class="talk-en" id="talkMomEn">—</p>
+        <p class="talk-ko" id="talkMomKo"></p>
+        <button class="talk-say" id="talkMomSay" type="button" data-i18n-aria="talkMomAria" aria-label="엄마 문장 듣기">🔊</button>
+      </div>
+
+      <div class="talk-card kid">
+        <div class="talk-who">
+          <span class="who-emoji" aria-hidden="true">👦</span>
+          <span class="who-label" data-i18n="talkKid">Seohan says</span>
+        </div>
+        <p class="talk-en" id="talkKidEn">—</p>
+        <p class="talk-ko" id="talkKidKo"></p>
+        <button class="talk-say" id="talkKidSay" type="button" data-i18n-aria="talkKidAria" aria-label="서한이 문장 듣기">🔊</button>
+      </div>
+
+      <div class="talk-actions">
+        <button class="primary-btn" id="talkBoth" type="button">🔊 <span data-i18n="talkBoth">둘 다 듣기</span></button>
+      </div>
+      <p class="hint" data-i18n="talkHint">엄마가 먼저 영어로 말해 주고, 서한이가 따라 말해 보게 해 주세요. 🔊를 누르면 다시 들려줘요.</p>
+    </div>
+
+    <footer class="modal-foot">
+      <button class="ghost-btn" type="button" data-talk-close="1" data-i18n="talkClose">닫기</button>
+    </footer>
+  </div>
 </div>
 
 <!-- 설정 -->
@@ -1096,6 +1790,232 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
 <div class="celebrate" id="celebrate" aria-hidden="true"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
+/* ============================================================
+   EOS 2026 Sight Words · 11월 (Monthly Binder Level C · Seahorse, Blowfish)
+   최현 님이 직접 찍어 보내신 교재 15장을 그대로 옮겼어요.
+   - w    : sight word
+   - ko   : 부모님용 짧은 뜻
+   - st   : 처음 숙달 상태 (weak = 연습 필요 / known = 읽을 수 있음)
+   - note : 교재 학습 날짜
+   - pics : 교재 오른쪽 'Sight Words' 보조 그림 단어 5개 [단어, 그림]
+   - ex   : 교재 예문 8개 [문장, 보조 그림 단어, 그림]
+   ============================================================ */
+window.SIGHT_DATA = {
+  title: '2026 Sight Words Monthly Binder · Level C · 11월',
+  words: [
+    {
+      w: 'even', ko: '~조차 · 평평한', st: 'known', note: '11/07',
+      pics: [['flat', '🛣️'], ['spring', '🌸'], ['go', '🚶'], ['grab', '🤲'], ['sink', '🚰']],
+      ex: [
+        ['The box is even and flat.', 'box', '📦'],
+        ['I can run even faster now.', 'run', '🏃'],
+        ['It can rain even in spring.', 'rain', '🌧️'],
+        ['I feel even better now.', 'feel', '😊'],
+        ['I have to go even if it rains.', 'go', '🚶'],
+        ['They will even pack bags.', 'bags', '🎒'],
+        ['We will even grab it.', 'grab', '🤲'],
+        ['I can even fix the sink.', 'sink', '🚰']
+      ]
+    },
+    {
+      w: 'put', ko: '놓다', st: 'known', note: '11/08',
+      pics: [['bun', '🍞'], ['shelf', '🗄️'], ['lid', '🥫'], ['water', '💧'], ['jam', '🍓']],
+      ex: [
+        ['I put the cap on.', 'cap', '🧢'],
+        ['He put the pen in the box.', 'pen', '🖊️'],
+        ['They put the lid on the pot.', 'lid', '🥫'],
+        ['We put the water by the fire.', 'water', '💧'],
+        ['Sam put the mug on the mat.', 'mug', '☕'],
+        ['Ben put the jam on the bun.', 'jam', '🍓'],
+        ['She put the mug on the shelf.', 'shelf', '🗄️'],
+        ['We put the key in the bag.', 'key', '🔑']
+      ]
+    },
+    {
+      w: 'why', ko: '왜', st: 'known', note: '11/10',
+      pics: [['swimming', '🏊'], ['chop', '🔪'], ['onion', '🧅'], ['miss', '🚌'], ['think', '🤔']],
+      ex: [
+        ['Why did he shut the box?', 'box', '📦'],
+        ["Why don't we go swimming?", 'swimming', '🏊'],
+        ['Why did dad chop the onion?', 'onion', '🧅'],
+        ['Why did Bob miss the bus?', 'bus', '🚌'],
+        ['Why did Sam cut his hair?', 'hair', '✂️'],
+        ['Why did you quit your job?', 'job', '💼'],
+        ["Why didn't you call me?", 'call', '📞'],
+        ["Why didn't I think of that?", 'think', '🤔']
+      ]
+    },
+    {
+      w: 'yellow', ko: '노란', st: 'weak', note: '11/12',
+      pics: [['ribbon', '🎀'], ['dress', '👗'], ['duck', '🦆'], ['fruit', '🍎'], ['coat', '🧥']],
+      ex: [
+        ['I see a yellow ribbon.', 'ribbon', '🎀'],
+        ['The yellow dress fits me.', 'dress', '👗'],
+        ['She has yellow tape.', 'tape', '🟨'],
+        ['The yellow duck can swim.', 'duck', '🦆'],
+        ['I like the yellow fruit.', 'fruit', '🍎'],
+        ['The yellow leaf fell off.', 'leaf', '🍂'],
+        ['He wore a yellow coat.', 'coat', '🧥'],
+        ['The yellow sun is hot.', 'sun', '☀️']
+      ]
+    },
+    {
+      w: 'find', ko: '찾다', st: 'weak', note: '11/13',
+      pics: [['ruler', '📏'], ['find', '🔍'], ['glue', '🧴'], ['scissors', '✂️'], ['volcano', '🌋']],
+      ex: [
+        ['Can you find the ruler?', 'ruler', '📏'],
+        ['Sam will find his eraser.', 'eraser', '🧽'],
+        ['I will find my glue.', 'glue', '🧴'],
+        ['He can find the nut.', 'nut', '🥜'],
+        ['Dad will find the scissors.', 'scissors', '✂️'],
+        ['She will find the pencil.', 'pencil', '✏️'],
+        ['I will find the volcano.', 'volcano', '🌋'],
+        ['I will find my baseball.', 'baseball', '⚾']
+      ]
+    },
+    {
+      w: 'funny', ko: '웃긴', st: 'weak', note: '11/16',
+      pics: [['joke', '😂'], ['funny', '🤪'], ['cute', '🥰'], ['trick', '🎩'], ['clown', '🤡']],
+      ex: [
+        ['That joke is funny.', 'joke', '😂'],
+        ['Ben is funny today.', 'funny', '🤪'],
+        ['The fish looks funny.', 'fish', '🐟'],
+        ['She is funny and cute.', 'cute', '🥰'],
+        ['It is a funny trick.', 'trick', '🎩'],
+        ['The dog acts funny.', 'dog', '🐶'],
+        ['The clown is funny.', 'clown', '🤡'],
+        ['I heard a funny sound.', 'sound', '🔊']
+      ]
+    },
+    {
+      w: 'one', ko: '하나', st: 'weak', note: '11/19',
+      pics: [['stapler', '🖇️'], ['sky', '🌤️'], ['cupcake', '🧁'], ['cookie', '🍪'], ['hamster', '🐹']],
+      ex: [
+        ['Sam has one new stapler.', 'stapler', '🖇️'],
+        ['I see one star in the sky.', 'star', '⭐'],
+        ['I will take one cupcake.', 'cupcake', '🧁'],
+        ['She made one cupcake.', 'cupcake', '🧁'],
+        ['We found one lost hammer.', 'hammer', '🔨'],
+        ['I need one more paper clip.', 'paper clip', '📎'],
+        ['He took one big cake.', 'cake', '🎂'],
+        ['I have one orange pen.', 'pen', '🖊️']
+      ]
+    },
+    {
+      w: 'sounds', ko: '들린다 · 소리', st: 'weak', note: '',
+      pics: [['sound', '🔊'], ['good', '👍'], ['slow', '🐢'], ['piano', '🎹'], ['strange', '👾']],
+      ex: [
+        ['The drum sounds loud.', 'drum', '🥁'],
+        ['The song sounds so good.', 'song', '🎵'],
+        ['The car sounds slow.', 'car', '🚗'],
+        ['Tim sounds like he is mad.', 'mad', '😠'],
+        ['I hear the sounds of the piano.', 'piano', '🎹'],
+        ['The cat sounds sick.', 'cat', '🐱'],
+        ['I hear strange sounds.', 'strange', '👾'],
+        ['It sounds like rain.', 'rain', '🌧️']
+      ]
+    },
+    {
+      w: 'another', ko: '또 다른', st: 'weak', note: '',
+      pics: [['paint', '🎨'], ['binder', '📒'], ['hot dog', '🌭'], ['mirror', '🪞'], ['towel', '🧺']],
+      ex: [
+        ['I want another paint can.', 'paint', '🎨'],
+        ['He took another nap.', 'nap', '😴'],
+        ['Can I have another binder?', 'binder', '📒'],
+        ['She ate another hot dog.', 'hot dog', '🌭'],
+        ['I want another piece.', 'piece', '🍰'],
+        ['I bought another mirror.', 'mirror', '🪞'],
+        ['Sam found another towel.', 'towel', '🧺'],
+        ['I need another hanger.', 'hanger', '👔']
+      ]
+    },
+    {
+      w: 'into', ko: '~안으로', st: 'weak', note: '',
+      pics: [['wall', '🧱'], ['pit', '🕳️'], ['hall', '🚪'], ['crawl', '👶'], ['room', '🛋️']],
+      ex: [
+        ['He went into the car.', 'car', '🚗'],
+        ['The car ran into the wall.', 'wall', '🧱'],
+        ['I fell into the pit.', 'pit', '🕳️'],
+        ['He walked into the hall.', 'hall', '🚪'],
+        ['The bug crawled into the jar.', 'jar', '🫙'],
+        ['She jumped into the pool.', 'pool', '🏊'],
+        ['I ran into the room.', 'room', '🛋️'],
+        ['The dog ran into the yard.', 'yard', '🌳']
+      ]
+    },
+    {
+      w: 'show', ko: '보여주다', st: 'weak', note: '',
+      pics: [['crib', '🛏️'], ['work', '💼'], ['respect', '🤝'], ['bookcase', '📚'], ['watch', '⌚']],
+      ex: [
+        ['I will show the crib.', 'crib', '🛏️'],
+        ['We show our work.', 'work', '💼'],
+        ['You show me respect.', 'respect', '🤝'],
+        ['I had my own TV show.', 'TV', '📺'],
+        ["She didn't show up.", 'show up', '🚶'],
+        ['Show me an example.', 'example', '📝'],
+        ['Show me another bookcase.', 'bookcase', '📚'],
+        ['Show him that watch.', 'watch', '⌚']
+      ]
+    },
+    {
+      w: 'year', ko: '해 · 년', st: 'weak', note: '',
+      pics: [['year', '📅'], ['end', '🏁'], ['twelve', '1️⃣2️⃣'], ['born', '🐣'], ['season', '🍂']],
+      ex: [
+        ['The year will end soon.', 'end', '🏁'],
+        ['I had fun last year.', 'fun', '🎉'],
+        ['She plans for the year.', 'plan', '📅'],
+        ['A year has twelve months.', 'twelve', '1️⃣2️⃣'],
+        ['Sam was born last year.', 'born', '🐣'],
+        ['A year has four seasons.', 'seasons', '🍂'],
+        ['He left a year ago.', 'left', '🚪'],
+        ['I will grow this year.', 'grow', '🌱']
+      ]
+    },
+    {
+      w: 'your', ko: '너의', st: 'weak', note: '',
+      pics: [['eye', '👁️'], ['wash', '🧼'], ['face', '😀'], ['teeth', '🦷'], ['tongue', '👅']],
+      ex: [
+        ['Open your eyes.', 'eyes', '👁️'],
+        ['Wash your face.', 'wash', '🧼'],
+        ['Brush your teeth.', 'teeth', '🦷'],
+        ["How's your dad?", 'dad', '👨'],
+        ['Stick your tongue out.', 'tongue', '👅'],
+        ["What's your name?", 'name', '🏷️'],
+        ['Is this your bike?', 'bike', '🚲'],
+        ['How was your night?', 'night', '🌙']
+      ]
+    },
+    {
+      w: 'goes', ko: '간다', st: 'weak', note: '',
+      pics: [['theater', '🎭'], ['library', '📚'], ['tower', '🏙️'], ['shed', '🏚️'], ['car', '🚗']],
+      ex: [
+        ['Tim goes to the theater.', 'theater', '🎭'],
+        ['Pam goes to the library.', 'library', '📚'],
+        ['The cat goes up the tower.', 'tower', '🏙️'],
+        ['Dad goes to the shed.', 'shed', '🏚️'],
+        ['The bug goes in the net.', 'net', '🕸️'],
+        ['It goes on and on.', 'on and on', '🔁'],
+        ['He goes to school.', 'school', '🏫'],
+        ['She goes to work by car.', 'car', '🚗']
+      ]
+    },
+    {
+      w: 'right', ko: '오른쪽 · 맞는', st: 'weak', note: '',
+      pics: [['turn', '↩️'], ['mother', '👩'], ['shoulder', '💪'], ['busy', '🏃'], ['choice', '✅']],
+      ex: [
+        ['I turn right.', 'turn', '↩️'],
+        ['His mother was right.', 'mother', '👩'],
+        ['I think you are right.', 'right', '👍'],
+        ['Is that the right answer?', 'answer', '❓'],
+        ['My right shoulder hurts.', 'shoulder', '💪'],
+        ["I'm busy right now.", 'busy', '🏃'],
+        ['He took the right path.', 'path', '🛤️'],
+        ['She made the right choice.', 'choice', '✅']
+      ]
+    }
+  ]
+};
+
 /* ============================================================
    큰 그림 배지 아이콘 (인라인 SVG 일러스트)
    — 글자를 못 읽는 만 4세도 그림만 보고 무엇인지 알 수 있게
@@ -1318,7 +2238,7 @@ function iconSVG(key) {
      기본 상수
   ============================================================ */
   var STORAGE_KEY = 'seohan-numberblocks-routine-v1';
-  var STORAGE_VERSION = 3;            /* v3: 영어 모드 · 큰 그림 아이콘 · 지금 할 일 스포트라이트 */
+  var STORAGE_VERSION = 4;            /* v4: 🔤 Sight Words 복습 놀이 탭 */
   var AUTO_TAB_MIN = 15 * 60;         /* 오후 3시부터는 방과 후 탭을 먼저 보여줘요 */
   var WEEK_ORDER = ['mon', 'tue', 'wed', 'thu', 'fri'];
   var WEEK_KEY_BY_DAY = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
@@ -1512,7 +2432,68 @@ function iconSVG(key) {
       setCountHintHw: '{n}개 · 체크하면 도장이 찍혀요',
       newItemKo: '새 항목',
       newItemEn: 'New item',
-      setMorningAtHint: '시각을 넣으면 그 시간에 큰 그림이 뜨고, 다음 항목 시각까지 강조돼요.'
+      setMorningAtHint: '시각을 넣으면 그 시간에 큰 그림이 뜨고, 다음 항목 시각까지 강조돼요.',
+
+      /* ---- 🔤 Sight Words ---- */
+      tabSight: 'Sight Words',
+      sightGameTitle: '단어 놀이',
+      modeListen: '듣고 단어 콕!',
+      modeFill: '문장 빈칸 놀이',
+      sightBoardTitle: '11월 단어 {n}개',
+      sightBoardHint: '단어를 누르면 소리가 나고, 교재 문장 8개가 펼쳐져요.',
+      sightMasterChip: '⭐ {m} / {t}',
+      sightSubIdle: '5문제를 풀 때마다 도장 1개가 더 쌓여요!',
+      sightSubToday: '오늘 {ok}개 맞혔어요 · {no}개 다시 연습',
+      sightPosLabel: '{n}문제째',
+      sightPosTotal: '한 세트 5문제',
+      sightQueue: '복습 큐 — 연습 <b>{w}개</b> · 알아요 <b>{k}개</b> · 세 번 연속 맞히면 Mastered!',
+      sightAskListen: '🔊 소리를 듣고 같은 단어를 콕 눌러 보세요!',
+      sightAskFill: '📖 빈칸에 들어갈 단어를 콕 눌러 보세요!',
+      sightFbOk: '정답! {w}',
+      sightFbNo: '이건 {w} 예요',
+      sightScore: '오늘 맞힌 {ok} · 다시 {no}',
+      sightWordScore: '맞힌 {ok} · 틀린 {no}',
+      sightNext: '다음 문제 →',
+      sightListenAria: '단어 다시 듣기',
+      sightKnown: '알아요',
+      sightWeak: '연습',
+      sightAddTitle: '새 단어 추가',
+      sightAddOpen: '열기',
+      sightAddClose: '닫기',
+      sightAddWord: '영어 단어',
+      sightAddKo: '뜻 (선택)',
+      sightAddEx: '교재 문장 (한 줄에 하나, 최대 8개)',
+      sightAddSave: '단어 추가',
+      sightAddHint: '문장을 비워 두면 듣고 고르기 놀이에만 나와요. 넣은 단어는 목록에서 ✕로 지울 수 있어요.',
+      sightNoSentences: '아직 문장이 없어요. 듣고 고르기 놀이에서 만나요!',
+      sightDelete: '✕',
+      sightWordAria: '{w} 소리 듣고 문장 펼치기',
+      sightStateAria: '{w} 알아요·연습 바꾸기',
+      sightDeleteAria: '{w} 단어 지우기',
+      sightStarsAria: '숙달도 {n}단계',
+      sightBonusStamp: 'Sight Words 보너스 도장',
+      celebrateSightTitle: '5문제 완료!',
+      celebrateSightSub: '도장 하나 더 받았어요. 최고예요!',
+      celebrateMasterTitle: 'Mastered! {w}',
+      celebrateMasterSub: '세 번 연속 맞혔어요. 이제 읽을 수 있어요!',
+      toastSightMastered: '{w} — 이제 알아요 ⭐',
+      toastSightKnown: '{w} — 알아요로 바꿨어요 ⭐',
+      toastSightPractice: '{w} — 다시 연습으로 돌렸어요',
+      toastSightAdded: '{w} 단어를 넣었어요',
+      toastSightDup: '이미 있는 단어예요',
+      toastSightNeedWord: '영어 단어를 먼저 넣어 주세요.',
+      toastSightDeleted: '{w} 단어를 지웠어요',
+
+      /* ---- 💬 생활 영어 회화 ---- */
+      talkTitle: '💬 생활 영어',
+      talkMom: 'Mom says',
+      talkKid: 'Seohan says',
+      talkBoth: '둘 다 듣기',
+      talkHint: '엄마가 먼저 영어로 말해 주고, 서한이가 따라 말해 보게 해 주세요. 🔈를 누르면 다시 들려줘요.',
+      talkClose: '닫기',
+      talkOpenAria: '{label} 생활 영어 회화 열기',
+      talkMomAria: '엄마 문장 영어로 듣기',
+      talkKidAria: '서한이 문장 영어로 듣기'
     },
     en: {
       appTitle: "Seohan's Numberblocks Routine",
@@ -1681,7 +2662,68 @@ function iconSVG(key) {
       setCountHintHw: '{n} items · check to earn a stamp',
       newItemKo: '새 항목',
       newItemEn: 'New item',
-      setMorningAtHint: 'Add a time and the big picture pops up then, staying until the next item time.'
+      setMorningAtHint: 'Add a time and the big picture pops up then, staying until the next item time.',
+
+      /* ---- 🔤 Sight Words ---- */
+      tabSight: 'Sight Words',
+      sightGameTitle: 'Word Game',
+      modeListen: 'Listen & Tap',
+      modeFill: 'Fill the Sentence',
+      sightBoardTitle: 'November Words ({n})',
+      sightBoardHint: 'Tap a word to hear it. Its 8 book sentences open below.',
+      sightMasterChip: '⭐ {m} / {t}',
+      sightSubIdle: 'Every 5 questions earns one more stamp!',
+      sightSubToday: '{ok} right today · {no} to practice',
+      sightPosLabel: 'Question {n}',
+      sightPosTotal: '5 per set',
+      sightQueue: 'Practice queue — <b>{w}</b> to practice · <b>{k}</b> known · 3 in a row = Mastered!',
+      sightAskListen: 'Listen, then tap the same word!',
+      sightAskFill: 'Tap the word that fills the blank!',
+      sightFbOk: 'Yes! {w}',
+      sightFbNo: 'This one is {w}',
+      sightScore: '{ok} right · {no} to retry',
+      sightWordScore: '{ok} right · {no} missed',
+      sightNext: 'Next →',
+      sightListenAria: 'Play the word again',
+      sightKnown: 'Mastered',
+      sightWeak: 'Practice',
+      sightAddTitle: 'Add a Word',
+      sightAddOpen: 'Open',
+      sightAddClose: 'Close',
+      sightAddWord: 'English word',
+      sightAddKo: 'Meaning (optional)',
+      sightAddEx: 'Book sentences (one per line, up to 8)',
+      sightAddSave: 'Add word',
+      sightAddHint: 'Leave the sentences empty and the word still shows in Listen & Tap. You can remove it with ✕ in the list.',
+      sightNoSentences: 'No sentences yet. Meet it in Listen & Tap!',
+      sightDelete: '✕',
+      sightWordAria: 'Hear {w} and open its sentences',
+      sightStateAria: 'Switch {w} between Practice and Mastered',
+      sightDeleteAria: 'Delete the word {w}',
+      sightStarsAria: 'Mastery level {n}',
+      sightBonusStamp: 'Sight Words bonus stamp',
+      celebrateSightTitle: '5 in a Row!',
+      celebrateSightSub: 'You earned one more stamp. Wonderful!',
+      celebrateMasterTitle: 'Mastered! {w}',
+      celebrateMasterSub: 'Three in a row — you can read it now!',
+      toastSightMastered: '{w} — mastered now ⭐',
+      toastSightKnown: '{w} — marked as Mastered ⭐',
+      toastSightPractice: '{w} — back to Practice',
+      toastSightAdded: 'Added the word {w}',
+      toastSightDup: 'That word is already here',
+      toastSightNeedWord: 'Type an English word first.',
+      toastSightDeleted: 'Removed {w}',
+
+      /* ---- 💬 talk ---- */
+      talkTitle: '💬 Let\'s Talk',
+      talkMom: 'Mom says',
+      talkKid: 'Seohan says',
+      talkBoth: 'Play both',
+      talkHint: 'Say your line in English first, then let Seohan say his. Tap 🔊 to hear it again.',
+      talkClose: 'Close',
+      talkOpenAria: 'Open the English talk for {label}',
+      talkMomAria: 'Hear Mom\'s line in English',
+      talkKidAria: 'Hear Seohan\'s line in English'
     }
   };
 
@@ -1930,7 +2972,9 @@ function iconSVG(key) {
   function freshDaily(date) {
     return {
       date: date, morning: {}, evening: {}, homework: {}, supplies: {}, order: [],
-      celebrated: { morning: false, evening: false, homework: false }
+      sight: { pos: 0, ok: 0, no: 0, last: '' },
+      sightBonus: 0,
+      celebrated: { morning: false, evening: false, homework: false, sight: false }
     };
   }
   function baseSettings() {
@@ -1950,7 +2994,8 @@ function iconSVG(key) {
   function defaultState() {
     return {
       v: STORAGE_VERSION, settings: baseSettings(), daily: freshDaily(todayKey()),
-      history: {}, weather: null, ui: { tabDate: '', tabManual: '' }
+      history: {}, weather: null, ui: { tabDate: '', tabManual: '' },
+      sight: sanitizeSight(null)
     };
   }
 
@@ -2080,6 +3125,49 @@ function iconSVG(key) {
     return out;
   }
 
+  /* 🔤 Sight Words 진행 기록 (기본 단어는 데이터 파일이, 여기엔 숙달도만 저장해요) */
+  function sanitizeSight(raw) {
+    var out = { words: {}, extra: [], mode: 'listen' };
+    if (!raw || typeof raw !== 'object') return out;
+    if (raw.words && typeof raw.words === 'object') {
+      for (var w in raw.words) {
+        if (!Object.prototype.hasOwnProperty.call(raw.words, w)) continue;
+        var r = raw.words[w];
+        if (!r || typeof r !== 'object') continue;
+        var key = String(w).trim().toLowerCase().slice(0, 24);
+        if (!key) continue;
+        out.words[key] = {
+          st: r.st === 'known' ? 'known' : 'weak',
+          ok: Math.max(0, Math.round(Number(r.ok) || 0)),
+          no: Math.max(0, Math.round(Number(r.no) || 0)),
+          streak: Math.max(0, Math.round(Number(r.streak) || 0)),
+          last: r.last === 'no' ? 'no' : (r.last === 'ok' ? 'ok' : '')
+        };
+      }
+    }
+    if (Array.isArray(raw.extra)) {
+      for (var i = 0; i < raw.extra.length && out.extra.length < 60; i++) {
+        var e = raw.extra[i];
+        if (!e || typeof e.w !== 'string') continue;
+        var ew = e.w.trim().toLowerCase().slice(0, 24);
+        if (!ew) continue;
+        var ex = [];
+        if (Array.isArray(e.ex)) {
+          for (var j = 0; j < e.ex.length && ex.length < 8; j++) {
+            var s = e.ex[j];
+            if (typeof s === 'string' && s.trim()) ex.push([s.trim().slice(0, 120), ew, '']);
+          }
+        }
+        out.extra.push({
+          w: ew, ko: String(e.ko || '').slice(0, 24),
+          st: e.st === 'known' ? 'known' : 'weak', note: '', pics: [], ex: ex
+        });
+      }
+    }
+    out.mode = raw.mode === 'fill' ? 'fill' : 'listen';
+    return out;
+  }
+
   var state = (function () {
     var raw = null;
     try { raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); } catch (e) { raw = null; }
@@ -2123,7 +3211,17 @@ function iconSVG(key) {
         fd.celebrated.morning = !!day.celebrated.morning;
         fd.celebrated.evening = !!day.celebrated.evening;
         fd.celebrated.homework = !!day.celebrated.homework;
+        fd.celebrated.sight = !!day.celebrated.sight;
       }
+      if (day.sight && typeof day.sight === 'object') {
+        fd.sight = {
+          pos: Math.max(0, Math.min(5, Math.round(Number(day.sight.pos) || 0))),
+          ok: Math.max(0, Math.round(Number(day.sight.ok) || 0)),
+          no: Math.max(0, Math.round(Number(day.sight.no) || 0)),
+          last: typeof day.sight.last === 'string' ? day.sight.last.slice(0, 24) : ''
+        };
+      }
+      fd.sightBonus = Math.max(0, Math.min(99, Math.round(Number(day.sightBonus) || 0)));
       d.daily = fd;
     }
     if (raw.history && typeof raw.history === 'object') {
@@ -2140,9 +3238,10 @@ function iconSVG(key) {
     }
     if (raw.ui && typeof raw.ui === 'object') {
       var tabDate = typeof raw.ui.tabDate === 'string' ? raw.ui.tabDate : '';
-      var tabManual = raw.ui.tabManual === 'morning' || raw.ui.tabManual === 'evening' ? raw.ui.tabManual : '';
+      var tabManual = (['morning', 'evening', 'sight'].indexOf(raw.ui.tabManual) >= 0) ? raw.ui.tabManual : '';
       d.ui = { tabDate: tabDate, tabManual: tabManual };
     }
+    d.sight = sanitizeSight(raw.sight);
     if (raw.weather && typeof raw.weather === 'object' && typeof raw.weather.temp === 'number') {
       d.weather = {
         temp: raw.weather.temp, min: raw.weather.min, max: raw.weather.max,
@@ -2192,7 +3291,8 @@ function iconSVG(key) {
     if (!daily) return 0;
     return Object.keys(daily.morning || {}).length +
       Object.keys(daily.evening || {}).length +
-      Object.keys(daily.homework || {}).length;
+      Object.keys(daily.homework || {}).length +
+      Math.max(0, Math.round(Number(daily.sightBonus) || 0));
   }
   function earnedToday() { return earnedIn(state.daily); }
   function totalStickers() {
@@ -2209,8 +3309,9 @@ function iconSVG(key) {
     var m = Object.keys(daily.morning || {}).length;
     var e = Object.keys(daily.evening || {}).length;
     var h = Object.keys(daily.homework || {}).length;
-    if (m + e + h === 0 && !state.history[daily.date]) return;
-    state.history[daily.date] = { earned: m + e + h, morning: m, evening: e, homework: h };
+    var extra = Math.max(0, Math.round(Number(daily.sightBonus) || 0));
+    if (m + e + h + extra === 0 && !state.history[daily.date]) return;
+    state.history[daily.date] = { earned: m + e + h + extra, morning: m, evening: e, homework: h };
     var keys = Object.keys(state.history).sort();
     while (keys.length > 90) { delete state.history[keys.shift()]; }
   }
@@ -2682,9 +3783,17 @@ function iconSVG(key) {
   }
 
   /* ------------------------------------------------------------
-     탭 : ☀️ 아침 / 🌙 방과 후
+     탭 : ☀️ 아침 / 🌙 방과 후 / 🔤 Sight Words
   ------------------------------------------------------------ */
   var activeTab = 'morning';
+  var TABS = ['morning', 'evening', 'sight'];
+
+  function tabBtnId(name) {
+    return 'tab' + (name === 'evening' ? 'Evening' : (name === 'sight' ? 'Sight' : 'Morning'));
+  }
+  function tabPanelId(name) {
+    return 'panel' + (name === 'evening' ? 'Evening' : (name === 'sight' ? 'Sight' : 'Morning'));
+  }
 
   function autoTab(now) {
     return (now.getHours() * 60 + now.getMinutes()) >= AUTO_TAB_MIN ? 'evening' : 'morning';
@@ -2692,7 +3801,7 @@ function iconSVG(key) {
 
   function moveStamps(tab) {
     var card = $('cardWeek');
-    var slot = tab === 'evening' ? $('stampSlotEvening') : $('stampSlotMorning');
+    var slot = $('stampSlot' + (tab === 'evening' ? 'Evening' : (tab === 'sight' ? 'Sight' : 'Morning')));
     if (card && slot && card.parentNode !== slot) slot.appendChild(card);
   }
 
@@ -2707,29 +3816,38 @@ function iconSVG(key) {
     var after = isAfterDeparture(new Date());
     $('tabMorning').classList.toggle('nudge', !after && m < mt && activeTab !== 'morning');
     $('tabEvening').classList.toggle('nudge', after && (e + h) < (et + ht) && activeTab !== 'evening');
+
+    var sBtn = $('tabSight'), sCnt = $('tabSightCount');
+    if (sBtn && sCnt) {
+      var sAll = sightAll(), sTotal = sAll.length, sDone = sightMastered();
+      sCnt.textContent = sDone + ' / ' + sTotal;
+      sBtn.classList.toggle('done-all', sTotal > 0 && sDone === sTotal);
+    }
   }
 
   function applyTab(tab, opts) {
-    activeTab = tab === 'evening' ? 'evening' : 'morning';
-    var isMorning = activeTab === 'morning';
-    var pm = $('panelMorning'), pe = $('panelEvening');
-    pm.hidden = !isMorning;
-    pe.hidden = isMorning;
-    var mBtn = $('tabMorning'), eBtn = $('tabEvening');
-    mBtn.classList.toggle('is-on', isMorning);
-    eBtn.classList.toggle('is-on', !isMorning);
-    mBtn.setAttribute('aria-selected', isMorning ? 'true' : 'false');
-    eBtn.setAttribute('aria-selected', isMorning ? 'false' : 'true');
-    mBtn.tabIndex = isMorning ? 0 : -1;
-    eBtn.tabIndex = isMorning ? -1 : 0;
-    document.body.classList.toggle('tab-evening', !isMorning);
+    activeTab = TABS.indexOf(tab) >= 0 ? tab : 'morning';
+    for (var i = 0; i < TABS.length; i++) {
+      var name = TABS[i], on = name === activeTab;
+      var panel = $(tabPanelId(name));
+      var btn = $(tabBtnId(name));
+      if (panel) panel.hidden = !on;
+      if (btn) {
+        btn.classList.toggle('is-on', on);
+        btn.setAttribute('aria-selected', on ? 'true' : 'false');
+        btn.tabIndex = on ? 0 : -1;
+      }
+    }
+    document.body.classList.toggle('tab-evening', activeTab === 'evening');
+    document.body.classList.toggle('tab-sight', activeTab === 'sight');
     moveStamps(activeTab);
     renderTabCounts();
+    if (activeTab === 'sight') { renderSight(); sightSayCurrent(); }
     if (!opts || !opts.keepScroll) { var m = $('main'); if (m) m.scrollTop = 0; }
   }
 
   function chooseTab(tab) {
-    var next = tab === 'evening' ? 'evening' : 'morning';
+    var next = TABS.indexOf(tab) >= 0 ? tab : 'morning';
     state.ui = { tabDate: todayKey(), tabManual: next };
     save();
     applyTab(next);
@@ -2738,7 +3856,7 @@ function iconSVG(key) {
 
   /* 저장된 수동 선택이 없으면 시간대에 맞는 탭을 골라요 */
   function resolveTab(now) {
-    if (state.ui && state.ui.tabManual && state.ui.tabDate === todayKey()) return state.ui.tabManual;
+    if (state.ui && TABS.indexOf(state.ui.tabManual) >= 0 && state.ui.tabDate === todayKey()) return state.ui.tabManual;
     return autoTab(now);
   }
 
@@ -2794,9 +3912,10 @@ function iconSVG(key) {
     container.innerHTML = '';
     for (var i = 0; i < items.length; i++) {
       var it = items[i];
-      var btn = document.createElement('button');
-      btn.type = 'button';
+      var btn = document.createElement('div');
       btn.className = 'check-row';
+      btn.setAttribute('role', 'button');
+      btn.tabIndex = 0;
       btn.setAttribute('data-kind', kind);
       btn.setAttribute('data-id', it.id);
       btn.setAttribute('aria-pressed', bag[it.id] ? 'true' : 'false');
@@ -2810,6 +3929,15 @@ function iconSVG(key) {
       label.className = 'label';
       label.textContent = itemLabel(it);
 
+      /* 💬 엄마·아이 생활 영어 회화 */
+      var talk = document.createElement('button');
+      talk.type = 'button';
+      talk.className = 'talk-btn';
+      talk.setAttribute('data-talk', kind + ':' + it.id);
+      talk.setAttribute('aria-haspopup', 'dialog');
+      talk.setAttribute('aria-label', Lf('talkOpenAria', { label: itemLabel(it) }));
+      talk.textContent = '💬';
+
       var mark = document.createElement('span');
       mark.className = 'mark';
       mark.innerHTML = '<span class="nb">' + nbSVG(it.num) + '</span>' +
@@ -2821,6 +3949,7 @@ function iconSVG(key) {
 
       btn.appendChild(pic);
       btn.appendChild(label);
+      btn.appendChild(talk);
       btn.appendChild(mark);
       btn.appendChild(tag);
       if (bag[it.id]) btn.classList.add('done');
@@ -2973,6 +4102,15 @@ function iconSVG(key) {
       row.appendChild(st);
       shown++;
     }
+    var bonus = Math.max(0, Math.round(Number(state.daily.sightBonus) || 0));
+    for (var b = 0; b < bonus; b++) {
+      var bst = document.createElement('div');
+      bst.className = 'stamp bonus';
+      bst.title = L('sightBonusStamp');
+      bst.innerHTML = nbSVG(10);
+      row.appendChild(bst);
+      shown++;
+    }
     $('stampEmpty').classList.toggle('hide', shown > 0);
     var today = earnedToday();
     $('stampTotal').textContent = Lf(today === 1 ? 'stampTodayOne' : 'stampToday', { n: today });
@@ -3043,6 +4181,7 @@ function iconSVG(key) {
     renderEveningHero();
     renderTabCounts();
     renderWeather();
+    renderSight();
   }
 
   /* ============================================================
@@ -3099,16 +4238,20 @@ function iconSVG(key) {
     celebrate(kind);
   }
 
-  function celebrateText(kind) {
+  function celebrateText(kind, word) {
     if (kind === 'evening') return { title: L('celebrateEveningTitle'), sub: L('celebrateEveningSub') };
     if (kind === 'homework') return { title: L('celebrateHomeworkTitle'), sub: L('celebrateHomeworkSub') };
+    if (kind === 'sight') return { title: L('celebrateSightTitle'), sub: L('celebrateSightSub') };
+    if (kind === 'master') {
+      return { title: Lf('celebrateMasterTitle', { w: word || '' }), sub: L('celebrateMasterSub') };
+    }
     return { title: L('celebrateMorningTitle'), sub: L('celebrateMorningSub') };
   }
 
-  function celebrate(kind) {
+  function celebrate(kind, word) {
     var layer = $('celebrate');
     layer.innerHTML = '';
-    var text = celebrateText(kind);
+    var text = celebrateText(kind, word);
     var card = document.createElement('div');
     card.className = 'celebrate-card';
     card.innerHTML = '<div class="gang">' + nbSVG(1) + nbSVG(2) + nbSVG(3) + '</div>' +
@@ -3623,6 +4766,850 @@ function iconSVG(key) {
     } catch (e) { toast(L('toastSpeakFail')); }
   }
 
+    /* ============================================================
+     🔤 Sight Words — 11월 EOS 복습 놀이
+     · weak 단어와 최근 틀린 단어를 먼저, known 단어는 가끔 섞어요
+     · 3번 연속 맞히면 Mastered!, 틀리면 다시 연습 큐로
+     · 5문제(1세트)마다 축하 + 오늘 도장 1개 보너스
+  ============================================================ */
+  var SIGHT_DEF = (window.SIGHT_DATA && window.SIGHT_DATA.words) ? window.SIGHT_DATA.words : [];
+  var SIGHT_SET = 5;
+  var sightQ = null;
+  var sightOpen = '';
+  var sightLastKey = '';
+  var sightTimer = null;
+
+  function sightAll() {
+    var out = [], i;
+    for (i = 0; i < SIGHT_DEF.length; i++) {
+      var d = SIGHT_DEF[i];
+      out.push({
+        w: d.w, ko: d.ko || '', note: d.note || '',
+        pics: d.pics || [], ex: d.ex || [],
+        base: d.st === 'known' ? 'known' : 'weak', extra: false, key: d.w
+      });
+    }
+    var extra = (state.sight && state.sight.extra) || [];
+    for (i = 0; i < extra.length; i++) {
+      var e = extra[i];
+      out.push({
+        w: e.w, ko: e.ko || '', note: '',
+        pics: e.pics || [], ex: e.ex || [],
+        base: e.st === 'known' ? 'known' : 'weak', extra: true, key: e.w
+      });
+    }
+    return out;
+  }
+
+  function sightEntry(key) {
+    var all = sightAll();
+    for (var i = 0; i < all.length; i++) if (all[i].key === key) return all[i];
+    return null;
+  }
+
+  function sightRec(key, base) {
+    if (!state.sight) state.sight = { words: {}, extra: [], mode: 'listen' };
+    if (!state.sight.words) state.sight.words = {};
+    var r = state.sight.words[key];
+    if (!r) {
+      r = { st: base === 'known' ? 'known' : 'weak', ok: 0, no: 0, streak: 0, last: '' };
+      state.sight.words[key] = r;
+    }
+    return r;
+  }
+
+  function sightStars(rec) {
+    var n = rec.st === 'known' ? 3 : (rec.streak >= 2 ? 2 : (rec.streak >= 1 ? 1 : 0));
+    return '★★★'.slice(0, n) + '☆☆☆'.slice(0, 3 - n);
+  }
+
+  function sightMastered() {
+    var all = sightAll(), n = 0;
+    for (var i = 0; i < all.length; i++) if (sightRec(all[i].key, all[i].base).st === 'known') n++;
+    return n;
+  }
+
+  function shuffleList(list) {
+    for (var i = list.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = list[i]; list[i] = list[j]; list[j] = t;
+    }
+    return list;
+  }
+
+  /* weak 6 : known 1, 방금 틀린 단어는 +4 로 더 자주 나와요 */
+  function pickSightTarget(pool, avoid) {
+    var bag = [], i, k;
+    for (i = 0; i < pool.length; i++) {
+      var e = pool[i];
+      if (avoid && pool.length > 1 && e.key === avoid) continue;
+      var r = sightRec(e.key, e.base);
+      var wgt = r.st === 'weak' ? 6 : 1;
+      if (r.last === 'no') wgt += 4;
+      for (k = 0; k < wgt; k++) bag.push(e.key);
+    }
+    if (!bag.length) return pool[Math.floor(Math.random() * pool.length)];
+    var pick = bag[Math.floor(Math.random() * bag.length)];
+    for (i = 0; i < pool.length; i++) if (pool[i].key === pick) return pool[i];
+    return pool[0];
+  }
+
+  function nextSightQuestion() {
+    if (sightTimer) { clearTimeout(sightTimer); sightTimer = null; }
+    if (!state.sight) state.sight = { words: {}, extra: [], mode: 'listen' };
+    var mode = state.sight.mode === 'fill' ? 'fill' : 'listen';
+    var all = sightAll();
+    var pool = [];
+    for (var i = 0; i < all.length; i++) {
+      if (mode === 'fill' && !(all[i].ex && all[i].ex.length)) continue;
+      pool.push(all[i]);
+    }
+    if (!pool.length) {
+      sightQ = null;
+      renderSightHero();
+      renderSightQuestion();
+      return;
+    }
+    var target = pickSightTarget(pool, sightLastKey);
+    var others = [];
+    for (var j = 0; j < pool.length; j++) if (pool[j].key !== target.key) others.push(pool[j].key);
+    shuffleList(others);
+    var options = [target.key];
+    for (var k = 0; k < others.length && options.length < 4; k++) options.push(others[k]);
+    shuffleList(options);
+    var ex = (target.ex && target.ex.length) ? target.ex[Math.floor(Math.random() * target.ex.length)] : null;
+    sightQ = {
+      key: target.key, entry: target, ex: ex, options: options,
+      mode: mode, answered: false, chosen: '', correct: false
+    };
+    sightLastKey = target.key;
+    renderSightHero();
+    renderSightQuestion();
+    if (mode === 'listen' && activeTab === 'sight') speakEn(target.w, 0.78);
+  }
+
+  function renderSight() {
+    if (!document.getElementById('panelSight')) return;
+    if (!state.sight) state.sight = { words: {}, extra: [], mode: 'listen' };
+    if (!state.daily.sight) state.daily.sight = { pos: 0, ok: 0, no: 0, last: '' };
+    if (!sightQ) nextSightQuestion();
+    renderSightHero();
+    renderSightQuestion();
+    renderWordGrid();
+    renderWordDetail();
+    var tg = $('btnToggleAdd'), tf = $('sightAddForm');
+    if (tg && tf) {
+      tg.textContent = tf.hidden ? L('sightAddOpen') : L('sightAddClose');
+      tg.setAttribute('aria-expanded', tf.hidden ? 'false' : 'true');
+    }
+  }
+
+  function renderSightHero() {
+    var all = sightAll();
+    var total = all.length;
+    var mastered = sightMastered();
+    var day = state.daily.sight || { pos: 0, ok: 0, no: 0 };
+    var pos = Math.max(0, Math.min(SIGHT_SET, Math.round(Number(day.pos) || 0)));
+    var chip = $('sightMasterChip');
+    if (chip) chip.textContent = Lf('sightMasterChip', { m: mastered, t: total });
+    var big = $('sightBig');
+    if (big) big.innerHTML = pos + ' <span class="of">/ ' + SIGHT_SET + '</span>';
+    var sub = $('sightSub');
+    if (sub) {
+      sub.textContent = (day.ok || day.no)
+        ? Lf('sightSubToday', { ok: day.ok || 0, no: day.no || 0 })
+        : L('sightSubIdle');
+    }
+    var pct = Math.round((pos / SIGHT_SET) * 100);
+    if ($('sightFill')) $('sightFill').style.width = pct + '%';
+    if ($('sightPct')) $('sightPct').textContent = pct + '%';
+    if ($('sightLeft')) $('sightLeft').textContent = Lf('sightPosLabel', { n: pos });
+    if ($('sightRight')) $('sightRight').textContent = Lf('sightPosTotal', { n: SIGHT_SET });
+    var weak = 0, known = 0;
+    for (var i = 0; i < all.length; i++) {
+      if (sightRec(all[i].key, all[i].base).st === 'known') known++; else weak++;
+    }
+    if ($('sightQueue')) $('sightQueue').innerHTML = Lf('sightQueue', { w: weak, k: known });
+    var mode = state.sight.mode === 'fill' ? 'fill' : 'listen';
+    var btns = document.querySelectorAll('#sightModeSwitch .mode-btn');
+    for (var j = 0; j < btns.length; j++) {
+      var on = btns[j].getAttribute('data-mode') === mode;
+      btns[j].classList.toggle('is-on', on);
+      btns[j].setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
+  }
+
+  /* 문장에서 sight word(또는 빈칸)를 강조한 노드 묶음을 만들어요 */
+  function sentenceBits(text, word, blank) {
+    var out = [];
+    var src = String(text == null ? '' : text);
+    var w = String(word == null ? '' : word);
+    var i = w ? src.toLowerCase().indexOf(w.toLowerCase()) : -1;
+    if (i < 0) { out.push(document.createTextNode(src)); return out; }
+    if (i > 0) out.push(document.createTextNode(src.slice(0, i)));
+    var sp = document.createElement('span');
+    sp.className = blank ? 'blank' : 'sw';
+    sp.textContent = blank ? '\u00A0' : src.slice(i, i + w.length);
+    out.push(sp);
+    if (i + w.length < src.length) out.push(document.createTextNode(src.slice(i + w.length)));
+    return out;
+  }
+
+  function renderSightQuestion() {
+    var q = sightQ;
+    var day = state.daily.sight || {};
+    var pos = Math.max(0, Math.min(SIGHT_SET, Math.round(Number(day.pos) || 0)));
+    if ($('sightSetPill')) $('sightSetPill').textContent = Math.min(pos + 1, SIGHT_SET) + ' / ' + SIGHT_SET;
+    var pic = $('sightPic'), sen = $('sightSentence'), hint = $('sightHint');
+    var isFill = !!(q && q.mode === 'fill');
+    if (q && isFill && q.ex) {
+      if (pic) { pic.hidden = false; pic.textContent = q.ex[2] || ''; }
+      if (sen) {
+        sen.hidden = false;
+        sen.innerHTML = '';
+        var bits = sentenceBits(q.ex[0], q.key, true);
+        for (var b = 0; b < bits.length; b++) sen.appendChild(bits[b]);
+      }
+      if (hint) hint.textContent = L('sightAskFill');
+    } else {
+      if (pic) { pic.hidden = true; pic.textContent = ''; }
+      if (sen) { sen.hidden = true; sen.innerHTML = ''; }
+      if (hint) hint.textContent = L('sightAskListen');
+    }
+    var audio = $('sightAudio');
+    if (audio) audio.classList.toggle('pulse', !!q && !isFill && !q.answered);
+
+    var box = $('sightOptions');
+    if (box) {
+      box.innerHTML = '';
+      if (q) {
+        for (var i = 0; i < q.options.length; i++) {
+          var key = q.options[i];
+          var ob = document.createElement('button');
+          ob.type = 'button';
+          ob.className = 'opt-btn';
+          ob.setAttribute('data-key', key);
+          ob.textContent = key;
+          if (q.answered) {
+            ob.disabled = true;
+            if (key === q.key) ob.classList.add('is-right');
+            else if (key === q.chosen) ob.classList.add('is-wrong');
+            else ob.classList.add('is-dim');
+          }
+          box.appendChild(ob);
+        }
+      }
+    }
+
+    var fb = $('sightFeedback');
+    if (fb) {
+      if (q && q.answered) {
+        fb.hidden = false;
+        fb.classList.toggle('bad', !q.correct);
+        if ($('sightFbEmoji')) $('sightFbEmoji').textContent = q.correct ? '🎉' : '🤔';
+        if ($('sightFbTitle')) {
+          $('sightFbTitle').textContent = q.correct ? Lf('sightFbOk', { w: q.key }) : Lf('sightFbNo', { w: q.key });
+        }
+        var line = $('sightFbLine');
+        if (line) {
+          line.innerHTML = '';
+          if (q.ex) {
+            line.hidden = false;
+            if (q.ex[2]) line.appendChild(document.createTextNode(q.ex[2] + ' '));
+            var lb = sentenceBits(q.ex[0], q.key, false);
+            for (var l = 0; l < lb.length; l++) line.appendChild(lb[l]);
+          } else {
+            line.hidden = true;
+          }
+        }
+      } else {
+        fb.hidden = true;
+        fb.classList.remove('bad');
+      }
+    }
+
+    var sc = $('sightScore');
+    if (sc) sc.textContent = Lf('sightScore', { ok: day.ok || 0, no: day.no || 0 });
+  }
+
+  /* en-US 읽어주기 (단어·문장·회화 공용) */
+  function speakEn(text, rate) {
+    var t = String(text == null ? '' : text).replace(/\s+/g, ' ').trim();
+    if (!t) return false;
+    if (!('speechSynthesis' in window) || typeof window.SpeechSynthesisUtterance === 'undefined') {
+      toast(L('toastNoSpeak'));
+      return false;
+    }
+    try {
+      var synth = window.speechSynthesis;
+      synth.cancel();
+      var u = new window.SpeechSynthesisUtterance(t);
+      u.lang = 'en-US';
+      u.rate = rate || 0.82;
+      u.pitch = 1.08;
+      var voices = synth.getVoices() || [];
+      for (var i = 0; i < voices.length; i++) {
+        if (/^en[-_]US/i.test(voices[i].lang)) { u.voice = voices[i]; break; }
+      }
+      synth.speak(u);
+      return true;
+    } catch (e) {
+      toast(L('toastSpeakFail'));
+      return false;
+    }
+  }
+
+  /* 여러 문장을 이어서 읽어요 (취소하지 않고 큐에 쌓기) */
+  function speakEnQueue(lines, rate) {
+    if (!('speechSynthesis' in window) || typeof window.SpeechSynthesisUtterance === 'undefined') {
+      toast(L('toastNoSpeak'));
+      return false;
+    }
+    try {
+      var synth = window.speechSynthesis;
+      synth.cancel();
+      for (var i = 0; i < lines.length; i++) {
+        var t = String(lines[i] || '').replace(/\s+/g, ' ').trim();
+        if (!t) continue;
+        var u = new window.SpeechSynthesisUtterance(t);
+        u.lang = 'en-US';
+        u.rate = rate || 0.82;
+        u.pitch = 1.08;
+        synth.speak(u);
+      }
+      return true;
+    } catch (e) {
+      toast(L('toastSpeakFail'));
+      return false;
+    }
+  }
+
+  function speakSightWord() {
+    if (!sightQ) return;
+    speakEn(sightQ.key, 0.72);
+  }
+
+  /* 탭에 들어오면 지금 문제를 한 번 들려줘요 */
+  function sightSayCurrent() {
+    if (!sightQ || sightQ.answered || sightQ.mode !== 'listen') return;
+    speakEn(sightQ.key, 0.78);
+  }
+
+  function speakSightSentence() {
+    if (!sightQ) return;
+    if (sightQ.ex) speakEn(sightQ.ex[0], 0.82);
+    else speakEn(sightQ.key, 0.72);
+  }
+
+  function stampFlash(n) {
+    var host = document.querySelector('.card-sight-game');
+    if (!host) return;
+    var old = host.querySelector('.sight-stamp');
+    if (old && old.parentNode) old.parentNode.removeChild(old);
+    var layer = document.createElement('div');
+    layer.className = 'sight-stamp';
+    var st = document.createElement('div');
+    st.className = 'st';
+    st.innerHTML = nbSVG(n);
+    layer.appendChild(st);
+    host.appendChild(layer);
+    setTimeout(function () {
+      if (layer.parentNode) layer.parentNode.removeChild(layer);
+    }, 900);
+  }
+
+  function addSightStamp() {
+    var day = state.daily;
+    day.sightBonus = Math.max(0, Math.round(Number(day.sightBonus) || 0)) + 1;
+    save();
+    renderStamps();
+    renderWeek();
+    renderTabCounts();
+    renderEveningHero();
+    beep('success');
+  }
+
+  function scheduleNextSight(ms) {
+    if (sightTimer) clearTimeout(sightTimer);
+    sightTimer = setTimeout(function () {
+      sightTimer = null;
+      if (activeTab !== 'sight' || document.hidden) return;
+      nextSightQuestion();
+    }, ms);
+  }
+
+  function answerSight(key) {
+    if (!sightQ || sightQ.answered) return;
+    var q = sightQ;
+    var rec = sightRec(q.key, q.entry.base);
+    var ok = key === q.key;
+    if (!state.daily.sight) state.daily.sight = { pos: 0, ok: 0, no: 0, last: '' };
+    var day = state.daily.sight;
+    q.answered = true;
+    q.chosen = key;
+    q.correct = ok;
+    rec.last = ok ? 'ok' : 'no';
+    if (ok) {
+      rec.ok++;
+      rec.streak++;
+      day.ok = (day.ok || 0) + 1;
+      beep('stamp');
+      stampFlash(1 + (rec.ok % 10));
+      if (rec.st !== 'known' && rec.streak >= 3) {
+        rec.st = 'known';
+        toast(Lf('toastSightMastered', { w: q.key }));
+        celebrate('master', q.key);
+      }
+    } else {
+      rec.no++;
+      rec.streak = 0;
+      rec.st = 'weak';
+      day.no = (day.no || 0) + 1;
+      beep('undo');
+    }
+    day.pos = Math.min(SIGHT_SET, (Math.round(Number(day.pos) || 0)) + 1);
+    day.last = q.key;
+    var done = day.pos >= SIGHT_SET;
+    if (done) day.pos = 0;
+    save();
+    renderSightHero();
+    renderSightQuestion();
+    renderWordGrid();
+    renderWordDetail();
+    renderTabCounts();
+    if (ok) speakEn(q.ex ? q.ex[0] : q.key, 0.82);
+    if (done) {
+      addSightStamp();
+      setTimeout(function () { celebrate('sight'); }, 420);
+    }
+    scheduleNextSight(done ? 3800 : (ok ? 2500 : 3300));
+  }
+
+  function setSightMode(mode) {
+    var m = mode === 'fill' ? 'fill' : 'listen';
+    if (!state.sight) state.sight = { words: {}, extra: [], mode: 'listen' };
+    if (state.sight.mode === m) return;
+    state.sight.mode = m;
+    save();
+    beep('tab');
+    nextSightQuestion();
+    renderWordGrid();
+    renderWordDetail();
+  }
+
+  function toggleSightStatus(key) {
+    var e = sightEntry(key);
+    if (!e) return;
+    var r = sightRec(key, e.base);
+    if (r.st === 'known') {
+      r.st = 'weak';
+      r.streak = 0;
+    } else {
+      r.st = 'known';
+      r.streak = 3;
+    }
+    save();
+    renderSight();
+    renderTabCounts();
+    beep('stamp');
+    toast(r.st === 'known' ? Lf('toastSightKnown', { w: e.w }) : Lf('toastSightPractice', { w: e.w }));
+  }
+
+  function renderWordGrid() {
+    var grid = $('wordGrid');
+    if (!grid) return;
+    var all = sightAll();
+    grid.innerHTML = '';
+    for (var i = 0; i < all.length; i++) {
+      var e = all[i];
+      var r = sightRec(e.key, e.base);
+      var card = document.createElement('div');
+      card.className = 'w-card' + (r.st === 'known' ? ' is-known' : '') + (sightOpen === e.key ? ' is-open' : '');
+      card.setAttribute('data-w', e.key);
+
+      var main = document.createElement('button');
+      main.type = 'button';
+      main.className = 'w-main';
+      main.setAttribute('aria-label', Lf('sightWordAria', { w: e.w }));
+      var tx = document.createElement('span');
+      tx.className = 'w-text';
+      tx.textContent = e.w;
+      var stt = document.createElement('span');
+      stt.className = 'w-stars';
+      stt.textContent = sightStars(r);
+      stt.setAttribute('title', Lf('sightStarsAria', { n: r.st === 'known' ? 3 : r.streak }));
+      main.appendChild(tx);
+      main.appendChild(stt);
+
+      var chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'w-state';
+      chip.setAttribute('data-state', e.key);
+      chip.setAttribute('aria-pressed', r.st === 'known' ? 'true' : 'false');
+      chip.setAttribute('aria-label', Lf('sightStateAria', { w: e.w }));
+      chip.textContent = r.st === 'known' ? L('sightKnown') : L('sightWeak');
+
+      card.appendChild(main);
+      card.appendChild(chip);
+      grid.appendChild(card);
+    }
+    var cnt = $('sightBoardCount');
+    if (cnt) cnt.textContent = all.length + ' · ⭐' + sightMastered();
+    var ttl = $('sightBoardTitle');
+    if (ttl) ttl.textContent = Lf('sightBoardTitle', { n: all.length });
+  }
+
+  function renderWordDetail() {
+    var box = $('wordDetail');
+    if (!box) return;
+    if (!sightOpen) {
+      box.hidden = true;
+      box.innerHTML = '';
+      return;
+    }
+    var e = sightEntry(sightOpen);
+    if (!e) {
+      sightOpen = '';
+      box.hidden = true;
+      box.innerHTML = '';
+      return;
+    }
+    box.hidden = false;
+    box.innerHTML = '';
+
+    var head = document.createElement('div');
+    head.className = 'wd-head';
+    var left = document.createElement('div');
+    var wd = document.createElement('span');
+    wd.className = 'wd-word';
+    wd.textContent = e.w;
+    left.appendChild(wd);
+    if (e.ko) {
+      var k = document.createElement('span');
+      k.className = 'wd-ko';
+      k.textContent = ' · ' + e.ko;
+      left.appendChild(k);
+    }
+    if (e.note) {
+      var n = document.createElement('span');
+      n.className = 'wd-ko';
+      n.textContent = ' · ' + e.note;
+      left.appendChild(n);
+    }
+    head.appendChild(left);
+    if (e.extra) {
+      var del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'wd-del';
+      del.setAttribute('data-del', e.key);
+      del.setAttribute('aria-label', Lf('sightDeleteAria', { w: e.w }));
+      del.textContent = L('sightDelete');
+      head.appendChild(del);
+    }
+    box.appendChild(head);
+
+    var r = sightRec(e.key, e.base);
+    var stars = document.createElement('p');
+    stars.className = 'hint';
+    stars.textContent = sightStars(r) + ' · ' +
+      (r.st === 'known' ? L('sightKnown') : L('sightWeak')) +
+      ' · ' + Lf('sightWordScore', { ok: r.ok, no: r.no });
+    box.appendChild(stars);
+
+    if (e.pics && e.pics.length) {
+      var pr = document.createElement('div');
+      pr.className = 'wd-pics';
+      for (var p = 0; p < e.pics.length; p++) {
+        var pb = document.createElement('button');
+        pb.type = 'button';
+        pb.className = 'wd-pic';
+        pb.setAttribute('data-say', e.pics[p][0]);
+        var em = document.createElement('span');
+        em.className = 'e';
+        em.textContent = e.pics[p][1] || '🔊';
+        pb.appendChild(em);
+        pb.appendChild(document.createTextNode(e.pics[p][0]));
+        pr.appendChild(pb);
+      }
+      box.appendChild(pr);
+    }
+
+    var list = document.createElement('div');
+    list.className = 'wd-list';
+    for (var i = 0; i < e.ex.length; i++) {
+      var row = document.createElement('button');
+      row.type = 'button';
+      row.className = 'wd-line';
+      row.setAttribute('data-say', e.ex[i][0]);
+      var emo = document.createElement('span');
+      emo.className = 'e';
+      emo.textContent = e.ex[i][2] || '🔊';
+      var t = document.createElement('span');
+      t.className = 't';
+      var bits = sentenceBits(e.ex[i][0], e.w, false);
+      for (var j = 0; j < bits.length; j++) t.appendChild(bits[j]);
+      var snd = document.createElement('span');
+      snd.className = 'snd';
+      snd.textContent = '🔊';
+      row.appendChild(emo);
+      row.appendChild(t);
+      row.appendChild(snd);
+      list.appendChild(row);
+    }
+    if (!e.ex.length) {
+      var none = document.createElement('p');
+      none.className = 'hint';
+      none.textContent = L('sightNoSentences');
+      list.appendChild(none);
+    }
+    box.appendChild(list);
+  }
+
+  function openSightWord(key) {
+    sightOpen = sightOpen === key ? '' : key;
+    renderWordGrid();
+    renderWordDetail();
+    if (sightOpen) speakEn(key, 0.72);
+  }
+
+  function addSightWordData(word, ko, lines) {
+    var w = String(word == null ? '' : word).trim().toLowerCase();
+    if (!w || !/^[a-z][a-z' -]{0,23}$/.test(w)) {
+      toast(L('toastSightNeedWord'));
+      return false;
+    }
+    var all = sightAll();
+    for (var i = 0; i < all.length; i++) {
+      if (String(all[i].w).toLowerCase() === w) {
+        toast(L('toastSightDup'));
+        return false;
+      }
+    }
+    var ex = [];
+    var src = lines || [];
+    for (var j = 0; j < src.length && ex.length < 8; j++) {
+      var t = String(src[j] == null ? '' : src[j]).trim().slice(0, 120);
+      if (t) ex.push([t, w, '']);
+    }
+    if (!state.sight) state.sight = { words: {}, extra: [], mode: 'listen' };
+    if (!Array.isArray(state.sight.extra)) state.sight.extra = [];
+    state.sight.extra.push({
+      w: w, ko: String(ko == null ? '' : ko).trim().slice(0, 24),
+      st: 'weak', note: '', pics: [], ex: ex
+    });
+    var r = sightRec(w, 'weak');
+    r.st = 'weak';
+    sightOpen = w;
+    save();
+    renderSight();
+    renderTabCounts();
+    return true;
+  }
+
+  function addSightWordFromForm() {
+    var wEl = $('sightNewWord'), kEl = $('sightNewKo'), eEl = $('sightNewEx');
+    if (!wEl) return;
+    var raw = String(eEl ? eEl.value : '').split(/\r?\n/);
+    var lines = [];
+    for (var i = 0; i < raw.length; i++) if (raw[i].trim()) lines.push(raw[i].trim());
+    var word = wEl.value.trim();
+    if (!addSightWordData(word, kEl ? kEl.value : '', lines)) return;
+    wEl.value = '';
+    if (kEl) kEl.value = '';
+    if (eEl) eEl.value = '';
+    toast(Lf('toastSightAdded', { w: word }));
+  }
+
+  function deleteSightWord(key) {
+    var list = (state.sight && state.sight.extra) || [];
+    var idx = -1;
+    for (var i = 0; i < list.length; i++) if (list[i].w === key) idx = i;
+    if (idx < 0) return;
+    list.splice(idx, 1);
+    if (state.sight.words) delete state.sight.words[key];
+    if (sightOpen === key) sightOpen = '';
+    if (sightQ && sightQ.key === key) sightQ = null;
+    save();
+    renderSight();
+    renderTabCounts();
+    toast(Lf('toastSightDeleted', { w: key }));
+  }
+
+  function bindSightEvents() {
+    var audio = $('sightAudio');
+    if (audio) audio.addEventListener('click', function () { speakSightWord(); });
+    var fbSpeak = $('sightFbSpeak');
+    if (fbSpeak) fbSpeak.addEventListener('click', function () { speakSightSentence(); });
+    var nextBtn = $('sightNext');
+    if (nextBtn) nextBtn.addEventListener('click', function () { beep('tab'); nextSightQuestion(); });
+    var opts = $('sightOptions');
+    if (opts) opts.addEventListener('click', function (ev) {
+      var b = ev.target.closest ? ev.target.closest('.opt-btn') : null;
+      if (!b || b.disabled) return;
+      answerSight(b.getAttribute('data-key'));
+    });
+    var modes = $('sightModeSwitch');
+    if (modes) modes.addEventListener('click', function (ev) {
+      var b = ev.target.closest ? ev.target.closest('.mode-btn') : null;
+      if (b) setSightMode(b.getAttribute('data-mode'));
+    });
+    var grid = $('wordGrid');
+    if (grid) grid.addEventListener('click', function (ev) {
+      var chip = ev.target.closest ? ev.target.closest('.w-state') : null;
+      if (chip) { toggleSightStatus(chip.getAttribute('data-state')); return; }
+      var main = ev.target.closest ? ev.target.closest('.w-main') : null;
+      if (main) {
+        var card = main.closest('.w-card');
+        if (card) openSightWord(card.getAttribute('data-w'));
+      }
+    });
+    var detail = $('wordDetail');
+    if (detail) detail.addEventListener('click', function (ev) {
+      var del = ev.target.closest ? ev.target.closest('.wd-del') : null;
+      if (del) { deleteSightWord(del.getAttribute('data-del')); return; }
+      var say = ev.target.closest ? ev.target.closest('[data-say]') : null;
+      if (say) speakEn(say.getAttribute('data-say'), 0.8);
+    });
+    var toggle = $('btnToggleAdd');
+    var form = $('sightAddForm');
+    if (toggle && form) toggle.addEventListener('click', function () {
+      var open = form.hidden;
+      form.hidden = !open;
+      toggle.textContent = open ? L('sightAddClose') : L('sightAddOpen');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open && $('sightNewWord')) $('sightNewWord').focus();
+    });
+    var addBtn = $('btnAddWord');
+    if (addBtn) addBtn.addEventListener('click', addSightWordFromForm);
+    var newWord = $('sightNewWord');
+    if (newWord) newWord.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); addSightWordFromForm(); }
+    });
+  }
+
+  /* ============================================================
+     💬 생활 영어 회화 — 엄마(Mom says) · 서한이(Seohan says)
+  ============================================================ */
+  var TALK = {
+    m1: { mom: ["Let's make your bed together!", '이불 같이 정리해 볼까?'],
+          kid: ['Okay! I can do it myself!', '응! 나 혼자서도 할 수 있어!'] },
+    m2: { mom: ['Drink a glass of water, please.', '물 한 컵 마셔 볼까?'],
+          kid: ['Yum, water is refreshing!', '맛있다! 물이 시원해!'] },
+    m3: { mom: ['Time to wash your face and brush your teeth!', '세수하고 양치할 시간이야!'],
+          kid: ['Look! My teeth are sparkling clean!', '봐! 내 이가 반짝반짝해!'] },
+    m4: { mom: ["Breakfast is ready! Let's eat!", '아침밥 다 됐어! 먹자!'],
+          kid: ["Thank you for the food! I'm hungry!", '잘 먹을게요! 배고파!'] },
+    m5: { mom: ["Let's get dressed for school.", '옷 갈아입고 유치원 갈 준비 하자.'],
+          kid: ['Ta-da! How do I look?', '짠! 나 어때?'] },
+    m6: { mom: ["Did you pack your backpack? Let's go!", '가방 챙겼어? 이제 가자!'],
+          kid: ["All packed! I'm ready to go!", '다 챙겼어! 갈 준비 완료!'] },
+
+    e1: { mom: ['Go wash your hands with soap!', '가서 비누로 손 씻어!'],
+          kid: ['All clean! Look at my hands!', '깨끗해! 내 손 봐!'] },
+    e2: { mom: ['Dinner time! Come to the table!', '저녁 시간이야! 식탁으로 와!'],
+          kid: ['It smells delicious!', '냄새가 너무 좋아!'] },
+    e3: { mom: ['Time to clean up your toys!', '장난감 정리할 시간이야!'],
+          kid: ['I put all my toys away!', '내 장난감 다 정리했어!'] },
+    e4: { mom: ["Let's take a warm bath!", '따뜻한 물로 목욕하자!'],
+          kid: ['Yay! Splash, splash!', '신난다! 첨벙첨벙!'] },
+    e5: { mom: ["Brush, brush! Let's brush before bed.", '치카치카! 자기 전에 양치하자.'],
+          kid: ['All done! No sugar bugs!', '다 했어! 충치 벌레 없어!'] },
+    e6: { mom: ["Let's get ready for tomorrow.", '내일 준비를 미리 해 두자.'],
+          kid: ['My bag is ready for tomorrow!', '내일 가방 준비 끝!'] },
+    e7: { mom: ['Time for bed! Sweet dreams!', '잘 시간이야! 좋은 꿈 꿔!'],
+          kid: ['Good night, Mommy! Love you!', '잘 자요 엄마! 사랑해요!'] },
+
+    h1: { mom: ["Let's do your EOS homework together.", 'EOS 숙제 같이 해 볼까?'],
+          kid: ["Okay! I'll do it now.", '응! 지금 할게!'] },
+    h2: { mom: ['Can you read this word for me?', '이 단어 읽어 줄 수 있어?'],
+          kid: ['Yes! This word is easy for me.', '응! 이 단어는 쉬워!'] },
+    h3: { mom: ["Let's count and do one page of math.", '하나 둘 세면서 수학 한 장 하자.'],
+          kid: ['I can count all by myself!', '나 혼자 셀 수 있어!'] },
+    h4: { mom: ["Let's find the shapes in this puzzle!", '이 퍼즐에서 도형을 찾아보자!'],
+          kid: ['Look! A square and a triangle!', '봐! 네모랑 세모야!'] },
+    h5: { mom: ["Let's think together on this page.", '이 페이지 같이 생각해 보자.'],
+          kid: ['I found the answer!', '답을 찾았어!'] }
+  };
+
+  var talkKindName = { morning: 'morningTitle', evening: 'eveningTitle', homework: 'homeworkTitle' };
+  var talkOpenKey = '';
+
+  function talkFor(kind, item) {
+    var t = TALK[item && item.id];
+    if (t) return t;
+    var label = (item && (item.en || item.ko)) || '';
+    return {
+      mom: ["Let's do this together — " + label + '!', '같이 해 보자!'],
+      kid: ['Okay! I can do it!', '응! 나도 할 수 있어!']
+    };
+  }
+
+  function openTalk(kind, id) {
+    var item = itemById(kind, id);
+    if (!item) return;
+    var t = talkFor(kind, item);
+    talkOpenKey = kind + ':' + id;
+    var modal = $('talkModal');
+    if (!modal) return;
+    if ($('talkKind')) $('talkKind').textContent = L(talkKindName[kind] || 'morningTitle');
+    if ($('talkItem')) $('talkItem').textContent = itemLabel(item);
+    if ($('talkMomEn')) $('talkMomEn').textContent = t.mom[0];
+    if ($('talkMomKo')) $('talkMomKo').textContent = t.mom[1];
+    if ($('talkKidEn')) $('talkKidEn').textContent = t.kid[0];
+    if ($('talkKidKo')) $('talkKidKo').textContent = t.kid[1];
+    modal.hidden = false;
+    document.documentElement.classList.add('modal-open');
+    var first = $('talkMomSay');
+    if (first) setTimeout(function () { first.focus(); }, 140);
+  }
+
+  function closeTalk() {
+    var modal = $('talkModal');
+    if (!modal || modal.hidden) return;
+    modal.hidden = true;
+    talkOpenKey = '';
+    document.documentElement.classList.remove('modal-open');
+  }
+
+  function talkLines() {
+    var mom = $('talkMomEn'), kid = $('talkKidEn');
+    return [mom ? mom.textContent : '', kid ? kid.textContent : ''];
+  }
+
+  function bindTalkEvents() {
+    document.addEventListener('click', function (ev) {
+      var open = ev.target.closest ? ev.target.closest('[data-talk]') : null;
+      if (open) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        var bits = String(open.getAttribute('data-talk')).split(':');
+        openTalk(bits[0], bits[1]);
+        beep('tab');
+        return;
+      }
+      var close = ev.target.closest ? ev.target.closest('[data-talk-close]') : null;
+      if (close) {
+        ev.preventDefault();
+        closeTalk();
+      }
+    }, true);
+
+    var momBtn = $('talkMomSay');
+    if (momBtn) momBtn.addEventListener('click', function () {
+      var m = $('talkMomEn');
+      if (m) speakEn(m.textContent, 0.8);
+    });
+    var kidBtn = $('talkKidSay');
+    if (kidBtn) kidBtn.addEventListener('click', function () {
+      var k = $('talkKidEn');
+      if (k) speakEn(k.textContent, 0.8);
+    });
+    var bothBtn = $('talkBoth');
+    if (bothBtn) bothBtn.addEventListener('click', function () {
+      speakEnQueue(talkLines(), 0.8);
+    });
+  }
+
   /* ============================================================
      이벤트 연결
   ============================================================ */
@@ -3632,6 +5619,7 @@ function iconSVG(key) {
     var homeworkList = $('homeworkList');
     function onListClick(kind) {
       return function (e) {
+        if (e.target.closest && e.target.closest('.talk-btn')) return;
         var row = e.target.closest ? e.target.closest('.check-row') : null;
         if (!row) return;
         toggleItem(kind, row.getAttribute('data-id'), row);
@@ -3640,6 +5628,16 @@ function iconSVG(key) {
     morningList.addEventListener('click', onListClick('morning'));
     eveningList.addEventListener('click', onListClick('evening'));
     homeworkList.addEventListener('click', onListClick('homework'));
+    [['morning', morningList], ['evening', eveningList], ['homework', homeworkList]].forEach(function (pair) {
+      pair[1].addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        if (e.target.closest && e.target.closest('.talk-btn')) return;
+        var row = e.target.closest ? e.target.closest('.check-row') : null;
+        if (!row) return;
+        e.preventDefault();
+        toggleItem(pair[0], row.getAttribute('data-id'), row);
+      });
+    });
 
     /* 지금 할 일 — 그림을 눌러도 완료 */
     $('nowTap').addEventListener('click', function () {
@@ -3649,16 +5647,23 @@ function iconSVG(key) {
     });
 
     /* 탭 전환 */
-    ['morning', 'evening'].forEach(function (name) {
-      var btn = $('tab' + (name === 'evening' ? 'Evening' : 'Morning'));
+    TABS.forEach(function (name) {
+      var btn = $(tabBtnId(name));
+      if (!btn) return;
       btn.addEventListener('click', function () { chooseTab(name); });
       btn.addEventListener('keydown', function (e) {
         if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
         e.preventDefault();
-        chooseTab(activeTab === 'morning' ? 'evening' : 'morning');
-        $('tab' + (activeTab === 'evening' ? 'Evening' : 'Morning')).focus();
+        var idx = TABS.indexOf(activeTab);
+        var step = e.key === 'ArrowRight' ? 1 : TABS.length - 1;
+        var nextName = TABS[(idx + step) % TABS.length];
+        chooseTab(nextName);
+        var nb = $(tabBtnId(nextName));
+        if (nb) nb.focus();
       });
     });
+    bindSightEvents();
+    bindTalkEvents();
     $('supplyChecks').addEventListener('click', function (e) {
       var chip = e.target.closest ? e.target.closest('.supply-chip') : null;
       if (chip) toggleSupply(Number(chip.getAttribute('data-idx')));
@@ -3677,7 +5682,9 @@ function iconSVG(key) {
       el.addEventListener('click', closeSettings);
     });
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && !$('settingsModal').hidden) closeSettings();
+      if (e.key !== 'Escape') return;
+      if (!$('talkModal').hidden) { closeTalk(); return; }
+      if (!$('settingsModal').hidden) closeSettings();
     });
 
     $('btnSaveSettings').addEventListener('click', saveSettings);
@@ -3810,7 +5817,7 @@ function iconSVG(key) {
 
   /* 테스트/점검용 (화면에는 영향 없음) */
   window.__seohanTest = {
-    version: '3.0.0',
+    version: '3.2.0',
     storageVersion: STORAGE_VERSION,
     getState: function () { return JSON.parse(JSON.stringify(state)); },
     setState: function (s) { state = s; save(); renderAll(); },
@@ -3848,6 +5855,54 @@ function iconSVG(key) {
     itemLabel: function (kind, id) {
       var it = itemById(kind, id);
       return it ? itemLabel(it) : '';
+    },
+    tabs: function () { return TABS.slice(); },
+    sight: {
+      list: function () {
+        return sightAll().map(function (e) {
+          var r = sightRec(e.key, e.base);
+          return { w: e.w, st: r.st, ok: r.ok, no: r.no, streak: r.streak, ex: e.ex.length, extra: e.extra };
+        });
+      },
+      question: function () {
+        if (!sightQ) return null;
+        return {
+          key: sightQ.key, options: sightQ.options.slice(), mode: sightQ.mode,
+          answered: sightQ.answered, correct: sightQ.correct,
+          sentence: sightQ.ex ? sightQ.ex[0] : ''
+        };
+      },
+      answer: function (key) { answerSight(key == null ? (sightQ && sightQ.key) : key); },
+      next: function () { nextSightQuestion(); },
+      mode: function () { return state.sight.mode; },
+      setMode: function (m) { setSightMode(m); },
+      toggle: function (w) { toggleSightStatus(w); },
+      open: function (w) { openSightWord(w); },
+      add: function (w, ko, ex) { return addSightWordData(w, ko, ex || []); },
+      remove: function (w) { deleteSightWord(w); },
+      openWord: function () { return sightOpen; },
+      stats: function () {
+        var d = state.daily.sight || {};
+        return {
+          pos: d.pos || 0, ok: d.ok || 0, no: d.no || 0,
+          bonus: state.daily.sightBonus || 0,
+          mastered: sightMastered(), total: sightAll().length
+        };
+      }
+    },
+    talk: {
+      open: function (kind, id) { openTalk(kind, id); },
+      close: function () { closeTalk(); },
+      openKey: function () { return talkOpenKey; },
+      text: function () {
+        return {
+          mom: $('talkMomEn').textContent, momKo: $('talkMomKo').textContent,
+          kid: $('talkKidEn').textContent, kidKo: $('talkKidKo').textContent,
+          item: $('talkItem').textContent, kind: $('talkKind').textContent
+        };
+      },
+      has: function (id) { return !!TALK[id]; },
+      keys: function () { return Object.keys(TALK); }
     }
   };
 })();
