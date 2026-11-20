@@ -1209,6 +1209,14 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
   .card-morning .check-row .label, .card-evening .check-row .label{font-size:.8rem}
   .card-morning .check-row, .card-evening .check-row{padding:.35rem .3rem .3rem; border-radius:17px}
 }
+
+/* 좁은 휴대폰: 탭 라벨이 잘리지 않게 */
+@media (max-width:560px){
+  .tab-btn{padding:.3rem .4rem; gap:.25rem}
+  .tab-btn .tab-count{display:none}
+  .tab-btn .tab-label{font-size:.82rem}
+  .tab-btn .tab-emoji{font-size:1.05rem}
+}
 </style>
 </head>
 <body>
