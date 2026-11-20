@@ -293,7 +293,7 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
 /* ===== 큰 그림 배지 ===== */
 .pic{
   flex:0 0 auto;
-  width:clamp(38px,2.9rem,50px); height:clamp(38px,2.9rem,50px);
+  width:clamp(44px,3.2rem,56px); height:clamp(44px,3.2rem,56px);
   border-radius:1rem; display:grid; place-items:center;
   background:#f4f2ff;
   box-shadow:inset 0 0 0 2px rgba(255,255,255,.75), 0 1px 0 rgba(42,42,60,.05);
@@ -1689,6 +1689,83 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
   .tab-btn .tab-label{font-size:.82rem}
   .tab-btn .tab-emoji{font-size:1.05rem}
 }
+
+/* ===== 🏖️ 공휴일 토글 ===== */
+.holiday-btn{
+  display:flex; align-items:center; gap:.32rem; height:2.6rem; padding:0 .66rem;
+  border-radius:14px; background:#fff; color:#8a5300; font-size:.82rem; font-weight:900;
+  box-shadow:0 2px 0 rgba(42,42,60,.10), 0 6px 14px rgba(42,42,60,.08);
+  border:2px solid #ffe1a8; cursor:pointer; white-space:nowrap;
+}
+.holiday-btn .holiday-ico{font-size:1.05rem; line-height:1}
+.holiday-btn:active{transform:translateY(1px)}
+.holiday-btn.on{background:linear-gradient(180deg,#ddf5ff,#b3e8ff); color:#075985; border-color:#7dd3fc; box-shadow:0 2px 0 #7dd3fc}
+.holiday-btn.auto{opacity:.94}
+@media (max-width:600px){ .holiday-btn .holiday-txt{display:none} .holiday-btn{padding:0 .5rem} }
+
+/* ===== 주말 · 공휴일 화면 ===== */
+.wk-board{flex:1 0 auto; display:grid; gap:var(--gap); grid-template-columns:minmax(0,1fr); align-content:start; max-width:1500px; margin:0 auto; width:100%}
+.wk-hero{background:linear-gradient(150deg,#fff 0%,#f4fbff 45%,#e7f7ff 100%); border:2px solid #c7e9ff}
+.wk-hero .hero-chip.wk-am{background:#fff1d6; color:#96650a}
+.wk-hero .hero-chip.wk-noon{background:#fff8cc; color:#8a6d00}
+.wk-hero .hero-chip.wk-pm{background:#e9e1ff; color:#4c3aa8}
+.wk-hero .hero-chip.wk-study{background:#ffe6f1; color:#a01a5f}
+.wk-hero .progress-fill.study-fill{background:linear-gradient(90deg,#f472b6,#8b5cf6,#38bdf8,#22c55e)}
+.wk-list-card{background:linear-gradient(170deg,#fffdf8 0%,#fff 60%); border:2px solid #f0e7d6}
+.wk-side{display:flex; flex-direction:column; gap:var(--gap); min-width:0}
+.wk-play-btn{
+  margin-top:.65rem; width:100%; display:flex; align-items:center; justify-content:center; gap:.45rem;
+  min-height:3rem; border-radius:16px; background:linear-gradient(180deg,#fff,#f4edff);
+  border:2px solid #e3d8ff; color:#5b46c9; font-size:1rem; font-weight:900;
+  box-shadow:0 3px 0 rgba(91,70,201,.16); cursor:pointer;
+}
+.wk-play-btn:active{transform:translateY(2px); box-shadow:0 1px 0 rgba(91,70,201,.16)}
+.wk-sight-back{max-width:1500px; margin:0 auto .55rem; width:100%}
+.wk-sight-back[hidden]{display:none}
+.wk-tabbar[hidden]{display:none}
+
+/* 주말 루틴은 크고 또렷하게 */
+.check-list.big .check-row{min-height:4.05rem; padding:.5rem .7rem .5rem .5rem; border-radius:20px; gap:.7rem}
+.check-list.big .check-row .label{font-size:1.14rem}
+.check-list.big .pic{width:clamp(52px,4.1rem,72px); height:clamp(52px,4.1rem,72px); border-radius:1.25rem}
+.check-list.big .check-row .mark{width:3rem; height:3rem}
+.check-list.big .check-row .mark .nb{width:2.25rem; height:2.25rem}
+.wk-hero .wk-big .num{color:#0f7a44}
+
+@media (min-width:900px) and (orientation:landscape){
+  .wk-board{
+    height:100%;
+    grid-template-columns:minmax(0,.95fr) minmax(0,1.55fr);
+    grid-template-rows:auto minmax(0,1fr);
+    grid-template-areas:"wkhero wklist" "wkside wklist";
+  }
+  .wk-hero{grid-area:wkhero}
+  .wk-list-card{grid-area:wklist; display:flex; flex-direction:column; min-height:0}
+  .wk-list-card .check-list.big{flex:1 1 auto; min-height:0; overflow:auto}
+  .wk-side{grid-area:wkside; overflow:auto; min-height:0}
+  .check-list.big .check-row{min-height:3.6rem}
+  .panel-morning .card-morning, .panel-evening .card-homework{overflow:auto}
+}
+
+/* ===== 🍚 밥 3끼 보너스 ===== */
+.card-meal{background:linear-gradient(160deg,#fffdf5 0%,#fff5e4 100%); border:2px solid #ffe0a8}
+.meal-row{display:flex; gap:.42rem; margin-top:.15rem}
+.meal-chip{
+  flex:1 1 0; min-width:0; display:flex; flex-direction:column; align-items:center; gap:.1rem;
+  padding:.45rem .2rem .4rem; border-radius:14px; background:#fff; border:2px dashed #eadfca;
+  opacity:.66; transition:opacity .2s, background .2s, border-color .2s, box-shadow .2s;
+}
+.meal-chip .m-emoji{font-size:1.1rem; line-height:1}
+.meal-chip .m-name{font-size:.72rem; font-weight:900; color:#8a7a5c; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%}
+.meal-chip .m-bowl{font-size:1.3rem; line-height:1; filter:grayscale(1); opacity:.42; transition:filter .2s, opacity .2s}
+.meal-chip.on{opacity:1; border-style:solid; border-color:#f8c667; background:linear-gradient(180deg,#fff9e3,#ffeec2); box-shadow:0 2px 0 #eed08a}
+.meal-chip.on .m-bowl{filter:none; opacity:1; animation:bowlPop .45s cubic-bezier(.2,1.6,.4,1)}
+@keyframes bowlPop{0%{transform:scale(.55) rotate(-12deg)}60%{transform:scale(1.22) rotate(6deg)}100%{transform:scale(1) rotate(0)}}
+.meal-stars{display:flex; justify-content:center; gap:.55rem; margin-top:.55rem; font-size:1.4rem; line-height:1}
+.meal-star{filter:grayscale(1); opacity:.26; transition:filter .25s, opacity .25s}
+.meal-star.on{filter:none; opacity:1; animation:bowlPop .5s cubic-bezier(.2,1.6,.4,1)}
+.meal-note{margin-top:.5rem; font-size:.78rem; font-weight:800; color:var(--ink-faint); text-align:center; line-height:1.35}
+.meal-note.on{color:#0f7a44}
 </style>
 </head>
 <body>
@@ -1706,13 +1783,16 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
       </div>
     </div>
     <div class="topbar-right">
+      <button class="holiday-btn" id="btnHoliday" type="button" aria-pressed="false" aria-label="공휴일 모드" title="공휴일 모드">
+        <span class="holiday-ico" aria-hidden="true">🏖️</span><span class="holiday-txt" data-i18n="holidayBtn">공휴일</span>
+      </button>
       <button class="sync-pill off" id="syncDot" type="button" aria-live="polite">
         <span class="dot off" aria-hidden="true"></span><span class="txt" id="syncDotText">오프라인</span>
       </button>
       <button class="refresh-btn" id="btnRefreshApp" type="button" aria-label="최신 버전으로 새로고침" title="최신 버전으로 새로고침">
         <span class="refresh-ico" aria-hidden="true">🔄</span>
       </button>
-      <span class="app-ver" id="appVer" title="앱 버전">v5.3.0</span>
+      <span class="app-ver" id="appVer" title="앱 버전">v5.4.0</span>
       <button class="wake-btn" id="btnWakeQuick" type="button" aria-pressed="false" aria-label="화면 켜짐 유지" title="화면 켜짐 유지">
         <span class="wake-ico" id="wakeQuickIcon" aria-hidden="true">🌙</span><span class="wake-txt" id="wakeQuickText">꺼짐</span>
       </button>
@@ -1741,7 +1821,7 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
   </header>
 
   <!-- 탭 : 아침 / 방과 후 -->
-  <nav class="tabbar" data-i18n-aria="tabsAria" aria-label="루틴 탭">
+  <nav class="tabbar" id="weekdayTabbar" data-i18n-aria="tabsAria" aria-label="루틴 탭">
     <div class="tabbar-inner" role="tablist">
       <button class="tab-btn is-on" id="tabMorning" type="button" role="tab"
               aria-selected="true" aria-controls="panelMorning" data-tab="morning">
@@ -1760,6 +1840,36 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
         <span class="tab-emoji" aria-hidden="true">🔤</span>
         <span class="tab-label" data-i18n="tabSight">Sight Words</span>
         <span class="tab-count" id="tabSightCount">0 / 15</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- 탭 : 주말·공휴일 🌅 아침 / ☀️ 점심 / 🌙 저녁 / 📖 Study -->
+  <nav class="tabbar wk-tabbar" id="weekendTabbar" data-i18n-aria="tabsAria" aria-label="루틴 탭" hidden>
+    <div class="tabbar-inner" role="tablist">
+      <button class="tab-btn is-on" id="tabWm" type="button" role="tab"
+              aria-selected="true" aria-controls="panelWm" data-tab="wm">
+        <span class="tab-emoji" aria-hidden="true">🌅</span>
+        <span class="tab-label" data-i18n="tabWm">아침</span>
+        <span class="tab-count" id="tabWmCount">0 / 5</span>
+      </button>
+      <button class="tab-btn" id="tabWl" type="button" role="tab"
+              aria-selected="false" aria-controls="panelWl" data-tab="wl" tabindex="-1">
+        <span class="tab-emoji" aria-hidden="true">☀️</span>
+        <span class="tab-label" data-i18n="tabWl">점심</span>
+        <span class="tab-count" id="tabWlCount">0 / 3</span>
+      </button>
+      <button class="tab-btn" id="tabWe" type="button" role="tab"
+              aria-selected="false" aria-controls="panelWe" data-tab="we" tabindex="-1">
+        <span class="tab-emoji" aria-hidden="true">🌙</span>
+        <span class="tab-label" data-i18n="tabWe">저녁</span>
+        <span class="tab-count" id="tabWeCount">0 / 7</span>
+      </button>
+      <button class="tab-btn" id="tabWs" type="button" role="tab"
+              aria-selected="false" aria-controls="panelWs" data-tab="ws" tabindex="-1">
+        <span class="tab-emoji" aria-hidden="true">📖</span>
+        <span class="tab-label" data-i18n="tabWs">Study</span>
+        <span class="tab-count" id="tabWsCount">0 / 4</span>
       </button>
     </div>
   </nav>
@@ -1981,9 +2091,179 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
       </div>
     </div>
 
+    <!-- ===== 주말·공휴일 : 🌅 아침 ===== -->
+    <div class="panel panel-wk" id="panelWm" role="tabpanel" aria-labelledby="tabWm" hidden>
+      <div class="board wk-board">
+        <section class="card wk-hero">
+          <div class="hero-top">
+            <h2 class="hero-chip wk-am" data-i18n="wkAmChip">🌅 아침</h2>
+            <span class="depart-chip" id="wmHeroChip">—</span>
+          </div>
+          <div class="hero-big wk-big">0 / 5</div>
+          <div class="hero-sub wk-sub" data-i18n="wkSub">천천히 하나씩 해 볼까요?</div>
+          <div class="progress">
+            <div class="progress-track"><div class="progress-fill wk-fill"></div></div>
+            <div class="progress-meta"><span class="wk-pct">0%</span><span class="wk-meta-r" data-i18n="wkMeta">오늘의 주말 루틴</span></div>
+          </div>
+        </section>
+
+        <section class="card wk-list-card">
+          <div class="card-head">
+            <h2 data-i18n="wkAmTitle">🌅 주말 아침 루틴</h2>
+            <span class="count-pill" id="wmCount">0 / 5</span>
+          </div>
+          <div class="mini-progress" aria-hidden="true"><span id="wmBar"></span></div>
+          <div class="check-list big" id="wmList"></div>
+          <p class="done-note" id="wmNote">그림을 하나씩 눌러 볼까요?</p>
+        </section>
+
+        <div class="wk-side">
+          <div class="meal-slot" id="mealSlotWm">
+            <!-- 🍚 밥 3끼 콤보 보상 카드 (탭을 옮기면 함께 움직여요) -->
+            <section class="card card-meal" id="cardMeal" aria-labelledby="mealTitle">
+              <div class="card-head">
+                <h2 id="mealTitle" data-i18n="mealTitle">🍚 오늘의 밥 3끼</h2>
+                <span class="count-pill soft" id="mealCount">0 / 3</span>
+              </div>
+              <div class="meal-row" id="mealRow" role="list">
+                <div class="meal-chip" data-meal="am" role="listitem">
+                  <span class="m-emoji" aria-hidden="true">🌅</span>
+                  <span class="m-name" data-i18n="mealAm">아침</span>
+                  <span class="m-bowl" aria-hidden="true">🍚</span>
+                </div>
+                <div class="meal-chip" data-meal="noon" role="listitem">
+                  <span class="m-emoji" aria-hidden="true">☀️</span>
+                  <span class="m-name" data-i18n="mealNoon">점심</span>
+                  <span class="m-bowl" aria-hidden="true">🍚</span>
+                </div>
+                <div class="meal-chip" data-meal="pm" role="listitem">
+                  <span class="m-emoji" aria-hidden="true">🌙</span>
+                  <span class="m-name" data-i18n="mealPm">저녁</span>
+                  <span class="m-bowl" aria-hidden="true">🍚</span>
+                </div>
+              </div>
+              <div class="meal-stars" id="mealStars" aria-hidden="true">
+                <span class="meal-star" data-i="0">⭐</span>
+                <span class="meal-star" data-i="1">⭐</span>
+                <span class="meal-star" data-i="2">⭐</span>
+              </div>
+              <p class="meal-note" id="mealNote">3끼를 다 먹으면 넘버블럭스 친구가 한 명 더 와요!</p>
+            </section>
+          </div>
+          <div class="stamp-slot" id="stampSlotWm"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 주말·공휴일 : ☀️ 점심 ===== -->
+    <div class="panel panel-wk" id="panelWl" role="tabpanel" aria-labelledby="tabWl" hidden>
+      <div class="board wk-board">
+        <section class="card wk-hero">
+          <div class="hero-top">
+            <h2 class="hero-chip wk-noon" data-i18n="wkNoonChip">☀️ 점심</h2>
+            <span class="depart-chip" id="wlHeroChip">—</span>
+          </div>
+          <div class="hero-big wk-big">0 / 3</div>
+          <div class="hero-sub wk-sub" data-i18n="wkSub">천천히 하나씩 해 볼까요?</div>
+          <div class="progress">
+            <div class="progress-track"><div class="progress-fill wk-fill"></div></div>
+            <div class="progress-meta"><span class="wk-pct">0%</span><span class="wk-meta-r" data-i18n="wkMeta">오늘의 주말 루틴</span></div>
+          </div>
+        </section>
+
+        <section class="card wk-list-card">
+          <div class="card-head">
+            <h2 data-i18n="wkNoonTitle">☀️ 점심 루틴</h2>
+            <span class="count-pill" id="wlCount">0 / 3</span>
+          </div>
+          <div class="mini-progress" aria-hidden="true"><span id="wlBar"></span></div>
+          <div class="check-list big" id="wlList"></div>
+          <p class="done-note" id="wlNote">그림을 하나씩 눌러 볼까요?</p>
+        </section>
+
+        <div class="wk-side">
+          <div class="meal-slot" id="mealSlotWl"></div>
+          <div class="stamp-slot" id="stampSlotWl"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 주말·공휴일 : 🌙 저녁 ===== -->
+    <div class="panel panel-wk" id="panelWe" role="tabpanel" aria-labelledby="tabWe" hidden>
+      <div class="board wk-board">
+        <section class="card wk-hero">
+          <div class="hero-top">
+            <h2 class="hero-chip wk-pm" data-i18n="wkPmChip">🌙 저녁</h2>
+            <span class="depart-chip" id="weHeroChip">—</span>
+          </div>
+          <div class="hero-big wk-big">0 / 7</div>
+          <div class="hero-sub wk-sub" data-i18n="wkSub">천천히 하나씩 해 볼까요?</div>
+          <div class="progress">
+            <div class="progress-track"><div class="progress-fill wk-fill"></div></div>
+            <div class="progress-meta"><span class="wk-pct">0%</span><span class="wk-meta-r" data-i18n="wkMeta">오늘의 주말 루틴</span></div>
+          </div>
+        </section>
+
+        <section class="card wk-list-card">
+          <div class="card-head">
+            <h2 data-i18n="wkPmTitle">🌙 주말 저녁 루틴</h2>
+            <span class="count-pill eve" id="weCount">0 / 7</span>
+          </div>
+          <div class="mini-progress eve" aria-hidden="true"><span id="weBar"></span></div>
+          <div class="check-list big" id="weList"></div>
+          <p class="done-note" id="weNote">그림을 하나씩 눌러 볼까요?</p>
+        </section>
+
+        <div class="wk-side">
+          <div class="meal-slot" id="mealSlotWe"></div>
+          <div class="stamp-slot" id="stampSlotWe"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 주말·공휴일 : 📖 Study ===== -->
+    <div class="panel panel-wk" id="panelWs" role="tabpanel" aria-labelledby="tabWs" hidden>
+      <div class="board wk-board">
+        <section class="card wk-hero">
+          <div class="hero-top">
+            <h2 class="hero-chip wk-study" data-i18n="wkStudyChip">📖 Study</h2>
+            <span class="depart-chip" id="wsHeroChip">—</span>
+          </div>
+          <div class="hero-big wk-big">0 / 4</div>
+          <div class="hero-sub wk-sub" data-i18n="wkStudySub">한 장씩 하고 스티커를 붙여요!</div>
+          <div class="progress">
+            <div class="progress-track"><div class="progress-fill wk-fill study-fill"></div></div>
+            <div class="progress-meta"><span class="wk-pct">0%</span><span class="wk-meta-r" data-i18n="wkMetaStudy">오늘의 공부</span></div>
+          </div>
+          <button class="wk-play-btn" id="btnSightPlay" type="button" aria-haspopup="dialog" aria-controls="panelSight">
+            <span aria-hidden="true">🔤</span><span data-i18n="wkSightPlay">Sight Words 단어 놀이</span>
+          </button>
+        </section>
+
+        <section class="card wk-list-card">
+          <div class="card-head">
+            <h2 data-i18n="wkStudyTitle">📖 오늘의 공부</h2>
+            <span class="count-pill" id="wsCount">0 / 4</span>
+          </div>
+          <div class="mini-progress" aria-hidden="true"><span id="wsBar"></span></div>
+          <div class="check-list big" id="wsList"></div>
+          <p class="done-note" id="wsNote">한 장씩 끝내면 넘버블럭스 도장이 찍혀요!</p>
+        </section>
+
+        <div class="wk-side">
+          <div class="meal-slot" id="mealSlotWs"></div>
+          <div class="stamp-slot" id="stampSlotWs"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- ===== Sight Words 탭 ===== -->
     <div class="panel panel-sight" id="panelSight" role="tabpanel" aria-labelledby="tabSight" hidden>
       <div class="board">
+
+        <div class="wk-sight-back" id="wkSightBack" hidden>
+          <button class="ghost-btn" id="btnSightBack" type="button">← <span data-i18n="wkSightBack">Study로 돌아가기</span></button>
+        </div>
 
         <div class="col col-a">
 
@@ -13410,14 +13690,15 @@ window.VOICE_AUDIO = {
    — 글자를 못 읽는 만 4세도 그림만 보고 무엇인지 알 수 있게
    ============================================================ */
 var ICON_ORDER = [
-  'bed', 'water', 'wash', 'tooth', 'meal', 'dinner', 'hands', 'toys', 'bath',
-  'prep', 'sleep', 'bag', 'dress', 'book', 'abc', 'math', 'shapes', 'puzzle',
+  'bed', 'water', 'wash', 'tooth', 'meal', 'dinner', 'hands', 'toys', 'bath', 'shower',
+  'bottle', 'prep', 'sleep', 'bag', 'dress', 'book', 'abc', 'math', 'shapes', 'puzzle',
   'uniform', 'indoor', 'ballet', 'gym', 'sneakers', 'bookclub', 'star'
 ];
 
 var ICON_BG = {
-  bed: '#FFF1DC', water: '#E4F5FF', wash: '#E8F4FF', tooth: '#E9F8F1', meal: '#FFF3E0',
-  dinner: '#FFF0F3', hands: '#E4F6FF', toys: '#FFF1DE', bath: '#E3F6FF', prep: '#FFF0F6',
+  bed: '#FFF1DC', water: '#E4F5FF', wash: '#E8F4FF', tooth: '#EDF9F3', meal: '#FFF3E0',
+  dinner: '#FFF0F3', hands: '#E4F6FF', toys: '#FFF1DE', bath: '#E3F6FF', shower: '#E6F7FF',
+  bottle: '#FFF6DA', prep: '#FFF0F6',
   sleep: '#F0ECFF', bag: '#FFF0DE', dress: '#FFF0F4', book: '#FFF4E6', abc: '#FFF7DA',
   math: '#E6F4FF', shapes: '#FFF0F6', puzzle: '#F2EBFF', uniform: '#EEF3FA', indoor: '#F0F8FF',
   ballet: '#FFF0F6', gym: '#E9F0FA', sneakers: '#EBFAF2', bookclub: '#FFF3E6', star: '#FFF7DA'
@@ -13440,178 +13721,209 @@ function shoeBody(t, stripe) {
 }
 
 var ICONS = {
-  /* 이불 정리 — 침대 */
-  bed: '<rect x="6" y="16" width="5.4" height="19" rx="2.4" fill="#C97B3F"/>' +
-    '<rect x="9.5" y="33" width="4.6" height="7" rx="1.9" fill="#A96431"/>' +
-    '<rect x="34" y="33" width="4.6" height="7" rx="1.9" fill="#A96431"/>' +
-    '<rect x="10.5" y="26" width="31" height="8" rx="3.6" fill="#FFFFFF" stroke="#E8D6C2" stroke-width="1.6"/>' +
-    '<path d="M21 22h17.4A3.6 3.6 0 0 1 42 25.6V31a3.6 3.6 0 0 1-3.6 3.6H21z" fill="#5FB4EE"/>' +
-    '<rect x="21" y="22" width="21" height="3.6" rx="1.8" fill="#8ACAF3"/>' +
-    '<rect x="12.6" y="20.6" width="9" height="6" rx="3" fill="#FFFFFF" stroke="#D9E6F2" stroke-width="1.4"/>',
+  /* 이불 정리 — 침대와 이불 */
+  bed: '<rect x="5.5" y="12" width="7" height="21" rx="3.2" fill="#C08552"/>' +
+    '<rect x="7" y="31" width="5" height="9" rx="2.2" fill="#9A6234"/>' +
+    '<rect x="36" y="30" width="5.6" height="10" rx="2.4" fill="#9A6234"/>' +
+    '<rect x="10" y="23.6" width="30.5" height="9.4" rx="4.4" fill="#FFFBF2" stroke="#E9D9C3" stroke-width="1.6"/>' +
+    '<path d="M19 18.6h17.5a4.4 4.4 0 0 1 4.4 4.4v9h-21.9z" fill="#4FA3E3"/>' +
+    '<path d="M19 18.6h17.5a4.4 4.4 0 0 1 4.4 4.4v2.4h-21.9z" fill="#84C8F6"/>' +
+    '<path d="M25.4 25.4v7.6" stroke="#3B87C4" stroke-width="1.5" opacity=".55"/>' +
+    '<rect x="11.2" y="17.6" width="9.4" height="6.6" rx="3.3" fill="#FFFFFF" stroke="#DCE7F2" stroke-width="1.5"/>',
 
   /* 물 마시기 — 물컵 */
-  water: '<path d="M14.5 12h19l-2 25.6a4.3 4.3 0 0 1-4.3 3.9h-6.4a4.3 4.3 0 0 1-4.3-3.9z" fill="#EDF9FF" stroke="#8CCBEA" stroke-width="2" stroke-linejoin="round"/>' +
-    '<path d="M16.1 21.6h15.8L30.4 37a3 3 0 0 1-3 2.7h-6.8a3 3 0 0 1-3-2.7z" fill="#54B6E8"/>' +
-    '<rect x="18.8" y="14.4" width="2.8" height="5.2" rx="1.4" fill="#FFFFFF" opacity="0.9"/>' +
-    '<path d="M36 6.4c1.7 2.4 2.8 3.9 2.8 5.4a2.8 2.8 0 1 1-5.6 0c0-1.5 1.1-3 2.8-5.4z" fill="#54B6E8"/>',
+  water: '<path d="M12.6 9.5h22.8l-2.6 29a4.3 4.3 0 0 1-4.3 3.9h-9a4.3 4.3 0 0 1-4.3-3.9z" fill="#EAF9FF" stroke="#4FB0E4" stroke-width="2.4" stroke-linejoin="round"/>' +
+    '<path d="M14.6 20.6h18.8l-1.9 17.6a3 3 0 0 1-3 2.7h-9a3 3 0 0 1-3-2.7z" fill="#3FA9E3"/>' +
+    '<ellipse cx="24" cy="20.6" rx="9.4" ry="2.2" fill="#8EDCF7"/>' +
+    '<rect x="18" y="13.6" width="3.2" height="6" rx="1.6" fill="#FFFFFF" opacity=".9"/>' +
+    '<path d="M37.4 3.6c2.2 3.1 3.4 5 3.4 6.8a3.4 3.4 0 1 1-6.8 0c0-1.8 1.2-3.7 3.4-6.8z" fill="#3FA9E3"/>',
 
   /* 세수 — 세면대와 수도꼭지 */
-  wash: '<path d="M24 27V15a4.6 4.6 0 0 1 4.6-4.6h3.4" fill="none" stroke="#9FB0C4" stroke-width="4.2" stroke-linecap="round"/>' +
-    '<path d="M34 10.4v7.6" stroke="#9FB0C4" stroke-width="4.2" stroke-linecap="round"/>' +
-    '<rect x="15" y="17.6" width="9.4" height="3.8" rx="1.9" fill="#9FB0C4"/>' +
-    '<path d="M34 19.4v5.6" stroke="#6FC3EC" stroke-width="3.6" stroke-linecap="round"/>' +
-    '<circle cx="30.8" cy="23.6" r="1.7" fill="#BFE6F7"/>' +
-    '<circle cx="37.4" cy="24.4" r="1.4" fill="#BFE6F7"/>' +
-    '<path d="M8 28h32v6.6a6 6 0 0 1-6 6H14a6 6 0 0 1-6-6z" fill="#D7E9F6" stroke="#B9D3E8" stroke-width="1.9" stroke-linejoin="round"/>' +
-    '<ellipse cx="24" cy="28" rx="16.2" ry="4.8" fill="#F2FAFF" stroke="#B9D3E8" stroke-width="1.7"/>',
+  wash: '<path d="M23 27V15.4a5 5 0 0 1 5-5h3.6" fill="none" stroke="#9FB0C4" stroke-width="4.6" stroke-linecap="round"/>' +
+    '<path d="M33.6 10v8.2" stroke="#9FB0C4" stroke-width="4.6" stroke-linecap="round"/>' +
+    '<rect x="13.6" y="17.6" width="10" height="4.2" rx="2.1" fill="#9FB0C4"/>' +
+    '<path d="M33.6 19.2v6" stroke="#5FC2EE" stroke-width="4" stroke-linecap="round"/>' +
+    '<circle cx="30" cy="24.4" r="2" fill="#A9E2F8"/><circle cx="37" cy="25.4" r="1.6" fill="#A9E2F8"/>' +
+    '<path d="M7 28.6h34v6.2a6.4 6.4 0 0 1-6.4 6.4H13.4A6.4 6.4 0 0 1 7 34.8z" fill="#D2E9F8" stroke="#A9CCE5" stroke-width="2" stroke-linejoin="round"/>' +
+    '<ellipse cx="24" cy="28.6" rx="17" ry="5" fill="#F4FBFF" stroke="#A9CCE5" stroke-width="1.8"/>' +
+    '<ellipse cx="24" cy="28.6" rx="10" ry="2.8" fill="#CBE8F7" opacity=".8"/>',
 
-  /* 양치 — 칫솔과 이 */
-  tooth: '<path d="M23 12.5c5 0 8.6 2.9 8.6 7.4 0 3.5-1.3 5.5-1.8 8.2-.4 2.4-.6 6.5-2.5 6.5-1.9 0-1.6-5.3-4.3-5.3s-2.5 5.3-4.3 5.3c-1.9 0-2.1-4.1-2.5-6.5-.5-2.7-1.8-4.7-1.8-8.2 0-4.5 3.7-7.4 8.6-7.4z" ' +
-    'fill="#FFFFFF" stroke="#CBDFEF" stroke-width="1.8"/>' +
-    '<circle cx="19.6" cy="20" r="1.3" fill="#DBE9F5"/><circle cx="26.4" cy="20" r="1.3" fill="#DBE9F5"/>' +
-    '<g transform="rotate(20 23 23)">' +
-    '<rect x="29.6" y="8.5" width="4.6" height="24" rx="2.3" fill="#5FB4EE"/>' +
-    '<rect x="28.4" y="7" width="7" height="7" rx="2.6" fill="#FFFFFF" stroke="#CBDFEF" stroke-width="1.2"/>' +
-    '<path d="M29.6 9.6h5.2M29.6 12h5.2" stroke="#8FD3F4" stroke-width="1.1" stroke-linecap="round"/>' +
+  /* 양치 — 칫솔과 거품과 이 */
+  tooth: '<g transform="rotate(-14 15 22)">' +
+    '<rect x="12.4" y="7.4" width="6.4" height="25" rx="3.2" fill="#4FA3E3"/>' +
+    '<rect x="10.8" y="4.6" width="9.6" height="8.4" rx="3.2" fill="#FFFFFF" stroke="#BBD9EE" stroke-width="1.4"/>' +
+    '<path d="M12.6 7.4h6.4M12.6 10.4h6.4" stroke="#7CC8EE" stroke-width="1.3" stroke-linecap="round"/>' +
+    '</g>' +
+    '<path d="M31 14.4c4.8 0 8.2 2.8 8.2 7.2 0 3.3-1.2 5.1-1.7 7.8-.4 2.3-.6 6.1-2.4 6.1-1.8 0-1.5-5-4.1-5s-2.3 5-4.1 5c-1.8 0-2-3.8-2.4-6.1-.5-2.7-1.7-4.5-1.7-7.8 0-4.4 3.4-7.2 8.2-7.2z" fill="#FFFFFF" stroke="#C6D9EA" stroke-width="1.8"/>' +
+    '<circle cx="24.6" cy="8.6" r="3.1" fill="#FFFFFF" opacity=".92"/>' +
+    '<circle cx="33.6" cy="6.6" r="2.4" fill="#FFFFFF" opacity=".92"/>' +
+    '<circle cx="29" cy="12.6" r="1.7" fill="#FFFFFF" opacity=".8"/>' +
+    '<circle cx="27.4" cy="24" r="1.4" fill="#DBE9F5"/><circle cx="34.6" cy="24" r="1.4" fill="#DBE9F5"/>',
+
+  /* 밥 먹기 — 밥그릇과 숟가락 */
+  meal: '<path d="M16 5.4c-1.9 1.9 1.9 3.1 0 5M22 4.4c-1.9 1.9 1.9 3.1 0 5M28 5.4c-1.9 1.9 1.9 3.1 0 5" stroke="#D8C4AC" stroke-width="2.4" fill="none" stroke-linecap="round"/>' +
+    '<path d="M13.4 22.6a10.8 10.8 0 0 1 21.6 0z" fill="#FFFFFF" stroke="#EBD9C6" stroke-width="1.5"/>' +
+    '<path d="M9 22.6h30c0 8.6-6.7 15.6-15 15.6S9 31.2 9 22.6z" fill="#EF6464"/>' +
+    '<path d="M11.6 26.6c1.6 4.8 6.2 8 12.4 8s10.8-3.2 12.4-8" fill="none" stroke="#FFE1E1" stroke-width="2.2" opacity=".85"/>' +
+    '<rect x="8" y="20.8" width="32" height="4" rx="2" fill="#D24949"/>' +
+    '<g transform="rotate(11 41 24)">' +
+    '<ellipse cx="41" cy="11" rx="3.4" ry="5" fill="#CFD8E3" stroke="#B4C0CE" stroke-width="1.1"/>' +
+    '<rect x="39.7" y="14.6" width="2.6" height="23" rx="1.3" fill="#CFD8E3" stroke="#B4C0CE" stroke-width="1"/>' +
     '</g>',
 
-  /* 밥 먹기 — 밥그릇 */
-  meal: '<path d="M18.8 5.4c-1.9 1.9 1.9 3 0 4.9M24.4 4.4c-1.9 1.9 1.9 3 0 4.9M30 5.4c-1.9 1.9 1.9 3 0 4.9" ' +
-    'stroke="#CBBBA8" stroke-width="2.2" fill="none" stroke-linecap="round"/>' +
-    '<path d="M12.5 27a11.5 11.5 0 0 1 23 0z" fill="#FFFFFF" stroke="#E8DCCA" stroke-width="1.6"/>' +
-    '<path d="M8.5 27h31c0 8.4-7 15.2-15.5 15.2S8.5 35.4 8.5 27z" fill="#5FB4EE"/>' +
-    '<path d="M10.6 31.4c1.7 4.2 6.6 7 13.4 7s11.7-2.8 13.4-7" fill="none" stroke="#8ACAF3" stroke-width="2"/>' +
-    '<path d="M8.5 27h31" stroke="#3E96D4" stroke-width="2.8" stroke-linecap="round"/>',
-
   /* 저녁 먹기 — 접시와 수저 */
-  dinner: '<ellipse cx="7.6" cy="14.2" rx="3.6" ry="4.8" fill="#C2CDDA"/>' +
-    '<rect x="6.3" y="18.4" width="2.6" height="19" rx="1.3" fill="#C2CDDA"/>' +
-    '<rect x="39.6" y="12" width="2.6" height="25.4" rx="1.3" fill="#C2CDDA"/>' +
-    '<path d="M38.4 12h1.4v7M41 12h1.4v7" stroke="#C2CDDA" stroke-width="2" stroke-linecap="round"/>' +
-    '<circle cx="24" cy="25.5" r="12.4" fill="#FFFFFF" stroke="#DCE6F0" stroke-width="2"/>' +
-    '<circle cx="24" cy="25.5" r="8.6" fill="#FFF3D9"/>' +
-    '<circle cx="21.4" cy="24.6" r="3.2" fill="#F6A54A"/>' +
-    '<circle cx="26.6" cy="22.4" r="2.9" fill="#52B788"/>' +
-    '<circle cx="27" cy="27.8" r="2.5" fill="#F2849E"/>',
+  dinner: '<ellipse cx="8" cy="13.4" rx="3.8" ry="5" fill="#C2CDDA"/>' +
+    '<rect x="6.7" y="17.8" width="2.8" height="20" rx="1.4" fill="#C2CDDA"/>' +
+    '<rect x="39" y="11" width="2.8" height="26.4" rx="1.4" fill="#C2CDDA"/>' +
+    '<path d="M37.6 11h1.5v7.4M40.7 11h1.5v7.4" stroke="#C2CDDA" stroke-width="2.2" stroke-linecap="round"/>' +
+    '<circle cx="24" cy="25.4" r="12.8" fill="#FFFFFF" stroke="#DCE6F0" stroke-width="2.2"/>' +
+    '<circle cx="24" cy="25.4" r="8.8" fill="#FFF3D9"/>' +
+    '<circle cx="21.2" cy="24.4" r="3.4" fill="#F6A54A"/>' +
+    '<circle cx="26.8" cy="22.2" r="3" fill="#52B788"/>' +
+    '<circle cx="27.2" cy="27.8" r="2.6" fill="#F2849E"/>',
 
-  /* 손 씻기 — 비누와 거품 */
-  hands: '<circle cx="34" cy="12" r="3.2" fill="#FFFFFF" stroke="#BFE3F5" stroke-width="1.6"/>' +
-    '<circle cx="40" cy="17.4" r="2.4" fill="#FFFFFF" stroke="#BFE3F5" stroke-width="1.6"/>' +
-    '<circle cx="35.4" cy="20.6" r="1.9" fill="#FFFFFF" stroke="#BFE3F5" stroke-width="1.4"/>' +
-    '<path d="M27.6 14.6h-4.2a2.4 2.4 0 0 1 0-4.8h2.2" fill="none" stroke="#5FAFC9" stroke-width="2.6" stroke-linecap="round"/>' +
-    '<rect x="21" y="14.4" width="6.4" height="5.8" rx="1.8" fill="#5FAFC9"/>' +
-    '<rect x="16.6" y="19.6" width="14.4" height="20.4" rx="5" fill="#7FD1E8"/>' +
-    '<rect x="16.6" y="26" width="14.4" height="4.4" fill="#FFFFFF" opacity="0.65"/>' +
-    '<rect x="16.6" y="33.4" width="14.4" height="4.4" fill="#FFFFFF" opacity="0.45"/>',
+  /* 손 씻기 — 물방울과 손과 거품 */
+  hands: '<path d="M22.4 4v6.2" stroke="#7FD4F5" stroke-width="4.4" stroke-linecap="round"/>' +
+    '<path d="M18 6.6v4M27 6.6v4" stroke="#A9E2F8" stroke-width="3" stroke-linecap="round"/>' +
+    '<path d="M11.6 30.4v-4.6a4.6 4.6 0 0 1 4.6-4.6h7.6l2.4-4.4a2.6 2.6 0 0 1 4.6 2.4l-1.9 4.2h6.6a3 3 0 0 1 3 3v4z" fill="#FFD7B0" stroke="#E0A97A" stroke-width="1.7" stroke-linejoin="round"/>' +
+    '<path d="M12.4 30.4h25.2v2.8a6.4 6.4 0 0 1-6.4 6.4H18.8a6.4 6.4 0 0 1-6.4-6.4z" fill="#F7E2C9" stroke="#E0A97A" stroke-width="1.7" stroke-linejoin="round"/>' +
+    '<circle cx="17.6" cy="36.4" r="2.6" fill="#FFFFFF" opacity=".95"/>' +
+    '<circle cx="24" cy="38.4" r="2.1" fill="#FFFFFF" opacity=".95"/>' +
+    '<circle cx="30.6" cy="36.2" r="2.4" fill="#FFFFFF" opacity=".95"/>' +
+    '<circle cx="36.6" cy="12.4" r="3" fill="#FFFFFF" stroke="#BFE3F5" stroke-width="1.5"/>' +
+    '<circle cx="41.6" cy="18" r="2.2" fill="#FFFFFF" stroke="#BFE3F5" stroke-width="1.4"/>',
 
-  /* 장난감 정리 — 장난감 상자 */
-  toys: '<circle cx="19" cy="14" r="5.2" fill="#F2849E"/>' +
-    '<path d="M19 8.8c1.4 1.6 1.4 8.8 0 10.4" fill="none" stroke="#D9637F" stroke-width="1.4"/>' +
-    '<rect x="27.6" y="8.4" width="9.4" height="9.4" rx="2.4" fill="#5FB4EE"/>' +
-    '<rect x="31" y="10.6" width="2.6" height="5" rx="1.3" fill="#EAF7FF"/>' +
-    '<path d="M9 25h30v12.4a4.4 4.4 0 0 1-4.4 4.4H13.4A4.4 4.4 0 0 1 9 37.4z" fill="#F6A54A"/>' +
-    '<rect x="7" y="20.8" width="34" height="6.4" rx="3.2" fill="#E08C36"/>' +
-    '<rect x="20" y="30" width="8" height="4" rx="2" fill="#FFE3B8"/>',
+  /* 장난감 정리 — 알록달록 블록 */
+  toys: '<rect x="7.4" y="16.6" width="15.6" height="15" rx="3.4" fill="#4FA3E3"/>' +
+    '<rect x="10.2" y="13.4" width="4" height="4.2" rx="1.6" fill="#7FC4F2"/>' +
+    '<rect x="16.2" y="13.4" width="4" height="4.2" rx="1.6" fill="#7FC4F2"/>' +
+    '<rect x="24.6" y="22" width="15.4" height="15" rx="3.4" fill="#F5A623"/>' +
+    '<rect x="27.4" y="18.8" width="4" height="4.2" rx="1.6" fill="#FFC978"/>' +
+    '<rect x="33.4" y="18.8" width="4" height="4.2" rx="1.6" fill="#FFC978"/>' +
+    '<rect x="13.4" y="24.6" width="15.8" height="14.6" rx="3.4" fill="#EF6464"/>' +
+    '<rect x="16.2" y="21.4" width="4" height="4.2" rx="1.6" fill="#FF9B9B"/>' +
+    '<rect x="22.2" y="21.4" width="4" height="4.2" rx="1.6" fill="#FF9B9B"/>' +
+    '<path d="M18.4 31.4h5.4M21.1 28.7v5.4" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity=".9"/>',
 
   /* 목욕 — 욕조와 거품 */
-  bath: '<path d="M26.6 14.4c2.6-1.4 5.4-.6 6.2 1.6h4.4" fill="none" stroke="#F6C453" stroke-width="2"/>' +
-    '<circle cx="31" cy="19.4" r="4.4" fill="#F9C74F"/>' +
-    '<path d="M35 18.4l3.4 1.6-3.4 1.6z" fill="#F6A54A"/>' +
-    '<circle cx="12.6" cy="18" r="3.8" fill="#FFFFFF"/>' +
-    '<circle cx="19" cy="14" r="4.6" fill="#FFFFFF"/>' +
-    '<circle cx="24.6" cy="17.6" r="3.2" fill="#FFFFFF"/>' +
-    '<path d="M6 24.4h36v4.8a9.4 9.4 0 0 1-9.4 9.4H15.4A9.4 9.4 0 0 1 6 29.2z" fill="#7FD1E8"/>' +
-    '<rect x="4.6" y="21.6" width="38.8" height="5.4" rx="2.7" fill="#FFFFFF" stroke="#C8E4F1" stroke-width="1.5"/>',
+  bath: '<circle cx="14" cy="16.6" r="4" fill="#FFFFFF"/>' +
+    '<circle cx="20.4" cy="12.4" r="4.8" fill="#FFFFFF"/>' +
+    '<circle cx="26.6" cy="16.2" r="3.4" fill="#FFFFFF"/>' +
+    '<circle cx="33.4" cy="13" r="3" fill="#FFFFFF" opacity=".9"/>' +
+    '<path d="M5.6 25h36.8v4.6a9.8 9.8 0 0 1-9.8 9.8H15.4a9.8 9.8 0 0 1-9.8-9.8z" fill="#6FC6E8"/>' +
+    '<path d="M8 30h32" stroke="#A6DFF3" stroke-width="2.4" opacity=".9"/>' +
+    '<rect x="4" y="21.6" width="40" height="5.6" rx="2.8" fill="#FFFFFF" stroke="#BEDFEF" stroke-width="1.6"/>',
 
   /* 내일 준비물 — 개어 놓은 옷 */
-  prep: '<rect x="12.4" y="30.4" width="23.2" height="8.4" rx="3.6" fill="#5FB4EE"/>' +
-    '<rect x="14.6" y="22.4" width="19" height="8" rx="3.6" fill="#F2849E"/>' +
-    '<rect x="16.6" y="14.4" width="15" height="8" rx="3.6" fill="#F9C74F"/>' +
-    '<path d="M20.6 10.6h6.8" stroke="#E0AE3F" stroke-width="2.2" stroke-linecap="round"/>' +
-    '<circle cx="24" cy="34.6" r="2.2" fill="#EAF7FF" opacity="0.9"/>',
+  prep: '<rect x="11.6" y="30" width="24.8" height="8.8" rx="3.8" fill="#4FA3E3"/>' +
+    '<rect x="13.8" y="21.8" width="20.4" height="8.4" rx="3.8" fill="#F2849E"/>' +
+    '<rect x="15.8" y="13.6" width="16.4" height="8.4" rx="3.8" fill="#F9C74F"/>' +
+    '<path d="M20 9.8h8" stroke="#E0AE3F" stroke-width="2.6" stroke-linecap="round"/>' +
+    '<circle cx="24" cy="34.4" r="2.4" fill="#EAF7FF" opacity=".95"/>',
 
-  /* 잠자리 — 달과 별 */
-  sleep: '<path d="M32 10a15.6 15.6 0 1 0 0 28 13.4 13.4 0 0 1 0-28z" fill="#F9C74F"/>' +
-    '<path d="M12.4 11.4l1.4 3.1 3.2 1.4-3.2 1.4-1.4 3.1-1.4-3.1-3.2-1.4 3.2-1.4z" fill="#FFD166"/>' +
-    '<path d="M35.6 30.6h5.6l-5.6 6h5.6" fill="none" stroke="#9B7EDE" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>' +
-    '<path d="M36.8 22.4h4.2l-4.2 4.6h4.2" fill="none" stroke="#C3B1E1" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>',
+  /* 잠자리 — 침대와 달님 */
+  sleep: '<rect x="4.6" y="20" width="30" height="8.4" rx="3.8" fill="#FFFBF2" stroke="#E7D8C4" stroke-width="1.5"/>' +
+    '<rect x="3.4" y="16.4" width="5.4" height="17" rx="2.6" fill="#C08552"/>' +
+    '<rect x="9" y="19.6" width="8" height="5.4" rx="2.7" fill="#FFFFFF" stroke="#DCE7F2" stroke-width="1.3"/>' +
+    '<path d="M15.6 16.4h15.8a4 4 0 0 1 4 4v4.4H15.6z" fill="#7C8CF8"/>' +
+    '<rect x="5" y="28.4" width="3.6" height="7" rx="1.8" fill="#9A6234"/>' +
+    '<rect x="31.6" y="28.4" width="3.6" height="7" rx="1.8" fill="#9A6234"/>' +
+    '<path d="M38 6.2a8.4 8.4 0 1 0 0 15 7.2 7.2 0 0 1 0-15z" fill="#F9C74F"/>' +
+    '<path d="M30.4 5.6l1 2.2 2.3 1-2.3 1-1 2.2-1-2.2-2.3-1 2.3-1z" fill="#FFD166"/>' +
+    '<circle cx="42.4" cy="22.6" r="1.4" fill="#FFD166"/>',
 
   /* 가방 챙기기 — 책가방 */
-  bag: '<path d="M20 14.6v-1.8a4 4 0 0 1 8 0v1.8" fill="none" stroke="#C97B3F" stroke-width="2.8" stroke-linecap="round"/>' +
-    '<rect x="11.6" y="14.4" width="24.8" height="26" rx="8" fill="#F6A54A"/>' +
-    '<path d="M11.6 24h24.8v-1.6a8 8 0 0 0-8-8h-8.8a8 8 0 0 0-8 8z" fill="#E08C36"/>' +
-    '<rect x="17" y="26.4" width="14" height="9.6" rx="3.4" fill="#FFD9A8"/>' +
-    '<rect x="21.4" y="30" width="5.2" height="2.6" rx="1.3" fill="#E08C36"/>',
+  bag: '<path d="M20 14.4v-1.6a4 4 0 0 1 8 0v1.6" fill="none" stroke="#C97B3F" stroke-width="3" stroke-linecap="round"/>' +
+    '<rect x="11" y="14" width="26" height="26.4" rx="8.4" fill="#F6A54A"/>' +
+    '<path d="M11 24.4h26v-2a8.4 8.4 0 0 0-8.4-8.4h-9.2A8.4 8.4 0 0 0 11 22.4z" fill="#E08C36"/>' +
+    '<rect x="16.4" y="26.4" width="15.2" height="10.4" rx="3.6" fill="#FFE0B4"/>' +
+    '<rect x="21.4" y="30.4" width="5.4" height="2.8" rx="1.4" fill="#E08C36"/>',
 
   /* 옷 입기 — 티셔츠 */
-  dress: '<path d="M18.6 10.6l5.4 2.2 5.4-2.2 6.4 4.2a2 2 0 0 1 .6 2.7l-3 4.6a1.6 1.6 0 0 1-2.6.2l-1-1.4v16.4a2.4 2.4 0 0 1-2.4 2.4H19.4a2.4 2.4 0 0 1-2.4-2.4V20.9l-1 1.4a1.6 1.6 0 0 1-2.6-.2l-3-4.6a2 2 0 0 1 .6-2.7z" fill="#F2849E"/>' +
-    '<path d="M18.6 10.6c1.5 2.7 3.4 4 5.4 4s3.9-1.3 5.4-4" fill="#FFD1DC" stroke="#E06E8C" stroke-width="1.4" stroke-linejoin="round"/>' +
-    '<path d="M24 24.4l1.5 3 3.3.5-2.4 2.3.6 3.3-3-1.6-3 1.6.6-3.3-2.4-2.3 3.3-.5z" fill="#FFF0A8"/>',
+  dress: '<path d="M18.4 9.8l5.6 2.3 5.6-2.3 6.6 4.4a2.1 2.1 0 0 1 .6 2.8l-3.1 4.8a1.7 1.7 0 0 1-2.7.2l-1-1.5v17.2a2.5 2.5 0 0 1-2.5 2.5H19.5a2.5 2.5 0 0 1-2.5-2.5V20.5l-1 1.5a1.7 1.7 0 0 1-2.7-.2l-3.1-4.8a2.1 2.1 0 0 1 .6-2.8z" fill="#F2849E"/>' +
+    '<path d="M18.4 9.8c1.6 2.8 3.5 4.2 5.6 4.2s4-1.4 5.6-4.2" fill="#FFD1DC" stroke="#E06E8C" stroke-width="1.5" stroke-linejoin="round"/>' +
+    '<path d="M24 24.6l1.6 3.2 3.5.5-2.5 2.4.6 3.5-3.2-1.7-3.2 1.7.6-3.5-2.5-2.4 3.5-.5z" fill="#FFF0A8"/>',
 
-  /* EOS 숙제 — 펼친 책 */
-  book: '<path d="M23.4 13.4c-3.6-2.2-7.8-3-12-3-1.6 0-2.4.9-2.4 2.5v18.8c0 1.4 1 2.2 2.4 2.2 4 0 8.4.8 12 3z" fill="#FFFFFF" stroke="#D6E2EE" stroke-width="1.8" stroke-linejoin="round"/>' +
-    '<path d="M24.6 13.4c3.6-2.2 7.8-3 12-3 1.6 0 2.4.9 2.4 2.5v18.8c0 1.4-1 2.2-2.4 2.2-4 0-8.4.8-12 3z" fill="#FFFFFF" stroke="#D6E2EE" stroke-width="1.8" stroke-linejoin="round"/>' +
-    '<path d="M14 16.6h6.4M14 21.4h6.4M27.6 16.6H34M27.6 21.4H34" stroke="#B9C8D6" stroke-width="2" stroke-linecap="round"/>' +
-    '<path d="M24 11.6v6" stroke="#E4572E" stroke-width="2.2" stroke-linecap="round"/>' +
-    '<path d="M24 11.4l5.4 2-5.4 2z" fill="#E4572E"/>',
+  /* 숙제 — 펼친 책과 연필 */
+  book: '<path d="M23.4 13.6c-3.7-2.3-8-3.1-12.3-3.1-1.6 0-2.5.9-2.5 2.6v18.8c0 1.5 1 2.3 2.5 2.3 4.1 0 8.6.8 12.3 3.1z" fill="#FFFFFF" stroke="#C9D9E8" stroke-width="1.9" stroke-linejoin="round"/>' +
+    '<path d="M24.6 13.6c3.7-2.3 8-3.1 12.3-3.1 1.6 0 2.5.9 2.5 2.6v18.8c0 1.5-1 2.3-2.5 2.3-4.1 0-8.6.8-12.3 3.1z" fill="#FFFFFF" stroke="#C9D9E8" stroke-width="1.9" stroke-linejoin="round"/>' +
+    '<path d="M13.8 17h6.6M13.8 22h6.6M13.8 27h5M27.6 17h6.6M27.6 22h6.6M27.6 27h5" stroke="#B9C8D6" stroke-width="2.1" stroke-linecap="round"/>' +
+    '<g transform="rotate(34 34 26)"><rect x="31.6" y="6" width="4.8" height="20" rx="1.4" fill="#F9C74F"/><path d="M31.6 26h4.8l-2.4 4.4z" fill="#F2B5A0"/><rect x="31.6" y="6" width="4.8" height="4" rx="1.2" fill="#EF6464"/></g>',
 
   /* Sight word — 낱말 카드 */
-  abc: '<rect x="6" y="8" width="36" height="32" rx="6.5" fill="#FFE9A8" stroke="#EFC24C" stroke-width="2"/>' +
-    '<text x="24" y="33" text-anchor="middle" font-family="Verdana,Helvetica,Arial,sans-serif" font-size="19" font-weight="700" fill="#A9600A">Aa</text>' +
-    '<circle cx="12.6" cy="14.6" r="1.8" fill="#F6D678"/>' +
-    '<circle cx="35.4" cy="33.4" r="1.8" fill="#F6D678"/>',
+  abc: '<rect x="5" y="7" width="38" height="34" rx="7" fill="#FFE9A8" stroke="#E9BB45" stroke-width="2.2"/>' +
+    '<text x="24" y="33" text-anchor="middle" font-family="Verdana,Helvetica,Arial,sans-serif" font-size="20" font-weight="700" fill="#A9600A">Aa</text>' +
+    '<circle cx="11.6" cy="13.8" r="1.9" fill="#F6D678"/>' +
+    '<circle cx="36.4" cy="34.2" r="1.9" fill="#F6D678"/>',
 
   /* 소마셈 — 숫자 카드 */
-  math: '<rect x="6" y="8" width="36" height="32" rx="6.5" fill="#DCF0FF" stroke="#9FD2EF" stroke-width="2"/>' +
-    '<text x="24" y="33" text-anchor="middle" font-family="Verdana,Helvetica,Arial,sans-serif" font-size="18" font-weight="700" fill="#1C6E9E">123</text>' +
-    '<path d="M33.4 32.6h5M35.9 30v5.2" stroke="#7CBEE0" stroke-width="1.8" stroke-linecap="round"/>',
+  math: '<rect x="5" y="7" width="38" height="34" rx="7" fill="#DCF0FF" stroke="#8FCCEC" stroke-width="2.2"/>' +
+    '<text x="24" y="33" text-anchor="middle" font-family="Verdana,Helvetica,Arial,sans-serif" font-size="19" font-weight="700" fill="#1C6E9E">123</text>' +
+    '<path d="M33.8 33h5.4M36.5 30.3v5.4" stroke="#5FA9D0" stroke-width="2" stroke-linecap="round"/>',
 
   /* 소마도형 — 도형 친구들 */
-  shapes: '<path d="M17.4 7.4l9.8 15.4H7.6z" fill="#F9C74F"/>' +
-    '<rect x="25" y="10.6" width="16" height="16" rx="3.6" fill="#5FB4EE"/>' +
-    '<circle cx="16.6" cy="31.4" r="8.2" fill="#F2849E"/>',
+  shapes: '<path d="M17 6.6l10.6 16.4H6.4z" fill="#F9C74F" stroke="#E3AE2E" stroke-width="1.2" stroke-linejoin="round"/>' +
+    '<rect x="25" y="9.8" width="17" height="17" rx="4" fill="#4FA3E3" stroke="#3B87C4" stroke-width="1.2"/>' +
+    '<circle cx="16.4" cy="32" r="8.8" fill="#F2849E" stroke="#DE6F8B" stroke-width="1.2"/>',
 
-  /* 팩토슐레 — 퍼즐 조각 둘 */
-  puzzle: '<rect x="25" y="8" width="16" height="16" rx="4.2" fill="#F9C74F"/>' +
-    '<circle cx="33" cy="8.4" r="4.6" fill="#F9C74F"/>' +
-    '<circle cx="30.4" cy="16.6" r="2.1" fill="#FFE6A8"/>' +
-    '<rect x="7.6" y="22" width="18.4" height="18.4" rx="4.2" fill="#9B7EDE"/>' +
-    '<circle cx="26" cy="31.2" r="4.4" fill="#9B7EDE"/>' +
-    '<circle cx="16.8" cy="31.2" r="2.4" fill="#C3B1E1"/>',
+  /* 팩토슐레 — 퍼즐 조각 */
+  puzzle: '<path d="M24 6.4h9.6a3 3 0 0 1 3 3v4.2a3.6 3.6 0 1 1 0 7.2v4.2a3 3 0 0 1-3 3H24z" fill="#F9C74F" stroke="#E3AE2E" stroke-width="1.3" stroke-linejoin="round"/>' +
+    '<path d="M24 6.4h-9.6a3 3 0 0 0-3 3v4.2a3.6 3.6 0 1 0 0 7.2v4.2a3 3 0 0 0 3 3H24z" fill="#9B7EDE" stroke="#7D63C4" stroke-width="1.3" stroke-linejoin="round"/>' +
+    '<path d="M24 27.8v5.6a3 3 0 0 0 3 3h4.4a3.6 3.6 0 1 1 7.2 0h1.6a3 3 0 0 0 3-3v-4.4z" fill="#4FA3E3" stroke="#3B87C4" stroke-width="1.3" stroke-linejoin="round"/>' +
+    '<circle cx="15" cy="19" r="2.4" fill="#C3B1E1"/><circle cx="33" cy="14" r="2.2" fill="#FFE6A8"/>',
 
   /* 원복 — 셔츠와 넥타이 */
-  uniform: '<path d="M18.6 10.6l5.4 2.2 5.4-2.2 6.4 4.2a2 2 0 0 1 .6 2.7l-3 4.6a1.6 1.6 0 0 1-2.6.2l-1-1.4v16.4a2.4 2.4 0 0 1-2.4 2.4H19.4a2.4 2.4 0 0 1-2.4-2.4V20.9l-1 1.4a1.6 1.6 0 0 1-2.6-.2l-3-4.6a2 2 0 0 1 .6-2.7z" fill="#F4F8FC" stroke="#C9D7E5" stroke-width="1.6"/>' +
-    '<path d="M18.6 10.6l5.4 7.4 5.4-7.4" fill="#FFFFFF" stroke="#C9D7E5" stroke-width="1.4" stroke-linejoin="round"/>' +
-    '<path d="M24 17.6l2.8 2.6-1.6 11.4-.9 2.8-1-2.8-1.6-11.4z" fill="#E4572E"/>',
+  uniform: '<path d="M18.4 9.8l5.6 2.3 5.6-2.3 6.6 4.4a2.1 2.1 0 0 1 .6 2.8l-3.1 4.8a1.7 1.7 0 0 1-2.7.2l-1-1.5v17.2a2.5 2.5 0 0 1-2.5 2.5H19.5a2.5 2.5 0 0 1-2.5-2.5V20.5l-1 1.5a1.7 1.7 0 0 1-2.7-.2l-3.1-4.8a2.1 2.1 0 0 1 .6-2.8z" fill="#F7FAFD" stroke="#C4D4E4" stroke-width="1.7"/>' +
+    '<path d="M18.4 9.8l5.6 7.8 5.6-7.8" fill="#FFFFFF" stroke="#C4D4E4" stroke-width="1.5" stroke-linejoin="round"/>' +
+    '<path d="M24 17.6l2.9 2.7-1.6 11.9-1.3 3-1.3-3-1.6-11.9z" fill="#E4572E"/>',
 
   /* 실내화 — 흰 실내화 한 켤레 */
   indoor: shoeBody('translate(-3,7) scale(.82)', true) +
     shoeBody('translate(12,0) scale(.82)', true),
 
   /* 발레복 — 튀튀 */
-  ballet: '<path d="M21 10.4h6l1.8 8.4H19.2z" fill="#F2849E"/>' +
-    '<path d="M19.2 18.8h9.6l6.4 8.6c-4.2 2.2-8.4 3.2-11.2 3.2s-7-1-11.2-3.2z" fill="#F9A8C0"/>' +
-    '<path d="M22.4 8.6l1.6 3.6M25.6 8.6l-1.6 3.6" stroke="#D9637F" stroke-width="1.9" stroke-linecap="round"/>' +
-    '<path d="M17.6 21.4c4.2 2 8.6 2 12.8 0" fill="none" stroke="#FFFFFF" stroke-width="1.6" opacity="0.8"/>',
+  ballet: '<path d="M20.8 9.6h6.4l1.9 8.8H18.9z" fill="#F2849E"/>' +
+    '<path d="M18.9 18.4h10.2l6.8 9c-4.4 2.4-8.9 3.4-11.9 3.4s-7.5-1-11.9-3.4z" fill="#F9A8C0"/>' +
+    '<path d="M22.2 7.6l1.7 3.8M25.8 7.6l-1.7 3.8" stroke="#D9637F" stroke-width="2" stroke-linecap="round"/>' +
+    '<path d="M17.2 21.4c4.4 2.1 9.2 2.1 13.6 0" fill="none" stroke="#FFFFFF" stroke-width="1.7" opacity=".85"/>',
 
   /* 체육복 — 운동복 상의 */
-  gym: '<path d="M17.4 11l6.6 2.8L30.6 11l6.4 4.8a2.4 2.4 0 0 1 .4 3l-3.2 4.6-3.6-2.2v15.2a2.4 2.4 0 0 1-2.4 2.4H19.8a2.4 2.4 0 0 1-2.4-2.4V21.2l-3.6 2.2-3.2-4.6a2.4 2.4 0 0 1 .4-3z" fill="#3E7CB1"/>' +
-    '<path d="M17.4 11l6.6 2.8L30.6 11" fill="none" stroke="#FFFFFF" stroke-width="1.8"/>' +
-    '<path d="M13.4 17.6l2.2 3.2M34.6 17.6l-2.2 3.2" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>' +
-    '<rect x="22.4" y="24" width="3.2" height="10.4" rx="1.6" fill="#FFFFFF" opacity="0.85"/>',
+  gym: '<path d="M17.2 10.6l6.8 3 6.8-3 6.6 5a2.5 2.5 0 0 1 .4 3.1l-3.3 4.8-3.7-2.3v15.8a2.5 2.5 0 0 1-2.5 2.5H19.7a2.5 2.5 0 0 1-2.5-2.5V21.2l-3.7 2.3-3.3-4.8a2.5 2.5 0 0 1 .4-3.1z" fill="#3E7CB1"/>' +
+    '<path d="M17.2 10.6l6.8 3 6.8-3" fill="none" stroke="#FFFFFF" stroke-width="1.9"/>' +
+    '<path d="M13.2 17.4l2.3 3.4M34.8 17.4l-2.3 3.4" stroke="#FFFFFF" stroke-width="2.3" stroke-linecap="round"/>' +
+    '<rect x="22.4" y="23.6" width="3.2" height="11" rx="1.6" fill="#FFFFFF" opacity=".85"/>',
 
   /* 운동화 — 스니커 */
   sneakers: shoeBody('translate(-1,1)'),
 
   /* 북클럽 책 — 책 더미 */
-  bookclub: '<rect x="9" y="31" width="30" height="7" rx="2.4" fill="#5FB4EE"/>' +
-    '<rect x="11.4" y="24.2" width="27" height="7" rx="2.4" fill="#F2849E"/>' +
-    '<rect x="13.6" y="17.4" width="24" height="7" rx="2.4" fill="#F9C74F"/>' +
-    '<rect x="20" y="10.6" width="20" height="7" rx="2.4" fill="#52B788"/>' +
-    '<path d="M34.4 12.4v3.8M31.4 19.2v4M30.4 26v4M29.4 32.8v4" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" opacity="0.85"/>',
+  bookclub: '<rect x="8.6" y="30.6" width="30.8" height="7.4" rx="2.6" fill="#4FA3E3"/>' +
+    '<rect x="11" y="23.6" width="27.8" height="7.4" rx="2.6" fill="#F2849E"/>' +
+    '<rect x="13.4" y="16.6" width="24.6" height="7.4" rx="2.6" fill="#F9C74F"/>' +
+    '<rect x="20" y="9.6" width="20.4" height="7.4" rx="2.6" fill="#52B788"/>' +
+    '<path d="M34.6 11.4v3.8M31.6 18.4v3.8M30.6 25.4v3.8M29.6 32.4v3.8" stroke="#FFFFFF" stroke-width="1.7" stroke-linecap="round" opacity=".85"/>',
+
+  /* 샤워기 — 물줄기와 거품 */
+  shower: '<path d="M24 4.4v7.6" stroke="#9FB0C4" stroke-width="3.6" stroke-linecap="round"/>' +
+    '<path d="M13.6 13.4h20.8a3.4 3.4 0 0 1 3.4 3.4v1.2H10.2v-1.2a3.4 3.4 0 0 1 3.4-3.4z" fill="#C6D3E0" stroke="#9FB0C4" stroke-width="1.4"/>' +
+    '<path d="M15.6 20.6v3.6M20.4 20.6v5.4M25.2 20.6v3.6M30 20.6v5.4M34.4 20.6v3.6" stroke="#5FC2EE" stroke-width="3.4" stroke-linecap="round" opacity=".9"/>' +
+    '<circle cx="17.6" cy="35.4" r="3" fill="#FFFFFF" opacity=".95"/>' +
+    '<circle cx="24.4" cy="38" r="2.4" fill="#FFFFFF" opacity=".95"/>' +
+    '<circle cx="31.4" cy="35" r="2.7" fill="#FFFFFF" opacity=".95"/>' +
+    '<circle cx="28.2" cy="30.4" r="1.7" fill="#FFFFFF" opacity=".8"/>',
+
+  /* 물통과 수저통 */
+  bottle: '<rect x="8.4" y="16.4" width="13.2" height="24.4" rx="5" fill="#7FD4F5" stroke="#4FB0E4" stroke-width="1.8"/>' +
+    '<rect x="10.6" y="10.4" width="8.8" height="6.6" rx="2.4" fill="#4FB0E4"/>' +
+    '<rect x="11.8" y="8" width="6.4" height="3.2" rx="1.6" fill="#2E93C9"/>' +
+    '<rect x="10.8" y="21.4" width="8.4" height="6" rx="2" fill="#FFFFFF" opacity=".75"/>' +
+    '<rect x="25" y="20.6" width="14.4" height="20.2" rx="5" fill="#F9C74F" stroke="#E3AE2E" stroke-width="1.8"/>' +
+    '<rect x="25" y="25.6" width="14.4" height="3.2" fill="#E3AE2E" opacity=".55"/>' +
+    '<path d="M29.6 22.4v16M34.8 22.4v16" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" opacity=".9"/>' +
+    '<ellipse cx="29.6" cy="21.4" rx="2" ry="2.8" fill="#FFFFFF" stroke="#D8B24A" stroke-width="1"/>',
 
   /* 기본값 — 별 */
-  star: '<path d="M24 6.6l5 10.4 11.4 1.5-8.3 7.9 2.1 11.3L24 32.3l-10.2 5.4 2.1-11.3-8.3-7.9L19 17z" fill="#F9C74F" stroke="#EFB429" stroke-width="1.6" stroke-linejoin="round"/>'
+  star: '<path d="M24 5.4l5.4 11.2 12.3 1.7-8.9 8.6 2.2 12.2L24 33.3l-11 5.8 2.2-12.2-8.9-8.6 12.3-1.7z" fill="#F9C74F" stroke="#EFB429" stroke-width="1.8" stroke-linejoin="round"/>'
 };
 
 function iconSVG(key) {
@@ -13627,8 +13939,8 @@ function iconSVG(key) {
      기본 상수
   ============================================================ */
   var STORAGE_KEY = 'seohan-numberblocks-routine-v1';
-  var STORAGE_VERSION = 5;            /* v5: ☁️ 실시간 동기화 · 💌 응원 · 🧩 넘버블럭스 도감 */
-  var APP_VERSION = '5.3.0';          /* v5.3: 도장 취소·중복 발행 수정 · 🔄 새로고침 버튼 */
+  var STORAGE_VERSION = 6;            /* v6: 🏖️ 주말·공휴일 모드 · 물통·수저통 · 내일 준비물 삭제 */
+  var APP_VERSION = '5.4.0';          /* v5.4: 주말·공휴일 모드 · Study 탭 · 밥 3끼 보너스 · 1~100 넘버블럭스 SVG */
   var APP_BUILT = '2026-11-21';
   var CELEBRATE_UNDO_MS = 10000;      /* 전체 완료 후 10초 안에 취소하면 축하·도감 해금을 되돌려요 */
   var UNDO_TTL = 90 * 1000;           /* 방금 취소한 체크는 90초 동안 원격 상태보다 우선해요 */
@@ -13666,7 +13978,70 @@ function iconSVG(key) {
       langName: '한국어',
       tabMorning: '아침 루틴',
       tabEvening: '방과 후',
+      tabWm: '아침',
+      tabWl: '점심',
+      tabWe: '저녁',
+      tabWs: 'Study',
       tabsAria: '루틴 탭',
+      holidayBtn: '공휴일',
+      holidayOnTitle: '공휴일 모드 켜기',
+      holidayOffTitle: '공휴일 모드 끄기',
+      holidayAutoTitle: '주말이라 자동으로 주말 모드예요',
+      toastHolidayOn: '🏖️ 공휴일 모드! 오늘은 주말처럼 보내요',
+      toastHolidayOff: '공휴일 모드를 껐어요. 평일 루틴으로 돌아왔어요',
+      toastHolidayWeekend: '토·일은 자동으로 주말 모드예요',
+      brandSubWeekend: '주말 루틴 · 천천히 시작해요',
+      wkTagWeekend: '{d} · 주말',
+      wkTagHoliday: '공휴일',
+      wkSub: '천천히 하나씩 해 볼까요?',
+      wkSubDone: '모두 끝! 정말 최고예요!',
+      wkMeta: '오늘의 주말 루틴',
+      wkMetaStudy: '오늘의 공부',
+      wkAmChip: '🌅 아침',
+      wkNoonChip: '☀️ 점심',
+      wkPmChip: '🌙 저녁',
+      wkStudyChip: '📖 Study',
+      wkAmTitle: '🌅 주말 아침 루틴',
+      wkNoonTitle: '☀️ 점심 루틴',
+      wkPmTitle: '🌙 주말 저녁 루틴',
+      wkStudyTitle: '📖 오늘의 공부',
+      wkStudySub: '한 장씩 하고 스티커를 붙여요!',
+      wkSightPlay: 'Sight Words 단어 놀이',
+      wkSightBack: 'Study로 돌아가기',
+      noteWmIdle: '그림을 하나씩 눌러 볼까요?',
+      noteWmAll: '주말 아침 완료! 멋져요!',
+      noteWmPart: '좋아요, {n}개만 더!',
+      noteWlIdle: '점심도 하나씩 눌러 볼까요?',
+      noteWlAll: '점심 완료! 잘 먹었어요!',
+      noteWlPart: '{n}개만 더 하면 돼요!',
+      noteWeIdle: '저녁 루틴도 하나씩 해 볼까요?',
+      noteWeAll: '주말 저녁 완료! 오늘 정말 멋졌어요!',
+      noteWePart: '조금만 더! {n}개 남았어요',
+      noteWsIdle: '한 장씩 끝내면 넘버블럭스 도장이 찍혀요!',
+      noteWsAll: '오늘 공부 끝! 최고예요!',
+      noteWsPart: '{n}장 남았어요!',
+      mealTitle: '🍚 오늘의 밥 3끼',
+      mealAm: '아침',
+      mealNoon: '점심',
+      mealPm: '저녁',
+      mealNoteIdle: '아침·점심·저녁 밥을 다 먹으면 넘버블럭스 친구가 한 명 더 와요!',
+      mealNotePart: '좋아요! {n}끼만 더 먹으면 보너스 친구!',
+      mealNoteReady: '3끼 완성! 보너스 친구를 만나러 가 볼까요?',
+      mealNoteDone: '오늘 보너스는 넘버블럭스 {n}! 도감에 들어갔어요 🧩',
+      mealNoteAll: '3끼 보너스는 오늘 이미 받았어요 🧩',
+      mealPraiseAm: '🌅 아침 밥 완벽! 잘 먹었어요!',
+      mealPraiseNoon: '☀️ 점심도 냠냠! 잘했어요!',
+      mealPraisePm: '🌙 저녁까지 냠냠! 최고예요!',
+      celebrateWmTitle: '주말 아침 완료!',
+      celebrateWmSub: '이불도 정리하고 손도 씻고, 멋진 아침이에요',
+      celebrateWlTitle: '점심 완료!',
+      celebrateWlSub: '맛있게 먹고 스티커도 받았어요',
+      celebrateWeTitle: '주말 저녁 완료!',
+      celebrateWeSub: '스스로 다 하고 잠자리에 들어요. 정말 멋져요',
+      celebrateWsTitle: '오늘 공부 완료!',
+      celebrateWsSub: '네 장 모두 끝냈어요. 머리가 반짝반짝!',
+      celebrateMealTitle: '🍚 밥 3끼 완벽!',
+      celebrateMealSub: '보너스로 넘버블럭스 {n}이 도감에 왔어요!',
       heroMorningChip: '아침 준비',
       heroBeforeChip: '아침 준비 시작 전',
       departChip: '출발 {t}',
@@ -13937,7 +14312,70 @@ function iconSVG(key) {
       langName: 'English',
       tabMorning: 'Morning',
       tabEvening: 'After School',
+      tabWm: 'Morning',
+      tabWl: 'Lunch',
+      tabWe: 'Evening',
+      tabWs: 'Study',
       tabsAria: 'Routine tabs',
+      holidayBtn: 'Holiday',
+      holidayOnTitle: 'Turn on holiday mode',
+      holidayOffTitle: 'Turn off holiday mode',
+      holidayAutoTitle: 'It is the weekend — weekend mode is automatic',
+      toastHolidayOn: "🏖️ Holiday mode! Let's enjoy today like a weekend",
+      toastHolidayOff: 'Holiday mode off. Back to the weekday routine.',
+      toastHolidayWeekend: 'Saturday and Sunday switch to weekend mode automatically.',
+      brandSubWeekend: 'Weekend routine · take it easy',
+      wkTagWeekend: '{d} · Weekend',
+      wkTagHoliday: 'Holiday',
+      wkSub: "Let's go one at a time!",
+      wkSubDone: 'All done! You are amazing!',
+      wkMeta: "Today's weekend routine",
+      wkMetaStudy: "Today's study",
+      wkAmChip: '🌅 Morning',
+      wkNoonChip: '☀️ Lunch',
+      wkPmChip: '🌙 Evening',
+      wkStudyChip: '📖 Study',
+      wkAmTitle: '🌅 Weekend Morning',
+      wkNoonTitle: '☀️ Lunch Routine',
+      wkPmTitle: '🌙 Weekend Evening',
+      wkStudyTitle: '📖 Study Time',
+      wkStudySub: 'One page at a time, then a sticker!',
+      wkSightPlay: 'Sight Words word game',
+      wkSightBack: 'Back to Study',
+      noteWmIdle: 'Tap each picture to check it off!',
+      noteWmAll: 'Weekend morning done! Well done!',
+      noteWmPart: 'Nice! {n} more to go!',
+      noteWlIdle: 'Tap each one for lunch time!',
+      noteWlAll: 'Lunch done! Good eating!',
+      noteWlPart: '{n} more and lunch is done!',
+      noteWeIdle: "Let's do the evening routine one by one!",
+      noteWeAll: 'Weekend evening done! What a great day!',
+      noteWePart: '{n} left — you can do it!',
+      noteWsIdle: 'Finish a page and earn a stamp!',
+      noteWsAll: 'Study done! You are the best!',
+      noteWsPart: '{n} more pages to go!',
+      mealTitle: '🍚 Three Meals Today',
+      mealAm: 'Breakfast',
+      mealNoon: 'Lunch',
+      mealPm: 'Dinner',
+      mealNoteIdle: 'Eat all three meals and another Numberblock joins your dex!',
+      mealNotePart: 'Nice! {n} more meal for a bonus friend!',
+      mealNoteReady: "All three meals! Let's meet the bonus friend!",
+      mealNoteDone: "Today's bonus is Numberblock {n}! Added to the dex 🧩",
+      mealNoteAll: "You already earned today's three-meal bonus 🧩",
+      mealPraiseAm: '🌅 Breakfast done — great eating!',
+      mealPraiseNoon: '☀️ Lunch too — yum yum!',
+      mealPraisePm: '🌙 Dinner done — you are the best!',
+      celebrateWmTitle: 'Weekend Morning Done!',
+      celebrateWmSub: 'Bed made, hands washed — a lovely morning',
+      celebrateWlTitle: 'Lunch Done!',
+      celebrateWlSub: 'Ate well and earned the sticker',
+      celebrateWeTitle: 'Weekend Evening Done!',
+      celebrateWeSub: 'Everything done and off to bed — wonderful',
+      celebrateWsTitle: 'Study Done!',
+      celebrateWsSub: 'All four pages finished. Shiny brain!',
+      celebrateMealTitle: '🍚 All Three Meals!',
+      celebrateMealSub: 'Bonus Numberblock {n} joined your dex!',
       heroMorningChip: 'Morning Prep',
       heroBeforeChip: 'Before morning prep',
       departChip: 'Leave {t}',
@@ -14252,19 +14690,65 @@ function iconSVG(key) {
     { id: 'm3', num: 3, icon: 'wash', at: '08:00', ko: '세수하고 양치하기', en: 'Wash Face & Brush Teeth' },
     { id: 'm4', num: 4, icon: 'meal', at: '07:30', ko: '밥 맛있게 먹기', en: 'Eat Breakfast' },
     { id: 'm5', num: 5, icon: 'dress', at: '08:10', ko: '옷 갈아입기', en: 'Get Dressed' },
-    { id: 'm6', num: 6, icon: 'bag', at: '08:13', ko: '가방 챙기기', en: 'Pack Backpack' }
+    { id: 'm6', num: 6, icon: 'bag', at: '08:13', ko: '가방 챙기기', en: 'Pack Backpack' },
+    { id: 'm7', num: 7, icon: 'bottle', at: '08:14', ko: '물통·수저통 챙기기', en: 'Water Bottle & Cutlery Case' }
   ];
   /* v1 기본값(신발 신기 포함) — 저장된 예전 데이터를 알아보는 데만 써요 */
-  var OLD_DEFAULT_MORNING = DEFAULT_MORNING.concat([{ id: 'm7', num: 7, icon: 'sneakers', at: '', ko: '신발 신기', en: 'Put on Shoes' }]);
+  var OLD_DEFAULT_MORNING = DEFAULT_MORNING.slice(0, 6).map(function (it) { return clone(it); })
+    .concat([{ id: 'm7', num: 7, icon: 'sneakers', at: '', ko: '신발 신기', en: 'Put on Shoes' }]);
   var DEFAULT_EVENING = [
     { id: 'e1', num: 1, icon: 'hands', ko: '다녀와서 손 씻기', en: 'Wash Hands' },
     { id: 'e2', num: 2, icon: 'dinner', ko: '저녁 맛있게 먹기', en: 'Eat Dinner' },
     { id: 'e3', num: 3, icon: 'toys', ko: '장난감 정리하기', en: 'Clean Up Toys' },
     { id: 'e4', num: 4, icon: 'bath', ko: '목욕·세수하기', en: 'Take a Bath' },
     { id: 'e5', num: 5, icon: 'tooth', ko: '양치하기', en: 'Brush Teeth' },
-    { id: 'e6', num: 6, icon: 'prep', ko: '내일 옷·준비물 챙기기', en: 'Prep Clothes & Bag' },
-    { id: 'e7', num: 7, icon: 'sleep', ko: '일찍 잠자리 들기', en: 'Go to Sleep' }
+    { id: 'e6', num: 6, icon: 'sleep', ko: '일찍 잠자리 들기', en: 'Go to Sleep' }
   ];
+
+  /* ------------------------------------------------------------
+     주말 · 공휴일용 루틴 (고정 항목 · 설정에서 바꾸지 않아요)
+  ------------------------------------------------------------ */
+  var DEFAULT_W_MORNING = [
+    { id: 'wm1', num: 1, icon: 'bed', ko: '이불 정리하기', en: 'Make My Bed' },
+    { id: 'wm2', num: 2, icon: 'hands', ko: '손 씻기', en: 'Wash Hands' },
+    { id: 'wm3', num: 3, icon: 'water', ko: '물 마시기', en: 'Drink Water' },
+    { id: 'wm4', num: 4, icon: 'meal', ko: '아침 맛있게 먹기', en: 'Eat Breakfast', meal: 'am' },
+    { id: 'wm5', num: 5, icon: 'wash', ko: '세수하고 양치하기', en: 'Wash Face & Brush Teeth' }
+  ];
+  var DEFAULT_W_LUNCH = [
+    { id: 'wl1', num: 1, icon: 'hands', ko: '손 씻기', en: 'Wash Hands' },
+    { id: 'wl2', num: 2, icon: 'water', ko: '물 마시기', en: 'Drink Water' },
+    { id: 'wl3', num: 3, icon: 'meal', ko: '점심 맛있게 먹기', en: 'Eat Lunch', meal: 'noon' }
+  ];
+  var DEFAULT_W_EVENING = [
+    { id: 'we1', num: 1, icon: 'hands', ko: '손 씻기', en: 'Wash Hands' },
+    { id: 'we2', num: 2, icon: 'water', ko: '물 마시기', en: 'Drink Water' },
+    { id: 'we3', num: 3, icon: 'meal', ko: '저녁 맛있게 먹기', en: 'Eat Dinner', meal: 'pm' },
+    { id: 'we4', num: 4, icon: 'toys', ko: '장난감 정리하기', en: 'Clean Up Toys' },
+    { id: 'we5', num: 5, icon: 'shower', ko: '세수하고 샤워하기', en: 'Wash & Shower' },
+    { id: 'we6', num: 6, icon: 'tooth', ko: '양치하기', en: 'Brush Teeth' },
+    { id: 'we7', num: 7, icon: 'sleep', ko: '일찍 자기', en: 'Sleep Early' }
+  ];
+  var DEFAULT_W_STUDY = [
+    { id: 'ws1', num: 8, icon: 'abc', ko: 'Sight word 1장', en: 'Sight Words (1p)' },
+    { id: 'ws2', num: 9, icon: 'math', ko: '소마셈 1장', en: 'Soma Math (1p)' },
+    { id: 'ws3', num: 10, icon: 'shapes', ko: '소마도형 1장', en: 'Soma Shapes (1p)' },
+    { id: 'ws4', num: 1, icon: 'puzzle', ko: '팩토슐레 1장', en: 'Facto Schule (1p)' }
+  ];
+  var WK_KINDS = ['wm', 'wl', 'we', 'ws'];
+  var WD_KINDS = ['morning', 'evening', 'homework'];
+  var BAG_KINDS = ['morning', 'evening', 'homework', 'wm', 'wl', 'we', 'ws'];
+
+  /* 주말 아침 '이불 정리' 같은 고정 항목인지 알아보는 데 쓰는 도우미 */
+  function isPrepItem(it) {
+    var t = String((it && (it.ko || it.label || it.en)) || '').replace(/\s+/g, '').toLowerCase();
+    return t.indexOf('내일옷') >= 0 || t.indexOf('준비물챙기') >= 0 ||
+      t.indexOf('prepclothes') >= 0 || t.indexOf('clothes&bag') >= 0;
+  }
+  function isBottleItem(it) {
+    var t = String((it && (it.ko || it.label || it.en)) || '').toLowerCase();
+    return t.indexOf('물통') >= 0 || t.indexOf('수저통') >= 0 || t.indexOf('bottle') >= 0;
+  }
   var DEFAULT_HOMEWORK = [
     { id: 'h1', num: 8, icon: 'book', ko: 'EOS Daily homework', en: 'EOS Daily Homework' },
     { id: 'h2', num: 9, icon: 'abc', ko: 'Sight word', en: 'Sight Words' },
@@ -14314,15 +14798,15 @@ function iconSVG(key) {
   ============================================================ */
   var NB_SHAPES = {
     1: [[0, 0]],
-    2: [[0, 0], [1, 0]],
-    3: [[0, 0], [1, 0], [2, 0]],
+    2: [[0, 0], [0, 1]],
+    3: [[0, 0], [0, 1], [0, 2]],
     4: [[0, 0], [1, 0], [0, 1], [1, 1]],
     5: [[0, 1], [1, 1], [2, 1], [0, 0], [1, 0]],
-    6: [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1]],
-    7: [[0, 0], [1, 0], [0, 1], [1, 1], [2, 1], [0, 2], [1, 2]],
-    8: [[0, 0], [1, 0], [2, 0], [3, 0], [0, 1], [1, 1], [2, 1], [3, 1]],
+    6: [[0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2]],
+    7: [[0, 0], [0, 1], [1, 1], [0, 2], [1, 2], [0, 3], [1, 3]],
+    8: [[0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2], [0, 3], [1, 3]],
     9: [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2]],
-    10: [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [0, 1], [1, 1], [2, 1], [3, 1], [4, 1]]
+    10: [[0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2], [0, 3], [1, 3], [0, 4], [1, 4]]
   };
   var NB_COLORS = {
     1: ['#ef4444'],
@@ -14337,44 +14821,337 @@ function iconSVG(key) {
     10: ['#ffffff']
   };
 
+  /* ---- 넘버블럭스 1~100 규칙 ----
+     · 1~9  : 원색 낱개 블록 + 저마다의 얼굴·소품
+     · 10   : 하얀 블록 10 + 빨간 테두리
+     · 11~19: 하얀 10 묶음 + 1~9 원색 낱개(위에 붙임)
+     · 20~99: 십의 자리 큰 블록(20 주황 · 30 노랑 · 40 초록 · 50 하늘 · 60 보라 · 70 무지개 · 80 분홍 · 90 회색)
+              + 1의 자리 원색 낱개
+     · 25·36·49·64·81 = 정사각형, 100 = 10×10 하얀 대장
+  ---- */
+  var NB_ONE_COLOR = { 1: '#ef4444', 2: '#f97316', 3: '#f5c518', 4: '#22c55e', 5: '#38bdf8', 6: '#8b5cf6', 7: '#a855f7', 8: '#f472b6', 9: '#94a3b8' };
+  var NB_RAINBOW = ['#ef4444', '#f97316', '#f5c518', '#22c55e', '#38bdf8', '#6366f1', '#a855f7'];
+  var NB_TEN = {
+    2: { c: '#f97316', glyph: 'hat' },
+    3: { c: '#f5c518', glyph: 'flag' },
+    4: { c: '#22c55e', glyph: 'square' },
+    5: { c: '#38bdf8', glyph: 'star' },
+    6: { c: '#8b5cf6', glyph: 'dice' },
+    7: { c: '', glyph: 'rainbow' },
+    8: { c: '#f472b6', glyph: 'mask' },
+    9: { c: '#94a3b8', glyph: 'sneeze' }
+  };
+  var NB_BASE_COLS = { 10: 5, 20: 5, 30: 6, 40: 8, 50: 10, 60: 10, 70: 10, 80: 10, 90: 10 };
+  var NB_SQUARE = { 25: 5, 36: 6, 49: 7, 64: 8, 81: 9, 100: 10 };
+
+  /* 칸 배치: 왼쪽 위부터 한 줄씩 (낱개는 십 묶음 위에 얹어요) */
+  function nbUnits(n) {
+    var cells = [], i, x, y;
+    if (n <= 10) {
+      var sh = NB_SHAPES[n] || NB_SHAPES[1];
+      for (i = 0; i < sh.length; i++) cells.push({ x: sh[i][0], y: sh[i][1] });
+      return cells;
+    }
+    var sq = NB_SQUARE[n];
+    if (sq) {
+      for (y = 0; y < sq; y++) for (x = 0; x < sq; x++) cells.push({ x: x, y: y });
+      return cells;
+    }
+    var base = n < 20 ? 10 : Math.floor(n / 10) * 10;
+    var ones = n - base;
+    var cols = NB_BASE_COLS[base] || 6;
+    var rows = Math.ceil(base / cols);
+    for (y = 0; y < rows; y++) {
+      for (x = 0; x < cols; x++) {
+        if (cells.length >= base) break;
+        cells.push({ x: x, y: y });
+      }
+    }
+    var ox = 0, oy = -1;
+    for (i = 0; i < ones; i++) {
+      cells.push({ x: ox, y: oy });
+      ox++;
+      if (ox >= cols) { ox = 0; oy--; }
+    }
+    return cells;
+  }
+
+  function nbStarPoints(cx, cy, r) {
+    var p = '';
+    for (var i = 0; i < 10; i++) {
+      var a = -Math.PI / 2 + i * Math.PI / 5;
+      var rr = (i % 2 === 0) ? r : r * 0.45;
+      p += (cx + Math.cos(a) * rr).toFixed(2) + ',' + (cy + Math.sin(a) * rr).toFixed(2) + ' ';
+    }
+    return p;
+  }
+  function nbStar(cx, cy, r, fill, stroke) {
+    return '<polygon points="' + nbStarPoints(cx, cy, r) + '" fill="' + fill + '"' +
+      (stroke ? ' stroke="' + stroke + '" stroke-width="0.8"' : '') + '/>';
+  }
+
+  /* 작은 소품 (10×10 설계 → 원하는 크기로) */
+  function nbGlyph(kind, x, y, u) {
+    var g = '';
+    if (!kind) return '';
+    switch (kind) {
+      case 'crown':
+        g = '<path d="M0.6 9.4V3.2l2.8 2.6L5 1.2l1.6 4.6 2.8-2.6v6.2z" fill="#f5c518" stroke="#d9a11a" stroke-width="1" stroke-linejoin="round"/>' +
+          '<circle cx="5" cy="6.6" r="0.9" fill="#ef4444"/>';
+        break;
+      case 'hat':
+        g = '<path d="M1.6 8.2c0-3.6 1.5-6 3.4-6s3.4 2.4 3.4 6z" fill="#c98a4b"/>' +
+          '<rect x="0.3" y="8" width="9.4" height="2" rx="1" fill="#a86f39"/>';
+        break;
+      case 'glasses':
+        g = '<circle cx="2.6" cy="5" r="2.1" fill="none" stroke="#8b5cf6" stroke-width="1.1"/>' +
+          '<circle cx="7.4" cy="5" r="2.1" fill="none" stroke="#8b5cf6" stroke-width="1.1"/>' +
+          '<path d="M4.7 5h0.6" stroke="#8b5cf6" stroke-width="1.1"/>';
+        break;
+      case 'star':
+        g = nbStar(5, 5, 4.6, '#f5c518', '#e0ab1d');
+        break;
+      case 'dice':
+        g = '<rect x="0.5" y="0.5" width="9" height="9" rx="2" fill="#ffffff" stroke="#b9a7f2" stroke-width="1"/>' +
+          '<circle cx="3.1" cy="3.1" r="1" fill="#6d4bd8"/><circle cx="6.9" cy="3.1" r="1" fill="#6d4bd8"/>' +
+          '<circle cx="5" cy="5" r="1" fill="#6d4bd8"/><circle cx="3.1" cy="6.9" r="1" fill="#6d4bd8"/>' +
+          '<circle cx="6.9" cy="6.9" r="1" fill="#6d4bd8"/>';
+        break;
+      case 'rainbow':
+        g = '<g fill="none" stroke-width="1.5" stroke-linecap="round">' +
+          '<path d="M0.4 9a4.6 4.6 0 0 1 9.2 0" stroke="#ef4444"/>' +
+          '<path d="M1.8 9a3.2 3.2 0 0 1 6.4 0" stroke="#f5c518"/>' +
+          '<path d="M3.2 9a1.8 1.8 0 0 1 3.6 0" stroke="#38bdf8"/></g>';
+        break;
+      case 'guitar':
+        g = '<path d="M3.4 9.4l4.2-4.4" stroke="#8a5a2b" stroke-width="1.5" stroke-linecap="round"/>' +
+          '<path d="M7 1.2l2 2-2.1 1.3-1.2-1.2z" fill="#38bdf8"/>' +
+          '<circle cx="2.4" cy="7.8" r="1.9" fill="#f5c518"/>';
+        break;
+      case 'mask':
+        g = '<path d="M0.4 4.6c2.6-1.8 6.6-1.8 9.2 0-.9 2.6-2.5 4-4.6 4s-3.7-1.4-4.6-4z" fill="#8b5cf6"/>' +
+          '<ellipse cx="3.4" cy="4.6" rx="1.2" ry="1" fill="#fff"/><ellipse cx="6.6" cy="4.6" rx="1.2" ry="1" fill="#fff"/>';
+        break;
+      case 'sneeze':
+        g = '<g stroke="#7cc4f2" stroke-width="1.3" stroke-linecap="round">' +
+          '<path d="M8.2 3.2h1.8M8.6 5.4h2.2M8.2 7.6h1.8"/></g>' +
+          '<circle cx="4.6" cy="5.4" r="2.6" fill="#e2e8f0" stroke="#a8b4c2" stroke-width="0.9"/>';
+        break;
+      case 'flag':
+        g = '<path d="M2 9.8V1.2" stroke="#a06a2c" stroke-width="1.1"/>' +
+          '<path d="M2.6 1.4h6.2l-1.6 2.3 1.6 2.3H2.6z" fill="#ef4444"/>';
+        break;
+      case 'square':
+        g = '<rect x="1" y="1" width="8" height="8" rx="1.4" fill="#ffffff" stroke="#166534" stroke-width="1.4"/>' +
+          '<rect x="3.4" y="3.4" width="3.2" height="3.2" rx="0.6" fill="#22c55e"/>';
+        break;
+      case 'football':
+        g = '<circle cx="5" cy="5" r="4.3" fill="#ffffff" stroke="#3b3b4d" stroke-width="1"/>' +
+          '<path d="M5 2.6l1.5 1.1-.6 1.8H4.1L3.5 3.7z" fill="#3b3b4d"/>' +
+          '<path d="M2.2 6.4l1.6.4M7.8 6.4l-1.6.4M5 7.6v1.6" stroke="#3b3b4d" stroke-width="0.7"/>';
+        break;
+      case 'clock':
+        g = '<circle cx="5" cy="5" r="4.2" fill="#fff7da" stroke="#c08a1e" stroke-width="1.1"/>' +
+          '<path d="M5 2.6V5l2 1.3" stroke="#8a5300" stroke-width="1.1" fill="none" stroke-linecap="round"/>';
+        break;
+      case 'palette':
+        g = '<path d="M1 5.2a4.4 4.4 0 1 1 8.3 2.1c-1 2-2.9 1.1-3.9 1.7s-2.3 1-3.1 0A4.6 4.6 0 0 1 1 5.2z" fill="#e9c08f" stroke="#c99a63" stroke-width="1"/>' +
+          '<circle cx="3.2" cy="3.8" r="1" fill="#ef4444"/><circle cx="5.7" cy="3" r="1" fill="#38bdf8"/>' +
+          '<circle cx="7.1" cy="5.4" r="1" fill="#f5c518"/>';
+        break;
+      case 'bolt':
+        g = '<path d="M6.2 0.6L1.8 5.9h2.6L3.4 9.8 8.2 4.2H5.5z" fill="#f5c518" stroke="#e0ab1d" stroke-width="0.7" stroke-linejoin="round"/>';
+        break;
+      case 'skate':
+        g = '<rect x="0.2" y="3.6" width="9.6" height="2.2" rx="1.1" fill="#f472b6"/>' +
+          '<circle cx="2.4" cy="7.6" r="1.5" fill="#4b4b63"/><circle cx="7.6" cy="7.6" r="1.5" fill="#4b4b63"/>';
+        break;
+      case 'cane':
+        g = '<path d="M7.6 9.8V3.6a2.1 2.1 0 1 0-2.1-2.1" stroke="#c08a1e" stroke-width="1.4" fill="none" stroke-linecap="round"/>';
+        break;
+      case 'crack':
+        g = '<path d="M4.6 0.6L2.4 5h2.4L3.2 9.8 7.6 4.6H5.2L6.6 0.6z" fill="#ffffff" stroke="#8a5300" stroke-width="0.6" opacity="0.9"/>';
+        break;
+      case 'sparkle':
+        g = nbStar(5, 5, 4.4, '#fff7b0', '#f0c419');
+        break;
+    }
+    return g ? '<g transform="translate(' + x + ' ' + y + ') scale(' + (u / 10) + ')">' + g + '</g>' : '';
+  }
+
+  /* 얼굴: 1 외눈 · 2 안경 · 3 장난스러운 · 4 네모 눈썹 · 8 슈퍼 가면 · 9 동그란 코 · 10 별눈 */
+  function nbFace(kind, fx, fy) {
+    var out = '', ex = 2.9, ey = -1.1, d = '#2b2b3a';
+    function eyes(r) {
+      return '<circle cx="' + (fx - ex) + '" cy="' + (fy + ey) + '" r="' + r + '" fill="' + d + '"/>' +
+        '<circle cx="' + (fx + ex) + '" cy="' + (fy + ey) + '" r="' + r + '" fill="' + d + '"/>';
+    }
+    function smile(w, dy) {
+      return '<path d="M' + (fx - w) + ' ' + (fy + 1.1 + (dy || 0)) + ' q' + w + ' ' + (w * 1.05) + ' ' + (w * 2) +
+        ' 0" stroke="' + d + '" stroke-width="1.15" fill="none" stroke-linecap="round"/>';
+    }
+    function openMouth(w) {
+      return '<path d="M' + (fx - w) + ' ' + (fy + 1) + ' q' + w + ' ' + (w * 1.7) + ' ' + (w * 2) + ' 0 z" fill="#8a3b3b"/>' +
+        '<path d="M' + (fx - w * 0.6) + ' ' + (fy + 1 + w * 0.62) + ' q' + (w * 0.6) + ' ' + (w * 0.55) + ' ' + (w * 1.2) + ' 0 z" fill="#f2728f"/>';
+    }
+    switch (kind) {
+      case 'one':
+        out += '<circle cx="' + fx + '" cy="' + (fy - 0.3) + '" r="3" fill="#ffffff" stroke="' + d + '" stroke-width="1.1"/>' +
+          '<circle cx="' + fx + '" cy="' + (fy - 0.3) + '" r="1.35" fill="' + d + '"/>' +
+          '<circle cx="' + (fx - 0.6) + '" cy="' + (fy - 1) + '" r="0.45" fill="#ffffff"/>';
+        out += smile(2.4, 1.8);
+        break;
+      case 'glasses':
+        out += '<circle cx="' + (fx - ex) + '" cy="' + (fy + ey) + '" r="2.2" fill="#ffffff" stroke="#8b5cf6" stroke-width="1.15"/>' +
+          '<circle cx="' + (fx + ex) + '" cy="' + (fy + ey) + '" r="2.2" fill="#ffffff" stroke="#8b5cf6" stroke-width="1.15"/>' +
+          '<path d="M' + (fx - ex + 2.2) + ' ' + (fy + ey) + 'h' + (ex * 2 - 4.4) + '" stroke="#8b5cf6" stroke-width="1.05"/>' +
+          '<circle cx="' + (fx - ex) + '" cy="' + (fy + ey) + '" r="0.85" fill="' + d + '"/>' +
+          '<circle cx="' + (fx + ex) + '" cy="' + (fy + ey) + '" r="0.85" fill="' + d + '"/>';
+        out += smile(2.2, 1);
+        break;
+      case 'brow':
+        out += '<rect x="' + (fx - ex - 1.5) + '" y="' + (fy + ey - 3.7) + '" width="3" height="1.3" rx="0.4" fill="#166534"/>' +
+          '<rect x="' + (fx + ex - 1.5) + '" y="' + (fy + ey - 3.7) + '" width="3" height="1.3" rx="0.4" fill="#166534"/>';
+        out += eyes(1.15) + smile(2.4, 1);
+        break;
+      case 'playful':
+        out += eyes(1.2) + openMouth(2.2);
+        break;
+      case 'mask':
+        out += '<path d="M' + (fx - 6.4) + ' ' + (fy - 2.4) + 'c4.3-1.8 8.5-1.8 12.8 0-.9 2.8-3.5 4.4-6.4 4.4s-5.5-1.6-6.4-4.4z" fill="#7c3aed"/>' +
+          '<ellipse cx="' + (fx - ex) + '" cy="' + (fy - 0.4) + '" rx="1.5" ry="1.15" fill="#ffffff"/>' +
+          '<ellipse cx="' + (fx + ex) + '" cy="' + (fy - 0.4) + '" rx="1.5" ry="1.15" fill="#ffffff"/>';
+        out += smile(2, 2);
+        break;
+      case 'nose':
+        out += eyes(1.05) +
+          '<circle cx="' + fx + '" cy="' + (fy + 1.3) + '" r="1.8" fill="#e8eef5" stroke="#94a3b8" stroke-width="0.75"/>';
+        break;
+      case 'star':
+        out += nbStar(fx - ex, fy + ey, 2.1, '#fbbf24') + nbStar(fx + ex, fy + ey, 2.1, '#fbbf24') + smile(2.3, 1.4);
+        break;
+      default:
+        out += eyes(1.2) + smile(2.5, 0.7);
+    }
+    out += '<circle cx="' + (fx - 5.7) + '" cy="' + (fy + 2.5) + '" r="1.1" fill="#ff8fa3" opacity="0.45"/>' +
+      '<circle cx="' + (fx + 5.7) + '" cy="' + (fy + 2.5) + '" r="1.1" fill="#ff8fa3" opacity="0.45"/>';
+    return out;
+  }
+
+  /* 숫자별 시그니처 소품 (11~20 · 100) */
+  function nbSpecial(n, g) {
+    var out = '', w = g.w, h = g.h;
+    switch (n) {
+      case 11: out += nbGlyph('football', w + 1, h - 11, 10); break;
+      case 12: out += nbGlyph('clock', w * 0.52, h * 0.34, 11); break;
+      case 13: out += nbGlyph('crack', w * 0.56, h * 0.34, 10); break;
+      case 14: out += nbGlyph('skate', 0, h + 1, w); break;
+      case 15: out += nbGlyph('flag', w - 9, -10, 10); break;
+      case 16: out += nbGlyph('sparkle', w + 1, 4, 10); break;
+      case 17: out += nbGlyph('palette', w + 1, h * 0.42, 12); break;
+      case 18: out += nbGlyph('bolt', w * 0.58, h * 0.36, 11); break;
+      case 19: out += nbGlyph('sparkle', -5, 6, 8) + nbGlyph('sparkle', w + 1, h * 0.5, 9); break;
+      case 20: out += nbGlyph('hat', g.faceX - 5.4, -11, 11) + nbGlyph('cane', w + 1, h * 0.44, 13); break;
+      case 100:
+        out += nbGlyph('crown', g.faceX - 8, -14, 16) + nbGlyph('sparkle', w + 1, 4, 11) + nbGlyph('sparkle', -7, h * 0.6, 9);
+        break;
+    }
+    return out;
+  }
+
   function nbSVG(n) {
-    n = Math.max(1, Math.min(10, Math.round(Number(n) || 1)));
-    var cells = NB_SHAPES[n];
-    var colors = NB_COLORS[n];
-    var U = 12, S = 10.4, R = 2.6;
-    var maxX = 0, maxY = 0;
-    for (var i = 0; i < cells.length; i++) {
-      if (cells[i][0] > maxX) maxX = cells[i][0];
-      if (cells[i][1] > maxY) maxY = cells[i][1];
+    n = Math.max(1, Math.min(100, Math.round(Number(n) || 1)));
+    var cells = nbUnits(n), i, k;
+    var U = 12, S = 11.3, R = 2.4;
+    var minX = 0, minY = 0, maxX = 0, maxY = 0;
+    for (i = 0; i < cells.length; i++) {
+      if (cells[i].x < minX) minX = cells[i].x;
+      if (cells[i].y < minY) minY = cells[i].y;
+      if (cells[i].x > maxX) maxX = cells[i].x;
+      if (cells[i].y > maxY) maxY = cells[i].y;
     }
+    for (i = 0; i < cells.length; i++) { cells[i].x -= minX; cells[i].y -= minY; }
+    maxX -= minX; maxY -= minY;
     var w = (maxX + 1) * U, h = (maxY + 1) * U;
-    var body = '', k;
-    for (k = 0; k < cells.length; k++) {
-      var cx = cells[k][0] * U + 0.7, cy = cells[k][1] * U + 0.7;
-      var fill = colors.length > 1 ? colors[k % colors.length] : colors[0];
-      var stroke = n === 10 ? '#ef4444' : 'rgba(30,25,50,.16)';
-      body += '<rect x="' + cx + '" y="' + cy + '" width="' + S + '" height="' + S + '" rx="' + R + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="' + (n === 10 ? 1.7 : 0.7) + '"/>';
-      body += '<rect x="' + (cx + 1.5) + '" y="' + (cy + 1.3) + '" width="' + (S - 3.4) + '" height="2.2" rx="1.1" fill="#fff" opacity="0.35"/>';
+
+    /* 줄(y)마다 색을 정해요 — 아래가 십의 묶음, 위가 낱개 */
+    var ones = n <= 10 ? 0 : (n < 20 ? n - 10 : n % 10);
+    var totalRows = maxY + 1;
+    var onesRows = ones ? Math.ceil(ones / (NB_SQUARE[n] || NB_BASE_COLS[n < 20 ? 10 : Math.floor(n / 10) * 10] || 6)) : 0;
+    if (n > 10 && n < 20) onesRows = Math.ceil(ones / 5);
+    var tensRows = Math.max(0, totalRows - onesRows);
+    var tensDigit = n >= 20 ? Math.floor(n / 10) : 0;
+
+    function rowFill(y) {
+      if (n <= 10) {
+        var cols = NB_COLORS[n] || ['#ef4444'];
+        if (n === 10) return '#ffffff';
+        return cols.length > 1 ? cols[(maxY - y) % cols.length] : cols[0];
+      }
+      if (n === 100) return '#ffffff';
+      var isOnesRow = y >= tensRows;         /* 위쪽 줄 = 1의 자리 낱개 */
+      if (n < 20) {
+        return isOnesRow ? (NB_ONE_COLOR[n - 10] || '#ffffff') : '#ffffff';
+      }
+      if (isOnesRow) {
+        return n % 10 === 0 ? '#ffffff' : (NB_ONE_COLOR[n % 10] || '#ffffff');
+      }
+      var dec = NB_TEN[tensDigit];
+      if (tensDigit === 7) return NB_RAINBOW[Math.max(0, Math.min(6, tensRows - 1 - y)) % 7];
+      return (dec && dec.c) ? dec.c : '#94a3b8';
     }
-    var topCells = cells.filter(function (c) { return c[1] === 0; });
+    function whiteCell(y) {
+      if (n === 10 || n === 100) return true;
+      if (n > 10 && n < 20) return y < tensRows;
+      return false;
+    }
+
+    var body = '';
+    for (k = 0; k < cells.length; k++) {
+      var cx = cells[k].x * U + 0.35, cy = cells[k].y * U + 0.35;
+      var isWhite = whiteCell(cells[k].y);
+      var fill = rowFill(cells[k].y);
+      var stroke = isWhite ? '#ef4444' : 'rgba(30,25,50,.14)';
+      body += '<rect x="' + cx + '" y="' + cy + '" width="' + S + '" height="' + S + '" rx="' + R + '" fill="' + fill +
+        '" stroke="' + stroke + '" stroke-width="' + (isWhite ? 1.5 : 0.6) + '"/>';
+      body += '<rect x="' + (cx + 1.6) + '" y="' + (cy + 1.2) + '" width="' + (S - 3.6) + '" height="2" rx="1" fill="#fff" opacity="0.3"/>';
+    }
+
+    /* 얼굴은 맨 윗줄 가운데 */
+    var topCells = cells.filter(function (c) { return c.y === 0; });
     var faceX = 0;
-    for (k = 0; k < topCells.length; k++) faceX += topCells[k][0] * U + U / 2;
-    faceX = faceX / topCells.length;
+    for (k = 0; k < topCells.length; k++) faceX += topCells[k].x * U + U / 2;
+    faceX = faceX / Math.max(1, topCells.length);
     var faceY = U / 2;
-    var dark = '#2b2b3a';
-    var face = '<circle cx="' + (faceX - 2.9) + '" cy="' + (faceY - 1.1) + '" r="1.2" fill="' + dark + '"/>' +
-      '<circle cx="' + (faceX + 2.9) + '" cy="' + (faceY - 1.1) + '" r="1.2" fill="' + dark + '"/>' +
-      '<path d="M' + (faceX - 2.5) + ' ' + (faceY + 1.2) + ' q2.5 2.6 5 0" stroke="' + dark + '" stroke-width="1.15" fill="none" stroke-linecap="round"/>' +
-      '<circle cx="' + (faceX - 4.6) + '" cy="' + (faceY + 1.6) + '" r="1.1" fill="#ff8fa3" opacity="0.55"/>' +
-      '<circle cx="' + (faceX + 4.6) + '" cy="' + (faceY + 1.6) + '" r="1.1" fill="#ff8fa3" opacity="0.55"/>';
+    var od = n <= 10 ? n : n % 10;
+    var fk;
+    if (n === 10 || n === 100) fk = 'star';
+    else if (od === 0) fk = 'normal';
+    else fk = ['normal', 'one', 'glasses', 'playful', 'brow', 'normal', 'playful', 'normal', 'mask', 'nose'][od] || 'normal';
+    /* 소품: 낱개 숫자 특징(1~9) + 십의 자리 특징(20~90) */
+    var acc = '';
+    if (n > 10) {
+      if (od === 3) acc += nbGlyph('crown', faceX - 6, -11, 12);
+      else if (od === 5) acc += nbGlyph('star', -8, h * 0.42, 10);
+      else if (od === 6) acc += nbGlyph('dice', w + 1, 3, 10);
+      else if (od === 7) acc += nbGlyph('rainbow', -6, h - 9, 12);
+      else if (od === 1) acc += nbGlyph('sparkle', w + 1, 4, 9);
+      if (tensDigit && tensDigit !== 7) acc += nbGlyph(NB_TEN[tensDigit].glyph, -6, 2, 10);
+      else if (tensDigit === 7) acc += nbGlyph('rainbow', -7, 2, 10);
+    }
+    acc += nbSpecial(n, { w: w, h: h, faceX: faceX, U: U });
+
+    /* 팔 · 다리 */
     var armY = h / 2 - 1.1;
-    var arms = '<rect x="-2.4" y="' + armY + '" width="3.1" height="2.2" rx="1.1" fill="' + colors[0] + '" opacity="0.9"/>' +
-      '<rect x="' + (w - 0.7) + '" y="' + armY + '" width="3.1" height="2.2" rx="1.1" fill="' + colors[colors.length - 1] + '" opacity="0.9"/>';
-    var legs = '<rect x="' + (w * 0.2) + '" y="' + (h - 0.4) + '" width="2.3" height="3.6" rx="1.1" fill="#4b4b63" opacity="0.55"/>' +
-      '<rect x="' + (w * 0.72) + '" y="' + (h - 0.4) + '" width="2.3" height="3.6" rx="1.1" fill="#4b4b63" opacity="0.55"/>';
-    return '<svg viewBox="-4 -4 ' + (w + 8) + ' ' + (h + 9) + '" width="100%" height="100%" ' +
+    var armFill = rowFill(totalRows - 1);
+    var arms = '<rect x="-2.6" y="' + armY + '" width="3.2" height="2.2" rx="1.1" fill="' + armFill + '" opacity="0.95"/>' +
+      '<rect x="' + (w - 0.6) + '" y="' + armY + '" width="3.2" height="2.2" rx="1.1" fill="' + armFill + '" opacity="0.95"/>';
+    var legs = '<rect x="' + (w * 0.22) + '" y="' + (h - 0.4) + '" width="2.4" height="3.4" rx="1.1" fill="#4b4b63" opacity="0.55"/>' +
+      '<rect x="' + (w * 0.68) + '" y="' + (h - 0.4) + '" width="2.4" height="3.4" rx="1.1" fill="#4b4b63" opacity="0.55"/>';
+
+    return '<svg viewBox="-9 -16 ' + (w + 26) + ' ' + (h + 28) + '" width="100%" height="100%" ' +
       'preserveAspectRatio="xMidYMid meet" role="img" aria-label="' + (isKo() ? '넘버블럭스 ' : 'Numberblocks ') + n + '" focusable="false">' +
-      legs + arms + body + face + '</svg>';
+      legs + arms + body + nbFace(fk, faceX, faceY) + acc + '</svg>';
   }
 
   /* ============================================================
@@ -14446,11 +15223,15 @@ function iconSVG(key) {
 
   function freshDaily(date) {
     return {
-      date: date, morning: {}, evening: {}, homework: {}, supplies: {}, order: [],
+      date: date, morning: {}, evening: {}, homework: {},
+      wm: {}, wl: {}, we: {}, ws: {},           /* 주말·공휴일 루틴 체크 */
+      supplies: {}, order: [],
       sight: { pos: 0, ok: 0, no: 0, last: '' },
       sightBonus: 0,
       celebrated: { morning: false, evening: false, homework: false, sight: false },
       cele: {},           /* kind → { at: 축하한 시각, n: 그때 해금한 넘버블럭스 } */
+      mealClaimed: false, /* 🍚 밥 3끼 보너스 — 하루 1회만 */
+      mealReward: { at: 0, n: 0 },
       undo: []            /* 방금 취소한 체크 { k: '아침:id', at } — 원격 동기화가 되살리지 못하게 */
     };
   }
@@ -14520,6 +15301,16 @@ function iconSVG(key) {
         if (!s.morning.length) s.morning = clone(DEFAULT_MORNING);
       }
       out.settings = s;
+    }
+    /* v6: 등원 준비에 '물통·수저통 챙기기'를 더하고, '내일 옷·준비물 챙기기'는 지워요 */
+    if (Array.isArray(s.morning) && s.morning.length) {
+      var hasBottle = false;
+      for (var bi = 0; bi < s.morning.length; bi++) if (isBottleItem(s.morning[bi])) hasBottle = true;
+      if (!hasBottle) s.morning.push(clone(DEFAULT_MORNING[6]));
+    }
+    if (Array.isArray(s.evening)) {
+      s.evening = s.evening.filter(function (it) { return !isPrepItem(it); });
+      if (!s.evening.length) s.evening = clone(DEFAULT_EVENING);
     }
     out.v = STORAGE_VERSION;
     return out;
@@ -14595,6 +15386,10 @@ function iconSVG(key) {
         row.at = at;
       }
       out.push(row);
+    }
+    /* '내일 옷·준비물 챙기기'는 어느 기기에서 올라와도 쓰지 않아요 */
+    if (kind === 'evening') {
+      out = out.filter(function (it) { return !isPrepItem(it); });
     }
     return out.length ? out.slice(0, 20) : clone(defaults);
   }
@@ -14699,14 +15494,17 @@ function iconSVG(key) {
     var day = raw.daily;
     if (day && typeof day === 'object' && day.date) {
       var fd = freshDaily(String(day.date));
-      if (day.morning && typeof day.morning === 'object') {
-        for (var k in day.morning) if (day.morning[k]) fd.morning[String(k)] = true;
+      for (var gi = 0; gi < BAG_KINDS.length; gi++) {
+        var gk = BAG_KINDS[gi], gbag = day[gk];
+        if (!gbag || typeof gbag !== 'object') continue;
+        for (var k in gbag) if (gbag[k]) fd[gk][String(k)] = true;
       }
-      if (day.evening && typeof day.evening === 'object') {
-        for (var ke in day.evening) if (day.evening[ke]) fd.evening[String(ke)] = true;
-      }
-      if (day.homework && typeof day.homework === 'object') {
-        for (var k2 in day.homework) if (day.homework[k2]) fd.homework[String(k2)] = true;
+      fd.mealClaimed = !!day.mealClaimed;
+      if (day.mealReward && typeof day.mealReward === 'object') {
+        fd.mealReward = {
+          at: Math.max(0, Math.round(Number(day.mealReward.at) || 0)),
+          n: Math.max(0, Math.min(100, Math.round(Number(day.mealReward.n) || 0)))
+        };
       }
       if (Array.isArray(day.order)) {
         fd.order = day.order.filter(function (x) { return typeof x === 'string'; }).slice(0, 60);
@@ -14802,12 +15600,24 @@ function iconSVG(key) {
      유틸 / 지표
   ============================================================ */
   function itemsOf(kind) {
+    if (kind === 'wm') return DEFAULT_W_MORNING;
+    if (kind === 'wl') return DEFAULT_W_LUNCH;
+    if (kind === 'we') return DEFAULT_W_EVENING;
+    if (kind === 'ws') return DEFAULT_W_STUDY;
     if (kind === 'evening') return state.settings.evening;
     return kind === 'homework' ? state.settings.homework : state.settings.morning;
   }
   function itemById(kind, id) {
     var list = itemsOf(kind);
     for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+    return null;
+  }
+  /* 체크 기록이 남은 항목은 모드가 바뀌어도 찾아야 도장이 사라지지 않아요 */
+  function itemByIdAny(id) {
+    for (var i = 0; i < BAG_KINDS.length; i++) {
+      var it = itemById(BAG_KINDS[i], id);
+      if (it) return it;
+    }
     return null;
   }
   function itemLabel(it) {
@@ -14823,7 +15633,7 @@ function iconSVG(key) {
   /* 지금 체크된 항목만 순서대로 (order 에 빠진 것이 있어도 하나도 놓치지 않아요) */
   function checkedKeys() {
     var out = [], seen = {}, order = Array.isArray(state.daily.order) ? state.daily.order : [];
-    var kinds = ['morning', 'evening', 'homework'];
+    var kinds = BAG_KINDS;
     var i, k;
     for (i = 0; i < order.length; i++) {
       var key = order[i];
@@ -14832,7 +15642,7 @@ function iconSVG(key) {
       if (p.length !== 2 || kinds.indexOf(p[0]) < 0) continue;
       var bag = state.daily[p[0]] || {};
       if (!bag[p[1]]) continue;
-      if (!itemById(p[0], p[1])) continue;
+      if (!itemByIdAny(p[1])) continue;
       seen[key] = 1;
       out.push({ key: key, kind: p[0], id: p[1] });
     }
@@ -14842,7 +15652,7 @@ function iconSVG(key) {
         if (!Object.prototype.hasOwnProperty.call(b, k) || !b[k]) continue;
         var kk = kd + ':' + k;
         if (seen[kk]) continue;
-        if (!itemById(kd, k)) continue;
+        if (!itemByIdAny(k)) continue;
         seen[kk] = 1;
         out.push({ key: kk, kind: kd, id: k });
       }
@@ -14895,10 +15705,9 @@ function iconSVG(key) {
   }
   function earnedIn(daily) {
     if (!daily) return 0;
-    return Object.keys(daily.morning || {}).length +
-      Object.keys(daily.evening || {}).length +
-      Object.keys(daily.homework || {}).length +
-      0;   /* Sight Words 는 공부용 — 도장을 주지 않아요 */
+    var n = 0;
+    for (var i = 0; i < BAG_KINDS.length; i++) n += Object.keys(daily[BAG_KINDS[i]] || {}).length;
+    return n;   /* Sight Words 는 공부용 — 도장을 주지 않아요 */
   }
   function earnedToday() { return checkedKeys().length; }
   function totalStickers() {
@@ -14911,7 +15720,10 @@ function iconSVG(key) {
     return t;
   }
   function totalItems() {
-    return state.settings.morning.length + state.settings.evening.length + state.settings.homework.length;
+    var kinds = weekendMode() ? WK_KINDS : WD_KINDS;
+    var n = 0;
+    for (var i = 0; i < kinds.length; i++) n += itemsOf(kinds[i]).length;
+    return n;
   }
 
   function archiveDaily(daily) {
@@ -14919,9 +15731,10 @@ function iconSVG(key) {
     var m = Object.keys(daily.morning || {}).length;
     var e = Object.keys(daily.evening || {}).length;
     var h = Object.keys(daily.homework || {}).length;
-    var extra = 0;   /* Sight Words 는 공부용 — 도장을 주지 않아요 */
+    var extra = 0;   /* 주말 루틴 + Sight Words — 주말은 따로 합산 */
+    for (var wi = 0; wi < WK_KINDS.length; wi++) extra += Object.keys(daily[WK_KINDS[wi]] || {}).length;
     if (m + e + h + extra === 0 && !state.history[daily.date]) return;
-    state.history[daily.date] = { earned: m + e + h + extra, morning: m, evening: e, homework: h };
+    state.history[daily.date] = { earned: m + e + h + extra, morning: m, evening: e, homework: h + extra };
     var keys = Object.keys(state.history).sort();
     while (keys.length > 90) { delete state.history[keys.shift()]; }
   }
@@ -14943,19 +15756,19 @@ function iconSVG(key) {
   }
 
   function pruneDaily() {
-    var mIds = {}, eIds = {}, hIds = {}, i;
-    for (i = 0; i < state.settings.morning.length; i++) mIds[state.settings.morning[i].id] = 1;
-    for (i = 0; i < state.settings.evening.length; i++) eIds[state.settings.evening[i].id] = 1;
-    for (i = 0; i < state.settings.homework.length; i++) hIds[state.settings.homework[i].id] = 1;
-    for (var k in state.daily.morning) if (!mIds[k]) delete state.daily.morning[k];
-    for (var k3 in state.daily.evening) if (!eIds[k3]) delete state.daily.evening[k3];
-    for (var k2 in state.daily.homework) if (!hIds[k2]) delete state.daily.homework[k2];
+    var ids = {}, i, kind;
+    for (i = 0; i < BAG_KINDS.length; i++) {
+      kind = BAG_KINDS[i];
+      var list = itemsOf(kind);
+      var set = {};
+      for (var j = 0; j < list.length; j++) set[list[j].id] = 1;
+      ids[kind] = set;
+      if (!state.daily[kind] || typeof state.daily[kind] !== 'object') state.daily[kind] = {};
+      for (var k in state.daily[kind]) if (!set[k]) delete state.daily[kind][k];
+    }
     state.daily.order = state.daily.order.filter(function (key) {
       var p = key.split(':');
-      if (p[0] === 'morning') return !!mIds[p[1]];
-      if (p[0] === 'evening') return !!eIds[p[1]];
-      if (p[0] === 'homework') return !!hIds[p[1]];
-      return false;
+      return !!(ids[p[0]] && ids[p[0]][p[1]]);
     });
     reconcileOrder();   /* 체크된 것과 도장 목록을 정확히 일치시켜요 */
   }
@@ -15265,7 +16078,9 @@ function iconSVG(key) {
       s.innerHTML = nbSVG(n);
       box.appendChild(s);
     });
-    $('brandSub').textContent = Lf('brandSub', { start: state.settings.startTime, depart: state.settings.departTime });
+    $('brandSub').textContent = weekendMode()
+      ? L('brandSubWeekend')
+      : Lf('brandSub', { start: state.settings.startTime, depart: state.settings.departTime });
     renderCheerLine();
     renderSyncDot();
     var cheerTxt = document.querySelector('#btnCheer .cheer-btn-txt');
@@ -15409,36 +16224,92 @@ function iconSVG(key) {
      탭 : ☀️ 아침 / 🌙 방과 후 / 🔤 Sight Words
   ------------------------------------------------------------ */
   var activeTab = 'morning';
-  var TABS = ['morning', 'evening', 'sight'];
+  var ALL_TABS = ['morning', 'evening', 'sight', 'wm', 'wl', 'we', 'ws'];
+  var TABS = ALL_TABS;
+  var WK_TABS = ['wm', 'wl', 'we', 'ws'];
+  var TAB_SUFFIX = { morning: 'Morning', evening: 'Evening', sight: 'Sight', wm: 'Wm', wl: 'Wl', we: 'We', ws: 'Ws' };
 
-  function tabBtnId(name) {
-    return 'tab' + (name === 'evening' ? 'Evening' : (name === 'sight' ? 'Sight' : 'Morning'));
-  }
-  function tabPanelId(name) {
-    return 'panel' + (name === 'evening' ? 'Evening' : (name === 'sight' ? 'Sight' : 'Morning'));
-  }
+  function tabBtnId(name) { return 'tab' + (TAB_SUFFIX[name] || 'Morning'); }
+  function tabPanelId(name) { return 'panel' + (TAB_SUFFIX[name] || 'Morning'); }
 
   function autoTab(now) {
     return (now.getHours() * 60 + now.getMinutes()) >= AUTO_TAB_MIN ? 'evening' : 'morning';
   }
 
+  /* ============================================================
+     🏖️ 주말 · 공휴일 모드
+     — 토·일은 자동, 평일은 헤더의 🏖️ 공휴일 버튼으로 켜요
+  ============================================================ */
+  function isWeekendDate(d) {
+    var g = d.getDay();
+    return g === 0 || g === 6;
+  }
+  function weekendMode() {
+    if (isWeekendDate(new Date())) return true;
+    var ui = state.ui || {};
+    return !!(ui.holiday && ui.holidayDate === todayKey());
+  }
+  function holidayLocked() { return isWeekendDate(new Date()); }
+
+  function applyMode(opts) {
+    var wk = weekendMode();
+    document.body.classList.toggle('weekend-mode', wk);
+    var wd = $('weekdayTabbar'), webar = $('weekendTabbar');
+    if (wd) wd.hidden = wk;
+    if (webar) webar.hidden = !wk;
+    var btn = $('btnHoliday');
+    if (btn) {
+      btn.classList.toggle('on', wk);
+      btn.classList.toggle('auto', holidayLocked());
+      btn.setAttribute('aria-pressed', wk ? 'true' : 'false');
+      btn.setAttribute('aria-disabled', holidayLocked() ? 'true' : 'false');
+      btn.title = holidayLocked() ? L('holidayAutoTitle') : (wk ? L('holidayOffTitle') : L('holidayOnTitle'));
+    }
+    var back = $('wkSightBack');
+    if (back) back.hidden = !wk;
+    if (opts && opts.switchTab) applyTab(resolveTab(new Date()), { keepScroll: true });
+  }
+
+  function setHoliday(on) {
+    if (holidayLocked()) {
+      toast(L('toastHolidayWeekend'));
+      return;
+    }
+    if (!state.ui) state.ui = { tabDate: '', tabManual: '' };
+    state.ui.holiday = !!on;
+    state.ui.holidayDate = todayKey();
+    save();
+    applyMode({ switchTab: true });
+    renderAll();
+    beep('tab');
+    toast(on ? L('toastHolidayOn') : L('toastHolidayOff'));
+  }
+
   function moveStamps(tab) {
     var card = $('cardWeek');
-    var slot = $('stampSlot' + (tab === 'evening' ? 'Evening' : (tab === 'sight' ? 'Sight' : 'Morning')));
+    var slot = $('stampSlot' + (TAB_SUFFIX[tab] || 'Morning'));
+    if (card && slot && card.parentNode !== slot) slot.appendChild(card);
+  }
+  function moveMealCard(tab) {
+    var card = $('cardMeal');
+    var slot = $('mealSlot' + (TAB_SUFFIX[tab] || ''));
     if (card && slot && card.parentNode !== slot) slot.appendChild(card);
   }
 
   function renderTabCounts() {
-    var m = checkedCount('morning'), mt = state.settings.morning.length;
-    var e = checkedCount('evening'), et = state.settings.evening.length;
-    var h = checkedCount('homework'), ht = state.settings.homework.length;
-    $('tabMorningCount').textContent = m + ' / ' + mt;
-    $('tabEveningCount').textContent = (e + h) + ' / ' + (et + ht);
-    $('tabMorning').classList.toggle('done-all', mt > 0 && m === mt);
-    $('tabEvening').classList.toggle('done-all', (et + ht) > 0 && (e + h) === (et + ht));
+    var m = checkedCount('morning'), mt = itemsOf('morning').length;
+    var e = checkedCount('evening'), et = itemsOf('evening').length;
+    var h = checkedCount('homework'), ht = itemsOf('homework').length;
+    var mBtn = $('tabMorning'), eBtn = $('tabEvening');
+    var mCnt = $('tabMorningCount'), eCnt = $('tabEveningCount');
+    if (mCnt) mCnt.textContent = m + ' / ' + mt;
+    if (eCnt) eCnt.textContent = (e + h) + ' / ' + (et + ht);
+    if (mBtn) mBtn.classList.toggle('done-all', mt > 0 && m === mt);
+    if (eBtn) eBtn.classList.toggle('done-all', (et + ht) > 0 && (e + h) === (et + ht));
+    var wkMode = weekendMode();
     var after = isAfterDeparture(new Date());
-    $('tabMorning').classList.toggle('nudge', !after && m < mt && activeTab !== 'morning');
-    $('tabEvening').classList.toggle('nudge', after && (e + h) < (et + ht) && activeTab !== 'evening');
+    if (mBtn) mBtn.classList.toggle('nudge', !wkMode && !after && m < mt && activeTab !== 'morning');
+    if (eBtn) eBtn.classList.toggle('nudge', !wkMode && after && (e + h) < (et + ht) && activeTab !== 'evening');
 
     var sBtn = $('tabSight'), sCnt = $('tabSightCount');
     if (sBtn && sCnt) {
@@ -15446,12 +16317,24 @@ function iconSVG(key) {
       sCnt.textContent = sDone + ' / ' + sTotal;
       sBtn.classList.toggle('done-all', sTotal > 0 && sDone === sTotal);
     }
+
+    /* 주말 탭 4개 */
+    for (var i = 0; i < WK_TABS.length; i++) {
+      var k = WK_TABS[i];
+      var total = itemsOf(k).length, done = checkedCount(k);
+      var cnt = $('tab' + TAB_SUFFIX[k] + 'Count');
+      var b = $('tab' + TAB_SUFFIX[k]);
+      if (cnt) cnt.textContent = done + ' / ' + total;
+      if (b) b.classList.toggle('done-all', total > 0 && done === total);
+    }
   }
 
   function applyTab(tab, opts) {
-    activeTab = TABS.indexOf(tab) >= 0 ? tab : 'morning';
-    for (var i = 0; i < TABS.length; i++) {
-      var name = TABS[i], on = name === activeTab;
+    var wk = weekendMode();
+    if (WK_TABS.indexOf(tab) >= 0 && !wk) tab = 'morning';
+    activeTab = ALL_TABS.indexOf(tab) >= 0 ? tab : (wk ? 'wm' : 'morning');
+    for (var i = 0; i < ALL_TABS.length; i++) {
+      var name = ALL_TABS[i], on = name === activeTab;
       var panel = $(tabPanelId(name));
       var btn = $(tabBtnId(name));
       if (panel) panel.hidden = !on;
@@ -15463,15 +16346,20 @@ function iconSVG(key) {
     }
     document.body.classList.toggle('tab-evening', activeTab === 'evening');
     document.body.classList.toggle('tab-sight', activeTab === 'sight');
+    document.body.classList.toggle('tab-wk', WK_TABS.indexOf(activeTab) >= 0);
     moveStamps(activeTab);
+    moveMealCard(activeTab);
     renderTabCounts();
     if (activeTab === 'sight') { renderSight(); }   /* 탭 진입만으로는 소리 없음 */
+    if (WK_TABS.indexOf(activeTab) >= 0) renderWeekend();
     if (!opts || !opts.keepScroll) { var m = $('main'); if (m) m.scrollTop = 0; }
   }
 
   function chooseTab(tab) {
-    var next = TABS.indexOf(tab) >= 0 ? tab : 'morning';
-    state.ui = { tabDate: todayKey(), tabManual: next };
+    var next = ALL_TABS.indexOf(tab) >= 0 ? tab : 'morning';
+    if (!state.ui || typeof state.ui !== 'object') state.ui = { tabDate: '', tabManual: '' };
+    state.ui.tabDate = todayKey();
+    state.ui.tabManual = next;
     save();
     applyTab(next);
     beep('tab');
@@ -15479,8 +16367,19 @@ function iconSVG(key) {
 
   /* 저장된 수동 선택이 없으면 시간대에 맞는 탭을 골라요 */
   function resolveTab(now) {
-    if (state.ui && TABS.indexOf(state.ui.tabManual) >= 0 && state.ui.tabDate === todayKey()) return state.ui.tabManual;
-    return autoTab(now);
+    var wk = weekendMode();
+    var ui = state.ui || {};
+    var manual = (ui.tabDate === todayKey() && ALL_TABS.indexOf(ui.tabManual) >= 0) ? ui.tabManual : '';
+    if (manual === 'sight') return 'sight';
+    if (manual) {
+      if (wk ? WK_TABS.indexOf(manual) >= 0 : (manual === 'morning' || manual === 'evening')) return manual;
+    }
+    return wk ? 'wm' : autoTab(now);
+  }
+
+  /* 지금 화면에 보이는 탭들 (키보드 이동용) */
+  function visibleTabs() {
+    return weekendMode() ? WK_TABS.concat(['sight']) : ['morning', 'evening', 'sight'];
   }
 
   function monthDay(d) {
@@ -15584,7 +16483,11 @@ function iconSVG(key) {
     var map = {
       morning: { idle: 'noteMorningIdle', all: 'noteMorningAll', part: 'noteMorningPart' },
       evening: { idle: 'noteEveningIdle', all: 'noteEveningAll', part: 'noteEveningPart' },
-      homework: { idle: 'noteHomeworkIdle', all: 'noteHomeworkAll', part: 'noteHomeworkPart' }
+      homework: { idle: 'noteHomeworkIdle', all: 'noteHomeworkAll', part: 'noteHomeworkPart' },
+      wm: { idle: 'noteWmIdle', all: 'noteWmAll', part: 'noteWmPart' },
+      wl: { idle: 'noteWlIdle', all: 'noteWlAll', part: 'noteWlPart' },
+      we: { idle: 'noteWeIdle', all: 'noteWeAll', part: 'noteWePart' },
+      ws: { idle: 'noteWsIdle', all: 'noteWsAll', part: 'noteWsPart' }
     };
     return L(map[kind][key]);
   }
@@ -15592,7 +16495,11 @@ function iconSVG(key) {
   var KIND_UI = {
     morning: { list: 'morningList', count: 'morningCount', bar: 'morningBar', note: 'morningNote' },
     evening: { list: 'eveningList', count: 'eveningCount', bar: 'eveningBar', note: 'eveningNote' },
-    homework: { list: 'homeworkList', count: 'homeworkCount', bar: 'homeworkBar', note: 'homeworkNote' }
+    homework: { list: 'homeworkList', count: 'homeworkCount', bar: 'homeworkBar', note: 'homeworkNote' },
+    wm: { list: 'wmList', count: 'wmCount', bar: 'wmBar', note: 'wmNote' },
+    wl: { list: 'wlList', count: 'wlCount', bar: 'wlBar', note: 'wlNote' },
+    we: { list: 'weList', count: 'weCount', bar: 'weBar', note: 'weNote' },
+    ws: { list: 'wsList', count: 'wsCount', bar: 'wsBar', note: 'wsNote' }
   };
 
   function renderListState(kind) {
@@ -15785,6 +16692,8 @@ function iconSVG(key) {
     renderListState('morning');
     renderListState('evening');
     renderListState('homework');
+    applyMode(null);
+    renderWeekend();
     renderSupplies();
     renderTomorrow();
     renderStamps();
@@ -15796,6 +16705,137 @@ function iconSVG(key) {
     renderWeather();
     renderSight();
     renderDexPill();
+  }
+
+  /* ============================================================
+     🌅 주말 · 공휴일 루틴 화면
+  ============================================================ */
+  function renderWeekendHero(kind) {
+    var panel = $(tabPanelId(kind));
+    if (!panel) return;
+    var items = itemsOf(kind), total = items.length, done = checkedCount(kind);
+    var pct = total ? Math.round((done / total) * 100) : 0;
+    var big = panel.querySelector('.wk-big');
+    if (big) big.innerHTML = '<span class="num">' + done + '</span> / ' + total;
+    var fill = panel.querySelector('.wk-fill');
+    if (fill) fill.style.width = pct + '%';
+    var pctEl = panel.querySelector('.wk-pct');
+    if (pctEl) pctEl.textContent = pct + '%';
+    var sub = panel.querySelector('.wk-sub');
+    if (sub) sub.textContent = (total > 0 && done === total) ? L('wkSubDone') : L('wkSub');
+    var chip = $({ wm: 'wmHeroChip', wl: 'wlHeroChip', we: 'weHeroChip', ws: 'wsHeroChip' }[kind]);
+    if (chip) chip.textContent = weekendTagText();
+  }
+
+  function weekendTagText() {
+    var now = new Date();
+    if (isWeekendDate(now)) return Lf('wkTagWeekend', { d: WEEK_FULL[currentLang][now.getDay()] });
+    return L('wkTagHoliday');
+  }
+
+  function renderWeekend() {
+    for (var i = 0; i < WK_KINDS.length; i++) {
+      var k = WK_KINDS[i];
+      var list = $(KIND_UI[k].list);
+      if (list) buildList(k, list);
+      renderListState(k);
+      renderWeekendHero(k);
+    }
+    renderMealBonus();
+    moveMealCard(activeTab);
+    moveStamps(activeTab);
+  }
+
+  /* ============================================================
+     🍚 주말·공휴일 밥 3끼 콤보 보상
+     — 아침·점심·저녁 '밥 먹기'를 모두 체크하면
+       아직 못 만난 넘버블럭스 1명을 보너스로 해금해요 (하루 1회)
+  ============================================================ */
+  var MEAL_SLOTS = [
+    { kind: 'wm', meal: 'am', emoji: '🌅' },
+    { kind: 'wl', meal: 'noon', emoji: '☀️' },
+    { kind: 'we', meal: 'pm', emoji: '🌙' }
+  ];
+
+  function mealItem(slot) {
+    var items = itemsOf(slot.kind);
+    for (var i = 0; i < items.length; i++) if (items[i].meal === slot.meal) return items[i];
+    return null;
+  }
+  function mealDone(slot) {
+    var it = mealItem(slot);
+    return !!(it && state.daily[slot.kind] && state.daily[slot.kind][it.id]);
+  }
+  function mealDoneCount() {
+    var n = 0;
+    for (var i = 0; i < MEAL_SLOTS.length; i++) if (mealDone(MEAL_SLOTS[i])) n++;
+    return n;
+  }
+  function mealClaimedToday() { return !!(state.daily && state.daily.mealClaimed); }
+  function mealSlotOf(kind, id) {
+    for (var i = 0; i < MEAL_SLOTS.length; i++) {
+      var s = MEAL_SLOTS[i];
+      if (s.kind !== kind) continue;
+      var it = mealItem(s);
+      if (it && it.id === id) return s;
+    }
+    return null;
+  }
+
+  function renderMealBonus() {
+    if (!state.daily) return;
+    var done = mealDoneCount(), i, slot;
+    for (i = 0; i < MEAL_SLOTS.length; i++) {
+      slot = MEAL_SLOTS[i];
+      var chip = document.querySelector('.meal-chip[data-meal="' + slot.meal + '"]');
+      if (chip) chip.classList.toggle('on', mealDone(slot));
+    }
+    var stars = document.querySelectorAll('.meal-star');
+    for (i = 0; i < stars.length; i++) stars[i].classList.toggle('on', i < done);
+    var cnt = $('mealCount');
+    if (cnt) cnt.textContent = done + ' / 3';
+    var row = $('mealRow');
+    if (row) row.classList.toggle('full', done === 3);
+    var note = $('mealNote');
+    if (!note) return;
+    var rec = state.daily.mealReward || {};
+    if (mealClaimedToday() && Number(rec.n) > 0) note.textContent = Lf('mealNoteDone', { n: rec.n });
+    else if (mealClaimedToday()) note.textContent = L('mealNoteAll');
+    else if (done === 0) note.textContent = L('mealNoteIdle');
+    else if (done < 3) note.textContent = Lf('mealNotePart', { n: 3 - done });
+    else note.textContent = L('mealNoteReady');
+    note.classList.toggle('on', done === 3);
+  }
+
+  /* 아직 못 만난 친구 중 랜덤 1명 */
+  function dexRandomLocked() {
+    var pool = [];
+    for (var n = 1; n <= DEX_MAX; n++) if (!dexHas(n)) pool.push(n);
+    if (!pool.length) return 0;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  function maybeClaimMealBonus() {
+    if (!state.daily || state.daily.date !== todayKey()) return 0;
+    if (mealClaimedToday()) return 0;          /* 하루 1회 — 취소 후 다시 체크해도 중복 없음 */
+    if (mealDoneCount() < 3) return 0;
+    var n = dexRandomLocked();
+    state.daily.mealClaimed = true;
+    state.daily.mealReward = { at: Date.now(), n: n || 0 };
+    if (n) {
+      var d = dexState();
+      d.unlocked[String(n)] = Date.now();
+      renderDexPill();
+      if (!dexModalHidden()) renderDexGrid();
+    }
+    save();
+    celebrate('meal', n ? String(n) : '');
+    renderMealBonus();
+    if (n) {
+      dexCheckMilestones(false);
+      dexSchedulePop(n);
+    }
+    return n;
   }
 
   /* ============================================================
@@ -15848,6 +16888,18 @@ function iconSVG(key) {
     renderEveningHero();
     renderTabCounts();
     renderWeek();
+    if (WK_KINDS.indexOf(kind) >= 0) {
+      renderWeekendHero(kind);
+      var mslot = mealSlotOf(kind, id);
+      if (mslot) {
+        if (!wasDone) {
+          beep('success');            /* 🍚 밥 한 끼 칭찬 효과음 */
+          toast(L(mslot.meal === 'am' ? 'mealPraiseAm' : (mslot.meal === 'noon' ? 'mealPraiseNoon' : 'mealPraisePm')));
+        }
+        renderMealBonus();
+        if (!wasDone) maybeClaimMealBonus();   /* 3끼 완성 → 보너스 친구 */
+      }
+    }
     if (!wasDone) maybeCelebrate(kind);
   }
 
@@ -15913,6 +16965,11 @@ function iconSVG(key) {
     if (kind === 'master') {
       return { title: Lf('celebrateMasterTitle', { w: word || '' }), sub: L('celebrateMasterSub') };
     }
+    if (kind === 'wm') return { title: L('celebrateWmTitle'), sub: L('celebrateWmSub') };
+    if (kind === 'wl') return { title: L('celebrateWlTitle'), sub: L('celebrateWlSub') };
+    if (kind === 'we') return { title: L('celebrateWeTitle'), sub: L('celebrateWeSub') };
+    if (kind === 'ws') return { title: L('celebrateWsTitle'), sub: L('celebrateWsSub') };
+    if (kind === 'meal') return { title: L('celebrateMealTitle'), sub: Lf('celebrateMealSub', { n: word || '' }) };
     return { title: L('celebrateMorningTitle'), sub: L('celebrateMorningSub') };
   }
 
@@ -18511,7 +19568,10 @@ function iconSVG(key) {
     ]
   };
 
-  var talkKindName = { morning: 'morningTitle', evening: 'eveningTitle', homework: 'homeworkTitle' };
+  var talkKindName = {
+    morning: 'morningTitle', evening: 'eveningTitle', homework: 'homeworkTitle',
+    wm: 'wkAmTitle', wl: 'wkNoonTitle', we: 'wkPmTitle', ws: 'wkStudyTitle'
+  };
   var talkOpenKey = '';
   var talkIdx = 0;
 
@@ -18736,265 +19796,12 @@ function iconSVG(key) {
   }
   function dx(ko, en) { return isKo() ? ko : en; }
 
-  /* ---- 도감용 블록 배치 ----
-     1~10  : 기본 모양
-     11~20 : 10 두 줄 + 하나들
-     21~100: 십의 자리 블록(5×2 칸 한 덩어리)을 쌓고, 낱개는 옆에 세로로
-  ---- */
-  function dexBody(n) {
-    var cells = [], i;
-    if (n <= 10) {
-      var shape = NB_SHAPES[n], cols = NB_COLORS[n];
-      for (i = 0; i < shape.length; i++) {
-        cells.push({
-          x: shape[i][0], y: shape[i][1], tw: 1, th: 1,
-          c: cols.length > 1 ? cols[i % cols.length] : cols[0],
-          white: n === 10
-        });
-      }
-      return cells;
-    }
-    if (n <= 20) {
-      var k = n - 10;
-      var rows = [], left = k;
-      while (left > 0) {
-        var take = Math.min(5, left);
-        rows.unshift(take);
-        left -= take;
-      }
-      var y = 0, r, c;
-      for (r = 0; r < rows.length; r++) {
-        var cnt = rows[r], startX = Math.floor((5 - cnt) / 2);
-        var col = DEX_ONES[k] || '#ffffff';
-        for (c = 0; c < cnt; c++) cells.push({ x: startX + c, y: y, tw: 1, th: 1, c: col, white: k === 10 });
-        y++;
-      }
-      for (var ty = 0; ty < 2; ty++) {
-        for (var tx = 0; tx < 5; tx++) cells.push({ x: tx, y: y + ty, tw: 1, th: 1, c: '#ffffff', white: true });
-      }
-      return cells;
-    }
-
-    /* 21~100 */
-    var tens = Math.floor(n / 10), ones = n % 10;
-    var cols = tens <= 5 ? 1 : 2;
-    var per = Math.ceil(tens / cols);
-    var colCount = [], rest = tens, ci;
-    for (ci = 0; ci < cols; ci++) {
-      var got = Math.min(per, rest);
-      colCount.push(got);
-      rest -= got;
-    }
-    var rowsMax = Math.max.apply(null, colCount);
-    var H = Math.max(rowsMax * 2, ones);
-    var dec = DEX_DECADE[Math.floor(n / 10)] || DEX_DECADE[10];
-    var idx = 0;
-    for (ci = 0; ci < cols; ci++) {
-      var nT = colCount[ci], colH = nT * 2;
-      for (i = 0; i < nT; i++) {
-        var ty2 = H - colH + i * 2;
-        var col2 = dec.rainbow ? dec.rainbow[idx % dec.rainbow.length] : dec.c;
-        cells.push({ x: ci * 5, y: ty2, tw: 5, th: 2, ten: true, c: col2 });
-        idx++;
-      }
-    }
-    var onesCol = DEX_ONES[ones] || '#ffffff';
-    for (i = 0; i < ones; i++) {
-      cells.push({ x: cols * 5, y: H - ones + i, tw: 1, th: 1, c: onesCol });
-    }
-    return cells;
-  }
-
-  /* ---- 캐릭터별 작은 소품 ---- */
-  function dexAcc(n, w, h) {
-    var g = '';
-    function star(cx, cy, r, fill) {
-      var p = '<polygon points="';
-      for (var i = 0; i < 10; i++) {
-        var ang = -Math.PI / 2 + i * Math.PI / 5;
-        var rr = i % 2 === 0 ? r : r * 0.45;
-        p += (cx + Math.cos(ang) * rr).toFixed(2) + ',' + (cy + Math.sin(ang) * rr).toFixed(2) + ' ';
-      }
-      return p + '" fill="' + fill + '"/>';
-    }
-    if (n > 20) {
-      var sq = dexSquareSide(n);
-      if (n >= 100) {
-        /* 황금 왕관 + 별 배지 */
-        var cx = w / 2;
-        g += '<path d="M' + (cx - 17) + ' -1 L' + (cx - 12) + ' -13 L' + (cx - 5) + ' -5 L' + cx + ' -15 L' +
-          (cx + 5) + ' -5 L' + (cx + 12) + ' -13 L' + (cx + 17) + ' -1 Z" fill="#FFD33D" stroke="#C98A00" stroke-width="1.5" stroke-linejoin="round"/>' +
-          '<circle cx="' + (cx - 12) + '" cy="-12" r="2" fill="#EF4444"/>' +
-          '<circle cx="' + cx + '" cy="-14" r="2.2" fill="#3B82F6"/>' +
-          '<circle cx="' + (cx + 12) + '" cy="-12" r="2" fill="#22C55E"/>' +
-          '<rect x="' + (cx - 15) + '" y="-2" width="30" height="3.2" rx="1.6" fill="#FFB300" stroke="#C98A00" stroke-width="0.9"/>' +
-          star(w - 8, 9, 7, '#FFF3B0') + star(9, 12, 5, '#FFF3B0');
-        return '<g class="dex-acc">' + g + '</g>';
-      }
-      if (sq) {
-        g += '<rect x="' + (w + 1.5) + '" y="' + (h - 15) + '" width="13.5" height="13.5" rx="2.6" fill="#fff" stroke="#7c3aed" stroke-width="1.7"/>' +
-          '<rect x="' + (w + 5) + '" y="' + (h - 11.5) + '" width="6.5" height="6.5" rx="1.2" fill="#a78bfa"/>';
-      } else if (n % 10 === 0) {
-        g += star(w + 5, 7, 6, '#FFC93A');
-      } else {
-        g += '<circle cx="' + (w + 5) + '" cy="7" r="2.8" fill="' + dexTint(n) + '" opacity="0.9"/>' +
-          '<circle cx="' + (w + 9) + '" cy="16" r="1.8" fill="' + dexTint(n) + '" opacity="0.55"/>';
-      }
-      return '<g class="dex-acc">' + g + '</g>';
-    }
-    switch (n) {
-      case 1: g += star(w + 3.5, 5, 4.6, '#f5c518'); break;
-      case 2:
-        g += '<rect x="1" y="' + (h + 1) + '" width="' + (w - 2) + '" height="3.2" rx="1.6" fill="#f97316"/>' +
-          '<circle cx="5" cy="' + (h + 5.4) + '" r="1.7" fill="#4b4b63"/><circle cx="' + (w - 5) + '" cy="' + (h + 5.4) + '" r="1.7" fill="#4b4b63"/>';
-        break;
-      case 3:
-        g += '<circle cx="' + (w + 4) + '" cy="5" r="2.6" fill="#6366f1"/>' +
-          '<rect x="' + (w + 5.6) + '" y="5" width="1.3" height="8" rx="0.6" fill="#6366f1"/>' +
-          '<circle cx="' + (w + 3) + '" cy="14" r="2.2" fill="#f472b6"/>' +
-          '<rect x="' + (w + 4.4) + '" y="14" width="1.3" height="7" rx="0.6" fill="#f472b6"/>';
-        break;
-      case 4:
-        g += '<path d="M' + (w + 3) + ' 12 c-3.6-3.4-6.4-.6-4 2.6 1 1.4 4 3.6 4 3.6 s3-2.2 4-3.6 c2.4-3.2-.4-6-4-2.6 z" fill="#f472b6" transform="translate(0,-4) scale(.9)"/>';
-        break;
-      case 5: g += star(w + 4, 6, 5, '#38bdf8') + star(w + 1, 17, 3, '#7dd3fc'); break;
-      case 6:
-        g += '<rect x="' + (w + 2) + '" y="4" width="9" height="9" rx="2" fill="#fff" stroke="#8b5cf6" stroke-width="1.4"/>' +
-          '<circle cx="' + (w + 4.5) + '" cy="6.5" r="1.1" fill="#8b5cf6"/><circle cx="' + (w + 8.5) + '" cy="10.5" r="1.1" fill="#8b5cf6"/>';
-        break;
-      case 7:
-        g += '<path d="M-4 ' + (h - 2) + ' a' + (w / 2 + 4) + ' ' + (w / 2 + 4) + ' 0 0 1 ' + (w + 8) + ' 0" fill="none" stroke="#ef4444" stroke-width="2"/>' +
-          '<path d="M-1.5 ' + (h - 2) + ' a' + (w / 2 + 1.5) + ' ' + (w / 2 + 1.5) + ' 0 0 1 ' + (w + 3) + ' 0" fill="none" stroke="#f5c518" stroke-width="2"/>' +
-          '<path d="M1 ' + (h - 2) + ' a' + (w / 2 - 1) + ' ' + (w / 2 - 1) + ' 0 0 1 ' + (w - 2) + ' 0" fill="none" stroke="#38bdf8" stroke-width="2"/>';
-        break;
-      case 8:
-        g += '<path d="M-6 ' + (h * 0.3) + ' l7 4 -7 4 z" fill="#ef4444" opacity="0.85"/>' + star(w + 4, 6, 5, '#fbbf24');
-        break;
-      case 9:
-        g += '<circle cx="' + (w + 4) + '" cy="8" r="6" fill="#fff" stroke="#94a3b8" stroke-width="1.4"/>' +
-          '<path d="M' + (w + 4) + ' 8 v-3.4 M' + (w + 4) + ' 8 h2.6" stroke="#64748b" stroke-width="1.3" stroke-linecap="round"/>';
-        break;
-      case 10:
-        g += '<path d="M' + (w / 2 - 7) + ' 0 l2.4-6 4.6 3.6 4.6-3.6 2.4 6 z" fill="#f5c518" stroke="#eab308" stroke-width="1"/>';
-        break;
-      case 11:
-        g += '<circle cx="' + (w + 4.5) + '" cy="' + (h - 4) + '" r="5.2" fill="#fff" stroke="#334155" stroke-width="1.3"/>' +
-          '<polygon points="' + (w + 4.5) + ',' + (h - 7.6) + ' ' + (w + 6.6) + ',' + (h - 4.8) + ' ' + (w + 5.6) + ',' + (h - 2) + ' ' + (w + 3.4) + ',' + (h - 2) + ' ' + (w + 2.4) + ',' + (h - 4.8) + '" fill="#334155"/>';
-        break;
-      case 12:
-        g += '<rect x="' + (w + 1) + '" y="' + (h - 14) + '" width="12" height="12" rx="1.5" fill="none" stroke="#f97316" stroke-width="2.2"/>' +
-          '<rect x="' + (w + 3.5) + '" y="' + (h - 11.5) + '" width="7" height="7" rx="1" fill="#fdba74"/>';
-        break;
-      case 13: g += star(w + 4, 5, 4.4, '#f5c518') + star(w + 1.5, 15, 3, '#fbbf24'); break;
-      case 14:
-        g += '<rect x="' + (w / 2 - 10) + '" y="' + (h + 1) + '" width="20" height="3.4" rx="1.7" fill="#f97316"/>' +
-          '<circle cx="' + (w / 2 - 6) + '" cy="' + (h + 5.6) + '" r="1.8" fill="#4b4b63"/><circle cx="' + (w / 2 + 6) + '" cy="' + (h + 5.6) + '" r="1.8" fill="#4b4b63"/>';
-        break;
-      case 15:
-        g += '<rect x="' + (w + 2) + '" y="' + (h - 5) + '" width="4" height="5" rx="1" fill="#38bdf8"/>' +
-          '<rect x="' + (w + 7) + '" y="' + (h - 10) + '" width="4" height="10" rx="1" fill="#0ea5e9"/>' +
-          '<rect x="' + (w + 12) + '" y="' + (h - 15) + '" width="4" height="15" rx="1" fill="#0284c7"/>';
-        break;
-      case 16:
-        g += '<rect x="' + (w + 1.5) + '" y="' + (h - 13) + '" width="12" height="12" rx="2" fill="#ede9fe" stroke="#8b5cf6" stroke-width="1.8"/>' +
-          '<rect x="' + (w + 4.5) + '" y="' + (h - 10) + '" width="6" height="6" rx="1" fill="#a78bfa"/>';
-        break;
-      case 17:
-        g += '<path d="M' + (w + 8) + ' 2 a7 7 0 1 0 1 13.6 c-1.8-.6-1.4-2 .2-2.4 1.6-.4 2.4-1.6 1.8-3.4 -.6-1.8-2.4-2.6-4-2 -.6-2.6 .2-4.6 1-5.8 z" fill="#fff" stroke="#a855f7" stroke-width="1.2"/>' +
-          '<circle cx="' + (w + 5) + '" cy="4.6" r="1.6" fill="#ef4444"/><circle cx="' + (w + 10.5) + '" cy="6" r="1.6" fill="#f5c518"/><circle cx="' + (w + 5) + '" cy="10.5" r="1.6" fill="#22c55e"/>';
-        break;
-      case 18:
-        g += '<path d="M' + (w + 4) + ' 0 l-6 10 h4.4 l-2.4 8 8-11 h-4.6 l3.2-7 z" fill="#fbbf24" stroke="#f59e0b" stroke-width="1"/>';
-        break;
-      case 19:
-        g += '<path d="M' + (w / 2 - 8) + ' -1 l2.6-6 5.4 4 5.4-4 2.6 6 z" fill="#f5c518" stroke="#eab308" stroke-width="1"/>' +
-          '<circle cx="' + (w / 2) + '" cy="-5" r="1.4" fill="#ef4444"/>';
-        break;
-      case 20:
-        g += '<path d="M' + (w * 0.12) + ' ' + (h * 0.62) + ' L' + (w * 0.5) + ' ' + (h * 0.98) + ' L' + (w * 0.88) + ' ' + (h * 0.62) + ' Z" fill="#f9a8d4" opacity="0.9"/>' +
-          '<circle cx="' + (w + 4) + '" cy="6" r="2.6" fill="#6366f1"/>' +
-          '<rect x="' + (w + 5.6) + '" y="6" width="1.3" height="7" rx="0.6" fill="#6366f1"/>' +
-          '<circle cx="' + (w + 1.5) + '" cy="15" r="2.2" fill="#f472b6"/>' +
-          '<rect x="' + (w + 2.9) + '" y="15" width="1.3" height="6" rx="0.6" fill="#f472b6"/>';
-        break;
-    }
-    return g ? '<g class="dex-acc">' + g + '</g>' : '';
-  }
-
-  function dexUnitSVG(cl, U, S, R) {
-    var cx = cl.x * U + 0.7, cy = cl.y * U + 0.7;
-    return '<rect x="' + cx + '" y="' + cy + '" width="' + S + '" height="' + S + '" rx="' + R + '" fill="' + cl.c +
-      '" stroke="' + (cl.white ? '#ef4444' : 'rgba(30,25,50,.16)') + '" stroke-width="' + (cl.white ? 1.7 : 0.7) + '"/>' +
-      '<rect x="' + (cx + 1.5) + '" y="' + (cy + 1.3) + '" width="' + (S - 3.4) + '" height="2.2" rx="1.1" fill="#fff" opacity="0.34"/>';
-  }
-  /* 십의 자리 10칸 덩어리 — 한 덩어리로 그려서 100종을 가볍게 */
-  function dexTenSVG(cl, U) {
-    /* 십 단위 블록 사이에 살짝 틈을 두어 한 덩어리로 보이지 않게 */
-    var gx = 1.1, gy = 1.1;
-    var x = cl.x * U + gx, y = cl.y * U + gy;
-    var w = 5 * U - gx * 2, h = 2 * U - gy * 2;
-    var out = '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="2.6" fill="' + cl.c +
-      '" stroke="rgba(30,25,50,.30)" stroke-width="1"/>';
-    for (var k = 1; k < 5; k++) {
-      var lx = cl.x * U + k * U;
-      out += '<line x1="' + lx + '" y1="' + (y + 1.6) + '" x2="' + lx + '" y2="' + (y + h - 1.6) +
-        '" stroke="rgba(30,25,50,.30)" stroke-width="1"/>';
-    }
-    out += '<line x1="' + (x + 1.6) + '" y1="' + (cl.y * U + U) + '" x2="' + (x + w - 1.6) + '" y2="' + (cl.y * U + U) +
-      '" stroke="rgba(30,25,50,.30)" stroke-width="1"/>';
-    out += '<rect x="' + (x + 2) + '" y="' + (y + 1.4) + '" width="' + (w - 4) + '" height="2.2" rx="1.1" fill="#fff" opacity="0.3"/>';
-    return out;
-  }
+  /* (예전 도감 전용 블록 렌더러는 1~100 시그니처 SVG 로 통합했어요) */
 
   function dexSVG(n) {
     n = Math.max(1, Math.min(DEX_MAX, Math.round(Number(n) || 1)));
-    var cells = dexBody(n);
-    var U = 12, S = 10.4, R = 2.6, i;
-    var maxX = 0, maxY = 0;
-    for (i = 0; i < cells.length; i++) {
-      var cw = cells[i].tw || 1, ch = cells[i].th || 1;
-      if (cells[i].x + cw > maxX) maxX = cells[i].x + cw;
-      if (cells[i].y + ch > maxY) maxY = cells[i].y + ch;
-    }
-    var w = maxX * U, h = maxY * U;
-    var body = '';
-    for (i = 0; i < cells.length; i++) {
-      body += cells[i].ten ? dexTenSVG(cells[i], U) : dexUnitSVG(cells[i], U, S, R);
-    }
-    /* 얼굴은 십의 자리 블록(넓은 몸통) 맨 윗줄 가운데에 — 없으면 전체 맨 윗줄 */
-    var minY = 1e9, minYt = 1e9, i2;
-    for (i2 = 0; i2 < cells.length; i2++) {
-      if (cells[i2].y < minY) minY = cells[i2].y;
-      if (cells[i2].ten && cells[i2].y < minYt) minYt = cells[i2].y;
-    }
-    var faceRow = (minYt < 1e9) ? minYt : minY;
-    var spanL = 1e9, spanR = -1e9;
-    for (i2 = 0; i2 < cells.length; i2++) {
-      if (cells[i2].y !== faceRow) continue;
-      var left = cells[i2].x * U, right = (cells[i2].x + (cells[i2].tw || 1)) * U;
-      if (left < spanL) spanL = left;
-      if (right > spanR) spanR = right;
-    }
-    minY = faceRow;
-    var fx = (spanL + spanR) / 2;
-    var fy = minY * U + U / 2 - 0.4;
-    var dark = '#2b2b3a';
-    var face = '<circle cx="' + (fx - 2.7) + '" cy="' + (fy - 1.1) + '" r="1.15" fill="' + dark + '"/>' +
-      '<circle cx="' + (fx + 2.7) + '" cy="' + (fy - 1.1) + '" r="1.15" fill="' + dark + '"/>' +
-      '<path d="M' + (fx - 2.2) + ' ' + (fy + 1.2) + ' q2.2 2.4 4.4 0" stroke="' + dark + '" stroke-width="1.1" fill="none" stroke-linecap="round"/>' +
-      '<circle cx="' + (fx - 4.4) + '" cy="' + (fy + 1.7) + '" r="1" fill="#ff8fa3" opacity="0.5"/>' +
-      '<circle cx="' + (fx + 4.4) + '" cy="' + (fy + 1.7) + '" r="1" fill="#ff8fa3" opacity="0.5"/>';
-    var armY = Math.max(4, Math.min(minY * U + U * 1.6, h - 10));
-    var armColL = cells[0] ? cells[0].c : '#fff';
-    var armColR = cells[cells.length - 1] ? cells[cells.length - 1].c : '#fff';
-    var arms = '<rect x="-2.6" y="' + armY + '" width="3.2" height="2.2" rx="1.1" fill="' + armColL + '" stroke="rgba(30,25,50,.14)" stroke-width="0.5"/>' +
-      '<rect x="' + (w - 0.6) + '" y="' + armY + '" width="3.2" height="2.2" rx="1.1" fill="' + armColR + '" stroke="rgba(30,25,50,.14)" stroke-width="0.5"/>';
-    var legs = '<rect x="' + (w * 0.22) + '" y="' + (h - 0.4) + '" width="2.4" height="3.6" rx="1.1" fill="#4b4b63" opacity="0.55"/>' +
-      '<rect x="' + (w * 0.7) + '" y="' + (h - 0.4) + '" width="2.4" height="3.6" rx="1.1" fill="#4b4b63" opacity="0.55"/>';
-    var padTop = n >= 100 ? 20 : (n > 20 ? 12 : 10);
-    return '<svg viewBox="-8 -' + padTop + ' ' + (w + 22) + ' ' + (h + padTop + 14) + '" width="100%" height="100%" ' +
-      'preserveAspectRatio="xMidYMid meet" role="img" aria-label="' + dx('넘버블럭스 ', 'Numberblock ') + n + '" focusable="false">' +
-      dexAcc(n, w, h) + legs + arms + body + face + '</svg>';
+    /* 도감 카드도 루틴 도장·축하 팝업과 똑같은 시그니처 캐릭터로 그려요 */
+    return nbSVG(n);
   }
 
   /* ---- 상태 ---- */
@@ -19577,7 +20384,7 @@ function iconSVG(key) {
   function payloadLooksEmpty(p) {
     if (!p || typeof p !== 'object') return true;
     var d = p.daily || {}, checks = 0, k;
-    var kinds = ['morning', 'evening', 'homework', 'supplies'];
+    var kinds = BAG_KINDS.concat(['supplies']);
     for (k = 0; k < kinds.length; k++) checks += Object.keys(d[kinds[k]] || {}).length;
     if (checks > 0) return false;
     if (Number(d.sightBonus) > 0 || Number(d.clearedAt) > 0) return false;
@@ -19595,7 +20402,7 @@ function iconSVG(key) {
   function payloadHasData(p) { return !payloadLooksEmpty(p); }
   function cloudHasData() { return !payloadLooksEmpty(cloudPayload()); }
   function payloadChecks(p) {
-    var d = (p && p.daily) || {}, n = 0, kinds = ['morning', 'evening', 'homework', 'supplies'];
+    var d = (p && p.daily) || {}, n = 0, kinds = BAG_KINDS.concat(['supplies']);
     for (var i = 0; i < kinds.length; i++) n += Object.keys(d[kinds[i]] || {}).length;
     return n;
   }
@@ -19628,14 +20435,22 @@ function iconSVG(key) {
   function sanitizeDaily(raw) {
     var fd = freshDaily(String((raw && raw.date) || todayKey()));
     if (!raw || typeof raw !== 'object') return fd;
-    ['morning', 'evening', 'homework', 'supplies'].forEach(function (kind) {
+    BAG_KINDS.concat(['supplies']).forEach(function (kind) {
       var bag = raw[kind];
       if (!bag || typeof bag !== 'object') return;
+      if (!fd[kind]) fd[kind] = {};
       for (var k in bag) {
         if (!Object.prototype.hasOwnProperty.call(bag, k)) continue;
         if (bag[k]) fd[kind][String(k)] = true;
       }
     });
+    fd.mealClaimed = !!raw.mealClaimed;
+    if (raw.mealReward && typeof raw.mealReward === 'object') {
+      fd.mealReward = {
+        at: Math.max(0, Math.round(Number(raw.mealReward.at) || 0)),
+        n: Math.max(0, Math.min(100, Math.round(Number(raw.mealReward.n) || 0)))
+      };
+    }
     if (Array.isArray(raw.order)) {
       fd.order = raw.order.filter(function (x) { return typeof x === 'string'; }).slice(0, 60);
     }
@@ -19832,7 +20647,7 @@ function iconSVG(key) {
     if (!localDaily || !state.daily || localDaily.date !== state.daily.date) return;
     if (Number(localDaily.clearedAt) > Number(state.daily.clearedAt || 0)) return;
     if (!Array.isArray(state.daily.order)) state.daily.order = [];
-    ['morning', 'evening', 'homework', 'supplies'].forEach(function (kind) {
+    BAG_KINDS.concat(['supplies']).forEach(function (kind) {
       var bag = localDaily[kind] || {};
       if (!state.daily[kind]) state.daily[kind] = {};
       for (var k in bag) {
@@ -20487,10 +21302,14 @@ function iconSVG(key) {
         toggleItem(kind, row.getAttribute('data-id'), row);
       };
     }
-    morningList.addEventListener('click', onListClick('morning'));
-    eveningList.addEventListener('click', onListClick('evening'));
-    homeworkList.addEventListener('click', onListClick('homework'));
-    [['morning', morningList], ['evening', eveningList], ['homework', homeworkList]].forEach(function (pair) {
+    var wmL = $('wmList'), wlL = $('wlList'), weL = $('weList'), wsL = $('wsList');
+    var listPairs = [
+      ['morning', morningList], ['evening', eveningList], ['homework', homeworkList],
+      ['wm', wmL], ['wl', wlL], ['we', weL], ['ws', wsL]
+    ];
+    listPairs.forEach(function (pair) {
+      if (!pair[1]) return;
+      pair[1].addEventListener('click', onListClick(pair[0]));
       pair[1].addEventListener('keydown', function (e) {
         if (e.key !== 'Enter' && e.key !== ' ') return;
         if (e.target.closest && e.target.closest('.talk-btn')) return;
@@ -20516,14 +21335,24 @@ function iconSVG(key) {
       btn.addEventListener('keydown', function (e) {
         if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
         e.preventDefault();
-        var idx = TABS.indexOf(activeTab);
-        var step = e.key === 'ArrowRight' ? 1 : TABS.length - 1;
-        var nextName = TABS[(idx + step) % TABS.length];
+        var list = visibleTabs();
+        var idx = list.indexOf(activeTab);
+        if (idx < 0) idx = 0;
+        var step = e.key === 'ArrowRight' ? 1 : list.length - 1;
+        var nextName = list[(idx + step) % list.length];
         chooseTab(nextName);
         var nb = $(tabBtnId(nextName));
         if (nb) nb.focus();
       });
     });
+    /* 🏖️ 공휴일 토글 */
+    var hol = $('btnHoliday');
+    if (hol) hol.addEventListener('click', function () { setHoliday(!weekendMode()); });
+    /* 📖 Study 탭 ↔ 🔤 Sight Words */
+    var sp = $('btnSightPlay');
+    if (sp) sp.addEventListener('click', function () { chooseTab('sight'); });
+    var sb = $('btnSightBack');
+    if (sb) sb.addEventListener('click', function () { chooseTab('ws'); });
     bindSightEvents();
     bindSightImport();
     bindTalkEvents();

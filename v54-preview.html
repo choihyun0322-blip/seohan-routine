@@ -15062,7 +15062,7 @@ function iconSVG(key) {
   function nbSVG(n) {
     n = Math.max(1, Math.min(100, Math.round(Number(n) || 1)));
     var cells = nbUnits(n), i, k;
-    var U = 12, S = 10.4, R = 2.6;
+    var U = 12, S = 11.3, R = 2.4;
     var minX = 0, minY = 0, maxX = 0, maxY = 0;
     for (i = 0; i < cells.length; i++) {
       if (cells[i].x < minX) minX = cells[i].x;
@@ -15089,13 +15089,13 @@ function iconSVG(key) {
         return cols.length > 1 ? cols[(maxY - y) % cols.length] : cols[0];
       }
       if (n === 100) return '#ffffff';
-      if (y >= tensRows) {
-        if (n < 20 || n % 10 === 0) return '#ffffff';
-        return NB_ONE_COLOR[n % 10] || '#ffffff';
+      var isOnesRow = y >= tensRows;         /* 위쪽 줄 = 1의 자리 낱개 */
+      if (n < 20) {
+        return isOnesRow ? (NB_ONE_COLOR[n - 10] || '#ffffff') : '#ffffff';
       }
-      if (n < 20) return '#ffffff';
-      if (!n) return '#ffffff';
-      if (n % 10 === 0 && y >= tensRows) return '#ffffff';
+      if (isOnesRow) {
+        return n % 10 === 0 ? '#ffffff' : (NB_ONE_COLOR[n % 10] || '#ffffff');
+      }
       var dec = NB_TEN[tensDigit];
       if (tensDigit === 7) return NB_RAINBOW[Math.max(0, Math.min(6, tensRows - 1 - y)) % 7];
       return (dec && dec.c) ? dec.c : '#94a3b8';
@@ -15108,13 +15108,13 @@ function iconSVG(key) {
 
     var body = '';
     for (k = 0; k < cells.length; k++) {
-      var cx = cells[k].x * U + 0.7, cy = cells[k].y * U + 0.7;
+      var cx = cells[k].x * U + 0.35, cy = cells[k].y * U + 0.35;
       var isWhite = whiteCell(cells[k].y);
       var fill = rowFill(cells[k].y);
-      var stroke = isWhite ? '#ef4444' : 'rgba(30,25,50,.16)';
+      var stroke = isWhite ? '#ef4444' : 'rgba(30,25,50,.14)';
       body += '<rect x="' + cx + '" y="' + cy + '" width="' + S + '" height="' + S + '" rx="' + R + '" fill="' + fill +
-        '" stroke="' + stroke + '" stroke-width="' + (isWhite ? 1.6 : 0.7) + '"/>';
-      body += '<rect x="' + (cx + 1.5) + '" y="' + (cy + 1.3) + '" width="' + (S - 3.4) + '" height="2.2" rx="1.1" fill="#fff" opacity="0.32"/>';
+        '" stroke="' + stroke + '" stroke-width="' + (isWhite ? 1.5 : 0.6) + '"/>';
+      body += '<rect x="' + (cx + 1.6) + '" y="' + (cy + 1.2) + '" width="' + (S - 3.6) + '" height="2" rx="1" fill="#fff" opacity="0.3"/>';
     }
 
     /* 얼굴은 맨 윗줄 가운데 */
