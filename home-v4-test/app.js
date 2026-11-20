@@ -1045,7 +1045,7 @@ function renderRecipes() {
   $$('#recFilters .fchip').forEach(b => b.classList.toggle('on', b.dataset.rf === ui.recKind));
   list = list.filter(x => {
     if (ui.recKind === 'ready' && x.pct !== 100) return false;
-    if (ui.recKind === 'mine' && (state.recipes || []).every(c => c.id !== x.r.id)) return false;
+    if (ui.recKind === 'mine' && x.r.kind !== '내 레시피') return false;
     if (q) {
       const hay = norm(x.r.name + ' ' + x.r.kind + ' ' + x.r.ings.join(' '));
       if (!hay.includes(q)) return false;
