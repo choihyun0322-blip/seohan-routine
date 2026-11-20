@@ -636,7 +636,7 @@ let ROOM = (function () {
 })();
 const LSKEY = 'seohan-home-v3:' + ROOM;   // 기존 기기 데이터를 그대로 살리기 위해 키는 유지
 let state = null;
-let ui = { tab: 'today', filter: 'all', showAllRec: false, recQ: '', recKind: 'all', pantryQ: '', receipt: null };
+let ui = { tab: 'today', filter: 'all', showAllRec: false, recQ: '', recKind: 'all', pantryQ: '', receipt: null, receiptMeta: null };
 let migrated = false;
 
 function allRecipes() {
@@ -1301,10 +1301,212 @@ function parseReceiptLines(raw) {
   });
   return out.slice(0, 40);
 }
+
+/* ---------------- 영수증 → 결제 정보(총액·날짜·결제처·결제수단) 추출 ---------------- */
+function rcptNum(v) { const n = Number(String(v == null ? '' : v).replace(/[^0-9]/g, '')); return Number.isFinite(n) ? n : 0; }
+function fmtNum(n) { return String(n == null ? '' : n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+function guessReceiptAmount(raw) {
+  const lines = String(raw || '').split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const skipLine = /(할인|적립|포인트|잔액|한도|누적|캐시백|마일리지)/;
+  const LABELS = [
+    '총\\s*결제\\s*금액', '최종\\s*결제\\s*금액', '실\\s*결제\\s*금액', '결제\\s*금액', '결제금액',
+    '총\\s*구매\\s*금액', '총\\s*주문\\s*금액', '주문\\s*금액', '구매\\s*금액',
+    '합계\\s*금액', '총\\s*합계', '합계액', '합계',
+    '총액', '총금액', '받을\\s*금액', '결제\\s*대상\\s*금액', '청구\\s*금액', '승인\\s*금액'
+  ];
+  for (let li = 0; li < LABELS.length; li++) {
+    const re = new RegExp('(?:' + LABELS[li] + ')[^0-9]{0,6}([0-9][0-9,\\s]{0,11})', 'i');
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (skipLine.test(line) && !/(결제\s*금액|합계|총액|총금액)/.test(line)) continue;
+      const m = line.match(re);
+      if (m) { const v = rcptNum(m[1]); if (v >= 100) return { amount: v, how: 'label' }; }
+    }
+  }
+  let best = 0;
+  lines.forEach(line => {
+    if (skipLine.test(line)) return;
+    const re = /([0-9][0-9,]{2,})\s*원/g;
+    let m;
+    while ((m = re.exec(line))) { const v = rcptNum(m[1]); if (v > best) best = v; }
+  });
+  if (best >= 100) return { amount: best, how: 'won' };
+  /* 원 표기가 없는 영수증: 날짜·카드번호·수량 줄을 걷어낸 뒤 가장 큰 금액 */
+  const skipLine2 = /(카드|승인|번호|전화|사업자|바코드|일시|주문|배송|수량|적립|할인|포인트)/;
+  lines.forEach(line0 => {
+    const line = line0
+      .replace(/20\d{2}\s*[.\-\/년]\s*\d{1,2}\s*[.\-\/월]\s*\d{1,2}/g, ' ')
+      .replace(/\d{2}\s*:\s*\d{2}(\s*:\s*\d{2})?/g, ' ');
+    if (skipLine2.test(line)) return;
+    const re = /([0-9]{1,3}(?:,[0-9]{3})+|[0-9]{4,7})/g;
+    let m;
+    while ((m = re.exec(line))) {
+      const v = rcptNum(m[1]);
+      if (v >= 1000 && v < 20000000 && v > best) best = v;
+    }
+  });
+  return { amount: best >= 1000 ? best : 0, how: best >= 1000 ? 'num' : '' };
+}
+function guessReceiptDate(raw) {
+  const t = String(raw || '');
+  const today = todayISO();
+  const ok = (y, m, d) => (m >= 1 && m <= 12 && d >= 1 && d <= 31) ? y + '-' + pad(m) + '-' + pad(d) : '';
+  let m;
+  if ((m = t.match(/(20\d{2})\s*[.\-\/년]\s*(\d{1,2})\s*[.\-\/월]\s*(\d{1,2})/))) { const r = ok(m[1], +m[2], +m[3]); if (r) return r; }
+  if ((m = t.match(/(20\d{2})(\d{2})(\d{2})(?!\d)/))) { const r = ok(m[1], +m[2], +m[3]); if (r) return r; }
+  if ((m = t.match(/(\d{1,2})\s*[.\-\/]\s*(\d{1,2})\s*[.\-\/]\s*(\d{2})(?!\d)/))) { const r = ok(2000 + Number(m[3]), +m[1], +m[2]); if (r) return r; }
+  const y = Number(today.slice(0, 4)), curM = Number(today.slice(5, 7));
+  const yearOf = mo => String(mo > curM ? y - 1 : y);
+  if ((m = t.match(/(\d{1,2})\s*월\s*(\d{1,2})\s*일/))) { const r = ok(yearOf(+m[1]), +m[1], +m[2]); if (r) return r; }
+  if ((m = t.match(/(?:^|[^0-9])(\d{1,2})\s*[.\-\/]\s*(\d{1,2})(?!\d)/))) { const r = ok(yearOf(+m[1]), +m[1], +m[2]); if (r) return r; }
+  return '';
+}
+const RCPT_BRANDS = [
+  /쿠팡\s*이츠/, /쿠팡/, /이마트\s*24/, /이마트/, /홈플러스/, /롯데마트/, /하나로마트/, /코스트코/, /트레이더스/, /노브랜드/,
+  /마켓컬리/, /오아시스\s*마켓/, /무신사/, /올리브영/, /다이소/, /GS\s*25/i, /세븐일레븐/, /배달의민족/, /요기요/,
+  /스타벅스/, /메가\s*(MGC)?\s*커피/i, /파리바게뜨/, /뚜레쥬르/, /맥도날드/, /버거킹/, /교촌/, /B마트/i,
+  /SSG/i, /쓱닷컴/, /11번가/, /G\s*마켓/i, /위메프/, /티몬/, /네이버\s*쇼핑/, /지그재그/, /롯데온/
+];
+function guessReceiptMerchant(raw) {
+  const lines = String(raw || '').split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const KEY = /(가맹점|상호명|상호|매장명|매장|판매처|결제처|구매처|주문처|업체명|판매자|스토어|상점)\s*[:：]?\s*(.{1,32})/;
+  for (let i = 0; i < lines.length; i++) {
+    const m = lines[i].match(KEY);
+    if (!m) continue;
+    let v = m[2].replace(/[0-9][0-9,]*\s*원?/g, ' ').replace(/[|]/g, ' ').replace(/\s+/g, ' ').trim();
+    v = v.replace(/^[\[\(【]+|[\]\)】]+$/g, '').trim();
+    if (v.length >= 2) return v.slice(0, 24);
+  }
+  const t = String(raw || '');
+  for (let i = 0; i < RCPT_BRANDS.length; i++) {
+    const m = t.match(RCPT_BRANDS[i]);
+    if (m) return m[0].replace(/\s+/g, '');
+  }
+  return '';
+}
+const RCPT_CARDS = [
+  [/(KB\s*국민|국민\s*카드|KB\s*카드|쿠팡\s*와우|와우\s*카드)/i, 'KB국민'],
+  [/(네이버\s*현대|현대\s*카드|네이버페이\s*카드)/, '네이버 현대'],
+  [/(하나\s*카드|하나\s*체크|하나\s*페이|하나\s*Pick|JADE|제이드)/i, '하나'],
+  [/(우리\s*카드|우리\s*체크)/, '우리체크'],
+  [/(NH\s*농협\s*(카드|체크)|농협\s*(카드|체크)|채움\s*(카드|체크|BAZIC)?)/i, '채움체크'],
+  [/(신한\s*(카드|체크)|미니언즈)/, '신한카드'],
+  [/(삼성\s*(카드|체크))/, '삼성카드'],
+  [/(카카오뱅크\s*(카드|체크)|프렌즈\s*체크)/, '카카오뱅크 체크'],
+  [/(토스뱅크\s*(카드|체크))/, '토스뱅크 체크'],
+  [/(SC\s*제일|SC현대)/i, 'SC제일 현대카드M'],
+  [/(현금|현찰)/, '현금'],
+  [/(기프티콘|상품권|모바일\s*쿠폰)/, '기프티콘']
+];
+function guessReceiptCard(raw) {
+  const lines = String(raw || '').split(/\r?\n/);
+  const hint = lines.filter(l => /(카드|체크|결제\s*수단|승인|간편결제|페이)/.test(l) && !/(할인|적립|포인트|무이자)/.test(l)).join('\n');
+  const scan = s => { if (!s) return ''; for (let i = 0; i < RCPT_CARDS.length; i++) if (RCPT_CARDS[i][0].test(s)) return RCPT_CARDS[i][1]; return ''; };
+  return scan(hint) || scan(String(raw || ''));
+}
+function parseReceiptMeta(raw) {
+  const a = guessReceiptAmount(raw);
+  return {
+    amount: a.amount || 0, amountHow: a.how || '',
+    date: guessReceiptDate(raw) || todayISO(),
+    merchant: guessReceiptMerchant(raw), card: guessReceiptCard(raw),
+    send: (a.amount || 0) > 0, sent: false, sendTouched: false
+  };
+}
+
+/* ---------------- 가계부 지갑(choi-wallet-2026) inbox 로 동시 전송 ---------------- */
+const WALLET_INBOX = DBURL + '/rooms/choi-wallet-2026/inbox.json';
+const WQKEY = LSKEY + ':walletq';
+/* 가계부 지갑의 matchCardId 가 알아보는 이름으로 맞춰 보낸다 */
+function cardForWallet(txt) {
+  const s = String(txt || '').trim();
+  if (!s) return '';
+  if (/우리/.test(s)) return '우리체크';
+  if (/채움|농협|NH/i.test(s)) return '채움체크';
+  if (/신한|미니언즈/.test(s)) return '미니언즈';
+  if (/카카오/.test(s)) return '프렌즈체크';
+  if (/토스/.test(s)) return '토스체크';
+  if (/SC\s*제일|SC현대/i.test(s)) return '';   /* 지갑이 SC현대M을 구분하지 못하므로 비워 둠(현금) */
+  return s;                                     /* KB국민 · 네이버 현대 · 하나 · 현금 · 기프티콘 */
+}
+function walletPayload(m) {
+  m = m || {};
+  const amount = Math.round(Number(m.amount) || 0);
+  const date = m.date || todayISO();
+  const merchant = String(m.merchant || '').trim() || '장보기';
+  const card = String(m.card || '').trim();
+  return {
+    amount: amount, merchant: merchant, card: cardForWallet(card), date: date,
+    source: 'home-receipt', ts: Date.now(),
+    raw: '[살림관제소] ' + merchant + ' ' + amount + '원 · ' + date + (card ? ' · ' + card : '')
+  };
+}
+function postWalletOnce(p) {
+  return fetch(WALLET_INBOX, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(p), cache: 'no-store'
+  }).then(r => r.status);
+}
+function queueWallet(p) {
+  try {
+    const q = JSON.parse(localStorage.getItem(WQKEY) || '[]');
+    q.push(p);
+    localStorage.setItem(WQKEY, JSON.stringify(q.slice(-20)));
+  } catch (e) { }
+}
+async function sendToWalletLedger(m) {
+  const p = walletPayload(m);
+  if (!p.amount) return { ok: false, why: 'no-amount' };
+  let why = '';
+  for (let i = 0; i < 2; i++) {
+    try {
+      const st = await postWalletOnce(p);
+      if (st === 200) return { ok: true, sent: p };
+      why = 'HTTP ' + st;
+      if (st === 400 || st === 401 || st === 403) break;   /* 규칙에서 막힘 — 재시도 무의미 */
+    } catch (e) { why = 'offline'; }
+    await new Promise(res => setTimeout(res, 500));
+  }
+  queueWallet(p);
+  return { ok: false, why: why };
+}
+async function drainWalletQueue() {
+  let q = [];
+  try { q = JSON.parse(localStorage.getItem(WQKEY) || '[]'); } catch (e) { return; }
+  if (!q.length) return;
+  const left = [];
+  for (let i = 0; i < q.length; i++) {
+    let ok = false;
+    try { ok = (await postWalletOnce(q[i])) === 200; } catch (e) { ok = false; }
+    if (!ok) left.push(q[i]);
+  }
+  try { localStorage.setItem(WQKEY, JSON.stringify(left.slice(-20))); } catch (e) { }
+  if (left.length < q.length) toast('💸 가계부로 밀렸던 기록 ' + (q.length - left.length) + '건을 보냈어요');
+}
+
+/* 영수증 카드의 결제 정보 입력칸을 ui.receiptMeta 값으로 맞춘다 */
+function syncReceiptMetaDom(show) {
+  const box = $('#receiptMeta');
+  if (!box) return;
+  box.hidden = !show;
+  if (!show) return;
+  const m = ui.receiptMeta || {};
+  const set = (id, v) => { const el = document.getElementById(id); if (el && el.value !== v) el.value = v; };
+  set('rcptDate', m.date || '');
+  set('rcptAmount', m.amount ? fmtNum(m.amount) : '');
+  set('rcptMerchant', m.merchant || '');
+  set('rcptCard', m.card || '');
+  const cb = $('#rcptSend'); if (cb) cb.checked = !!m.send;
+  const hint = $('#rcptHint');
+  if (hint) hint.textContent = m.sent ? '가계부로 보냈어요 ✓'
+    : (m.send ? (m.amount > 0 ? '가계부 지갑으로 함께 보내요' : '총액을 넣어 주세요') : '가계부에는 보내지 않아요');
+}
+
 function renderReceipt() {
   const box = $('#receiptResult');
   if (!box) return;
   const list = ui.receipt || [];
+  syncReceiptMetaDom(!!list.length);
   if (!list.length) { box.innerHTML = ''; return; }
   box.innerHTML = '<div class="sub-h" style="margin-top:12px"><span class="l">뽑은 품목 ' + list.length + '개 · ' + list.filter(x => x.on).length + '개 선택</span><span class="ln"></span></div>' +
     list.map((it, i) =>
@@ -1739,14 +1941,25 @@ document.addEventListener('click', e => {
       const raw = $('#receiptRaw') ? $('#receiptRaw').value : '';
       const list = parseReceiptLines(raw);
       ui.receipt = list;
+      ui.receiptMeta = list.length ? parseReceiptMeta(raw) : null;
       renderReceipt();
       toast(list.length ? '🔍 품목 ' + list.length + '개를 뽑았어요 — 확인하고 담아 주세요' : '품목을 못 찾았어요 — 한 줄에 하나씩 적어 주세요');
       break;
     }
     case 'receiptclear': {
       ui.receipt = null;
+      ui.receiptMeta = null;
       if ($('#receiptRaw')) $('#receiptRaw').value = '';
       renderReceipt();
+      break;
+    }
+    case 'rcptsend': {
+      if (!ui.receiptMeta) ui.receiptMeta = { send: false, amount: 0 };
+      ui.receiptMeta.send = !!el.checked;
+      ui.receiptMeta.sendTouched = true;
+      ui.receiptMeta.sent = false;
+      const hint = $('#rcptHint');
+      if (hint) hint.textContent = ui.receiptMeta.send ? (ui.receiptMeta.amount > 0 ? '가계부 지갑으로 함께 보내요' : '총액을 넣어 주세요') : '가계부에는 보내지 않아요';
       break;
     }
     case 'receipttoggle': {
@@ -1773,10 +1986,18 @@ document.addEventListener('click', e => {
           } else { putBackStock(s, it.name); n++; }
         });
       });
+      const meta = ui.receiptMeta ? Object.assign({}, ui.receiptMeta) : null;
+      const sendLedger = !!(meta && meta.send && meta.amount > 0);
       ui.receipt = null;
+      ui.receiptMeta = null;
       if ($('#receiptRaw')) $('#receiptRaw').value = '';
       renderReceipt();
-      toast(mode === 'list' ? '🛒 ' + n + '개를 구매리스트에 담았어요' : '❄️ ' + n + '개를 냉장고·재고에 넣었어요');
+      const baseMsg = mode === 'list' ? '🛒 ' + n + '개를 구매리스트에 담았어요' : '❄️ ' + n + '개를 냉장고·재고에 넣었어요';
+      if (!sendLedger) { toast(baseMsg); break; }
+      toast(baseMsg + ' · 💸 가계부로 보내는 중…');
+      sendToWalletLedger(meta).then(res => {
+        toast(baseMsg + (res.ok ? ' · 💸 가계부에도 보냈어요' : ' · 💸 가계부 전송 실패 — 다시 시도해 주세요'));
+      }).catch(() => { toast(baseMsg + ' · 💸 가계부 전송 실패 — 다시 시도해 주세요'); });
       break;
     }
 
@@ -1966,6 +2187,20 @@ document.addEventListener('click', e => {
 document.addEventListener('input', e => {
   if (e.target.id === 'recSearch') { ui.recQ = e.target.value; renderRecipes(); }
   if (e.target.id === 'pantrySearch') { ui.pantryQ = e.target.value; renderPantry(); }
+  const rid = e.target.id;
+  if (rid === 'rcptAmount' || rid === 'rcptMerchant' || rid === 'rcptCard' || rid === 'rcptDate') {
+    if (!ui.receiptMeta) ui.receiptMeta = { send: false, amount: 0 };
+    const m = ui.receiptMeta;
+    if (rid === 'rcptAmount') {
+      m.amount = rcptNum(e.target.value);
+      if (!m.sendTouched) { m.send = m.amount > 0; const cb = $('#rcptSend'); if (cb) cb.checked = m.send; }
+    } else if (rid === 'rcptMerchant') m.merchant = e.target.value.trim();
+    else if (rid === 'rcptCard') m.card = e.target.value.trim();
+    else m.date = e.target.value;
+    m.sent = false;
+    const hint = $('#rcptHint');
+    if (hint) hint.textContent = m.send ? (m.amount > 0 ? '가계부 지갑으로 함께 보내요' : '총액을 넣어 주세요') : '가계부에는 보내지 않아요';
+  }
   if (e.target.id === 'weekendMemo') {
     const v = e.target.value;
     if (!state.memo || typeof state.memo !== 'object') state.memo = {};
@@ -2001,6 +2236,8 @@ function boot() {
     }
   }, 20000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden && dirty) push(); });
+  window.addEventListener('online', () => { drainWalletQueue(); });
+  setTimeout(drainWalletQueue, 2500);
 }
 
 window.__home = {
@@ -2008,7 +2245,12 @@ window.__home = {
   get sync() { return { state: syncState, dirty, remoteDoc, lastPush }; },
   render, push, seedState, shareLink,
   zones: ZONES, inferZone, guessEmoji, nameMatches, ownedKeys, stockLevel, stockCount, allRecipes, RECIPES, GEMINI_RECIPES,
-  subs: SUBS, subOf, inferSub, parseReceiptLines, isWeekend: () => { const w = curWd(); return w === 0 || w === 6; }
+  subs: SUBS, subOf, inferSub, parseReceiptLines, isWeekend: () => { const w = curWd(); return w === 0 || w === 6; },
+  parseReceiptMeta, guessReceiptAmount, guessReceiptDate, guessReceiptMerchant, guessReceiptCard,
+  cardForWallet, walletPayload, sendToWalletLedger, WALLET_INBOX,
+  get receiptMeta() { return ui.receiptMeta; },
+  set receiptMeta(v) { ui.receiptMeta = v; },
+  receiptParse(raw) { ui.receipt = parseReceiptLines(raw); ui.receiptMeta = ui.receipt.length ? parseReceiptMeta(raw) : null; renderReceipt(); return { items: ui.receipt, meta: ui.receiptMeta }; }
 };
 
 document.addEventListener('DOMContentLoaded', boot);
