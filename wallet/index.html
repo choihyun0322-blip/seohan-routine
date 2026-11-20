@@ -356,7 +356,7 @@ table.tbl td.acts{white-space:nowrap;text-align:right}
 .seg2.plum button.on{background:#fff;color:var(--plum)}
 .loader{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:4px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.banner{display:flex;align-items:flex-start;gap:8px;border-radius:12px;padding:10px 11px;font-size:11px;font-weight:700;line-height:1.5;margin-bottom:9px}
+.banner{display:block;border-radius:12px;padding:10px 11px;font-size:11px;font-weight:700;line-height:1.5;margin-bottom:9px}
 .banner.info{background:var(--sage-soft);border:1px solid var(--sage-line);color:#5B6E54}
 .banner.warn{background:var(--amber-soft);border:1px solid var(--amber-line);color:var(--amber-d)}
 .banner.err{background:var(--coral-soft);border:1px solid var(--coral-line);color:var(--coral-d)}
@@ -472,6 +472,50 @@ table.tbl td.acts{white-space:nowrap;text-align:right}
 .pv i{font-style:normal;font-size:9.5px;color:var(--sub);margin-left:1px}
 @media(min-width:760px){.qadd{flex:0 0 170px}.qtypeseg{width:150px}}
 
+/* ============ 가져오기 모달: 하단 버튼 고정 (모바일에서 버튼이 가려지지 않게) ============ */
+.sheet.imp{display:flex;flex-direction:column;max-height:90dvh;max-height:90svh;overflow:hidden}
+.sheet.imp .sheet-h{flex:0 0 auto;position:static}
+.sheet.imp .sheet-b{flex:1 1 auto;min-height:0;max-height:none;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:10px}
+.sheet.imp .sheet-f{flex:0 0 auto;position:static;padding-bottom:calc(12px + env(safe-area-inset-bottom));box-shadow:0 -8px 18px rgba(120,96,66,.06)}
+.sheet.imp .tblwrap{max-height:none;overflow-x:auto;overflow-y:visible}
+
+/* ============ 같은 내역 일괄 변경 ============ */
+.bulkrow{padding:10px 15px calc(12px + env(safe-area-inset-bottom));border-top:1px dashed var(--line-soft);background:#FFFDFA}
+.bulkrow .btn{width:100%;padding:11px;font-size:11.5px;border-radius:10px}
+.bulkrow .btn b{color:var(--sage-d);font-weight:800}
+.bulkrow .hint{margin-top:6px}
+
+/* ============ 내역 지우기 ============ */
+.wiperow{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:13px;padding:10px 11px;background:#FFFDFA;margin-bottom:8px;flex-wrap:wrap}
+.wiperow .wt{flex:1;min-width:130px}
+.wiperow .wt b{display:block;font-size:11.5px;font-weight:800;letter-spacing:-.3px}
+.wiperow .wt small{display:block;font-size:9px;font-weight:600;color:#B0A596;margin-top:2px;line-height:1.4}
+.wiperow .wc{font-size:12px;font-weight:800;color:var(--coral-d);font-variant-numeric:tabular-nums;white-space:nowrap}
+.wiperow .btn{flex:0 0 auto}
+
+/* ============ PIN 잠금 ============ */
+.lockfld{background:var(--plum-soft);border:1px solid var(--plum-line);border-radius:13px;padding:11px 12px}
+.lockfld .qchk{color:var(--plum)}
+.lockmask{position:fixed;inset:0;z-index:300;background:linear-gradient(160deg,#F7F2E9,#EFE6D8);display:none;place-items:center;padding:18px}
+.lockmask.on{display:grid}
+body.locked{overflow:hidden}
+body.locked .app,body.locked .toast{visibility:hidden}
+.lockbox{width:100%;max-width:320px;text-align:center;background:#fff;border:1px solid var(--line);border-radius:24px;padding:24px 20px calc(18px + env(safe-area-inset-bottom));box-shadow:0 24px 60px rgba(43,39,33,.16)}
+.lockic{font-size:34px;line-height:1}
+.lockt{margin-top:8px;font-size:16px;font-weight:800;letter-spacing:-.6px}
+.locks{margin-top:4px;font-size:11px;font-weight:700;color:var(--mute)}
+.lockbox .dots{display:flex;justify-content:center;gap:11px;margin:16px 0 6px}
+.lockbox .dots i{width:13px;height:13px;border-radius:50%;background:#EFE7DA;border:1px solid #E2D7C5;transition:.15s}
+.lockbox .dots i.on{background:var(--sage);border-color:var(--sage);transform:scale(1.05)}
+.lockerr{min-height:15px;font-size:10.5px;font-weight:800;color:var(--coral-d)}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.keypad button{height:52px;border-radius:14px;background:#F6F1E8;border:1px solid var(--line);font-size:19px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
+.keypad button:active{background:var(--sage-soft);border-color:var(--sage-line)}
+.keypad button.fn{font-size:13px;color:var(--sub)}
+.lockforgot{margin-top:14px;font-size:10.5px;font-weight:800;color:var(--mute);text-decoration:underline;text-underline-offset:3px}
+.lockbox.shake{animation:lshake .4s}
+@keyframes lshake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+
 </style>
 </head>
 <body>
@@ -512,6 +556,7 @@ table.tbl td.acts{white-space:nowrap;text-align:right}
             <button id="mNext" aria-label="다음달">›</button>
           </div>
           <span class="chip line" id="ledgerChip">0건</span>
+          <button class="btn ghost sm" id="btnWipeLedger" title="가계부 내역만 지우기">🗑 내역 지우기</button>
         </div>
       </div>
 
@@ -837,6 +882,10 @@ table.tbl td.acts{white-space:nowrap;text-align:right}
     </div>
     <label class="qchk" style="margin-top:2px"><input type="checkbox" id="tInstall"> 무이자 할부 <small>실적에서 빼기</small></label>
   </div>
+  <div class="bulkrow">
+    <button class="btn dashed" id="tBulk">🔁 같은 내역 모두 바꾸기</button>
+    <div class="hint" id="tBulkHint"></div>
+  </div>
   <div class="sheet-f"><button class="btn ghost" id="tDelete" style="flex:0 0 auto;color:#A8472C">삭제</button><button class="btn pri" id="tSave">저장</button></div>
 </div></div>
 
@@ -868,6 +917,12 @@ table.tbl td.acts{white-space:nowrap;text-align:right}
         <button class="btn ghost sm" id="btnPullNow">서버에서 받기</button>
       </div>
     </div>
+    <div class="fld"><label>가계부 내역 지우기</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn coral sm" id="btnWipeOpen">🗑 내역 지우기</button>
+      </div>
+      <div class="hint">테스트로 넣은 기록을 비울 때 쓰세요. <b>이번 달만</b> 또는 <b>전체</b>를 골라 지울 수 있고, 카드·기프티콘·Pick·포인트와 설정은 그대로 남습니다.</div>
+    </div>
     <div class="fld"><label>데이터</label>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn ghost sm" id="btnExport">JSON 내보내기</button>
@@ -875,6 +930,16 @@ table.tbl td.acts{white-space:nowrap;text-align:right}
         <button class="btn ghost sm" id="btnClearDemo">예시만 지우기</button>
       </div>
       <div class="hint">예시 데이터는 화면을 미리 볼 때만 쓰세요. [예시만 지우기]로 한 번에 지워집니다.</div>
+    </div>
+    <div class="fld lockfld">
+      <label class="qchk" style="border:0;padding:0;justify-content:space-between;width:100%">
+        <span>🔒 비밀번호 잠금 <small id="setPinState">잠금 꺼짐</small></span>
+        <input type="checkbox" id="setPinOn" style="width:auto">
+      </label>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+        <button class="btn ghost sm" id="btnPinSet">PIN 정하기</button>
+      </div>
+      <div class="hint">켜 두면 이 페이지를 열 때 4자리 PIN을 물어봐요. PIN은 SHA-256 해시로만 저장되고, 숫자 자체는 저장하지 않습니다.</div>
     </div>
   </div>
   <div class="sheet-f"><button class="btn ghost" data-close>닫기</button></div>
@@ -890,7 +955,7 @@ table.tbl td.acts{white-space:nowrap;text-align:right}
   <div class="sheet-f"><button class="btn ghost" data-close>취소</button><button class="btn pri" id="passOk">열기</button></div>
 </div></div>
 
-<div class="mask" id="mImport"><div class="sheet" style="max-width:900px">
+<div class="mask" id="mImport"><div class="sheet imp" style="max-width:900px">
   <div class="sheet-h"><b id="impTitle">가져온 내역 확인</b><button class="x" data-close>✕</button></div>
   <div class="sheet-b">
     <div class="banner info" id="impSummary"></div>
@@ -925,6 +990,35 @@ table.tbl td.acts{white-space:nowrap;text-align:right}
   <div class="sheet-f"><button class="btn ghost" data-close>취소</button><button class="btn pri" id="ocrConfirm">선택한 <span id="ocrCount">0</span>건 반영</button></div>
 </div></div>
 
+<div class="mask" id="mWipe"><div class="sheet" style="max-width:420px">
+  <div class="sheet-h"><b>🗑 가계부 내역 지우기</b><button class="x" data-close>✕</button></div>
+  <div class="sheet-b">
+    <div class="banner info">카드·기프티콘·Pick·포인트와 설정은 <b>그대로 남기고</b> 가계부에 적힌 내역만 비웁니다. 되돌릴 수 없으니 먼저 [JSON 내보내기]로 백업해 두셔도 좋아요.</div>
+    <div class="wiperow">
+      <div class="wt"><b id="wipeMonthLabel">이번 달 내역만</b><small>이번 달 기록만 지우고 지난달은 그대로 둡니다</small></div>
+      <div class="wc" id="wipeMonthCnt">0건</div>
+      <button class="btn coral sm" id="wipeMonth">이번 달만</button>
+    </div>
+    <div class="wiperow">
+      <div class="wt"><b>가계부 내역 전체</b><small>모든 달의 내역을 한 번에 비웁니다</small></div>
+      <div class="wc" id="wipeAllCnt">0건</div>
+      <button class="btn coral sm" id="wipeAll">전체 지우기</button>
+    </div>
+  </div>
+  <div class="sheet-f"><button class="btn ghost" data-close>닫기</button></div>
+</div></div>
+
+<div class="mask" id="mPin"><div class="sheet" style="max-width:400px">
+  <div class="sheet-h"><b>🔒 4자리 PIN 정하기</b><button class="x" data-close>✕</button></div>
+  <div class="sheet-b">
+    <div class="banner info" id="pinMsg">숫자 4자리를 두 번 넣으면, 다음부터 이 페이지를 열 때 PIN을 물어봐요.</div>
+    <div class="fld"><label>새 PIN (숫자 4자리)</label><input id="pinNew" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••"></div>
+    <div class="fld"><label>한 번 더</label><input id="pinNew2" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••"></div>
+    <div class="hint">PIN을 잊어버리면 잠금 화면의 [PIN을 잊었어요]로 풀 수 있어요 (내역은 그대로 남습니다).</div>
+  </div>
+  <div class="sheet-f"><button class="btn ghost" data-close>취소</button><button class="btn pri" id="pinSave">저장</button></div>
+</div></div>
+
 <div class="bigmask" id="bigBarcode">
   <button class="big-close" id="bigClose" aria-label="닫기">✕</button>
   <div class="big-body">
@@ -937,6 +1031,23 @@ table.tbl td.acts{white-space:nowrap;text-align:right}
   <div class="big-actions">
     <button class="btn ghost" id="bigDone">사용 완료</button>
     <button class="btn pri" id="bigBack">닫기</button>
+  </div>
+</div>
+
+<div class="lockmask" id="lockScreen">
+  <div class="lockbox" id="lockBox">
+    <div class="lockic">🔒</div>
+    <div class="lockt">가계부 잠금</div>
+    <div class="locks">4자리 PIN을 넣어 주세요</div>
+    <div class="dots" id="lockDots"><i></i><i></i><i></i><i></i></div>
+    <div class="lockerr" id="lockErr"></div>
+    <div class="keypad" id="lockPad">
+      <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
+      <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
+      <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
+      <button data-k="del" class="fn">⌫</button><button data-k="0">0</button><button data-k="reset" class="fn">비우기</button>
+    </div>
+    <button class="lockforgot" id="lockForgot">PIN을 잊었어요</button>
   </div>
 </div>
 
@@ -971,6 +1082,7 @@ const CATS = [
   { n: "쇼핑", e: "🛍️", fixed: false },
   { n: "의료", e: "💊", fixed: false },
   { n: "문화", e: "🎬", fixed: false },
+  { n: "포인트·할인", e: "🎟️", fixed: false },
   { n: "기타", e: "📌", fixed: false },
   { n: "유치원비", e: "🏫", fixed: true },
   { n: "관리비", e: "🏢", fixed: true },
@@ -995,6 +1107,10 @@ const PAY_ACCOUNT = "account";
 
 const RANK_LABEL = { 1: "1순위", 2: "2순위", 3: "3순위", 0: "기타" };
 const SEED_VERSION = 3;
+
+/* 계좌·은행성 표기 — 카드 이름에 은행 브랜드가 있어도 이 표기가 있으면 카드가 아니라 계좌이체 */
+const ACCOUNT_HINT_RE = /계좌|이체|은행|통장|입출금|자동이체|대출|뱅크|ATM|출금|정기예금|적금|원리금/;
+const CARD_HINT_RE = /카드|체크|신용|CHECK|CARD/i;
 
 /* ---------- 통신사 멤버십 (카드 아님 → 실적 게이지에서 분리) ---------- */
 const KT_INFO = {
@@ -1175,6 +1291,58 @@ function uid(p) {
 function normKey(s) {
   return String(s || "").replace(/\s+/g, "").replace(/[()\[\]{}·.,\-_/]/g, "").toLowerCase();
 }
+/* ---------- 가맹점 이름 정규화 (같은 곳인지 판단) ---------- */
+const MERCHANT_NOISE_RE = /\(주\)|주식회사|\(유\)|유한회사|\(사\)|\(합\)|합자회사/g;
+const MERCHANT_TXN_RE = /자동이체|계좌이체|이체|송금|입금|출금|결제|승인|충전|사용|취소|정상|매출|대금|가맹점|온라인|오프라인|정기결제/g;
+function merchantKey(s) {
+  let k = String(s || "").replace(MERCHANT_NOISE_RE, "");
+  k = k.replace(MERCHANT_TXN_RE, "");
+  return normKey(k);
+}
+/* 같은 상호로 볼지: 정규화 이름 일치, 또는 짧은 쪽이 긴 쪽에 통째로 들어가면 같은 곳 */
+function merchantMatch(a, b) {
+  const ka = merchantKey(a), kb = merchantKey(b);
+  if (!ka || !kb) return false;
+  if (ka === kb) return true;
+  const short = ka.length <= kb.length ? ka : kb;
+  const long = ka.length <= kb.length ? kb : ka;
+  if (short.length >= 2 && long.indexOf(short) >= 0) return true;
+  return false;
+}
+
+/* ---------- PIN 잠금용 해시 (SHA-256, 파일로 열 때는 간이 해시) ---------- */
+function naiveHash(text) {
+  let h1 = 0x811c9dc5, h2 = 0x1000193;
+  for (let i = 0; i < text.length; i++) {
+    const c = text.charCodeAt(i);
+    h1 = ((h1 ^ c) * 16777619) >>> 0;
+    h2 = ((h2 + c) * 2654435761) >>> 0;
+  }
+  return (h1.toString(16) + h2.toString(16)).padStart(16, "0");
+}
+async function sha256Hex(text) {
+  if (window.crypto && crypto.subtle && crypto.subtle.digest) {
+    try {
+      const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+      return "s1:" + Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+    } catch (e) {}
+  }
+  return "f1:" + naiveHash(text);
+}
+function fallbackHash(text) { return "f1:" + naiveHash(text); }
+function pinSalt() {
+  const a = new Uint8Array(8);
+  if (window.crypto && crypto.getRandomValues) crypto.getRandomValues(a);
+  else for (let i = 0; i < 8; i++) a[i] = Math.floor(Math.random() * 256);
+  return Array.from(a).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+async function pinDigest(pin, salt) { return await sha256Hex("wallet-pin|" + (salt || "") + "|" + String(pin || "")); }
+async function pinMatches(pin, security) {
+  if (!security || !security.pinOn || !security.pinHash) return true;
+  const a = await pinDigest(pin, security.salt);
+  if (a === security.pinHash) return true;
+  return fallbackHash("wallet-pin|" + (security.salt || "") + "|" + String(pin || "")) === security.pinHash;
+}
 function debounce(fn, ms) {
   let t = null;
   return function () {
@@ -1274,6 +1442,7 @@ function blankState() {
     giftUses: [],
     ktChecks: {},
     catRules: {},
+    security: { pinOn: false, pinHash: "", salt: "" },
     updatedAt: 0
   };
 }
@@ -1333,6 +1502,10 @@ function normalizeState(raw) {
   });
   s.cards = Array.isArray(s.cards) && s.cards.length ? s.cards : seedCards();
   s.catRules = s.catRules && typeof s.catRules === "object" ? s.catRules : {};
+  s.security = s.security && typeof s.security === "object" ? s.security : {};
+  s.security.pinOn = !!s.security.pinOn;
+  s.security.pinHash = String(s.security.pinHash || "");
+  s.security.salt = String(s.security.salt || "");
   s.ktChecks = s.ktChecks && typeof s.ktChecks === "object" ? s.ktChecks : {};
   s.points.forEach(p => {
     p.id = p.id || uid("pt");
@@ -1470,25 +1643,49 @@ function pickSaving(mk) {
     s + (p.used && monthOf(p.usedAt || "") === mk ? num(p.usedAmount) : 0), 0);
 }
 function savedTotal(mk) {
-  return cardSavings(mk) + giftSaving(mk) + pickSaving(mk);
+  return cardSavings(mk) + giftSaving(mk) + pickSaving(mk) + pointPayback(mk);
+}
+/* 포인트 페이백·할인을 수입으로 기록한 금액 = 실질 절약액 (카드 실적과 무관) */
+function pointPayback(mk) {
+  return monthTxns(mk).filter(t => isIncomeT(t) && t.cat === "포인트·할인")
+    .reduce((s, t) => s + num(t.amount), 0);
 }
 function pointTotal() {
   return state.points.reduce((s, p) => s + num(p.balance), 0);
 }
 function pointById(id) { return state.points.find(p => p.id === id) || null; }
 
-/* 고정/변동 토글 규칙 기억 */
-function rememberRule(key, fixed, cat) {
+/* 고정/변동·분류·결제수단·유형 기억 */
+function rememberRule(key, fixed, cat, extra) {
   if (!key) return;
-  state.catRules[normKey(key)] = { fixed: fixed, cat: cat || null };
+  const k = normKey(key);
+  if (!k) return;
+  const r = Object.assign({}, state.catRules[k] || {});
+  if (typeof fixed === "boolean") r.fixed = fixed;
+  if (cat && CAT_BY[cat]) r.cat = cat;
+  if (extra && (extra.type === "income" || extra.type === "expense")) r.type = extra.type;
+  if (extra && extra.cardId) r.cardId = extra.cardId;
+  state.catRules[k] = r;
 }
 function applyRule(t) {
-  const r = state.catRules[normKey(t.memo)];
-  if (r) {
-    if (typeof r.fixed === "boolean" && !isIncomeT(t)) t.fixed = r.fixed;
-    if (r.cat && CAT_BY[r.cat]) t.cat = r.cat;
+  const r = state.catRules[normKey(t.memo)] || state.catRules[merchantKey(t.memo)];
+  if (!r) return t;
+  if (r.type === "income" || r.type === "expense") {
+    t.type = r.type;
+    if (t.type === "income") { t.fixed = false; t.installment = false; }
   }
+  if (r.cat && CAT_BY[r.cat]) t.cat = r.cat;
+  if (typeof r.fixed === "boolean" && !isIncomeT(t)) t.fixed = r.fixed;
+  if (r.cardId) t.cardId = r.cardId;
   return t;
+}
+
+/* 가계부 내역만 비우기 (카드·기프티콘·Pick·포인트·설정은 유지) */
+function wipeTxns(mode) {
+  const before = state.txns.length;
+  if (mode === "month") state.txns = state.txns.filter(t => monthOf(t.date) !== uiMonth);
+  else state.txns = [];
+  return before - state.txns.length;
 }
 
 function addTxn(t, opts) {
@@ -1706,6 +1903,7 @@ function renderAll() {
   syncMonthNav();
   setTab(uiTab, true);
   setSync(syncKind === "on" ? "on" : syncKind === "local" ? "local" : "connecting");
+  if (typeof applyLockState === "function") applyLockState();
 }
 
 function syncMonthNav() {
@@ -1721,8 +1919,8 @@ function renderKpis() {
   const st = monthStats(mk);
   const prev = monthStats(shiftMonth(mk, -1));
   const diff = prev.expense > 0 ? Math.round((st.expense - prev.expense) / prev.expense * 100) : null;
-  const cs = cardSavings(mk), gs = giftSaving(mk), ps = pickSaving(mk);
-  const save = cs + gs + ps;
+  const cs = cardSavings(mk), gs = giftSaving(mk), ps = pickSaving(mk), pb = pointPayback(mk);
+  const save = cs + gs + ps + pb;
   const net = st.net;
 
   box.innerHTML =
@@ -1738,7 +1936,7 @@ function renderKpis() {
       '<div class="cm">' + (net < 0 ? "지출이 수입보다 많아요" : "수입 − 지출 = 순저축") + "</div></div>" +
     '<div class="kpi save"><div class="lb">💰 ' + monthLabel(mk) + " 아낀 금액</div>" +
       '<div class="vl">' + fmt(save) + "<small>원</small></div>" +
-      '<div class="cm">카드 ' + fmt(cs) + " + 기프티콘 " + fmt(gs) + " + Pick " + fmt(ps) + "</div></div>";
+      '<div class="cm">카드 ' + fmt(cs) + " + 기프티콘 " + fmt(gs) + " + Pick " + fmt(ps) + (pb ? " + 포인트·할인 " + fmt(pb) : "") + "</div></div>";
 }
 
 /* ---------- 카드 ---------- */
@@ -2051,14 +2249,15 @@ function renderPoints() {
 
 /* ---------- foot ---------- */
 function renderFoot() {
-  const cs = cardSavings(uiMonth), gs = giftSaving(uiMonth), ps = pickSaving(uiMonth);
+  const cs = cardSavings(uiMonth), gs = giftSaving(uiMonth), ps = pickSaving(uiMonth), pb = pointPayback(uiMonth);
   const el = $("#footSave");
-  if (el) el.textContent = monthLabel(uiMonth) + " 아낀 " + won(cs + gs + ps);
+  if (el) el.textContent = monthLabel(uiMonth) + " 아낀 " + won(cs + gs + ps + pb);
   const d = $("#footDetail");
   if (d) {
     const expiring = state.gifts.filter(g => !g.used && dday(g.exp) != null && dday(g.exp) <= 14).length;
     const left = state.picks.filter(p => !p.used).length;
     d.textContent = "카드 " + fmt(cs) + " · 기프티콘 " + fmt(gs) + " · Pick " + fmt(ps) +
+      (pb ? " · 포인트·할인 " + fmt(pb) : "") +
       (expiring ? " · 만료 임박 " + expiring + "개" : "") + (left ? " · Pick " + left + "개 남음" : "");
   }
 }
@@ -2696,7 +2895,7 @@ function updateTxn(id, field, value) {
   }
   else if (field === "fixed") {
     t.fixed = !t.fixed;
-    rememberRule(t.memo, t.fixed, t.cat);
+    rememberRule(t.memo, t.fixed, t.cat, { type: t.type, cardId: t.cardId });
   } else if (field === "installment") t.installment = !!value;
   else if (field === "date") t.date = value || t.date;
   else if (field === "memo") { t.memo = String(value).slice(0, 80); if (state.catRules[normKey(t.memo)]) applyRule(t); }
@@ -2726,9 +2925,16 @@ function openTxn(id) {
   $("#tFixed").textContent = t.fixed ? "🔒 고정비" : "🔁 변동비";
   $("#tFixed").className = "seg2 " + (t.fixed ? "plum" : "");
   $("#tInstall").checked = !!t.installment;
+  const same = state.txns.filter(x => x.id !== t.id && merchantMatch(x.memo, t.memo)).length;
+  const bulk = $("#tBulk");
+  if (bulk) bulk.innerHTML = "🔁 같은 내역 모두 바꾸기" + (same ? " <b>(" + same + "건 더)</b>" : "");
+  const bh = $("#tBulkHint");
+  if (bh) bh.textContent = same
+    ? "같은 상호 「" + (merchantKey(t.memo) || t.memo) + "」 내역 " + same + "건에 이 설정을 한 번에 적용하고, 앞으로 들어오는 내역도 자동으로 맞춥니다"
+    : "지금은 같은 상호 내역이 더 없지만, 이 설정을 규칙으로 저장해 앞으로 들어오는 내역에 자동 적용합니다";
   openModal("mTxn");
 }
-function saveTxn() {
+function saveTxn(opts) {
   const t = state.txns.find(x => x.id === editingTxnId);
   if (!t) return;
   t.memo = ($("#tMemo").value || "").trim() || t.memo;
@@ -2741,8 +2947,27 @@ function saveTxn() {
   t.cardId = $("#tCard").value;
   t.installment = txnType === "income" ? false : $("#tInstall").checked;
   if (txnType === "income") t.fixed = false;
+
+  const bulk = !!(opts && opts.bulk);
+  rememberRule(t.memo, t.fixed, t.cat, { type: t.type, cardId: t.cardId });
+  let n = 0;
+  if (bulk) {
+    state.txns.forEach(x => {
+      if (x.id === t.id) return;
+      if (!merchantMatch(x.memo, t.memo)) return;
+      x.type = t.type;
+      x.cat = t.cat;
+      x.cardId = t.cardId;
+      x.fixed = t.type === "income" ? false : t.fixed;
+      if (t.type === "income") x.installment = false;
+      rememberRule(x.memo, x.fixed, x.cat, { type: x.type, cardId: x.cardId });
+      n++;
+    });
+  }
   touch(); closeModal("mTxn"); renderAll(); if ($("#mAll").classList.contains("on")) renderAllTx();
-  toast("내역을 고쳤어요");
+  toast(bulk
+    ? "같은 내역 " + (n + 1) + "건을 " + (t.type === "income" ? "수입" : "지출") + " · " + t.cat + (t.type === "income" ? "" : (t.fixed ? " · 고정비" : " · 변동비")) + "로 바꿨어요 · 다음부터 자동"
+    : "내역을 고쳤어요");
 }
 
 /* ---------- 최근 내역 토글 ---------- */
@@ -2751,7 +2976,7 @@ function toggleTxnFixed(id) {
   if (!t) return;
   if (isIncomeT(t)) { openTxn(id); return; }
   t.fixed = !t.fixed;
-  rememberRule(t.memo, t.fixed, t.cat);
+  rememberRule(t.memo, t.fixed, t.cat, { type: t.type, cardId: t.cardId });
   touch(); renderAll();
   toast((t.memo || "이 내역") + " → " + (t.fixed ? "고정비" : "변동비") + "로 옮겼어요 (다음에도 기억)");
 }
@@ -2761,6 +2986,7 @@ function openSettings() {
   $("#setRoom").value = Room;
   $("#setShare").textContent = shareUrl();
   setSync(syncKind === "on" ? "on" : syncKind === "local" ? "local" : "connecting");
+  renderSettingsPin();
   openModal("mSettings");
 }
 function bindSettings() {
@@ -2779,6 +3005,18 @@ function bindSettings() {
   });
   $("#btnImportDemo").addEventListener("click", fillDemo);
   $("#btnClearDemo").addEventListener("click", clearDemo);
+  $("#btnWipeOpen").addEventListener("click", openWipe);
+  const wl = $("#btnWipeLedger");
+  if (wl) wl.addEventListener("click", openWipe);
+  $("#wipeMonth").addEventListener("click", () => doWipe("month"));
+  $("#wipeAll").addEventListener("click", () => doWipe("all"));
+  $("#setPinOn").addEventListener("change", ev => togglePin(ev.target.checked));
+  $("#btnPinSet").addEventListener("click", openPinSetup);
+  $("#pinSave").addEventListener("click", savePinSetup);
+  ["#pinNew", "#pinNew2"].forEach(sel => {
+    const el = $(sel);
+    if (el) el.addEventListener("input", () => { el.value = el.value.replace(/\D/g, "").slice(0, 4); });
+  });
 }
 
 function fillDemo() {
@@ -2833,6 +3071,171 @@ function clearDemo() {
   toast("예시 " + (before - state.txns.length) + "건을 지웠어요");
 }
 
+/* ---------- 가계부 내역 지우기 ---------- */
+function openWipe() {
+  const mk = uiMonth;
+  const monthCnt = state.txns.filter(t => monthOf(t.date) === mk).length;
+  $("#wipeMonthLabel").textContent = monthTitle(mk) + " 내역만";
+  $("#wipeMonthCnt").textContent = monthCnt + "건";
+  $("#wipeAllCnt").textContent = state.txns.length + "건";
+  $("#wipeMonth").disabled = !monthCnt;
+  $("#wipeAll").disabled = !state.txns.length;
+  openModal("mWipe");
+}
+function doWipe(mode) {
+  const label = mode === "month" ? monthTitle(uiMonth) + " 내역" : "가계부 내역 전체";
+  const cnt = mode === "month" ? state.txns.filter(t => monthOf(t.date) === uiMonth).length : state.txns.length;
+  if (!cnt) { toast("지울 내역이 없어요"); return; }
+  if (!confirm(label + " " + cnt + "건을 지울까요?\n\n카드·기프티콘·Pick·포인트와 설정은 그대로 남고, 가계부 내역만 없어집니다.")) return;
+  const n = wipeTxns(mode);
+  touch(); closeModal("mWipe"); renderAll();
+  toast(n + "건을 지웠어요");
+}
+
+/* ---------- 4자리 PIN 잠금 ---------- */
+let unlockedNow = false;
+let pinInput = "";
+let lockBusy = false;
+const LS_LOCK = "wallet-lock-v1:";
+
+/* 잠금은 이 기기에도 따로 남긴다 — 서버 상태가 늦게 도착해도 풀리지 않게 */
+function localLock() {
+  try {
+    const raw = localStorage.getItem(LS_LOCK + Room);
+    if (!raw) return null;
+    const o = JSON.parse(raw);
+    if (o && o.pinOn && o.pinHash) return { pinOn: true, pinHash: String(o.pinHash), salt: String(o.salt || "") };
+  } catch (e) {}
+  return null;
+}
+function saveLocalLock(sec) { try { localStorage.setItem(LS_LOCK + Room, JSON.stringify(Object.assign({ at: Date.now() }, sec))); } catch (e) {} }
+function dropLocalLock() { try { localStorage.removeItem(LS_LOCK + Room); } catch (e) {} }
+
+function securityOf() {
+  if (!state.security || typeof state.security !== "object") state.security = { pinOn: false, pinHash: "", salt: "" };
+  return state.security;
+}
+function lockInfo() {
+  const s = securityOf();
+  if (s.pinOn && s.pinHash) return s;
+  return localLock();
+}
+function pinIsOn() { return !!lockInfo(); }
+function paintDots() {
+  $$("#lockDots i").forEach((d, i) => d.classList.toggle("on", i < pinInput.length));
+}
+function applyLockState() {
+  const el = $("#lockScreen");
+  if (!el) return;
+  const s = securityOf();
+  let li = localLock();
+  const staleLocal = li && num(li.at) && state.updatedAt && state.updatedAt > num(li.at) + 1500;
+  if (li && !(s.pinOn && s.pinHash)) {
+    if (staleLocal) { dropLocalLock(); li = null; }
+    else state.security = { pinOn: true, pinHash: li.pinHash, salt: li.salt };
+  } else if (li && s.pinOn && s.pinHash && li.pinHash !== s.pinHash) {
+    if (staleLocal) { dropLocalLock(); li = null; }
+    else state.security = { pinOn: true, pinHash: li.pinHash, salt: li.salt };
+  } else if (!li && s.pinOn && s.pinHash) {
+    saveLocalLock(s);
+  }
+  const cur = securityOf();
+  const locked = !!(li || (cur.pinOn && cur.pinHash)) && !unlockedNow;
+  el.classList.toggle("on", locked);
+  document.body.classList.toggle("locked", locked);
+  if (locked) { pinInput = ""; paintDots(); const e = $("#lockErr"); if (e) e.textContent = ""; }
+}
+async function submitPin() {
+  if (lockBusy || pinInput.length !== 4) return;
+  lockBusy = true;
+  const ok = await pinMatches(pinInput, lockInfo());
+  lockBusy = false;
+  if (ok) {
+    unlockedNow = true;
+    pinInput = "";
+    applyLockState();
+    toast("잠금을 풀었어요");
+  } else {
+    pinInput = "";
+    paintDots();
+    const e = $("#lockErr");
+    if (e) e.textContent = "PIN이 맞지 않아요 — 다시 넣어 주세요";
+    const box = $("#lockBox");
+    if (box) { box.classList.add("shake"); setTimeout(() => box.classList.remove("shake"), 430); }
+  }
+}
+function pinKey(ch) {
+  if (ch === "del") { pinInput = pinInput.slice(0, -1); paintDots(); return; }
+  if (ch === "clear" || ch === "reset") { pinInput = ""; paintDots(); return; }
+  if (!/^\d$/.test(ch) || pinInput.length >= 4) return;
+  pinInput += ch;
+  paintDots();
+  if (pinInput.length === 4) setTimeout(submitPin, 120);
+}
+function bindLock() {
+  const pad = $("#lockPad");
+  if (pad) pad.addEventListener("click", ev => {
+    const b = ev.target.closest("[data-k]");
+    if (b) pinKey(b.getAttribute("data-k"));
+  });
+  document.addEventListener("keydown", ev => {
+    const ls = $("#lockScreen");
+    if (!ls || !ls.classList.contains("on")) return;
+    if (/^\d$/.test(ev.key)) pinKey(ev.key);
+    else if (ev.key === "Backspace") { ev.preventDefault(); pinKey("del"); }
+    else if (ev.key === "Enter") submitPin();
+  });
+  const fg = $("#lockForgot");
+  if (fg) fg.addEventListener("click", () => {
+    if (!confirm("PIN을 잊으셨나요?\n\n이 기기에서 잠금을 풀고 PIN 설정을 지웁니다. 가계부 내용(내역·카드·기프티콘)은 그대로 남습니다.")) return;
+    state.security = { pinOn: false, pinHash: "", salt: "" };
+    dropLocalLock();
+    unlockedNow = true;
+    touch(); applyLockState(); renderSettingsPin();
+    toast("잠금을 풀었어요 — 설정에서 다시 켤 수 있어요");
+  });
+  applyLockState();
+}
+function renderSettingsPin() {
+  const on = pinIsOn();
+  const cb = $("#setPinOn");
+  if (cb) cb.checked = on;
+  const st = $("#setPinState");
+  if (st) st.textContent = on ? "🔒 잠금 켜짐 · 4자리 PIN" : "잠금 꺼짐";
+  const btn = $("#btnPinSet");
+  if (btn) btn.textContent = on ? "PIN 바꾸기" : "PIN 정하기";
+}
+function openPinSetup() {
+  $("#pinNew").value = "";
+  $("#pinNew2").value = "";
+  $("#pinMsg").textContent = pinIsOn()
+    ? "새 4자리 PIN을 두 번 넣어 주세요. 기존 PIN은 이걸로 바뀝니다."
+    : "숫자 4자리를 두 번 넣으면, 다음부터 이 페이지를 열 때 PIN을 물어봐요.";
+  openModal("mPin");
+  setTimeout(() => { const el = $("#pinNew"); if (el) el.focus(); }, 120);
+}
+async function savePinSetup() {
+  const a = ($("#pinNew").value || "").replace(/\D/g, "");
+  const b = ($("#pinNew2").value || "").replace(/\D/g, "");
+  if (!/^\d{4}$/.test(a)) { toast("숫자 4자리로 정해 주세요"); return; }
+  if (a !== b) { toast("두 번 넣은 PIN이 달라요"); return; }
+  const salt = pinSalt();
+  const hash = await pinDigest(a, salt);
+  state.security = { pinOn: true, pinHash: hash, salt: salt };
+  saveLocalLock(state.security);
+  unlockedNow = true;
+  touch(); closeModal("mPin"); renderSettingsPin(); applyLockState();
+  toast("🔒 잠금을 켰어요 — 다음에 열 때 PIN을 물어봐요");
+}
+function togglePin(on) {
+  if (on) { openPinSetup(); return; }
+  if (!confirm("비밀번호 잠금을 끌까요?\n이 기기와 공유 방에서 PIN 없이 바로 열립니다.")) { renderSettingsPin(); return; }
+  state.security = { pinOn: false, pinHash: "", salt: "" };
+  dropLocalLock();
+  touch(); renderSettingsPin(); applyLockState();
+  toast("잠금을 껐어요");
+}
+
 /* ---------- 단축어 ---------- */
 function openShortcut() {
   $("#scUrl").textContent = inboxUrl();
@@ -2882,7 +3285,8 @@ function bindModals() {
   $("#allCard").addEventListener("change", renderAllTx);
   $("#quickForm").addEventListener("keydown", ev => { if (ev.key === "Enter" && ev.target.tagName === "INPUT") { ev.preventDefault(); $("#quickForm").requestSubmit ? $("#quickForm").requestSubmit() : $("#quickForm").dispatchEvent(new Event("submit")); } });
   $("#useOk").addEventListener("click", confirmUseGift);
-  $("#tSave").addEventListener("click", saveTxn);
+  $("#tSave").addEventListener("click", () => saveTxn());
+  $("#tBulk").addEventListener("click", () => saveTxn({ bulk: true }));
   $("#tDelete").addEventListener("click", () => { if (editingTxnId) { deleteTxn(editingTxnId); closeModal("mTxn"); toast("지웠어요"); } });
   $("#tType").addEventListener("click", ev => {
     const b = ev.target.closest("[data-v]");
@@ -3470,30 +3874,54 @@ async function openEncryptedWorkbook(bytes) {
 
 /* ---------- 표 해석 ---------- */
 const SUPPLIER_CAT = {
-  "식비": "식비", "카페": "식비", "카페/간식": "식비", "간식": "식비", "외식": "식비", "배달": "식비",
+  "식비": "식비", "카페": "식비", "카페/간식": "식비", "카페·간식": "식비", "간식": "식비", "외식": "식비", "배달": "식비", "음식": "식비",
+  "주류": "문화", "유흥": "문화", "주류·유흥": "문화",
   "마트": "생활", "편의점": "생활", "생활": "생활", "생필품": "생활", "세탁": "생활",
-  "교통": "교통", "주유": "교통", "대중교통": "교통", "택시": "교통", "주차": "교통",
-  "쇼핑": "쇼핑", "온라인쇼핑": "쇼핑", "뷰티": "쇼핑", "의류": "쇼핑", "패션": "쇼핑",
-  "의료": "의료", "병원": "의료", "약국": "의료", "건강": "의료",
-  "문화": "문화", "여가": "문화", "취미": "문화", "도서": "문화", "영화": "문화",
-  "교육": "교육", "학원": "교육", "육아": "아이", "아이": "아이", "반려동물": "생활",
-  "통신": "통신", "인터넷": "통신", "주거": "관리비", "공과금": "관리비", "관리비": "관리비",
-  "보험": "보험", "세금": "세금", "이자": "대출", "수수료": "기타", "기타": "기타"
+  "마트·편의점": "생활",
+  "교통": "교통", "주유": "교통", "대중교통": "교통", "택시": "교통", "주차": "교통", "자동차": "교통",
+  "쇼핑": "쇼핑", "온라인쇼핑": "쇼핑", "뷰티": "쇼핑", "의류": "쇼핑", "패션": "쇼핑", "뷰티·미용": "쇼핑", "미용": "쇼핑",
+  "의료": "의료", "병원": "의료", "약국": "의료", "건강": "의료", "의료·건강": "의료",
+  "문화": "문화", "여가": "문화", "취미": "문화", "도서": "문화", "영화": "문화", "문화·여가": "문화",
+  "구독": "구독", "OTT": "구독", "통신": "통신", "인터넷": "통신",
+  "교육": "교육", "학원": "교육", "교재": "교육", "유치원": "유치원비", "어린이집": "유치원비",
+  "육아": "아이", "아이": "아이", "반려동물": "생활",
+  "주거": "관리비", "주거·통신": "관리비", "주거/통신": "관리비", "공과금": "관리비", "관리비": "관리비", "월세": "관리비", "임대": "관리비", "전기": "관리비", "가스": "관리비", "수도": "관리비",
+  "보험": "보험", "세금": "세금", "세금·공과금": "세금", "공공요금": "관리비",
+  "대출": "대출", "이자": "대출", "금융": "대출", "카드대금": "대출",
+  "포인트": "포인트·할인", "할인": "포인트·할인", "캐시백": "포인트·할인", "페이백": "포인트·할인", "적립": "포인트·할인", "리워드": "포인트·할인",
+  "이체": "기타", "수입": "기타", "급여": "기타", "수수료": "기타", "기타": "기타"
 };
+/* 표의 분류 열 → 앱 고정/변동 카테고리 (정확 → 조각 → 포함 순) */
+function supplierCat(given) {
+  const g = String(given || "").trim();
+  if (!g) return "";
+  if (SUPPLIER_CAT[g]) return SUPPLIER_CAT[g];
+  if (CAT_BY[g]) return g;
+  const parts = g.split(/[\/·>,\s]+/).filter(Boolean);
+  for (const p of parts) {
+    if (SUPPLIER_CAT[p]) return SUPPLIER_CAT[p];
+    if (CAT_BY[p]) return p;
+  }
+  const keys = Object.keys(SUPPLIER_CAT);
+  for (const k of keys) if (g.indexOf(k) >= 0) return SUPPLIER_CAT[k];
+  return "";
+}
 const CAT_GUESS = [
-  [/식비|카페|커피|간식|외식|배달|음식|식당|베이커리|치킨|피자|스타벅스|메가|투썸|이디야|컴포즈|빽다방|배스킨|던킨|맥도날드|버거|김밥|분식/, "식비"],
-  [/이마트|홈플러스|롯데마트|코스트코|마트|편의점|GS25|CU|세븐|생필품|다이소|세탁|청소/, "생활"],
-  [/육아|아이|키즈|유아|장난감|아동|어린이|서한/, "아이"],
-  [/주유|주차|택시|버스|지하철|교통|KTX|카카오T|티머니/, "교통"],
-  [/올리브영|무신사|쿠팡|쇼핑|의류|패션|뷰티|화장품/, "쇼핑"],
+  [/페이백|캐시백|포인트.?적립|적립금|리워드|마일리지.?적립/, "포인트·할인"],
+  [/관리비|공과금|월세|임대료|전기요금|가스요금|수도요금|도시가스|한전|아파트/, "관리비"],
+  [/대출|원리금|이자|상환|카드대금|할부금|중도금/, "대출"],
+  [/\bKT\b|\bSKT\b|SK텔레콤|LG\s?U\+|LGU|통신|인터넷|휴대폰|요금제|알뜰폰/, "통신"],
+  [/보험/, "보험"],
+  [/유치원|어린이집/, "유치원비"],
+  [/에오스|교육|학원|교재|학습지|소마|팩토|슐레|논술|과외|문제집/, "교육"],
+  [/식비|카페|커피|간식|외식|배달|음식|식당|베이커리|치킨|피자|스타벅스|메가|투썸|이디야|컴포즈|빽다방|배스킨|던킨|맥도날드|버거|김밥|분식|쿠팡이츠|배민|요기요|떡볶이/, "식비"],
+  [/이마트|홈플러스|롯데마트|코스트코|마트|편의점|GS25|CU|세븐|생필품|다이소|세탁|청소|쿠팡|컬리|무인양품/, "생활"],
+  [/육아|아이|키즈|유아|장난감|아동|어린이|서한|기저귀|분유/, "아이"],
+  [/주유|주차|택시|버스|지하철|교통|KTX|카카오T|티머니|하이패스/, "교통"],
+  [/올리브영|무신사|쇼핑|의류|패션|뷰티|화장품/, "쇼핑"],
   [/병원|약국|의료|치과|한의원/, "의료"],
   [/영화|도서|공연|문화|넷플릭스|유튜브|티빙|웨이브|밀리|구독/, "문화"],
-  [/통신|인터넷|휴대폰|KT|SKT|LG U/, "통신"],
-  [/관리비|공과금|전기|가스|수도|아파트/, "관리비"],
-  [/보험/, "보험"],
-  [/학원|유치원|어린이집|교재|교육/, "교육"],
-  [/대출|이자|카드대금|할부금/, "대출"],
-  [/세금|국세|지방세|과태료/, "세금"]
+  [/세금|국세|지방세|과태료|건강보험료|국민연금/, "세금"]
 ];
 
 function parseDateCell(v) {
@@ -3522,11 +3950,20 @@ function parseDateCell(v) {
   return "";
 }
 
-function matchCardId(text) {
-  const s = String(text || "");
+function matchCardId(text, extra) {
+  const s = String(text || "").trim();
+  const ctx = (s + " " + String(extra || "")).trim();
+  if (!s && !ctx) return "";
+  const hasCard = CARD_HINT_RE.test(s);
+  if (/현금/.test(s) && !hasCard) return PAY_CASH;
+  if (/기프티콘|상품권|쿠폰/.test(s) && !hasCard) return PAY_GIFT;
+  /* 결제수단에 카드 단어가 없으면, 결제수단+내역에 은행/계좌 표기가 있는지 먼저 본다
+     — '대출금: KB 계좌이체'(결제수단 KB국민)는 kb 카드가 아니라 계좌 */
+  if (!hasCard) {
+    if (/포인트|페이백|캐시백|적립금|마일리지/.test(s)) return PAY_POINT;
+    if (ACCOUNT_HINT_RE.test(ctx)) return PAY_ACCOUNT;
+  }
   if (!s) return "";
-  if (/현금/.test(s)) return PAY_CASH;
-  if (/기프티콘|상품권|쿠폰/.test(s)) return PAY_GIFT;
   if (/네이버\s?페이|네페/.test(s) && /하나/.test(s)) return "nepa";
   if (/현대/.test(s) || /9006/.test(s)) return "nv";
   if (/국민|KB/i.test(s) || /9402/.test(s)) return "kb";
@@ -3536,11 +3973,17 @@ function matchCardId(text) {
 }
 
 function guessCategory(text, given) {
-  const g = String(given || "").trim();
-  if (g && SUPPLIER_CAT[g]) return SUPPLIER_CAT[g];
-  if (g && CAT_BY[g]) return g;
+  const mapped = supplierCat(given);
+  if (mapped) return mapped;
   const s = String(text || "");
   for (const [re, cat] of CAT_GUESS) if (re.test(s)) return cat;
+  return "기타";
+}
+/* 수입 행의 분류 — 포인트·할인만 따로, 나머지는 기타 */
+function incomeCat(memo, given) {
+  if (supplierCat(given) === "포인트·할인") return "포인트·할인";
+  const s = String(memo || "") + " " + String(given || "");
+  if (/페이백|캐시백|포인트.?적립|적립금|리워드|할인/.test(s)) return "포인트·할인";
   return "기타";
 }
 
@@ -3548,32 +3991,39 @@ function guessCategory(text, given) {
    규칙: "내 계좌" 또는 송금·이체·입출금의 양쪽이 모두 본인(최현·케이최현·본인계좌)인 이동만 제외.
    타인·기관 이체(관리비·유치원비·이종원 송금 등)는 정상 지출/수입으로 가져온다. */
 function isTransferRow(typeVal, memo, catVal) {
-  const blob = [typeVal, memo, catVal].join(" ");
-  const s = String(blob || "").replace(/\s+/g, "");
-  if (!s) return false;
-  if (/내계좌|본인계좌|본인명의|내통장/.test(s)) return true;
-  const move = /이체|송금|입금|출금|수취|보냄|받음|대체/.test(s);
-  const self = /케이최현|최현/.test(s);
+  const blob = [typeVal, memo, catVal].join(" ").replace(/\s+/g, "");
+  if (!blob) return false;
+  if (/내계좌|본인계좌|본인명의|내통장/.test(blob)) return true;
+  const m = String(memo || "").replace(/\s+/g, "");
+  if (!m) return false;
+  const move = /이체|송금|입금|출금|수취|보냄|받음|대체/.test(blob);
+  const self = /케이최현|최현/.test(m);
   if (!move || !self) return false;
-  const rest = s
+  const rest = m
     .replace(/케이최현|최현/g, "")
-    .replace(/이체|송금|입금|출금|수취|보냄|받음|대체|자동/g, "")
+    .replace(/자동이체|이체|송금|입금|출금|수취|보냄|받음|대체|자동/g, "")
     .replace(/계좌|통장|은행|뱅크|국민|하나|우리|신한|농협|카카오|토스|SC|제일|기업|IBK|온라인|인터넷|모바일|앱|으로|에서|에게|로|한|내|본인/g, "")
     .replace(/[0-9]/g, "")
     .replace(/[()[\]{}·.,\-_/|:~*]/g, "");
   return rest.length <= 1;
 }
 
-/* 표의 구분·금액 부호로 수입/지출 판별 */
-function rowTypeOf(typeVal, amountCell) {
+/* 표의 구분·금액 부호·내역 문구로 수입/지출 판별
+   — 타인·기관에서 계좌이체로 들어온 돈은 반드시 수입 */
+function rowTypeOf(typeVal, amountCell, memo, catVal) {
   const t = String(typeVal || "");
-  if (/수입|입금|받음|수취|급여|이자|환불|캐시백/.test(t)) return "income";
+  const m = String(memo || "");
+  const c = String(catVal || "");
+  const amt = String(amountCell == null ? "" : amountCell).trim();
+  if (/^[-−]/.test(amt)) return "expense";
+  if (/수입|입금|받음|수취|급여|이자|환불|캐시백|페이백|리워드|지원금|보험금/.test(t + " " + c)) return "income";
   if (/지출|출금|결제|승인|사용|충전/.test(t)) return "expense";
-  if (/^[-−]/.test(String(amountCell == null ? "" : amountCell).trim())) return "expense";
+  if (/입금|받음|수취|송금받|들어옴|입금됨/.test(m) && !/출금|보냄|보낸|송금함/.test(m)) return "income";
+  if (/^[+＋]/.test(amt)) return "income";
   return "expense";
 }
-function isIncomeRow(typeVal, amountCell) {
-  return rowTypeOf(typeVal, amountCell) === "income";
+function isIncomeRow(typeVal, amountCell, memo, catVal) {
+  return rowTypeOf(typeVal, amountCell, memo, catVal) === "income";
 }
 
 function findHeader(rows) {
@@ -3607,14 +4057,28 @@ function parseWorkbook(wb) {
     if (idx.date == null && /날짜|일시|거래일|사용일|승인일|결제일|날자/.test(s)) idx.date = i;
     else if (idx.time == null && /시간|시각/.test(s)) idx.time = i;
     else if (idx.memo == null && /내용|사용처|가맹점|상호|적요|이용처|상대/.test(s)) idx.memo = i;
+    else if (idx.amountIn == null && /입금액|입금금액|수입금액/.test(s)) idx.amountIn = i;
+    else if (idx.amountOut == null && /출금액|지출금액|출금금액/.test(s)) idx.amountOut = i;
     else if (idx.amount == null && /금액|결제액|사용액|출금|승인금액|거래금액/.test(s)) idx.amount = i;
     else if (idx.card == null && /결제수단|카드|계좌|수단|결제방법/.test(s)) idx.card = i;
-    else if (idx.cat == null && /카테고리|분류명/.test(s)) idx.cat = i;
-    else if (idx.type == null && /구분|타입|입출금|수입지출|거래구분|^분류$/.test(s)) idx.type = i;
+    else if (idx.catSmall == null && /소분류|소분류명/.test(s)) idx.catSmall = i;
+    else if (idx.catBig == null && /대분류|중분류|분류|카테고리/.test(s)) idx.catBig = i;
+    else if (idx.type == null && /구분|타입|입출금|수입지출|거래구분/.test(s)) idx.type = i;
     else if (idx.inst == null && /할부/.test(s)) idx.inst = i;
     else if (idx.memo2 == null && /메모|비고|노트/.test(s)) idx.memo2 = i;
   });
-  if (idx.date == null && idx.amount == null) return { rows: [], excluded: 0, sheet: best.name };
+  if (idx.date == null && idx.amount == null && idx.amountIn == null && idx.amountOut == null) return { rows: [], excluded: 0, sheet: best.name };
+  /* '분류' 열이 실제로는 지출/수입 구분인 표(스타일) 대응 */
+  if (idx.catBig != null && idx.type == null) {
+    let hit = 0, seen = 0;
+    for (let r = best.header + 1; r < Math.min(rows.length, best.header + 12); r++) {
+      const v = String((rows[r] || [])[idx.catBig] || "").trim();
+      if (!v) continue;
+      seen++;
+      if (/^(지출|수입|입금|출금)$/.test(v)) hit++;
+    }
+    if (seen && hit >= Math.ceil(seen * 0.6)) { idx.type = idx.catBig; idx.catBig = null; }
+  }
 
   const existing = {};
   state.txns.forEach(t => { existing[t.date + "|" + t.amount + "|" + normKey(t.memo)] = 1; });
@@ -3623,28 +4087,46 @@ function parseWorkbook(wb) {
   let excluded = 0, dup = 0, income = 0;
   for (let r = best.header + 1; r < rows.length; r++) {
     const row = rows[r] || [];
-    const rawAmount = idx.amount != null ? row[idx.amount] : "";
     const rawDate = idx.date != null ? row[idx.date] : "";
-    const plainAmount = num(String(rawAmount).replace(/[^\d.\-]/g, ""));
-    if (!plainAmount && !rawDate) continue;
+    const catBig = idx.catBig != null ? String(row[idx.catBig] || "").trim() : "";
+    const catSmall = idx.catSmall != null ? String(row[idx.catSmall] || "").trim() : "";
+    const catVal = [catBig, catSmall].filter(Boolean).join(" ");
     const typeVal = idx.type != null ? row[idx.type] : "";
     const memo = String((idx.memo != null ? row[idx.memo] : "") || (idx.memo2 != null ? row[idx.memo2] : "") || "").trim().slice(0, 80);
+    /* 금액: 입금/출금 칸이 따로 있으면 그쪽을 우선 (뱅크샐러드 계좌 거래) */
+    let rawAmount = idx.amount != null ? row[idx.amount] : "";
+    let forcedIncome = false;
+    if (idx.amountIn != null && num(String(row[idx.amountIn] == null ? "" : row[idx.amountIn]).replace(/[^\d.\-]/g, "")) !== 0) {
+      rawAmount = row[idx.amountIn];
+      forcedIncome = true;
+    } else if (idx.amountOut != null && String(row[idx.amountOut] == null ? "" : row[idx.amountOut]).trim() !== "") {
+      rawAmount = row[idx.amountOut];
+    }
+    const plainAmount = num(String(rawAmount).replace(/[^\d.\-]/g, ""));
+    if (!plainAmount && !rawDate) continue;
     if (!memo && !plainAmount) continue;
     if (/^(합계|총계|소계)/.test(memo)) continue;
-    if (isTransferRow(typeVal, memo, idx.cat != null ? row[idx.cat] : "")) { excluded++; continue; }
+    if (isTransferRow(typeVal, memo, catVal)) { excluded++; continue; }
     const date = parseDateCell(rawDate) || parseDateCell(row[0]) || "";
     if (!date) { excluded++; continue; }
     const amount = Math.abs(plainAmount);
     if (!amount) continue;
-    const type = rowTypeOf(typeVal, rawAmount);
+    const type = forcedIncome ? "income" : rowTypeOf(typeVal, rawAmount, memo, catVal);
     const key = date + "|" + amount + "|" + normKey(memo);
-    const cat = type === "income" ? "기타" : guessCategory(memo, idx.cat != null ? row[idx.cat] : "");
+    const cat = type === "income" ? incomeCat(memo, catVal) : guessCategory(memo, catVal);
     const cardRaw = idx.card != null ? row[idx.card] : "";
+    let cardId;
+    if (type === "income") {
+      const cs = String(cardRaw || "");
+      if (/포인트|페이|적립/.test(cs) && !/카드|체크/.test(cs)) cardId = PAY_POINT;
+      else cardId = /카드|체크/.test(cs) ? (matchCardId(cs) || PAY_ACCOUNT) : PAY_ACCOUNT;
+    } else cardId = matchCardId(cardRaw, memo);
+    if (!cardId) cardId = /계좌|은행|이체/.test(String(cardRaw)) ? PAY_ACCOUNT : PAY_CASH;
     const item = {
       on: !existing[key],
       date: date, memo: memo || (type === "income" ? "수입" : cat), amount: amount, type: type, cat: cat,
       fixed: type === "income" ? false : catFixedDefault(cat),
-      cardId: type === "income" ? (/카드|체크/.test(String(cardRaw)) ? (matchCardId(cardRaw) || PAY_ACCOUNT) : PAY_ACCOUNT) : matchCardId(cardRaw),
+      cardId: cardId,
       installment: type === "income" ? false : (idx.inst != null ? /무이자|할부/.test(String(row[idx.inst])) && !/일시불/.test(String(row[idx.inst])) : false),
       dup: !!existing[key]
     };
@@ -4259,6 +4741,7 @@ function boot() {
   bindShortcut();
   bindImport();
   bindPass();
+  bindLock();
   bindOcr();
   bindPicks();
   bindPickOcr();
@@ -4292,6 +4775,34 @@ function boot() {
     parsePickPaste: parsePickPaste,
     isTransferRow: isTransferRow,
     rowTypeOf: rowTypeOf,
+    matchCardId: matchCardId,
+    guessCategory: guessCategory,
+    supplierCat: supplierCat,
+    merchantKey: merchantKey,
+    merchantMatch: merchantMatch,
+    pointPayback: pointPayback,
+    wipeTxns: wipeTxns,
+    openWipe: openWipe,
+    openTxn: openTxn,
+    saveTxn: saveTxn,
+    pinIsOn: pinIsOn,
+    pinMatches: pinMatches,
+    pinDigest: pinDigest,
+    applyLockState: applyLockState,
+    openPinSetup: openPinSetup,
+    setPin: function (pin) {
+      return (async function () {
+        const salt = pinSalt();
+        const hash = await pinDigest(pin, salt);
+        state.security = { pinOn: true, pinHash: hash, salt: salt };
+        saveLocalLock(state.security);
+        unlockedNow = false;
+        touch(); applyLockState();
+        return state.security;
+      })();
+    },
+    lockInfo: lockInfo,
+    dropLock: function () { state.security = { pinOn: false, pinHash: "", salt: "" }; dropLocalLock(); touch(); applyLockState(); },
     parseOcrLines: parseOcrLines,
     parseWorkbook: parseWorkbook,
     toggleTxnFixed: toggleTxnFixed,
