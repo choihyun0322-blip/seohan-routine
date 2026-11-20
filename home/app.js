@@ -558,7 +558,11 @@ function stripMods(n) {
   }
   return s;
 }
-function modsOnly(s) { return !!s && stripMods(s) === ''; }
+function modsOnly(s) {
+  if (!s) return false;
+  if (stripMods(s) === '') return true;
+  return s.slice(-1) === '용';        // 찌개용·볶음용·국거리용 — 어떻게 쓸지 적은 꼬리말
+}
 function isDishName(name) {
   const n = stripMods(norm(name));
   if (!n) return false;
