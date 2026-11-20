@@ -1237,6 +1237,149 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
 }
 
 /* ============================================================
+   v5.1 — ☀️ 헤더 화면유지 · 🎙️ 목소리 응원 · 🎁 쿠폰 · 🧩 100종 도감
+   ============================================================ */
+
+/* ---- 상단 헤더: 화면유지 원터치 ---- */
+.wake-btn{
+  display:inline-flex; align-items:center; gap:.3rem; height:2rem; padding:0 .55rem;
+  border-radius:999px; background:#f6f4ff; border:2px solid #e8e3f7;
+  font-size:.68rem; font-weight:900; color:#6b6880; cursor:pointer; white-space:nowrap;
+  box-shadow:0 2px 0 rgba(42,42,60,.06);
+}
+.wake-btn .wake-ico{font-size:.86rem; line-height:1}
+.wake-btn.on{background:#fff6d9; border-color:#ffd76e; color:#8a5a00; box-shadow:0 2px 0 #f0c14b}
+.wake-btn:active{transform:translateY(1px)}
+@media (max-width:900px){
+  .wake-btn{width:2rem; padding:0; justify-content:center}
+  .wake-btn .wake-txt{display:none}
+}
+
+/* ---- 헤더 최근 응원 다시 듣기 ---- */
+.brand-sub-row{display:flex; align-items:center; gap:.3rem; min-width:0; margin-top:.1rem}
+.brand-sub-row #brandSub{margin-top:0; min-width:0; flex:0 1 auto}
+.cheer-replay{
+  flex:0 0 auto; width:1.32rem; height:1.32rem; border-radius:50%;
+  display:inline-grid; place-items:center; font-size:.68rem; line-height:1;
+  background:#ffe9f2; border:1.6px solid #ffc2da; color:#b3326a; cursor:pointer;
+}
+.cheer-replay[hidden]{display:none}
+.cheer-replay:hover{background:#ffd9e8}
+.cheer-replay:active{transform:scale(.94)}
+
+/* ---- 응원 배너: 큰 듣기 버튼 ---- */
+.cheer-inner{flex-wrap:wrap}
+.cheer-ok{order:4}
+.cheer-listen{
+  order:5; flex:1 0 100%; margin-top:.15rem;
+  display:inline-flex; align-items:center; justify-content:center; gap:.4rem;
+  padding:.7rem 1rem; border-radius:18px; cursor:pointer;
+  background:linear-gradient(180deg,#fff,#ffe9f2); border:2.5px solid #ff8fbb; color:#b3326a;
+  font-size:1rem; font-weight:900; box-shadow:0 3px 0 #f7a8c8;
+  animation:listenPulse 1.9s ease-in-out infinite;
+}
+.cheer-listen[hidden]{display:none}
+.cheer-listen.voice{
+  background:linear-gradient(180deg,#fff9e8,#ffe7c8); border-color:#ffc46a; color:#8a5a00;
+  box-shadow:0 3px 0 #eab308; font-size:1.08rem; animation:listenGlowGold 2.1s ease-in-out infinite;
+}
+.cheer-listen:active{transform:translateY(2px); box-shadow:0 1px 0 #d63f76}
+@keyframes listenGlow{0%,100%{box-shadow:0 3px 0 #f7a8c8}50%{box-shadow:0 3px 0 #f7a8c8, 0 0 0 7px rgba(255,143,187,.26)}}
+@keyframes listenGlowGold{0%,100%{box-shadow:0 3px 0 #eab308}50%{box-shadow:0 3px 0 #eab308, 0 0 0 7px rgba(255,196,106,.3)}}
+
+/* ---- 🎙️ 응원 녹음 ---- */
+.cheer-rec{
+  display:flex; flex-direction:column; gap:.45rem;
+  padding:.7rem .8rem; border-radius:18px; background:#fff8fb; border:2px dashed #ffcfe2;
+}
+.cheer-rec-head{display:flex; align-items:center; justify-content:space-between; gap:.5rem}
+.cheer-rec-title{font-size:.82rem; font-weight:900; color:#b3326a}
+.cheer-rec-time{font-size:.74rem; font-weight:900; color:#8b849c; font-variant-numeric:tabular-nums}
+.cheer-rec-row{display:flex; align-items:center; gap:.45rem; flex-wrap:wrap}
+.cheer-rec-row[hidden]{display:none}
+.cheer-rec-row .hint{flex:1 1 10rem; margin:0}
+.rec-btn{
+  padding:.52rem .85rem; border-radius:14px; cursor:pointer;
+  background:#fff; border:2px solid #ffd0e2; color:#b3326a;
+  font-size:.84rem; font-weight:900; box-shadow:0 2px 0 #ffd9e8;
+}
+.rec-btn:hover{background:#fff3f8}
+.rec-btn:active{transform:translateY(1px); box-shadow:none}
+.rec-btn.stop{background:#ff5d97; border-color:#ff5d97; color:#fff; box-shadow:0 2px 0 #d63f76}
+.rec-btn.del{color:#8b849c; border-color:#e7e2f4; box-shadow:none}
+.rec-btn[disabled]{opacity:.5; cursor:not-allowed}
+#btnSendCheer.ready{box-shadow:0 0 0 3px rgba(255,93,151,.25)}
+
+/* ---- 🎁 쿠폰 트랙 ---- */
+.dex-track-wrap{display:flex; flex-direction:column; gap:.35rem}
+.dex-track-title{font-size:.8rem; font-weight:900; color:#8a5a00}
+.dex-track-sub{font-size:.68rem; font-weight:800; color:#b0761a}
+.dex-track{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:.35rem}
+.dex-ms{
+  display:flex; flex-direction:column; align-items:center; gap:.12rem; text-align:center;
+  padding:.4rem .25rem .45rem; border-radius:14px; background:#f8f6ff; border:2px solid #eae4fb;
+}
+.dex-ms.got{background:linear-gradient(180deg,#fffdf2,#ffeecd); border-color:#ffd76e}
+.dex-ms.used{background:#f2fdf5; border-color:#c7f0d6}
+.dex-ms-top{font-size:.72rem; font-weight:900; color:#5b5470}
+.dex-ms.got .dex-ms-top{color:#8a5a00}
+.dex-ms-sub{font-size:.58rem; font-weight:800; color:#8b849c; line-height:1.2}
+.dex-ms.got .dex-ms-sub{color:#b0761a}
+.dex-ms-btn{
+  margin-top:.2rem; padding:.16rem .4rem; border-radius:10px; cursor:pointer;
+  font-size:.58rem; font-weight:900; color:#8a5a00; background:#fff;
+  border:1.6px solid #ffd76e; font-family:inherit; white-space:nowrap;
+}
+.dex-ms-btn.done{color:#15803d; border-color:#c7f0d6; background:#f2fdf5}
+.dex-ms-btn:active{transform:translateY(1px)}
+
+/* ---- 🧩 구간 필터 칩 ---- */
+.dex-secs{display:flex; gap:.3rem; flex-wrap:wrap}
+.dex-sec{
+  display:inline-flex; align-items:center; gap:.28rem; cursor:pointer; font-family:inherit;
+  padding:.32rem .55rem; border-radius:999px; background:#f6f4ff; border:2px solid #ece9f7;
+  font-size:.7rem; font-weight:900; color:#6b6880;
+}
+.dex-sec:hover{background:#efeafd}
+.dex-sec.on{background:#efe9ff; border-color:#c9b6ff; color:#5b3fbf}
+.dex-sec-num{font-size:.62rem; font-weight:900; color:#9a93b0}
+.dex-sec.on .dex-sec-num{color:#7c5bff}
+.dex-detail-facts{font-size:.72rem; font-weight:900; color:#7c5bff; margin-top:.2rem}
+
+/* ---- 🎁 쿠폰 획득 팝업 ---- */
+.coupon-pop{
+  position:fixed; inset:0; z-index:96; display:flex; align-items:center; justify-content:center;
+  padding:1rem; background:rgba(38,26,66,.36); backdrop-filter:blur(2px);
+}
+.coupon-pop[hidden]{display:none}
+.coupon-card{
+  position:relative; z-index:2; width:min(92vw, 430px); padding:1.15rem 1.2rem 1.25rem; border-radius:28px;
+  text-align:center; background:linear-gradient(160deg,#fffdf4,#ffeecb 55%,#ffe0ec);
+  border:3px solid #ffcf5c; box-shadow:0 22px 60px rgba(90,60,10,.3), 0 6px 0 #f0b429;
+  animation:dexPopIn .5s cubic-bezier(.16,1.2,.3,1) both;
+}
+.coupon-tag{font-size:clamp(1.05rem,2.6vw,1.35rem); font-weight:900; color:#8a5a00; letter-spacing:-.02em}
+.coupon-reward{
+  margin-top:.3rem; font-size:clamp(1.02rem,2.5vw,1.24rem); font-weight:900; color:#b3326a;
+  background:#fff; border:2.5px dashed #ffb3d1; border-radius:16px; padding:.55rem .6rem;
+}
+.coupon-sub{margin-top:.5rem; font-size:.76rem; font-weight:800; color:#7a6a3a; word-break:keep-all}
+.coupon-card .primary-btn{margin-top:.85rem; width:100%}
+.coupon-sparks{position:absolute; inset:0; pointer-events:none; overflow:hidden}
+.coupon-sparks i{position:absolute; font-size:1.7rem; opacity:0; animation:dexSpark 2.2s ease-in-out infinite}
+.coupon-sparks i:nth-child(1){top:10%; left:8%; animation-delay:.1s}
+.coupon-sparks i:nth-child(2){top:18%; right:10%; animation-delay:.5s}
+.coupon-sparks i:nth-child(3){bottom:20%; left:12%; animation-delay:.9s}
+.coupon-sparks i:nth-child(4){bottom:12%; right:8%; animation-delay:1.3s}
+.coupon-sparks i:nth-child(5){top:46%; left:4%; animation-delay:1.6s}
+.coupon-sparks i:nth-child(6){top:54%; right:5%; animation-delay:1.9s}
+
+@media (max-width:760px){
+  .dex-track{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .dex-ms-sub{font-size:.55rem}
+}
+
+/* ============================================================
    루틴 타일 레이아웃 — 상단은 슬림, 루틴은 큼직한 카드 그리드
    ============================================================ */
 
@@ -1476,12 +1619,18 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
       <div class="brand-blocks" id="brandBlocks" aria-hidden="true"></div>
       <div class="brand-text">
         <h1 id="brandTitle" data-i18n="appTitle">서한이의 넘버블록스 루틴</h1>
-        <p id="brandSub">아침 07:20 시작 · 08:15 출발</p>
+        <div class="brand-sub-row">
+          <p id="brandSub">아침 07:20 시작 · 08:15 출발</p>
+          <button class="cheer-replay" id="btnCheerReplay" type="button" aria-label="최근 응원 다시 듣기" title="최근 응원 다시 듣기" hidden>🔊</button>
+        </div>
       </div>
     </div>
     <div class="topbar-right">
       <button class="sync-pill off" id="syncDot" type="button" aria-live="polite">
         <span class="dot off" aria-hidden="true"></span><span class="txt" id="syncDotText">오프라인</span>
+      </button>
+      <button class="wake-btn" id="btnWakeQuick" type="button" aria-pressed="false" aria-label="화면 켜짐 유지" title="화면 켜짐 유지">
+        <span class="wake-ico" id="wakeQuickIcon" aria-hidden="true">🌙</span><span class="wake-txt" id="wakeQuickText">꺼짐</span>
       </button>
       <button class="cheer-btn" id="btnCheer" type="button" aria-haspopup="dialog" aria-controls="cheerModal" aria-label="응원 보내기">
         <span aria-hidden="true">💌</span><span class="cheer-btn-txt">응원</span>
@@ -2026,6 +2175,13 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
           </div>
           <button class="switch" id="btnSound" type="button" role="switch" aria-checked="true"><span></span></button>
         </div>
+        <div class="switch-row">
+          <div class="switch-text">
+            <strong data-i18n="setCheerTtsT">한국어 응원 자동 읽기</strong>
+            <p data-i18n="setCheerTtsP">끄면 도착할 때 딩동~ 차임벨만 울려요. 배너의 🔊 를 누를 때만 읽어 줘요.</p>
+          </div>
+          <button class="switch" id="btnCheerTts" type="button" role="switch" aria-checked="false"><span></span></button>
+        </div>
         <div class="switch-row" id="fullscreenRow">
           <div class="switch-text">
             <strong data-i18n="fsT">전체 화면으로 보기</strong>
@@ -2079,6 +2235,7 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
       <p class="cheer-from" id="cheerFrom">💌 엄마의 응원</p>
       <p class="cheer-text" id="cheerBannerText">—</p>
     </div>
+    <button class="cheer-listen" id="cheerListen" type="button">🔊 엄마 목소리 듣기</button>
     <button class="cheer-ok" id="cheerOk" type="button">확인 ✅</button>
   </div>
   <div class="cheer-sparks" aria-hidden="true"><i>🎉</i><i>⭐</i><i>💛</i><i>✨</i><i>🎈</i></div>
@@ -2108,6 +2265,26 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
       <label class="field"><span>응원 한마디</span>
         <textarea id="cheerText" rows="2" maxlength="120" placeholder="서한아 화이팅! 엄마가 보고 있어 ❤️"></textarea>
       </label>
+      <div class="cheer-rec" id="cheerRec">
+        <div class="cheer-rec-head">
+          <span class="cheer-rec-title">🎙️ 목소리 응원</span>
+          <span class="cheer-rec-time" id="cheerRecTime">0.0초 / 15초</span>
+        </div>
+        <div class="cheer-rec-row" id="cheerRecIdle">
+          <button class="rec-btn" type="button" id="btnRecStart">🎙️ 녹음 시작</button>
+          <p class="hint" id="cheerRecHint">엄마·아빠 목소리로 15초까지 녹음할 수 있어요.</p>
+        </div>
+        <div class="cheer-rec-row" id="cheerRecLive" hidden>
+          <button class="rec-btn stop" type="button" id="btnRecStop">⏹ 녹음 끝내기</button>
+        </div>
+        <div class="cheer-rec-row done" id="cheerRecDone" hidden>
+          <button class="rec-btn" type="button" id="btnRecPlay">▶ 미리듣기</button>
+          <button class="rec-btn" type="button" id="btnRecAgain">🔁 다시 녹음</button>
+          <button class="rec-btn del" type="button" id="btnRecDelete">✖ 지우기</button>
+          <audio id="cheerRecAudio" hidden controls preload="metadata"></audio>
+          <p class="hint" id="cheerRecSize">—</p>
+        </div>
+      </div>
       <p class="hint" id="cheerStatus">—</p>
     </div>
     <footer class="modal-foot">
@@ -2130,7 +2307,12 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
       </button>
     </header>
     <div class="modal-body dex-body">
+      <div class="dex-track-wrap">
+        <p class="dex-track-title">🎁 다이소 3,000원 쿠폰 <span class="dex-track-sub">20·40·60·80·100종마다</span></p>
+        <div class="dex-track" id="dexTrack"></div>
+      </div>
       <p class="hint" id="dexEmptyNote">아침·저녁·숙제를 모두 끝내거나 Sight Words 한 세트를 마치면 새로운 넘버블럭스가 열려요!</p>
+      <div class="dex-secs" id="dexSections" role="tablist" aria-label="도감 구간"></div>
       <div class="dex-grid" id="dexGrid"></div>
       <div class="dex-detail" id="dexDetail" hidden></div>
     </div>
@@ -2151,6 +2333,17 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
     <button class="primary-btn" type="button" id="dexPopOk">도감에 담기 🧩</button>
   </div>
   <div class="dex-pop-sparks" aria-hidden="true"><i>✨</i><i>⭐</i><i>🎊</i><i>✨</i><i>🌟</i><i>🎊</i></div>
+</div>
+
+<!-- 🎁 다이소 쿠폰 마일스톤 -->
+<div class="coupon-pop" id="couponPop" hidden aria-live="assertive">
+  <div class="coupon-card">
+    <p class="coupon-tag" id="couponPopTitle">🎉 20종 달성!</p>
+    <p class="coupon-reward" id="couponPopReward">🎁 다이소 3,000원 쿠폰 획득!</p>
+    <p class="coupon-sub">엄마가 쿠폰을 사 주면 도감에서 <b>사용 완료 ✅</b>를 눌러 주세요.</p>
+    <button class="primary-btn" id="couponPopOk" type="button">좋아요! 🎉</button>
+  </div>
+  <div class="coupon-sparks" aria-hidden="true"><i>🎉</i><i>🎁</i><i>✨</i><i>⭐</i><i>💛</i><i>🎊</i></div>
 </div>
 
 <div class="celebrate" id="celebrate" aria-hidden="true"></div>
@@ -2774,6 +2967,18 @@ function iconSVG(key) {
       setSoundH: '소리 · 화면',
       soundT: '도장 소리',
       soundP: '체크할 때 짧은 소리가 나요.',
+      setCheerTtsT: '한국어 응원 자동 읽기',
+      setCheerTtsP: '끄면 도착할 때 딩동~ 차임벨만 울려요. 배너의 🔊 를 누를 때만 읽어 줘요.',
+      setCheerH: '💌 응원 목소리',
+      wakeQuickOn: '화면유지',
+      wakeQuickOff: '꺼짐',
+      wakeQuickAriaOn: '화면 켜짐 유지 켜짐 — 누르면 꺼요',
+      wakeQuickAriaOff: '화면 켜짐 유지 꺼짐 — 누르면 켜요',
+      wakeQuickOnToast: '☀️ 화면이 꺼지지 않게 했어요',
+      wakeQuickOffToast: '🌙 화면유지 껐어요',
+      wakeQuickNoSupport: '이 브라우저는 화면유지가 안 돼요. 기기 설정에서 자동 잠금을 꺼 주세요.',
+      toastCheerTtsOn: '🔊 도착한 응원을 자동으로 읽어 줄게요',
+      toastCheerTtsOff: '🔇 딩동 차임벨만 울려요',
       fsT: '전체 화면으로 보기',
       fsP: '태블릿을 루틴 화면으로만 쓸 때 좋아요.',
       fsBtn: '전체 화면',
@@ -2782,7 +2987,7 @@ function iconSVG(key) {
       resetSettings: '설정만 기본값으로',
       resetAll: '모든 기록 지우기',
       dataHint: '기록은 이 기기에 저장되고, 가족 연결이 켜져 있으면 같은 방의 다른 기기와도 함께 맞춰져요.',
-      buildNote: '넘버블럭스 1~10 · 서한이 아침·방과후 루틴 · 수원 영통구 날씨',
+      buildNote: '넘버블럭스 1~100 · 서한이 아침·방과후 루틴 · 수원 영통구 날씨',
       close: '닫기',
       save: '저장',
       itemNameKo: '한국어 이름',
@@ -3004,6 +3209,18 @@ function iconSVG(key) {
       setSoundH: 'Sound & Screen',
       soundT: 'Stamp sound',
       soundP: 'A short sound plays when you check something.',
+      setCheerTtsT: 'Read Korean cheers aloud',
+      setCheerTtsP: 'Off means only a cute ding-dong chime — press 🔊 to hear it.',
+      setCheerH: '💌 Cheer voice',
+      wakeQuickOn: 'Awake',
+      wakeQuickOff: 'Sleep',
+      wakeQuickAriaOn: 'Keep screen awake is on — press to turn off',
+      wakeQuickAriaOff: 'Keep screen awake is off — press to turn on',
+      wakeQuickOnToast: '☀️ The screen will stay awake',
+      wakeQuickOffToast: '🌙 Screen awake off',
+      wakeQuickNoSupport: 'This browser cannot keep the screen awake. Turn off auto-lock in device settings.',
+      toastCheerTtsOn: '🔊 Arriving cheers will be read aloud',
+      toastCheerTtsOff: '🔇 Only the ding-dong chime plays',
       fsT: 'Full screen',
       fsP: 'Nice when the tablet is only for the routine.',
       fsBtn: 'Full screen',
@@ -3012,7 +3229,7 @@ function iconSVG(key) {
       resetSettings: 'Reset settings',
       resetAll: 'Erase all records',
       dataHint: "Saved on this device — and kept in step with other devices in the same family room.",
-      buildNote: 'Numberblocks 1–10 · Seohan morning & after-school routine · Suwon Yeongtong weather',
+      buildNote: 'Numberblocks 1–100 · Seohan morning & after-school routine · Suwon Yeongtong weather',
       close: 'Close',
       save: 'Save',
       itemNameKo: '한국어 이름',
@@ -3354,7 +3571,8 @@ function iconSVG(key) {
       supplies: clone(DEFAULT_SUPPLIES),
       sound: true,
       wakeWanted: false,
-      keepAlive: false
+      keepAlive: false,
+      cheerTts: false
     };
   }
   function defaultState() {
@@ -3553,6 +3771,7 @@ function iconSVG(key) {
     st.sound = s.sound !== false;
     st.wakeWanted = !!s.wakeWanted;
     st.keepAlive = !!s.keepAlive;
+    st.cheerTts = !!s.cheerTts;
     d.settings = st;
 
     var day = raw.daily;
@@ -3981,6 +4200,10 @@ function iconSVG(key) {
     var group2 = $('setLangSwitch');
     if (group2) group2.setAttribute('aria-label', L('langAria'));
     langButtons();
+    /* 응원 배너·헤더 버튼 문구도 함께 바꿔요 */
+    if (typeof renderCheerBannerLabel === 'function') renderCheerBannerLabel();
+    if (typeof updateWakeQuick === 'function') updateWakeQuick();
+    if (typeof renderDexGrid === 'function' && !dexModalHidden()) renderDexGrid();
   }
 
   function setLang(next, opts) {
@@ -4715,6 +4938,9 @@ function iconSVG(key) {
       else if (kind === 'success') {
         [523, 659, 784, 1046].forEach(function (f, i) { tone(f, i * 0.11, 0.28, 0.07, 'triangle'); });
       }
+      else if (kind === 'coupon') {
+        [784, 988, 1175, 1568, 2093].forEach(function (f, i) { tone(f, i * 0.13, 0.4, 0.06, 'triangle'); });
+      }
     } catch (e) {}
   }
 
@@ -4729,7 +4955,12 @@ function iconSVG(key) {
     var status = $('wakeStatus');
     var hint = $('wakeHint');
     var supported = wakeSupported();
-    btn.setAttribute('aria-checked', state.settings.wakeWanted && !!wakeSentinel ? 'true' : 'false');
+    updateWakeQuick();
+    if (!btn) return;
+    /* 스위치는 '켜고 싶다'는 의지를 보여 줘요(실제 잠금은 아래 상태 글로) */
+    var sm = $('settingsModal');
+    var want = (draft && sm && !sm.hidden) ? !!draft.wakeWanted : !!state.settings.wakeWanted;
+    btn.setAttribute('aria-checked', want ? 'true' : 'false');
     btn.disabled = !supported;
     if (!supported) {
       status.textContent = L('wakeUnsupported');
@@ -4743,6 +4974,38 @@ function iconSVG(key) {
     else status.textContent = L('wakeOff');
   }
 
+  /* 헤더의 한 번 누르는 화면유지 토글 */
+  function updateWakeQuick() {
+    var b = $('btnWakeQuick');
+    if (!b) return;
+    var on = !!state.settings.wakeWanted;
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    b.classList.toggle('on', on);
+    var icon = $('wakeQuickIcon'), txt = $('wakeQuickText');
+    if (icon) icon.textContent = on ? '☀️' : '🌙';
+    if (txt) txt.textContent = on ? L('wakeQuickOn') : L('wakeQuickOff');
+    b.setAttribute('aria-label', on ? L('wakeQuickAriaOn') : L('wakeQuickAriaOff'));
+    b.title = on ? L('wakeQuickOn') : L('wakeQuickOff');
+  }
+  function toggleWakeQuick() {
+    var on = !state.settings.wakeWanted;
+    state.settings.wakeWanted = on;
+    save();
+    if (on) applyWake(); else releaseWake();
+    updateWakeUI();
+    if (on && !wakeSupported()) {
+      /* iOS 구형·일부 브라우저: 탭으로 무음 루프라도 켜 두기 */
+      var ok = false;
+      if (!state.settings.keepAlive) {
+        ok = startKeepAlive();
+        if (ok) { state.settings.keepAlive = true; save(); updateKeepAliveUI(); }
+      }
+      toast(L('wakeQuickNoSupport'));
+      return;
+    }
+    toast(on ? L('wakeQuickOnToast') : L('wakeQuickOffToast'));
+  }
+
   function requestWake() {
     if (!wakeSupported()) { updateWakeUI(); return; }
     try {
@@ -4753,8 +5016,23 @@ function iconSVG(key) {
           sentinel.addEventListener('release', function () { wakeSentinel = null; updateWakeUI(); });
         }
         updateWakeUI();
-      }).catch(function () { updateWakeUI(true); });
-    } catch (e) { updateWakeUI(true); }
+      }).catch(function () {
+        /* 잠금 요청이 거절되면(저전력 모드 등) 무음 루프로라도 버텨요 */
+        if (state.settings.wakeWanted && !keepAliveNode && startKeepAlive()) {
+          state.settings.keepAlive = true;
+          save();
+          updateKeepAliveUI();
+        }
+        updateWakeUI(true);
+      });
+    } catch (e) {
+      if (state.settings.wakeWanted && !keepAliveNode && startKeepAlive()) {
+        state.settings.keepAlive = true;
+        save();
+        updateKeepAliveUI();
+      }
+      updateWakeUI(true);
+    }
   }
   function releaseWake() {
     var s = wakeSentinel;
@@ -4985,6 +5263,7 @@ function iconSVG(key) {
     $('btnSound').setAttribute('aria-checked', draft.sound ? 'true' : 'false');
     $('btnWake').setAttribute('aria-checked', draft.wakeWanted ? 'true' : 'false');
     $('btnKeepAlive').setAttribute('aria-checked', draft.keepAlive ? 'true' : 'false');
+    if ($('btnCheerTts')) $('btnCheerTts').setAttribute('aria-checked', draft.cheerTts ? 'true' : 'false');
     updateWakeUI();
     updateKeepAliveUI();
     if (!document.documentElement.requestFullscreen) {
@@ -5093,6 +5372,7 @@ function iconSVG(key) {
     state.settings.sound = $('btnSound').getAttribute('aria-checked') === 'true';
     state.settings.wakeWanted = $('btnWake').getAttribute('aria-checked') === 'true';
     state.settings.keepAlive = $('btnKeepAlive').getAttribute('aria-checked') === 'true';
+    if ($('btnCheerTts')) state.settings.cheerTts = $('btnCheerTts').getAttribute('aria-checked') === 'true';
 
     state.daily.supplies = {};
     pruneDaily();
@@ -5156,7 +5436,14 @@ function iconSVG(key) {
     /alex/i, /daniel/i, /karen/i, /moira/i, /tessa/i, /serena/i,
     /natural/i, /neural/i, /enhanced/i, /premium/i, /siri/i
   ];
-  var VOICE_KO_PREF = [/yuna/i, /sora/i, /google 한국/i, /ko[-_]kr/i, /korean/i];
+  /* 한국어는 밝고 자연스러운 여성 음성을 먼저 고르고, 낮은 남성 톤은 뒤로 밀어요 */
+  var VOICE_KO_PREF = [
+    /google\s*한국/i, /google\s*korean/i,
+    /yuna/i, /sora/i, /heami/i, /sunhi/i, /seoyeon/i, /kyuri/i, /yeri/i, /jieun/i,
+    /female|woman/i,
+    /ko[-_]kr/i, /korean/i, /^ko/i
+  ];
+  var VOICE_KO_AVOID = /injoon|injoON|minho|gook|jihun|hyunsu|male|man\b|남성|아저씨/i;
   var VOICE = { en: null, ko: null, bound: false, count: 0 };
 
   function voiceList() {
@@ -5175,7 +5462,10 @@ function iconSVG(key) {
     if (/enhanced|premium|natural|neural/i.test(name)) score += 45;
     if (/google/i.test(name)) score += 28;
     if (v && v.localService === false) score += 12;
-    if (lang === 'ko') { if (/^ko/i.test(v.lang || '')) score += 10; }
+    if (lang === 'ko') {
+      if (/^ko/i.test(v.lang || '')) score += 10;
+      if (VOICE_KO_AVOID.test(name)) score -= 90;   /* 낮고 무거운 남성 톤은 피해요 */
+    }
     else {
       if (/^en[-_]US/i.test(v.lang || '')) score += 9;
       else if (/^en[-_]GB/i.test(v.lang || '')) score += 6;
@@ -5236,8 +5526,9 @@ function iconSVG(key) {
       var u = new window.SpeechSynthesisUtterance(t);
       u.lang = v && v.lang ? v.lang : (lang === 'ko' ? 'ko-KR' : 'en-US');
       if (v) u.voice = v;
-      u.rate = typeof opts.rate === 'number' ? opts.rate : (lang === 'ko' ? 0.92 : 0.9);
-      u.pitch = typeof opts.pitch === 'number' ? opts.pitch : 1.03;
+      /* 한국어는 밝고 경쾌한 아이·엄마 톤 (느리고 낮으면 무섭게 들려요) */
+      u.rate = typeof opts.rate === 'number' ? opts.rate : (lang === 'ko' ? 1.04 : 0.9);
+      u.pitch = typeof opts.pitch === 'number' ? opts.pitch : (lang === 'ko' ? 1.15 : 1.03);
       u.volume = 1;
       synth.speak(u);
       return true;
@@ -6403,12 +6694,13 @@ function iconSVG(key) {
   }
 
   /* ============================================================
-     🧩 넘버블럭스 도감 (Numberblocks Dex)
-     · 1~20 커스텀 SVG 일러스트, 미수집은 실루엣 + ???
-     · 아침/저녁/숙제 100% · Sight Words 1세트마다 1종 해금
+     🧩 넘버블럭스 도감 (Numberblocks Dex) · 1~100
+     · 1~20 커스텀 SVG 일러스트, 21~100 은 십의 자리 색·규칙 기반 제너레이터
+     · 미수집은 실루엣 + ???, 1~10 을 먼저 채운 뒤 11~100 은 랜덤 발견
+     · 20·40·60·80·100종마다 🎁 다이소 3,000원 쿠폰 마일스톤
      · 모은 캐릭터를 누르면 영어 자기소개 TTS + 한국어 설명
   ============================================================ */
-  var DEX_MAX = 20;
+  var DEX_MAX = 100;
 
   var DEX_DATA = [
     { n: 1, en: 'One', ko: '원', c: '#ef4444', line: '빨간 블록 하나! 씩씩하게 앞장서는 리더예요.', intro: 'Hello! I am Numberblock One!' },
@@ -6435,43 +6727,144 @@ function iconSVG(key) {
 
   var DEX_ONES = { 1: '#ef4444', 2: '#f97316', 3: '#f5c518', 4: '#22c55e', 5: '#38bdf8', 6: '#8b5cf6', 7: '#a855f7', 8: '#f472b6', 9: '#94a3b8' };
 
+  /* ---- 십의 자리 색 (Numberblocks 공식 컬러 느낌) ---- */
+  var DEX_DECADE = {
+    2: { c: '#FF8C2A' },                                   /* 20대 주황 */
+    3: { c: '#FFD426' },                                   /* 30대 노랑 */
+    4: { c: '#39B54A' },                                   /* 40대 초록 */
+    5: { c: '#2DA9E1' },                                   /* 50대 하늘 */
+    6: { c: '#8C52FF' },                                   /* 60대 보라 */
+    7: { c: '#A78BFA', rainbow: ['#ef4444', '#f97316', '#f5c518', '#22c55e', '#38bdf8', '#6366f1', '#a855f7'] },
+    8: { c: '#E8459B' },                                   /* 80대 마젠타 */
+    9: { c: '#A8B0BE' },                                   /* 90대 실버 */
+    10: { c: '#F2B01E' }                                   /* 100 황금 */
+  };
+  var DEX_MOOD = {
+    2: '주황빛 씩씩한', 3: '노란빛 반짝이는', 4: '초록빛 튼튼한', 5: '하늘빛 시원한',
+    6: '보라빛 신비한', 7: '무지개빛 알록달록한', 8: '분홍빛 발랄한', 9: '은빛 차분한', 10: '황금빛 대장'
+  };
+
+  var EN_ONES = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+  var EN_TEENS = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+  var EN_TENS = ['', 'Ten', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+  var KO_ONES = ['', '하나', '둘', '셋', '넷', '다섯', '여섯', '일곱', '여덟', '아홉'];
+  var KO_TENS = ['', '열', '스물', '서른', '마흔', '쉰', '예순', '일흔', '여든', '아흔'];
+
+  function dexEnNum(n) {
+    n = Math.round(Number(n) || 0);
+    if (n >= 100) return 'One Hundred';
+    if (n >= 20) {
+      var t = Math.floor(n / 10), o = n % 10;
+      return (EN_TENS[t] || '') + (o ? '-' + EN_ONES[o] : '');
+    }
+    if (n >= 10) return EN_TEENS[n - 10];
+    return EN_ONES[n] || '';
+  }
+  function dexKoNum(n) {
+    n = Math.round(Number(n) || 0);
+    if (n >= 100) return '백';
+    var t = Math.floor(n / 10), o = n % 10;
+    return (KO_TENS[t] || '') + KO_ONES[o];
+  }
+  function dexSquareSide(n) {
+    var r = Math.round(Math.sqrt(Number(n) || 0));
+    return (r >= 2 && r * r === n) ? r : 0;
+  }
+  function dexTint(n) {
+    if (n >= 100) return DEX_DECADE[10].c;
+    var d = Math.floor(n / 10);
+    return (DEX_DECADE[d] && DEX_DECADE[d].c) || '#8b5cf6';
+  }
+  function dexLine(n) {
+    if (n === 100) return '백! 10이 열 개 모인 커다란 정사각형. 황금 왕관을 쓴 도감 대장이에요.';
+    var t = Math.floor(n / 10), o = n % 10, ko = dexKoNum(n);
+    var sq = dexSquareSide(n);
+    if (sq) return ko + '! ' + sq + '×' + sq + ' 정사각형이라 가로 세로가 똑같아요. 네모 수 마법사!';
+    if (o === 0) return ko + '! 10이 ' + t + '개 모인 반듯한 기둥 친구예요.';
+    var mood = DEX_MOOD[t] || '멋진';
+    return ko + '! ' + mood + ' 친구예요. 10이 ' + t + '개와 낱개 ' + o + '개가 모였어요.';
+  }
+
+  var DEX_GEN = {};
   function dexItem(n) {
     n = Math.max(1, Math.min(DEX_MAX, Math.round(Number(n) || 1)));
     for (var i = 0; i < DEX_DATA.length; i++) if (DEX_DATA[i].n === n) return DEX_DATA[i];
-    return DEX_DATA[0];
+    if (!DEX_GEN[n]) {
+      var en = dexEnNum(n);
+      DEX_GEN[n] = {
+        n: n, en: en, ko: dexKoNum(n), c: dexTint(n),
+        line: dexLine(n), intro: 'Hello! I am Numberblock ' + en + '!'
+      };
+    }
+    return DEX_GEN[n];
   }
   function dx(ko, en) { return isKo() ? ko : en; }
 
-  /* ---- 도감용 블록 배치 (1~10 기본 모양, 11~20 = 열 + 하나들) ---- */
+  /* ---- 도감용 블록 배치 ----
+     1~10  : 기본 모양
+     11~20 : 10 두 줄 + 하나들
+     21~100: 십의 자리 블록(5×2 칸 한 덩어리)을 쌓고, 낱개는 옆에 세로로
+  ---- */
   function dexBody(n) {
     var cells = [], i;
     if (n <= 10) {
       var shape = NB_SHAPES[n], cols = NB_COLORS[n];
       for (i = 0; i < shape.length; i++) {
         cells.push({
-          x: shape[i][0], y: shape[i][1],
+          x: shape[i][0], y: shape[i][1], tw: 1, th: 1,
           c: cols.length > 1 ? cols[i % cols.length] : cols[0],
           white: n === 10
         });
       }
       return cells;
     }
-    var k = n - 10;
-    var rows = [], left = k;
-    while (left > 0) {
-      var take = Math.min(5, left);
-      rows.unshift(take);
-      left -= take;
+    if (n <= 20) {
+      var k = n - 10;
+      var rows = [], left = k;
+      while (left > 0) {
+        var take = Math.min(5, left);
+        rows.unshift(take);
+        left -= take;
+      }
+      var y = 0, r, c;
+      for (r = 0; r < rows.length; r++) {
+        var cnt = rows[r], startX = Math.floor((5 - cnt) / 2);
+        var col = DEX_ONES[k] || '#ffffff';
+        for (c = 0; c < cnt; c++) cells.push({ x: startX + c, y: y, tw: 1, th: 1, c: col, white: k === 10 });
+        y++;
+      }
+      for (var ty = 0; ty < 2; ty++) {
+        for (var tx = 0; tx < 5; tx++) cells.push({ x: tx, y: y + ty, tw: 1, th: 1, c: '#ffffff', white: true });
+      }
+      return cells;
     }
-    var y = 0, r, c;
-    for (r = 0; r < rows.length; r++) {
-      var cnt = rows[r], startX = Math.floor((5 - cnt) / 2);
-      var col = DEX_ONES[k] || '#ffffff';
-      for (c = 0; c < cnt; c++) cells.push({ x: startX + c, y: y, c: col, white: k === 10 });
-      y++;
+
+    /* 21~100 */
+    var tens = Math.floor(n / 10), ones = n % 10;
+    var cols = tens <= 5 ? 1 : 2;
+    var per = Math.ceil(tens / cols);
+    var colCount = [], rest = tens, ci;
+    for (ci = 0; ci < cols; ci++) {
+      var got = Math.min(per, rest);
+      colCount.push(got);
+      rest -= got;
     }
-    for (var ty = 0; ty < 2; ty++) {
-      for (var tx = 0; tx < 5; tx++) cells.push({ x: tx, y: y + ty, c: '#ffffff', white: true });
+    var rowsMax = Math.max.apply(null, colCount);
+    var H = Math.max(rowsMax * 2, ones);
+    var dec = DEX_DECADE[Math.floor(n / 10)] || DEX_DECADE[10];
+    var idx = 0;
+    for (ci = 0; ci < cols; ci++) {
+      var nT = colCount[ci], colH = nT * 2;
+      for (i = 0; i < nT; i++) {
+        var ty2 = H - colH + i * 2;
+        var col2 = dec.rainbow ? dec.rainbow[idx % dec.rainbow.length] : dec.c;
+        cells.push({ x: ci * 5, y: ty2, tw: 5, th: 2, ten: true, c: col2 });
+        idx++;
+      }
+    }
+    var onesCol = DEX_ONES[ones] || '#ffffff';
+    for (i = 0; i < ones; i++) {
+      cells.push({ x: cols * 5, y: H - ones + i, tw: 1, th: 1, c: onesCol });
     }
     return cells;
   }
@@ -6487,6 +6880,31 @@ function iconSVG(key) {
         p += (cx + Math.cos(ang) * rr).toFixed(2) + ',' + (cy + Math.sin(ang) * rr).toFixed(2) + ' ';
       }
       return p + '" fill="' + fill + '"/>';
+    }
+    if (n > 20) {
+      var sq = dexSquareSide(n);
+      if (n >= 100) {
+        /* 황금 왕관 + 별 배지 */
+        var cx = w / 2;
+        g += '<path d="M' + (cx - 17) + ' -1 L' + (cx - 12) + ' -13 L' + (cx - 5) + ' -5 L' + cx + ' -15 L' +
+          (cx + 5) + ' -5 L' + (cx + 12) + ' -13 L' + (cx + 17) + ' -1 Z" fill="#FFD33D" stroke="#C98A00" stroke-width="1.5" stroke-linejoin="round"/>' +
+          '<circle cx="' + (cx - 12) + '" cy="-12" r="2" fill="#EF4444"/>' +
+          '<circle cx="' + cx + '" cy="-14" r="2.2" fill="#3B82F6"/>' +
+          '<circle cx="' + (cx + 12) + '" cy="-12" r="2" fill="#22C55E"/>' +
+          '<rect x="' + (cx - 15) + '" y="-2" width="30" height="3.2" rx="1.6" fill="#FFB300" stroke="#C98A00" stroke-width="0.9"/>' +
+          star(w - 8, 9, 7, '#FFF3B0') + star(9, 12, 5, '#FFF3B0');
+        return '<g class="dex-acc">' + g + '</g>';
+      }
+      if (sq) {
+        g += '<rect x="' + (w + 1.5) + '" y="' + (h - 15) + '" width="13.5" height="13.5" rx="2.6" fill="#fff" stroke="#7c3aed" stroke-width="1.7"/>' +
+          '<rect x="' + (w + 5) + '" y="' + (h - 11.5) + '" width="6.5" height="6.5" rx="1.2" fill="#a78bfa"/>';
+      } else if (n % 10 === 0) {
+        g += star(w + 5, 7, 6, '#FFC93A');
+      } else {
+        g += '<circle cx="' + (w + 5) + '" cy="7" r="2.8" fill="' + dexTint(n) + '" opacity="0.9"/>' +
+          '<circle cx="' + (w + 9) + '" cy="16" r="1.8" fill="' + dexTint(n) + '" opacity="0.55"/>';
+      }
+      return '<g class="dex-acc">' + g + '</g>';
     }
     switch (n) {
       case 1: g += star(w + 3.5, 5, 4.6, '#f5c518'); break;
@@ -6567,71 +6985,126 @@ function iconSVG(key) {
     return g ? '<g class="dex-acc">' + g + '</g>' : '';
   }
 
+  function dexUnitSVG(cl, U, S, R) {
+    var cx = cl.x * U + 0.7, cy = cl.y * U + 0.7;
+    return '<rect x="' + cx + '" y="' + cy + '" width="' + S + '" height="' + S + '" rx="' + R + '" fill="' + cl.c +
+      '" stroke="' + (cl.white ? '#ef4444' : 'rgba(30,25,50,.16)') + '" stroke-width="' + (cl.white ? 1.7 : 0.7) + '"/>' +
+      '<rect x="' + (cx + 1.5) + '" y="' + (cy + 1.3) + '" width="' + (S - 3.4) + '" height="2.2" rx="1.1" fill="#fff" opacity="0.34"/>';
+  }
+  /* 십의 자리 10칸 덩어리 — 한 덩어리로 그려서 100종을 가볍게 */
+  function dexTenSVG(cl, U) {
+    /* 십 단위 블록 사이에 살짝 틈을 두어 한 덩어리로 보이지 않게 */
+    var gx = 1.1, gy = 1.1;
+    var x = cl.x * U + gx, y = cl.y * U + gy;
+    var w = 5 * U - gx * 2, h = 2 * U - gy * 2;
+    var out = '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="2.6" fill="' + cl.c +
+      '" stroke="rgba(30,25,50,.30)" stroke-width="1"/>';
+    for (var k = 1; k < 5; k++) {
+      var lx = cl.x * U + k * U;
+      out += '<line x1="' + lx + '" y1="' + (y + 1.6) + '" x2="' + lx + '" y2="' + (y + h - 1.6) +
+        '" stroke="rgba(30,25,50,.30)" stroke-width="1"/>';
+    }
+    out += '<line x1="' + (x + 1.6) + '" y1="' + (cl.y * U + U) + '" x2="' + (x + w - 1.6) + '" y2="' + (cl.y * U + U) +
+      '" stroke="rgba(30,25,50,.30)" stroke-width="1"/>';
+    out += '<rect x="' + (x + 2) + '" y="' + (y + 1.4) + '" width="' + (w - 4) + '" height="2.2" rx="1.1" fill="#fff" opacity="0.3"/>';
+    return out;
+  }
+
   function dexSVG(n) {
     n = Math.max(1, Math.min(DEX_MAX, Math.round(Number(n) || 1)));
     var cells = dexBody(n);
     var U = 12, S = 10.4, R = 2.6, i;
     var maxX = 0, maxY = 0;
     for (i = 0; i < cells.length; i++) {
-      if (cells[i].x > maxX) maxX = cells[i].x;
-      if (cells[i].y > maxY) maxY = cells[i].y;
+      var cw = cells[i].tw || 1, ch = cells[i].th || 1;
+      if (cells[i].x + cw > maxX) maxX = cells[i].x + cw;
+      if (cells[i].y + ch > maxY) maxY = cells[i].y + ch;
     }
-    var w = (maxX + 1) * U, h = (maxY + 1) * U;
+    var w = maxX * U, h = maxY * U;
     var body = '';
     for (i = 0; i < cells.length; i++) {
-      var cx = cells[i].x * U + 0.7, cy = cells[i].y * U + 0.7;
-      body += '<rect x="' + cx + '" y="' + cy + '" width="' + S + '" height="' + S + '" rx="' + R + '" fill="' + cells[i].c +
-        '" stroke="' + (cells[i].white ? '#ef4444' : 'rgba(30,25,50,.16)') + '" stroke-width="' + (cells[i].white ? 1.7 : 0.7) + '"/>' +
-        '<rect x="' + (cx + 1.5) + '" y="' + (cy + 1.3) + '" width="' + (S - 3.4) + '" height="2.2" rx="1.1" fill="#fff" opacity="0.34"/>';
+      body += cells[i].ten ? dexTenSVG(cells[i], U) : dexUnitSVG(cells[i], U, S, R);
     }
-    var top = cells.filter(function (c) { return c.y === 0; });
-    var fx = 0;
-    for (i = 0; i < top.length; i++) fx += top[i].x * U + U / 2;
-    fx = fx / top.length;
-    var fy = U / 2 - 0.4;
+    /* 얼굴은 십의 자리 블록(넓은 몸통) 맨 윗줄 가운데에 — 없으면 전체 맨 윗줄 */
+    var minY = 1e9, minYt = 1e9, i2;
+    for (i2 = 0; i2 < cells.length; i2++) {
+      if (cells[i2].y < minY) minY = cells[i2].y;
+      if (cells[i2].ten && cells[i2].y < minYt) minYt = cells[i2].y;
+    }
+    var faceRow = (minYt < 1e9) ? minYt : minY;
+    var spanL = 1e9, spanR = -1e9;
+    for (i2 = 0; i2 < cells.length; i2++) {
+      if (cells[i2].y !== faceRow) continue;
+      var left = cells[i2].x * U, right = (cells[i2].x + (cells[i2].tw || 1)) * U;
+      if (left < spanL) spanL = left;
+      if (right > spanR) spanR = right;
+    }
+    minY = faceRow;
+    var fx = (spanL + spanR) / 2;
+    var fy = minY * U + U / 2 - 0.4;
     var dark = '#2b2b3a';
     var face = '<circle cx="' + (fx - 2.7) + '" cy="' + (fy - 1.1) + '" r="1.15" fill="' + dark + '"/>' +
       '<circle cx="' + (fx + 2.7) + '" cy="' + (fy - 1.1) + '" r="1.15" fill="' + dark + '"/>' +
       '<path d="M' + (fx - 2.2) + ' ' + (fy + 1.2) + ' q2.2 2.4 4.4 0" stroke="' + dark + '" stroke-width="1.1" fill="none" stroke-linecap="round"/>' +
       '<circle cx="' + (fx - 4.4) + '" cy="' + (fy + 1.7) + '" r="1" fill="#ff8fa3" opacity="0.5"/>' +
       '<circle cx="' + (fx + 4.4) + '" cy="' + (fy + 1.7) + '" r="1" fill="#ff8fa3" opacity="0.5"/>';
-    var armY = Math.max(4, Math.min(h * 0.42, h - 10));
+    var armY = Math.max(4, Math.min(minY * U + U * 1.6, h - 10));
     var armColL = cells[0] ? cells[0].c : '#fff';
     var armColR = cells[cells.length - 1] ? cells[cells.length - 1].c : '#fff';
     var arms = '<rect x="-2.6" y="' + armY + '" width="3.2" height="2.2" rx="1.1" fill="' + armColL + '" stroke="rgba(30,25,50,.14)" stroke-width="0.5"/>' +
       '<rect x="' + (w - 0.6) + '" y="' + armY + '" width="3.2" height="2.2" rx="1.1" fill="' + armColR + '" stroke="rgba(30,25,50,.14)" stroke-width="0.5"/>';
     var legs = '<rect x="' + (w * 0.22) + '" y="' + (h - 0.4) + '" width="2.4" height="3.6" rx="1.1" fill="#4b4b63" opacity="0.55"/>' +
       '<rect x="' + (w * 0.7) + '" y="' + (h - 0.4) + '" width="2.4" height="3.6" rx="1.1" fill="#4b4b63" opacity="0.55"/>';
-    return '<svg viewBox="-8 -10 ' + (w + 22) + ' ' + (h + 24) + '" width="100%" height="100%" ' +
+    var padTop = n >= 100 ? 20 : (n > 20 ? 12 : 10);
+    return '<svg viewBox="-8 -' + padTop + ' ' + (w + 22) + ' ' + (h + padTop + 14) + '" width="100%" height="100%" ' +
       'preserveAspectRatio="xMidYMid meet" role="img" aria-label="' + dx('넘버블럭스 ', 'Numberblock ') + n + '" focusable="false">' +
       dexAcc(n, w, h) + legs + arms + body + face + '</svg>';
   }
 
   /* ---- 상태 ---- */
   function sanitizeDex(raw) {
-    var out = { unlocked: {}, seen: {} };
+    var out = { unlocked: {}, seen: {}, coupons: {}, couponsUsed: {} };
     if (!raw || typeof raw !== 'object') return out;
+    /* 이 함수는 app.js 의 state 초기화(스크립트 앞부분)에서도 불려요.
+       그때는 DEX_MAX 가 아직 undefined 라서 숫자 확인이 필요해요. */
+    var cap = (typeof DEX_MAX === 'number') ? DEX_MAX : 100;
     var u = raw.unlocked;
     if (u && typeof u === 'object') {
       for (var k in u) {
         if (!Object.prototype.hasOwnProperty.call(u, k)) continue;
         var n = Math.round(Number(k));
-        if (n >= 1 && n <= DEX_MAX) out.unlocked[String(n)] = Math.max(0, Math.round(Number(u[k]) || 0)) || 1;
+        if (n >= 1 && n <= cap) out.unlocked[String(n)] = Math.max(0, Math.round(Number(u[k]) || 0)) || 1;
       }
     }
     if (raw.seen && typeof raw.seen === 'object') {
       for (var s in raw.seen) {
         if (!Object.prototype.hasOwnProperty.call(raw.seen, s)) continue;
         var m = Math.round(Number(s));
-        if (m >= 1 && m <= DEX_MAX && raw.seen[s]) out.seen[String(m)] = true;
+        if (m >= 1 && m <= cap && raw.seen[s]) out.seen[String(m)] = true;
+      }
+    }
+    if (raw.coupons && typeof raw.coupons === 'object') {
+      for (var ck in raw.coupons) {
+        if (!Object.prototype.hasOwnProperty.call(raw.coupons, ck)) continue;
+        var cn = Math.round(Number(ck)), cAt = Number(raw.coupons[ck]);
+        if (cn > 0 && cn <= cap && cAt > 0) out.coupons[String(cn)] = Math.round(cAt);
+      }
+    }
+    if (raw.couponsUsed && typeof raw.couponsUsed === 'object') {
+      for (var uk in raw.couponsUsed) {
+        if (!Object.prototype.hasOwnProperty.call(raw.couponsUsed, uk)) continue;
+        var un = Math.round(Number(uk));
+        if (un > 0 && un <= cap && raw.couponsUsed[uk]) out.couponsUsed[String(un)] = true;
       }
     }
     return out;
   }
   function dexState() {
-    if (!state.dex || typeof state.dex !== 'object') state.dex = { unlocked: {}, seen: {} };
+    if (!state.dex || typeof state.dex !== 'object') state.dex = { unlocked: {}, seen: {}, coupons: {}, couponsUsed: {} };
     if (!state.dex.unlocked) state.dex.unlocked = {};
     if (!state.dex.seen) state.dex.seen = {};
+    if (!state.dex.coupons) state.dex.coupons = {};
+    if (!state.dex.couponsUsed) state.dex.couponsUsed = {};
     return state.dex;
   }
   function dexHas(n) { return !!dexState().unlocked[String(n)]; }
@@ -6641,16 +7114,54 @@ function iconSVG(key) {
     for (var k in d.unlocked) if (!d.seen[k]) n++;
     return n;
   }
+  /* 1~10 을 먼저 채우고, 그 뒤로는 아직 못 모은 친구 중에서 랜덤 발견 */
   function dexNextLocked() {
-    for (var n = 1; n <= DEX_MAX; n++) if (!dexHas(n)) return n;
-    return 0;
+    for (var n = 1; n <= 10; n++) if (!dexHas(n)) return n;
+    var pool = [];
+    for (var m = 11; m <= DEX_MAX; m++) if (!dexHas(m)) pool.push(m);
+    if (!pool.length) return 0;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  function dexMissing() { return DEX_MAX - dexCount(); }
+
+  /* ---- 🎁 다이소 3,000원 쿠폰 마일스톤 ---- */
+  var DEX_MILESTONES = [20, 40, 60, 80, 100];
+  var DEX_COUPON_NAME = '다이소 3,000원';
+
+  function dexCouponClaimed(m) { return !!dexState().coupons[String(m)]; }
+  function dexCouponUsed(m) { return !!dexState().couponsUsed[String(m)]; }
+  function dexCheckMilestones(silent) {
+    var n = dexCount(), claimed = 0, d = dexState();
+    for (var i = 0; i < DEX_MILESTONES.length; i++) {
+      var m = DEX_MILESTONES[i];
+      if (n >= m && !d.coupons[String(m)]) {
+        d.coupons[String(m)] = Date.now();
+        claimed = m;
+      }
+    }
+    if (claimed) {
+      save();
+      renderDexMilestones();
+      renderDexPill();
+      if (!silent) showCouponPop(claimed);
+    }
+    return claimed;
+  }
+  function dexToggleCouponUsed(m) {
+    var d = dexState();
+    if (!d.coupons[String(m)]) return false;
+    if (d.couponsUsed[String(m)]) delete d.couponsUsed[String(m)];
+    else d.couponsUsed[String(m)] = true;
+    save();
+    renderDexMilestones();
+    return dexCouponUsed(m);
   }
 
   /* ---- 해금 ---- */
   function dexAward(source) {
     var n = dexNextLocked();
     if (!n) {
-      if (source) toast(dx('도감을 다 모았어요! 🎉 스무 친구 모두 친구가 됐어요.', 'You collected all 20 Numberblocks! 🎉'));
+      if (source) toast(dx('도감을 다 모았어요! 🎉 백 명의 친구 모두 만났어요.', 'You collected all 100 Numberblocks! 🎉'));
       return 0;
     }
     var d = dexState();
@@ -6658,11 +7169,12 @@ function iconSVG(key) {
     save();
     renderDexPill();
     if (!dexModalHidden()) renderDexGrid();
+    dexCheckMilestones(false);
     dexSchedulePop(n);
     return n;
   }
 
-  var dexPopTimer = null, dexPopOpen = 0;
+  var dexPopTimer = null, dexPopOpen = 0, dexPendingPop = 0;
   function dexModalHidden() {
     var m = $('dexModal');
     return !m || m.hidden;
@@ -6671,7 +7183,12 @@ function iconSVG(key) {
     var c = $('celebrate');
     return !!(c && c.classList.contains('on'));
   }
+  function couponPopOpen() {
+    var c = $('couponPop');
+    return !!(c && !c.hidden);
+  }
   function dexSchedulePop(n) {
+    if (couponPopOpen()) { dexPendingPop = n; return; }
     var wait = dexCelebrating() ? 3500 : 420;
     setTimeout(function () { showDexPop(n); }, wait);
   }
@@ -6699,12 +7216,43 @@ function iconSVG(key) {
     dexPopOpen = 0;
   }
 
-  /* ---- 말하기 (고른 고품질 음성) ---- */
+  /* ---- 🎁 쿠폰 획득 축하 팝업 ---- */
+  function showCouponPop(m) {
+    var box = $('couponPop');
+    if (!box) return;
+    var t = $('couponPopTitle'), r = $('couponPopReward');
+    if (t) {
+      t.textContent = dx('🎉 ' + m + '종 달성!', '🎉 ' + m + ' collected!');
+      r.textContent = dx('🎁 ' + DEX_COUPON_NAME + ' 쿠폰 획득!', '🎁 You earned a Daiso 3,000 won coupon!');
+    }
+    box.hidden = false;
+    box.classList.add('on');
+    beep('coupon');
+    if (couponPopTimer) clearTimeout(couponPopTimer);
+    couponPopTimer = setTimeout(hideCouponPop, 16000);
+  }
+  var couponPopTimer = null;
+  function hideCouponPop() {
+    var box = $('couponPop');
+    if (!box) return;
+    if (couponPopTimer) { clearTimeout(couponPopTimer); couponPopTimer = null; }
+    box.classList.remove('on');
+    box.hidden = true;
+    if (dexPendingPop) {
+      var q = dexPendingPop;
+      dexPendingPop = 0;
+      setTimeout(function () { showDexPop(q); }, 380);
+    }
+  }
+
+  /* ---- 말하기 (밝은 톤) ---- */
   function speakEnglish(text, rate) {
     return speakOut(text, { lang: 'en', rate: typeof rate === 'number' ? Math.max(0.9, rate) : 0.9, silent: true });
   }
+  /* 한국어는 낮고 느린 '납치범 톤' 대신 밝고 경쾌한 톤으로 */
   function speakKorean(text, rate) {
-    return speakOut(text, { lang: 'ko', rate: typeof rate === 'number' ? Math.max(0.9, rate) : 0.92, silent: true });
+    var r = typeof rate === 'number' ? Math.max(1.02, rate) : 1.04;
+    return speakOut(text, { lang: 'ko', rate: r, pitch: 1.15, silent: true });
   }
 
   /* ---- 도감 배지 ---- */
@@ -6718,13 +7266,73 @@ function iconSVG(key) {
     pill.classList.toggle('full', n >= DEX_MAX);
   }
 
+  /* ---- 🎁 쿠폰 트랙 ---- */
+  function renderDexMilestones() {
+    var host = $('dexTrack');
+    if (!host) return;
+    host.innerHTML = '';
+    var got = dexCount();
+    for (var i = 0; i < DEX_MILESTONES.length; i++) {
+      var m = DEX_MILESTONES[i];
+      var claimed = dexCouponClaimed(m), used = dexCouponUsed(m);
+      var cell = document.createElement('div');
+      cell.className = 'dex-ms' + (claimed ? ' got' : '') + (used ? ' used' : '');
+      cell.setAttribute('data-ms', String(m));
+      if (!claimed) {
+        cell.innerHTML = '<span class="dex-ms-top">🔒 ' + m + '개</span>' +
+          '<span class="dex-ms-sub">' + dx('앞으로 ' + Math.max(0, m - got) + '개', Math.max(0, m - got) + ' to go') + '</span>';
+      } else {
+        var btn = used
+          ? '<button class="dex-ms-btn done" type="button" data-coupon-used="' + m + '">✅ ' + dx('사용 완료', 'Used') + '</button>'
+          : '<button class="dex-ms-btn" type="button" data-coupon-used="' + m + '">' + dx('사용 완료 ✅', 'Mark used ✅') + '</button>';
+        cell.innerHTML = '<span class="dex-ms-top">🎁 ' + m + '개</span>' +
+          '<span class="dex-ms-sub">' + dx(DEX_COUPON_NAME + ' 획득!', 'Daiso 3,000 won!') + '</span>' + btn;
+      }
+      host.appendChild(cell);
+    }
+  }
+
   /* ---- 도감 모달 ---- */
+  var DEX_SECTIONS = [
+    { label: '1–20', from: 1, to: 20 },
+    { label: '21–40', from: 21, to: 40 },
+    { label: '41–60', from: 41, to: 60 },
+    { label: '61–80', from: 61, to: 80 },
+    { label: '81–100', from: 81, to: 100 }
+  ];
+  var dexSection = 0;
+
+  function dexSectionOf(n) {
+    for (var i = 0; i < DEX_SECTIONS.length; i++) {
+      if (n >= DEX_SECTIONS[i].from && n <= DEX_SECTIONS[i].to) return i;
+    }
+    return 0;
+  }
+  function renderDexSections() {
+    var host = $('dexSections');
+    if (!host) return;
+    host.innerHTML = '';
+    for (var i = 0; i < DEX_SECTIONS.length; i++) {
+      var sec = DEX_SECTIONS[i], got = 0;
+      for (var n = sec.from; n <= sec.to; n++) if (dexHas(n)) got++;
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'dex-sec' + (i === dexSection ? ' on' : '');
+      b.setAttribute('role', 'tab');
+      b.setAttribute('aria-selected', i === dexSection ? 'true' : 'false');
+      b.setAttribute('data-sec', String(i));
+      b.innerHTML = '<span class="dex-sec-range">' + sec.label + '</span><span class="dex-sec-num">' + got + '/' + (sec.to - sec.from + 1) + '</span>';
+      host.appendChild(b);
+    }
+  }
   function renderDexGrid() {
     var grid = $('dexGrid');
     if (!grid) return;
+    dexCheckMilestones(true);   /* 이미 넘긴 구간은 조용히 챙겨 두기 */
+    var sec = DEX_SECTIONS[dexSection] || DEX_SECTIONS[0];
     grid.innerHTML = '';
     var unlockedNow = dexCount();
-    for (var n = 1; n <= DEX_MAX; n++) {
+    for (var n = sec.from; n <= sec.to; n++) {
       var it = dexItem(n), has = dexHas(n);
       var tile = document.createElement('button');
       tile.type = 'button';
@@ -6750,6 +7358,33 @@ function iconSVG(key) {
     if (cnt) cnt.textContent = unlockedNow + ' / ' + DEX_MAX;
     var empty = $('dexEmptyNote');
     if (empty) empty.hidden = unlockedNow > 0;
+    renderDexSections();
+    renderDexMilestones();
+  }
+
+  /* ---- 🎁 쿠폰 사용 완료 토글 (밖에서도 부를 수 있게) ---- */
+  function dexCouponMarkUsed(m, used) {
+    var d = dexState();
+    if (!d.coupons[String(m)]) return false;
+    if (used) d.couponsUsed[String(m)] = true;
+    else delete d.couponsUsed[String(m)];
+    save();
+    renderDexMilestones();
+    return dexCouponUsed(m);
+  }
+
+  function dexFacts(n) {
+    if (n <= 20) return '';
+    var sq = dexSquareSide(n), out = [];
+    if (n >= 100) out.push('10×10');
+    else {
+      out.push('10×' + Math.floor(n / 10));
+      if (n % 10) out.push('+' + (n % 10));
+    }
+    if (sq) out.push(sq + '×' + sq + ' ' + dx('정사각형', 'square'));
+    if (n % 10 === 0 && n < 100) out.push(dx('10의 배수', 'multiple of 10'));
+    if (n >= 100) out.push(dx('황금 왕관', 'golden crown'));
+    return out.join(' · ');
   }
 
   function openDexDetail(n) {
@@ -6773,6 +7408,10 @@ function iconSVG(key) {
     var ko = document.createElement('p');
     ko.className = 'dex-detail-line';
     ko.textContent = it.line;
+    var facts = document.createElement('p');
+    facts.className = 'dex-detail-facts';
+    facts.textContent = dexFacts(n);
+    facts.hidden = !facts.textContent;
     var intro = document.createElement('p');
     intro.className = 'dex-detail-intro';
     intro.textContent = '“' + it.intro + '”';
@@ -6787,11 +7426,12 @@ function iconSVG(key) {
     bKo.type = 'button';
     bKo.className = 'ghost-btn';
     bKo.textContent = '🔊 ' + dx('한국어 설명', 'Korean');
-    bKo.addEventListener('click', function () { speakKorean(it.line, 0.92); });
+    bKo.addEventListener('click', function () { speakKorean(it.line); });
     row.appendChild(bEn);
     row.appendChild(bKo);
     body.appendChild(h);
     body.appendChild(ko);
+    if (!facts.hidden) body.appendChild(facts);
     body.appendChild(intro);
     body.appendChild(row);
     box.appendChild(pic);
@@ -6803,6 +7443,8 @@ function iconSVG(key) {
   function openDex() {
     var m = $('dexModal');
     if (!m) return;
+    var nx = dexNextLocked();
+    if (nx) dexSection = dexSectionOf(nx);
     renderDexGrid();
     m.hidden = false;
     document.documentElement.classList.add('modal-open');
@@ -6834,6 +7476,35 @@ function iconSVG(key) {
         beep('stamp');
       });
     }
+    var secs = $('dexSections');
+    if (secs) {
+      secs.addEventListener('click', function (e) {
+        var b = e.target.closest ? e.target.closest('.dex-sec') : null;
+        if (!b) return;
+        var i = Number(b.getAttribute('data-sec'));
+        if (!(i >= 0 && i < DEX_SECTIONS.length) || i === dexSection) return;
+        dexSection = i;
+        var det = $('dexDetail');
+        if (det) { det.hidden = true; det.innerHTML = ''; }
+        renderDexGrid();
+        beep('tab');
+      });
+    }
+    var track = $('dexTrack');
+    if (track) {
+      track.addEventListener('click', function (e) {
+        var b = e.target.closest ? e.target.closest('[data-coupon-used]') : null;
+        if (!b) return;
+        var m = Number(b.getAttribute('data-coupon-used'));
+        var used = dexToggleCouponUsed(m);
+        beep('stamp');
+        toast(used ? dx('🎁 쿠폰 사용 완료로 표시했어요', 'Coupon marked as used') : dx('🎁 쿠폰을 다시 받은 상태로 돌렸어요', 'Coupon marked as not used'));
+      });
+    }
+    var cok = $('couponPopOk');
+    if (cok) cok.addEventListener('click', hideCouponPop);
+    var cpop = $('couponPop');
+    if (cpop) cpop.addEventListener('click', function (e) { if (e.target === cpop) hideCouponPop(); });
     document.querySelectorAll('[data-dex-close]').forEach(function (el) {
       el.addEventListener('click', closeDex);
     });
@@ -6845,6 +7516,8 @@ function iconSVG(key) {
     if (settingsInfo) settingsInfo.addEventListener('click', function () { closeSettings(); openDex(); });
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'Escape') return;
+      var cpop2 = $('couponPop');
+      if (cpop2 && !cpop2.hidden) { hideCouponPop(); return; }
       var d = $('dexModal');
       if (d && !d.hidden) { closeDex(); return; }
       var p = $('dexPop');
@@ -6888,6 +7561,11 @@ function iconSVG(key) {
     lastLocalAt: 0, lastAppliedAt: 0, lastPushedJson: '', pushTimer: null,
     cheerSeen: 0, sdkFailed: false, bannerTimer: null
   };
+
+  /* ---- 🎙️ 목소리 응원 녹음 ---- */
+  var CHEER_REC_MAX_MS = 15000;      /* 15초까지 */
+  var CHEER_AUDIO_MAX = 320000;      /* base64 글자 수(≈ 240KB) — 가볍게 */
+  var REC = { mr: null, stream: null, chunks: [], timer: null, startedAt: 0, data: '', mime: '', audio: null, busy: false };
 
   function cloudDeviceId() {
     var id = '';
@@ -6943,7 +7621,8 @@ function iconSVG(key) {
         morning: state.settings.morning,
         evening: state.settings.evening,
         homework: state.settings.homework,
-        supplies: state.settings.supplies
+        supplies: state.settings.supplies,
+        cheerTts: !!state.settings.cheerTts
       }
     };
   }
@@ -7062,6 +7741,7 @@ function iconSVG(key) {
       if (Array.isArray(s.evening)) state.settings.evening = sanitizeItems('evening', s.evening, DEFAULT_EVENING);
       if (Array.isArray(s.homework)) state.settings.homework = sanitizeItems('homework', s.homework, DEFAULT_HOMEWORK);
       if (s.supplies && typeof s.supplies === 'object') state.settings.supplies = sanitizeSupplies(s.supplies);
+      if (typeof s.cheerTts === 'boolean') state.settings.cheerTts = s.cheerTts;
       try { pruneDaily(); } catch (e) { /* 무시 */ }
     }
     if (p.sight) state.sight = sanitizeSight(p.sight);
@@ -7112,6 +7792,8 @@ function iconSVG(key) {
       CLOUD.applying = false;
     }
     renderAll();
+    dexCheckMilestones(true);
+    if (!dexModalHidden()) renderDexGrid();
     var afterDex = dexCount();
     if (afterDex > beforeDex && dexModalHidden()) {
       toast(dx('🧩 도감에 새 친구가 왔어요! (' + afterDex + '/' + DEX_MAX + ')', '🧩 A new friend joined the dex! (' + afterDex + '/' + DEX_MAX + ')'));
@@ -7145,6 +7827,10 @@ function iconSVG(key) {
     }
   }
 
+  function cheerAudioOK(a) {
+    return typeof a === 'string' && /^data:audio\//i.test(a) && a.length > 64 && a.length <= CHEER_AUDIO_MAX;
+  }
+
   function onCloudCheer(snap) {
     var c = snap.val();
     if (!c || typeof c.text !== 'string') return;
@@ -7153,6 +7839,7 @@ function iconSVG(key) {
     CLOUD.cheerSeen = at;
     state.cheer = {
       text: String(c.text).slice(0, 140),
+      audio: cheerAudioOK(c.audio) ? c.audio : '',
       at: at,
       from: String(c.from || '엄마').slice(0, 12),
       mine: c.by === CLOUD.deviceId
@@ -7311,14 +7998,16 @@ function iconSVG(key) {
     try { localStorage.setItem(CLOUD_FROM_KEY, name === '아빠' ? '아빠' : '엄마'); } catch (e) { /* 무시 */ }
   }
 
-  function sendCheer(text) {
+  function sendCheer(text, audio) {
     text = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 120);
-    if (!text) return false;
+    audio = cheerAudioOK(audio) ? audio : '';
+    if (!text && !audio) return false;
     if (!CLOUD.ready || !CLOUD.roomRef) {
       toast(dx('지금은 실시간 연결이 아니에요. 연결되면 다시 보내 주세요.', 'Not connected right now. Please try again once connected.'));
       return false;
     }
     var c = { text: text, at: Date.now(), by: CLOUD.deviceId, from: cheerFrom() };
+    if (audio) c.audio = audio;
     try {
       CLOUD.roomRef.child('cheer').set(c).catch(function () {
         toast(dx('응원을 보내지 못했어요 (연결 확인)', 'Could not send the cheer (check connection)'));
@@ -7328,7 +8017,7 @@ function iconSVG(key) {
       return false;
     }
     CLOUD.cheerSeen = Math.max(CLOUD.cheerSeen, c.at);
-    state.cheer = { text: c.text, at: c.at, from: c.from, mine: true };
+    state.cheer = { text: c.text, audio: audio, at: c.at, from: c.from, mine: true };
     save();
     renderCheerLine();
     return true;
@@ -7338,31 +8027,106 @@ function iconSVG(key) {
     var sub = $('brandSub');
     if (!sub) return;
     var c = state.cheer;
-    var fresh = c && c.text && (Date.now() - (Number(c.at) || 0) < 24 * 60 * 60 * 1000);
+    var hasAudio = !!(c && cheerAudioOK(c.audio));
+    var fresh = c && (c.text || hasAudio) && (Date.now() - (Number(c.at) || 0) < 24 * 60 * 60 * 1000);
+    var replay = $('btnCheerReplay');
     if (fresh) {
-      var t = String(c.text);
-      if (t.length > 42) t = t.slice(0, 41) + '…';
+      var t = String(c.text || '');
+      if (hasAudio) t = (t ? t + ' ' : '') + '🎙️';
+      if (t.length > 40) t = t.slice(0, 39) + '…';
       sub.textContent = '💌 ' + (c.from || '엄마') + ': ' + t;
       sub.classList.add('cheer-line');
-      sub.title = c.text;
+      sub.title = c.text || dx('목소리 응원', 'Voice cheer');
+      if (replay) replay.hidden = false;
     } else {
       sub.classList.remove('cheer-line');
       sub.removeAttribute('title');
       sub.textContent = Lf('brandSub', { start: state.settings.startTime, depart: state.settings.departTime });
+      if (replay) replay.hidden = true;
     }
+  }
+
+  /* 귀여운 딩동~✨ 차임벨 (2~3음) */
+  function cheerChime() {
+    if (!state.settings.sound) return;
+    try {
+      ensureCtx();
+      tone(1046.5, 0, 0.42, 0.05, 'sine');
+      tone(1318.5, 0.14, 0.45, 0.045, 'sine');
+      tone(1568.0, 0.3, 0.62, 0.04, 'sine');
+    } catch (e) { /* 무시 */ }
+  }
+
+  var CHEER_AUDIO_NOW = null;
+  function cheerAudioStop() {
+    if (!CHEER_AUDIO_NOW) return;
+    try { CHEER_AUDIO_NOW.pause(); CHEER_AUDIO_NOW.currentTime = 0; } catch (e) { /* 무시 */ }
+    CHEER_AUDIO_NOW = null;
+  }
+  /* 배너·헤더에서 엄마 목소리 재생 (자동재생이 막히면 큰 버튼이 남아 있어요) */
+  function cheerAudioPlay() {
+    var c = state.cheer;
+    if (!c || !cheerAudioOK(c.audio)) return false;
+    cheerAudioStop();
+    try {
+      var a = new Audio(c.audio);
+      a.preload = 'auto';
+      CHEER_AUDIO_NOW = a;
+      a.addEventListener('ended', function () { CHEER_AUDIO_NOW = null; });
+      var pr = a.play();
+      if (pr && typeof pr.catch === 'function') pr.catch(function () { /* 자동재생 차단 → 버튼으로 */ });
+      return true;
+    } catch (e) { return false; }
+  }
+
+  function cheerSpeakBanner() {
+    var c = state.cheer;
+    if (!c) return;
+    speakKorean(c.text || dx('엄마의 목소리 응원이 도착했어요!', 'A voice cheer arrived!'));
+  }
+
+  /* 배너에서 한 번만 누르면 바로 들려요 */
+  function cheerListen() {
+    var c = state.cheer;
+    if (!c) return;
+    if (cheerAudioOK(c.audio)) { cheerAudioPlay(); return; }
+    cheerSpeakBanner();
+  }
+
+  /* 배너 문구(언어 바꿀 때도 다시 그림) */
+  function renderCheerBannerLabel() {
+    var box = $('cheerBanner');
+    if (!box || box.hidden) return;
+    var c = state.cheer || {};
+    var hasAudio = cheerAudioOK(c.audio);
+    var from = c.from || '엄마';
+    $('cheerFrom').textContent = '💌 ' + dx(from + '의 응원', (from === '아빠' ? "Dad's" : "Mom's") + ' cheer');
+    $('cheerBannerText').textContent = c.text || dx('목소리로 응원을 보냈어요!', 'Sent a voice cheer!');
+    var listen = $('cheerListen');
+    if (listen) {
+      listen.hidden = false;
+      listen.classList.toggle('voice', hasAudio);
+      listen.textContent = hasAudio
+        ? '🔊 ' + dx(from + ' 목소리 듣기', 'Hear ' + (from === '아빠' ? 'Dad' : 'Mom'))
+        : '🔊 ' + dx('응원 읽어주기', 'Read the cheer');
+    }
+    var ok = $('cheerOk');
+    if (ok) ok.textContent = dx('확인 ✅', 'OK ✅');
   }
 
   function showCheerBanner(c) {
     var box = $('cheerBanner');
     if (!box) return;
-    $('cheerFrom').textContent = dx('💌 ', '💌 ') + (c.from || '엄마') + dx('의 응원', "'s cheer");
-    $('cheerBannerText').textContent = c.text;
+    var hasAudio = cheerAudioOK(c.audio);
     box.hidden = false;
+    renderCheerBannerLabel();
     box.classList.remove('on');
     void box.offsetWidth;
     box.classList.add('on');
-    beep('success');
-    setTimeout(function () { speakKorean(c.text, 0.95); }, 600);
+    cheerChime();
+    /* 목소리가 있으면 자동 재생 시도, 없으면 (설정을 켠 경우에만) 다정하게 읽기 */
+    if (hasAudio) setTimeout(function () { if (state.cheer && !state.cheer.mine) cheerAudioPlay(); }, 450);
+    else if (state.settings.cheerTts) setTimeout(function () { if (state.cheer && !state.cheer.mine) cheerSpeakBanner(); }, 700);
     if (CLOUD.bannerTimer) clearTimeout(CLOUD.bannerTimer);
     CLOUD.bannerTimer = setTimeout(hideCheerBanner, 30000);
   }
@@ -7373,13 +8137,175 @@ function iconSVG(key) {
     if (CLOUD.bannerTimer) { clearTimeout(CLOUD.bannerTimer); CLOUD.bannerTimer = null; }
     box.classList.remove('on');
     box.hidden = true;
+    cheerAudioStop();
+  }
+
+  /* ---- 🎙️ 녹음 ---- */
+  function recSupported() {
+    return !!(window.MediaRecorder && navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+  }
+  function recPickMime() {
+    if (!window.MediaRecorder || !MediaRecorder.isTypeSupported) return '';
+    var cands = [
+      'audio/webm;codecs=opus', 'audio/webm',
+      'audio/mp4;codecs=mp4a.40.2', 'audio/mp4',
+      'audio/aac', 'audio/ogg;codecs=opus'
+    ];
+    for (var i = 0; i < cands.length; i++) {
+      try { if (MediaRecorder.isTypeSupported(cands[i])) return cands[i]; } catch (e) { /* 무시 */ }
+    }
+    return '';
+  }
+  function recSeconds() {
+    return REC.startedAt ? Math.min(CHEER_REC_MAX_MS, Date.now() - REC.startedAt) / 1000 : 0;
+  }
+  function recRender(mode) {
+    var idle = $('cheerRecIdle'), live = $('cheerRecLive'), done = $('cheerRecDone');
+    var time = $('cheerRecTime'), hint = $('cheerRecHint'), size = $('cheerRecSize');
+    if (idle) idle.hidden = mode !== 'idle';
+    if (live) live.hidden = mode !== 'live';
+    if (done) done.hidden = mode !== 'done';
+    if (time) {
+      var s = recSeconds();
+      time.textContent = (mode === 'live' ? '● ' : '') + s.toFixed(1) + '초 / ' + (CHEER_REC_MAX_MS / 1000) + '초';
+    }
+    if (hint && mode === 'idle') hint.textContent = recSupported()
+      ? dx('엄마·아빠 목소리로 15초까지 녹음할 수 있어요.', 'Record up to 15 seconds in your own voice.')
+      : dx('이 브라우저에서는 녹음이 안 돼요. 글자로 응원을 보내 주세요.', 'Recording is not available here. Send words instead.');
+    var start = $('btnRecStart');
+    if (start) start.disabled = !recSupported();
+    if (size && mode === 'done') {
+      size.textContent = REC.data
+        ? dx('녹음 길이 ' + (REC.doneSec || 0).toFixed(1) + '초', 'Length ' + (REC.doneSec || 0).toFixed(1) + 's')
+        : '';
+    }
+  }
+  function recReset() {
+    if (REC.timer) { clearInterval(REC.timer); REC.timer = null; }
+    if (REC.mr && REC.mr.state !== 'inactive') { try { REC.mr.stop(); } catch (e) { /* 무시 */ } }
+    if (REC.stream) {
+      try { REC.stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) { /* 무시 */ }
+    }
+    REC.mr = null; REC.stream = null; REC.chunks = []; REC.startedAt = 0; REC.data = ''; REC.doneSec = 0; REC.busy = false;
+    var au = $('cheerRecAudio');
+    if (au) { try { au.pause(); } catch (e) {} au.removeAttribute('src'); au.hidden = true; }
+    recRender('idle');
+  }
+  function recStart() {
+    if (REC.busy) return;
+    if (!recSupported()) {
+      toast(dx('이 브라우저에서는 녹음이 안 돼요. 글자로 보내 주세요.', 'Recording is not supported here. Please send words.'));
+      recRender('idle');
+      return;
+    }
+    recReset();
+    REC.busy = true;
+    var req;
+    try {
+      req = navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, channelCount: 1 } });
+    } catch (e) { REC.busy = false; recRender('idle'); toast(dx('마이크를 켜지 못했어요.', 'Could not turn on the microphone.')); return; }
+    req.then(function (stream) {
+      REC.stream = stream;
+      var mime = recPickMime();
+      var opts = { audioBitsPerSecond: 24000 };   /* 가볍게 압축 */
+      if (mime) opts.mimeType = mime;
+      var mr;
+      try { mr = new MediaRecorder(stream, opts); }
+      catch (e) {
+        try { mr = new MediaRecorder(stream); } catch (e2) {
+          REC.busy = false; recRender('idle');
+          toast(dx('녹음을 시작하지 못했어요.', 'Could not start recording.'));
+          return;
+        }
+      }
+      REC.mr = mr;
+      REC.chunks = [];
+      REC.mime = mr.mimeType || mime || 'audio/webm';
+      mr.ondataavailable = function (ev) { if (ev.data && ev.data.size) REC.chunks.push(ev.data); };
+      mr.onstop = recFinish;
+      try { mr.start(250); } catch (e) { REC.busy = false; recRender('idle'); toast(dx('녹음을 시작하지 못했어요.', 'Could not start recording.')); return; }
+      REC.startedAt = Date.now();
+      REC.busy = false;
+      recRender('live');
+      REC.timer = setInterval(function () {
+        var s = recSeconds();
+        var t = $('cheerRecTime');
+        if (t) t.textContent = '● ' + s.toFixed(1) + '초 / ' + (CHEER_REC_MAX_MS / 1000) + '초';
+        if (s >= CHEER_REC_MAX_MS / 1000 - 0.05) recStop();
+      }, 120);
+    }, function () {
+      REC.busy = false;
+      recRender('idle');
+      toast(dx('마이크를 쓸 수 없어요. 브라우저에서 마이크를 허용해 주세요.', 'Microphone blocked. Please allow it in the browser.'));
+    });
+  }
+  function recStop() {
+    var mr = REC.mr;
+    if (REC.timer) { clearInterval(REC.timer); REC.timer = null; }
+    REC.doneSec = recSeconds();
+    if (mr && mr.state !== 'inactive') { try { mr.stop(); } catch (e) { recFinish(); } }
+    else recFinish();
+  }
+  function recFinish() {
+    if (REC.stream) {
+      try { REC.stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) { /* 무시 */ }
+      REC.stream = null;
+    }
+    var blob = null;
+    try { blob = new Blob(REC.chunks, { type: REC.mime || 'audio/webm' }); } catch (e) { blob = null; }
+    REC.chunks = [];
+    if (!blob || !blob.size) {
+      toast(dx('녹음이 비어 있어요. 다시 해 볼까요?', 'The recording was empty. Try again?'));
+      recRender('idle');
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function () {
+      var url = String(reader.result || '');
+      if (!/^data:audio\//i.test(url)) {
+        toast(dx('녹음을 저장하지 못했어요.', 'Could not save the recording.'));
+        recRender('idle');
+        return;
+      }
+      if (url.length > CHEER_AUDIO_MAX) {
+        toast(dx('녹음이 조금 길어요. 10초 안으로 다시 녹음해 주세요.', 'That was a bit long. Please record within 10 seconds.'));
+        recRender('idle');
+        return;
+      }
+      REC.data = url;
+      var au = $('cheerRecAudio');
+      if (au) { au.src = url; au.hidden = false; }
+      recRender('done');
+      updateCheerSendState();
+    };
+    reader.onerror = function () { recRender('idle'); toast(dx('녹음을 저장하지 못했어요.', 'Could not save the recording.')); };
+    try { reader.readAsDataURL(blob); }
+    catch (e) { recRender('idle'); }
+  }
+  function recPlay() {
+    var au = $('cheerRecAudio');
+    if (!au || !REC.data) {
+      if (REC.data) { try { var a = new Audio(REC.data); a.play(); } catch (e) {} }
+      return;
+    }
+    try { au.currentTime = 0; var p = au.play(); if (p && p.catch) p.catch(function () {}); } catch (e) { /* 무시 */ }
+  }
+  function updateCheerSendState() {
+    var send = $('btnSendCheer');
+    if (!send) return;
+    var ta = $('cheerText');
+    var has = !!(REC.data || (ta && ta.value.trim()));
+    send.classList.toggle('ready', has);
   }
 
   function openCheer() {
     var m = $('cheerModal');
     if (!m) return;
+    hideCheerBanner();   /* 배너가 모달을 가리지 않게 */
     var ta = $('cheerText');
     if (ta) ta.value = '';
+    recReset();
+    updateCheerSendState();
     var status = $('cheerStatus');
     if (status) {
       status.textContent = CLOUD.connected
@@ -7401,6 +8327,7 @@ function iconSVG(key) {
     if (!m) return;
     m.hidden = true;
     document.documentElement.classList.remove('modal-open');
+    recReset();
   }
 
   function bindCloudEvents() {
@@ -7450,13 +8377,35 @@ function iconSVG(key) {
       send.addEventListener('click', function () {
         var ta = $('cheerText');
         var text = ta ? ta.value : '';
-        if (!String(text).trim()) { toast(dx('응원 한마디를 적어 주세요!', 'Write a cheer first!')); if (ta) ta.focus(); return; }
-        if (sendCheer(text)) {
+        var audio = REC.data || '';
+        if (!String(text).trim() && !audio) {
+          toast(dx('응원 한마디를 적거나 목소리를 녹음해 주세요!', 'Write a cheer or record your voice first!'));
+          if (ta) ta.focus();
+          return;
+        }
+        if (sendCheer(text, audio)) {
           closeCheer();
           toast(dx('응원을 보냈어요! 💌', 'Cheer sent! 💌'));
         }
       });
     }
+    var ta2 = $('cheerText');
+    if (ta2) ta2.addEventListener('input', updateCheerSendState);
+
+    var recStartBtn = $('btnRecStart');
+    if (recStartBtn) recStartBtn.addEventListener('click', recStart);
+    var recStopBtn = $('btnRecStop');
+    if (recStopBtn) recStopBtn.addEventListener('click', recStop);
+    var recPlayBtn = $('btnRecPlay');
+    if (recPlayBtn) recPlayBtn.addEventListener('click', recPlay);
+    var recAgainBtn = $('btnRecAgain');
+    if (recAgainBtn) recAgainBtn.addEventListener('click', function () { recReset(); recStart(); });
+    var recDelBtn = $('btnRecDelete');
+    if (recDelBtn) recDelBtn.addEventListener('click', function () { recReset(); updateCheerSendState(); });
+    var listen = $('cheerListen');
+    if (listen) listen.addEventListener('click', cheerListen);
+    var replay = $('btnCheerReplay');
+    if (replay) replay.addEventListener('click', function (e) { e.stopPropagation(); cheerListen(); });
     document.querySelectorAll('[data-cheer-close]').forEach(function (el) {
       el.addEventListener('click', closeCheer);
     });
@@ -7494,6 +8443,7 @@ function iconSVG(key) {
     bindDexEvents();
     bindCloudEvents();
     initCloud();
+    dexCheckMilestones(true);   /* 예전에 모은 친구가 있으면 쿠폰부터 정리 */
   }
 
   /* ============================================================
@@ -7582,14 +8532,27 @@ function iconSVG(key) {
       var on = this.getAttribute('aria-checked') !== 'true';
       this.setAttribute('aria-checked', on ? 'true' : 'false');
     });
+    if ($('btnCheerTts')) {
+      $('btnCheerTts').addEventListener('click', function () {
+        var on = this.getAttribute('aria-checked') !== 'true';
+        this.setAttribute('aria-checked', on ? 'true' : 'false');
+        draft.cheerTts = on;
+        state.settings.cheerTts = on;
+        save();
+        toast(on ? L('toastCheerTtsOn') : L('toastCheerTtsOff'));
+      });
+    }
     $('btnWake').addEventListener('click', function () {
       var on = this.getAttribute('aria-checked') !== 'true';
       this.setAttribute('aria-checked', on ? 'true' : 'false');
+      if (draft) draft.wakeWanted = on;
       state.settings.wakeWanted = on;
       save();
       if (on) requestWake(); else releaseWake();
       updateWakeUI();
     });
+    var qw = $('btnWakeQuick');
+    if (qw) qw.addEventListener('click', toggleWakeQuick);
     $('btnKeepAlive').addEventListener('click', function () {
       var on = this.getAttribute('aria-checked') !== 'true';
       this.setAttribute('aria-checked', on ? 'true' : 'false');
@@ -7598,6 +8561,7 @@ function iconSVG(key) {
       } else {
         stopKeepAlive();
       }
+      if (draft) draft.keepAlive = on;
       state.settings.keepAlive = on;
       save();
     });
@@ -7749,8 +8713,20 @@ function iconSVG(key) {
     dex: {
       total: DEX_MAX,
       list: function () {
-        return DEX_DATA.map(function (d) { return { n: d.n, en: d.en, ko: d.ko, line: d.line, intro: d.intro }; });
+        var out = [];
+        for (var n = 1; n <= DEX_MAX; n++) {
+          var it = dexItem(n);
+          out.push({ n: it.n, en: it.en, ko: it.ko, line: it.line, intro: it.intro, c: it.c });
+        }
+        return out;
       },
+      milestones: DEX_MILESTONES.slice(),
+      coupons: function () { return JSON.parse(JSON.stringify(dexState().coupons || {})); },
+      couponsUsed: function () { return JSON.parse(JSON.stringify(dexState().couponsUsed || {})); },
+      markCoupon: function (m, used) { return dexCouponMarkUsed(m, !!used); },
+      section: function () { return dexSection; },
+      setSection: function (i) { dexSection = Math.max(0, Math.min(DEX_SECTIONS.length - 1, Number(i) || 0)); renderDexGrid(); },
+      couponOpen: function () { return couponPopOpen(); },
       count: dexCount,
       next: dexNextLocked,
       award: function (src) { return dexAward(src || 'test'); },
@@ -7763,6 +8739,12 @@ function iconSVG(key) {
       svg: dexSVG,
       has: dexHas
     },
+    speakKo: function (t) { return speakKorean(t); },
+    wake: {
+      on: function () { return !!state.settings.wakeWanted; },
+      toggle: toggleWakeQuick,
+      supported: wakeSupported
+    },
     cloud: {
       room: function () { return CLOUD.room; },
       connected: function () { return CLOUD.connected; },
@@ -7772,8 +8754,18 @@ function iconSVG(key) {
       push: function () { cloudPush(true); },
       apply: cloudApply,
       payload: cloudPayload,
-      send: function (text) { return sendCheer(text); },
+      send: function (text, audio) { return sendCheer(text, audio); },
       cheer: function () { return state.cheer ? JSON.parse(JSON.stringify(state.cheer)) : null; },
+      cheerAudioLen: function () { return (state.cheer && state.cheer.audio) ? state.cheer.audio.length : 0; },
+      cheerListen: cheerListen,
+      cheerTts: function () { return !!state.settings.cheerTts; },
+      setCheerTts: function (v) { state.settings.cheerTts = !!v; save(); },
+      rec: {
+        supported: recSupported, mime: recPickMime, reset: recReset, start: recStart, stop: recStop,
+        dataLen: function () { return REC.data ? REC.data.length : 0; },
+        data: function () { return REC.data; },
+        state: function () { return REC.mr ? REC.mr.state : 'idle'; }
+      },
       banner: function () {
         var b = $('cheerBanner');
         return (b && !b.hidden) ? $('cheerBannerText').textContent : '';
