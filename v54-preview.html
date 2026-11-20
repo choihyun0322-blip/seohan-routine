@@ -15089,7 +15089,7 @@ function iconSVG(key) {
         return cols.length > 1 ? cols[(maxY - y) % cols.length] : cols[0];
       }
       if (n === 100) return '#ffffff';
-      var isOnesRow = y >= tensRows;         /* 위쪽 줄 = 1의 자리 낱개 */
+      var isOnesRow = y < onesRows;          /* 맨 위 줄들 = 1의 자리 낱개 */
       if (n < 20) {
         return isOnesRow ? (NB_ONE_COLOR[n - 10] || '#ffffff') : '#ffffff';
       }
