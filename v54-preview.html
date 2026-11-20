@@ -15130,7 +15130,13 @@ function iconSVG(key) {
     else fk = ['normal', 'one', 'glasses', 'playful', 'brow', 'normal', 'playful', 'normal', 'mask', 'nose'][od] || 'normal';
     /* 소품: 낱개 숫자 특징(1~9) + 십의 자리 특징(20~90) */
     var acc = '';
-    if (n > 10) {
+    if (n <= 10) {
+      if (n === 1) acc += nbGlyph('sparkle', w + 1, 3, 9);
+      else if (n === 3) acc += nbGlyph('crown', faceX - 6, -11, 12);
+      else if (n === 5) acc += nbGlyph('star', -8, h * 0.42, 10);
+      else if (n === 6) acc += nbGlyph('dice', w + 1, 3, 10);
+      else if (n === 7) acc += nbGlyph('rainbow', -7, h - 9, 12);
+    } else {
       if (od === 3) acc += nbGlyph('crown', faceX - 6, -11, 12);
       else if (od === 5) acc += nbGlyph('star', -8, h * 0.42, 10);
       else if (od === 6) acc += nbGlyph('dice', w + 1, 3, 10);
