@@ -495,13 +495,16 @@ h1{font-size:21px;font-weight:800;letter-spacing:-.9px;line-height:1.15;white-sp
 
       <section class="card" id="card-recipes">
         <div class="card-h">
-          <h2>🍳 냉장고 재료 &amp; 레시피</h2>
+          <h2>🍳 식자재레시피</h2>
           <span class="chip sage" id="recChip">0개 맞춤</span>
         </div>
         <div class="wlabel"><span class="l">🧊 보관 구역별 재료</span><span class="r" id="pantryHint">냉장·냉동은 육류·야채·과일·밀키트로 자동 분류</span></div>
+        <div class="qbar" style="margin-bottom:8px">
+          <input id="pantrySearch" type="search" autocomplete="off" placeholder="🔍 식자재 검색...">
+        </div>
         <div class="pgroups" id="pantry"></div>
         <div class="padd">
-          <input id="pantryInput" type="text" placeholder="재료 추가 (예: 애호박)">
+          <input id="pantryInput" type="text" placeholder="식자재 추가 (예: 애호박)">
           <select id="pantryZone" title="보관 구역">
             <option value="auto">자동</option>
             <option value="fridge">❄️ 냉장</option>
@@ -560,6 +563,6 @@ h1{font-size:21px;font-weight:800;letter-spacing:-.9px;line-height:1.15;white-sp
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<script src="app.js?v=119395"></script>
+<script src="app.js?v=126326"></script>
 </body>
 </html>
