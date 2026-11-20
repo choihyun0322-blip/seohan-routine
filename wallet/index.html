@@ -1977,6 +1977,7 @@ function openGiftModal(id) {
       if (!id2) return;
       if (!confirm("이 기프티콘을 지울까요?")) return;
       state.gifts = state.gifts.filter(x => x.id !== id2);
+      state.giftUses = state.giftUses.filter(u => u.giftId !== id2);
       touch(); closeModal("mGift"); renderAll(); toast("지웠어요");
     });
   }
