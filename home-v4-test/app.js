@@ -576,7 +576,7 @@ function migrate(st) {
   return ch;
 }
 
-function normalize(st) {
+function normalize(st, skipMigrate) {
   if (!st || typeof st !== 'object') return null;
   st.settings = Object.assign({}, DEFAULT_SETTINGS, st.settings || {});
   st.settings.trash = Object.assign({}, DEFAULT_SETTINGS.trash, st.settings.trash || {});
@@ -596,7 +596,7 @@ function normalize(st) {
     if (!s.level) s.level = 'enough';
     if (isNum(s) && !Number.isFinite(Number(s.count))) s.count = countFromLevel(s.level);
   });
-  if (migrate(st)) migrated = true;
+  if (!skipMigrate && migrate(st)) migrated = true;
   if (st.day !== todayISO()) { st.day = todayISO(); st.checks = {}; }
   return st;
 }
@@ -689,6 +689,8 @@ function schedulePush() {
   pushTimer = setTimeout(push, 450);
 }
 async function push() {
+  // 방을 아직 한 번도 못 읽었으면(방이 비었는지 모르면) 밀지 않는다 — 남의 데이터를 덮을 수 있다
+  if (baseRemote === null) { scheduleRefetch(200); return; }
   const patch = buildPatch();
   dbg('push', Object.keys(patch).length + ' keys');
   if (!Object.keys(patch).length) { dirty = false; setSync('ok'); return; }
@@ -734,12 +736,15 @@ async function fetchState() {
 function applyRemote(doc) {
   const raw = localShape(doc);
   if (!raw) return;
+  const pre = normalize(localShape(doc), true);   // 마이그레이션 전 기준선 (여기에 없는 변화만 밀어 올린다)
+  migrated = false;
   const st = normalize(raw);
-  baseRemote = remoteShape(st);
+  baseRemote = remoteShape(pre);
   const same = JSON.stringify(st) === JSON.stringify(state);
   dbg('apply', 'r' + st.routines.length + ' p' + st.pantry.length + ' k' + st.stock.length);
   state = st; saveLocal();
   if (!same) render();
+  if (hasDiff()) schedulePush();   // 구역·칫솔·수량 등 새 구조를 남편 폰에도 반영
 }
 function openStream() {
   if (!('EventSource' in window)) { scheduleRefetch(3000); return; }
@@ -756,12 +761,11 @@ function onStream(type) {
   scheduleRefetch(120);
 }
 async function initSync() {
-  let pend = false;
-  try { pend = localStorage.getItem(LSKEY + ':pending') === '1'; } catch (e) { }
-  if (pend) { await push(); }
-  await fetchState();
+  await fetchState();               // 먼저 방을 읽는다 (읽기 전에는 아무것도 밀지 않는다)
+  if (dirty) schedulePush();
+  try { if (!dirty) localStorage.removeItem(LSKEY + ':pending'); } catch (e) { }
   openStream();
-  window.addEventListener('online', () => { setSync(dirty ? 'busy' : 'ok'); push(); openStream(); });
+  window.addEventListener('online', () => { if (dirty) push(); else scheduleRefetch(300); openStream(); });
   window.addEventListener('offline', () => setSync('off'));
 }
 
@@ -846,15 +850,15 @@ function renderAlerts() {
   const box = $('#alerts');
   const out = [];
   const none = state.stock.filter(s => stockLevel(s) === 'none');
+  const lowNum = state.stock.filter(s => isNum(s) && stockCount(s) > 0 && stockCount(s) <= 2);
   if (none.length) {
     out.push({
       cls: '', ic: '🔴', title: '다 떨어진 생필품 ' + none.length + '개',
-      sub: none.slice(0, 3).map(s => s.name).join(' · ') + (none.length > 3 ? ' 외' : ''),
+      sub: none.slice(0, 3).map(s => s.name).join(' · ') + (none.length > 3 ? ' 외' : '') +
+        (lowNum.length ? ' · 곧: ' + lowNum.slice(0, 2).map(s => s.name + ' ' + stockCount(s) + '개').join(' · ') : ''),
       btn: { label: '구매리스트 →', act: 'alertstock' }
     });
-  }
-  const lowNum = state.stock.filter(s => isNum(s) && stockCount(s) > 0 && stockCount(s) <= 2);
-  if (lowNum.length) {
+  } else if (lowNum.length) {
     out.push({
       cls: 'warm', ic: '⚠️', title: '곧 떨어져요',
       sub: lowNum.slice(0, 3).map(s => s.name + ' ' + stockCount(s) + '개').join(' · '),
@@ -935,7 +939,7 @@ function renderToday() {
   const hiddenOffice = state.mode === 'home' ? state.routines.filter(r => r.slot === 'am' && r.cond === 'office') : [];
   const hiddenHome = state.mode === 'office' ? state.routines.filter(r => r.slot === 'am' && r.cond === 'home') : [];
   let note = '';
-  if (hiddenOffice.length) note = '🏠 재택이라 <b>' + hiddenOffice.map(r => esc(r.text.split(' · ')[0])).join(' · ') + '</b>를 건너뛰었어요 — <b>출근</b>으로 바꾸면 자동으로 끼어들어요';
+  if (hiddenOffice.length) note = '🏠 재택이라 <b>출근 전용 루틴</b>(' + hiddenOffice.map(r => esc(r.text)).join(' · ') + ')은 건너뛰었어요 — <b>출근</b>으로 바꾸면 자동으로 끼어들어요';
   else if (hiddenHome.length) note = '🏢 출근이라 <b>' + hiddenHome.map(r => esc(r.text)).join(' · ') + '</b>는 숨겼어요 — <b>재택</b>으로 바꾸면 다시 나와요';
   else note = '오늘은 <b>' + esc(rh.em) + '</b> — ' + esc(rh.sub);
 
@@ -1665,7 +1669,6 @@ function boot() {
   saveLocal();
   render();
   setSync('busy', '남편과 연결하는 중…');
-  if (migrated) schedulePush();   // 새 구조(구역·칫솔·수량)를 남편 폰에도 반영
   initSync();
   setInterval(() => {
     if (state.day !== todayISO()) {
