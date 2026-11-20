@@ -317,6 +317,11 @@ select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,#A
 .fld .row2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 .fld .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
 .hint{font-size:9.5px;font-weight:600;color:#B7AC9C;line-height:1.55;margin-top:5px}
+.gscan-out{display:none;margin-top:7px;border:1px dashed var(--amber-line,#F1E3C6);border-radius:12px;padding:8px 9px;background:#FFFDF7}
+.gscan-out.on{display:block}
+.gscan-out .bcode{margin-top:0;height:44px}
+.gscan-out .bnum{margin-top:4px}
+.gscan-out #giftScanDetail{margin-top:3px;text-align:center}
 .step-list{list-style:none;counter-reset:s}
 .step-list li{counter-increment:s;position:relative;padding:8px 0 8px 30px;border-top:1px dashed var(--line-soft);font-size:12px;font-weight:600;color:var(--ink2);line-height:1.5}
 .step-list li:first-child{border-top:0}
@@ -768,6 +773,16 @@ body.locked .app,body.locked .toast{visibility:hidden}
 <div class="mask" id="mGift"><div class="sheet">
   <div class="sheet-h"><b id="giftModalTitle">기프티콘 추가</b><button class="x" data-close>✕</button></div>
   <div class="sheet-b">
+    <div class="fld gscan">
+      <button class="btn ghost sm" id="btnGiftScan" type="button" style="width:100%">📷 캡처에서 자동 채우기 <span class="chip line" style="margin-left:4px">한도 0%</span></button>
+      <input id="giftScanFile" type="file" accept="image/*" hidden>
+      <div class="hint" id="giftScanMsg">기프티콘 캡처를 고르면 <b>바코드·유효기간·상품명</b>을 읽어 채웁니다 · 사진은 이 기기 밖으로 나가지 않아요</div>
+      <div class="gscan-out" id="giftScanOut">
+        <div class="bcode"><svg class="bcsvg" id="giftScanBarcode"></svg></div>
+        <div class="bnum" id="giftScanNum"></div>
+        <div class="hint" id="giftScanDetail"></div>
+      </div>
+    </div>
     <div class="fld"><label>이름</label><input id="gName" placeholder="예: 메가MGC커피 (ICE)아메리카노"></div>
     <div class="fld"><div class="row2">
       <div><label>유효기간</label><input id="gExp" type="date"></div>
@@ -3277,6 +3292,12 @@ function openGiftModal(id) {
     });
   }
   del.style.display = g ? "" : "none";
+  // 캡처 인식 안내·미리보기 초기화
+  const sm = $("#giftScanMsg");
+  if (sm) sm.innerHTML = "기프티콘 캡처를 고르면 <b>바코드·유효기간·상품명</b>을 읽어 채웁니다 · 사진은 이 기기 밖으로 나가지 않아요";
+  const so = $("#giftScanOut");
+  if (so) so.classList.remove("on");
+  if (typeof gscanPreview === "function") gscanPreview();
   openModal("mGift");
 }
 function openGiftNew() { openGiftModal(""); }
@@ -3855,9 +3876,8 @@ function openShortcut() {
   $("#scUrl").textContent = inboxUrl();
   const note = $("#scNote");
   if (note) {
-    note.innerHTML = signedIn()
-      ? "🔐 서버는 <b>로그인한 최현 님 계정만</b> 받도록 잠겨 있어요. 아이폰 단축어는 로그인 정보 없이 보내므로 이 주소로는 <b>401로 거부</b>됩니다. 단축어 자동 기록을 쓰려면 <b>쓰기 전용 통로</b>를 따로 여는 방법이 있어요 — 열면 아무나 결제 한 줄을 넣을 수 있게 되니 원하실 때만 말씀해 주세요."
-      : "🔐 로그인 전에는 서버로 아무것도 보내지 않아요. 구글 로그인 + 암호 열쇠를 만들면 동기화가 켜집니다. (이 주소는 이제 로그인 없이 쓰면 401로 거부돼요)";
+    note.innerHTML = "🔓 단축어 <b>임시 투입구(새 내역 쓰기 전용)</b>가 열려 있어 <b>아이폰 단축어로 바로 전송</b>할 수 있어요. 내역을 읽거나 지우는 건 <b>최현 님 로그인 후에만</b> 됩니다." +
+      (signedIn() ? "" : " 로그인하면 이 기기로 자동으로 가져와 장부에 기록합니다.");
   }
   openModal("mShortcut");
 }
@@ -4310,6 +4330,497 @@ function bindPickOcr() {
     touch(); closeModal("mPickOcr"); renderAll();
     toast(sel.length + "건을 하나Pick 목록에 담았어요");
   });
+}
+
+/* ==== 46-gift-scan.js ==== */
+/* ============================================================
+   기프티콘 캡처 자동 인식 (한도 0% · 브라우저 안에서만)
+   1) 바코드: BarcodeDetector → @zxing/library (Code128·EAN·QR)
+   2) 글자: Tesseract.js(kor+eng) → 유효기간·브랜드·상품명·주문번호
+   ============================================================ */
+const GSCAN_ZXING_SRC = "https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js";
+const GSCAN_FORMATS = ["CODE_128", "CODE_39", "CODE_93", "EAN_13", "EAN_8", "UPC_A", "UPC_E", "ITF", "QR_CODE", "CODABAR"];
+const GSCAN_LABEL = /^(교환처|교환품목|교환상품|유효기간|사용기간|사용기한|만료일|주문번호|주문일|주문일시|결제금액|상품금액|금액|잔액|바코드|쿠폰번호|상품명|상품|보내는사람|받는사람|선물내역|유의사항|주의사항|이용안내|문의|고객센터|사용처|사용매장|교환가능|발행처|결제수단|일시|승인번호|카드번호|포인트|적립|할인|쿠폰|상세|더보기|전체보기|선물하기|카카오톡|poweredby|forbiz|기간|날짜)/i;
+
+/* 이름 · 짧은표시 · 찾을 말 (앞쪽이 더 구체적) */
+const GSCAN_BRANDS = [
+  { name: "메가MGC커피", short: "메가", keys: ["메가mgc커피", "메가mgc", "메가커피", "mgc커피", "메가"] },
+  { name: "스타벅스", short: "스타", keys: ["스타벅스", "스타벅", "starbucks", "스벅"] },
+  { name: "투썸플레이스", short: "투썸", keys: ["투썸플레이스", "투썸", "twosome"] },
+  { name: "이디야커피", short: "이디야", keys: ["이디야"] },
+  { name: "컴포즈커피", short: "컴포", keys: ["컴포즈"] },
+  { name: "빽다방", short: "빽다", keys: ["빽다방", "빽다"] },
+  { name: "커피빈", short: "커피빈", keys: ["커피빈"] },
+  { name: "할리스", short: "할리", keys: ["할리스"] },
+  { name: "폴바셋", short: "폴바", keys: ["폴바셋"] },
+  { name: "파스쿠찌", short: "파스", keys: ["파스쿠찌"] },
+  { name: "공차", short: "공차", keys: ["공차"] },
+  { name: "배스킨라빈스", short: "배스", keys: ["배스킨라빈스", "배스킨", "배라", "baskin", "31아이스크림"] },
+  { name: "파리바게뜨", short: "파리", keys: ["파리바게뜨", "파리바게트", "파리바게"] },
+  { name: "뚜레쥬르", short: "뚜레", keys: ["뚜레쥬르", "뚜레쥬"] },
+  { name: "던킨도너츠", short: "던킨", keys: ["던킨"] },
+  { name: "크리스피크림", short: "크리", keys: ["크리스피"] },
+  { name: "설빙", short: "설빙", keys: ["설빙"] },
+  { name: "GS25", short: "GS", keys: ["gs25", "지에스25"] },
+  { name: "세븐일레븐", short: "세븐", keys: ["세븐일레븐", "세븐일레"] },
+  { name: "이마트24", short: "이마트", keys: ["이마트24"] },
+  { name: "CU", short: "CU", keys: ["cu편의점", "씨유편의점"] },
+  { name: "올리브영", short: "올리", keys: ["올리브영"] },
+  { name: "다이소", short: "다이", keys: ["다이소"] },
+  { name: "교촌치킨", short: "교촌", keys: ["교촌"] },
+  { name: "BHC", short: "BHC", keys: ["bhc"] },
+  { name: "BBQ", short: "BBQ", keys: ["bbq", "비비큐"] },
+  { name: "버거킹", short: "버거", keys: ["버거킹"] },
+  { name: "맥도날드", short: "맥도", keys: ["맥도날드", "맥도"] },
+  { name: "롯데리아", short: "롯데", keys: ["롯데리아"] },
+  { name: "맘스터치", short: "맘스", keys: ["맘스터치"] },
+  { name: "KFC", short: "KFC", keys: ["kfc"] },
+  { name: "서브웨이", short: "서브", keys: ["서브웨이", "써브웨이"] },
+  { name: "도미노피자", short: "도미", keys: ["도미노"] },
+  { name: "피자헛", short: "피자", keys: ["피자헛"] },
+  { name: "신세계", short: "신세", keys: ["신세계"] },
+  { name: "이마트", short: "이마트", keys: ["이마트"] },
+  { name: "홈플러스", short: "홈플", keys: ["홈플러스"] },
+  { name: "롯데마트", short: "롯데", keys: ["롯데마트"] },
+  { name: "노브랜드", short: "노브", keys: ["노브랜드"] },
+  { name: "쿠팡", short: "쿠팡", keys: ["쿠팡"] },
+  { name: "마켓컬리", short: "컬리", keys: ["마켓컬리", "컬리"] },
+  { name: "무신사", short: "무신", keys: ["무신사"] },
+  { name: "배달의민족", short: "배민", keys: ["배달의민족", "배민"] },
+  { name: "요기요", short: "요기", keys: ["요기요"] },
+  { name: "미스터피자", short: "미스", keys: ["미스터피자"] },
+  { name: "네이버페이", short: "네이", keys: ["네이버페이"] },
+  { name: "카카오페이", short: "카카", keys: ["카카오페이"] }
+];
+
+let gscanBusy = false;
+let gscanZXing = null;
+
+/* ---------- 도구 ---------- */
+function gscanNorm(s) {
+  return String(s || "").toLowerCase().replace(/[\s\u00a0\\|_·.,:;'"`~!@#$%^&*+=<>?\/\[\]{}()]/g, "");
+}
+function gscanCanvas(img, sx, sy, sw, sh, scale) {
+  const c = document.createElement("canvas");
+  c.width = Math.max(1, Math.round(sw * scale));
+  c.height = Math.max(1, Math.round(sh * scale));
+  const ctx = c.getContext("2d");
+  ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, c.width, c.height);
+  ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(img, sx, sy, sw, sh, 0, 0, c.width, c.height);
+  return c;
+}
+/* 주소는 인식이 끝날 때까지 살려 둔다 — Tesseract가 img.src(blob)를 다시 읽어 간다 */
+function gscanLoadImage(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const im = new Image();
+    im.onload = () => resolve({ img: im, url: url });
+    im.onerror = () => { URL.revokeObjectURL(url); reject(new Error("사진을 열지 못했어요")); };
+    im.src = url;
+  });
+}
+async function gscanEnsureZXing() {
+  if (window.ZXing) return true;
+  if (!gscanZXing) {
+    gscanZXing = loadScript(GSCAN_ZXING_SRC).then(() => true).catch(() => { gscanZXing = null; return false; });
+  }
+  return gscanZXing;
+}
+
+/* ---------- 1) 바코드 ---------- */
+function gscanCleanCode(v) {
+  const raw = String(v || "").trim();
+  if (!raw) return "";
+  if (/^[\d\s\-]+$/.test(raw)) return raw.replace(/\D/g, "");
+  return raw.replace(/\s/g, "");
+}
+function gscanRegions(W, H) {
+  const list = [];
+  const add = (mx, fy, fh, target) => {
+    const sx = Math.max(0, Math.round(W * mx));
+    const sw = Math.min(W - sx, Math.round(W * (1 - mx * 2)));
+    const sy = Math.max(0, Math.round(H * fy));
+    const sh = Math.min(H - sy, Math.max(40, Math.round(H * fh)));
+    if (sw < 60 || sh < 40) return;
+    const scale = Math.max(0.5, Math.min(4, target / sw));
+    list.push([sx, sy, sw, sh, scale]);
+  };
+  // 좌우 테두리(어두운 배경·라운드 모서리)를 넣으면 1D 판독이 깨진다 → 여백을 주고 시작
+  add(0.06, 0, 1, 1000);          // 전체 (좌우 6% 여백)
+  add(0.06, 0, 1, 1600);
+  add(0.10, 0, 1, 1200);
+  add(0.02, 0, 1, 1000);          // 배경이 밝은 양식
+  add(0.06, 0.42, 0.55, 1500);    // 아래 절반 확대(바코드는 보통 아래쪽)
+  add(0.06, 0.30, 0.45, 1400);
+  add(0.06, 0.55, 0.45, 1400);
+  add(0.06, 0.10, 0.45, 1400);    // 위쪽에 바코드가 있는 양식
+  [0.30, 0.45, 0.60, 0.75].forEach(fy => add(0.06, fy, 0.25, 1400));
+  return list;
+}
+async function gscanDecodeBarcode(img) {
+  // (1) 브라우저 내장 감지기
+  try {
+    if ("BarcodeDetector" in window) {
+      const fm = await BarcodeDetector.getSupportedFormats();
+      const want = fm.filter(f => GSCAN_FORMATS.indexOf(String(f).toUpperCase()) >= 0);
+      if (want.length) {
+        const det = new BarcodeDetector({ formats: want });
+        const rs = await det.detect(img);
+        for (const r of rs || []) {
+          const v = gscanCleanCode(r.rawValue);
+          if (v) return { value: v, via: "감지기", format: r.format };
+        }
+      }
+    }
+  } catch (e) { /* 내장 감지기가 없으면 ZXing으로 */ }
+
+  // (2) ZXing — 영역을 나눠 스캔 (전체 이미지는 바코드가 작아 실패하는 경우가 많음)
+  if (!(await gscanEnsureZXing())) return null;
+  const W = img.naturalWidth, H = img.naturalHeight;
+  const hints = new Map();
+  hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, GSCAN_FORMATS.filter(f => ZXing.BarcodeFormat[f]).map(f => ZXing.BarcodeFormat[f]));
+  hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
+  const reader = new ZXing.MultiFormatReader();
+  for (const [sx, sy, sw, sh, scale] of gscanRegions(W, H)) {
+    let cv;
+    try { cv = gscanCanvas(img, sx, sy, sw, sh, scale); } catch (e) { continue; }
+    try {
+      const src = new ZXing.HTMLCanvasElementLuminanceSource(cv);
+      const bmp = new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(src));
+      const r = reader.decode(bmp, hints);
+      const v = r ? gscanCleanCode(r.getText()) : "";
+      if (v) return { value: v, via: "ZXing", format: String(r.getBarcodeFormat()) };
+    } catch (e) { /* 이 영역에서는 못 찾음 → 다음 영역 */ }
+  }
+  return null;
+}
+
+/* ---------- 2) 글자 ---------- */
+function gscanDates(text) {
+  const out = [];
+  const t = String(text || "");
+  const push = (y, mo, d) => {
+    y = Number(y); mo = Number(mo); d = Number(d);
+    if (y < 100) y += 2000;
+    if (y < 2000 || y > 2100 || mo < 1 || mo > 12 || d < 1 || d > 31) return;
+    const iso = y + "-" + pad2(mo) + "-" + pad2(d);
+    if (out.indexOf(iso) < 0) out.push(iso);
+  };
+  let m;
+  const re1 = /(20\d{2})\s*[년.\-\/]\s*(\d{1,2})\s*[월.\-\/]\s*(\d{1,2})\s*일?/g;
+  while ((m = re1.exec(t))) push(m[1], m[2], m[3]);
+  const re2 = /(?:^|[^\d])(\d{2})\s*[.\-\/]\s*(\d{1,2})\s*[.\-\/]\s*(\d{1,2})(?!\d)/g;
+  while ((m = re2.exec(t))) push(m[1], m[2], m[3]);
+  return out;
+}
+function gscanLineWords(l) {
+  const ws = (l.words || []).filter(w => w.text && w.text.trim());
+  if (!ws.length) return [];
+  const h = Math.max(6, l.bbox ? l.bbox.y1 - l.bbox.y0 : 10);
+  const keep = [ws[0]];
+  for (let i = 1; i < ws.length; i++) {
+    const gap = ws[i].bbox.x0 - ws[i - 1].bbox.x1;
+    if (gap > h * 2.2) break;                 // 오른쪽 로고·버튼 칸은 버린다
+    keep.push(ws[i]);
+  }
+  return keep;
+}
+function gscanJoinWords(ws) {
+  if (!ws.length) return "";
+  let out = ws[0].text.trim();
+  for (let i = 1; i < ws.length; i++) {
+    const a = ws[i - 1].text.trim(), b = ws[i].text.trim();
+    // 한글은 OCR이 음절 단위로 쪼개므로 붙이고, 라틴 글자끼리는 띄운다
+    const aE = a.slice(-1), bS = b.slice(0, 1);
+    const alnum = ch => /[A-Za-z0-9가-힣]/.test(ch);
+    const bothHangul = /[가-힣]/.test(aE) && /[가-힣]/.test(bS);
+    const space = alnum(aE) && alnum(bS) && !bothHangul;
+    out += (space ? " " : "") + b;
+  }
+  return out.replace(/\s+/g, " ").trim();
+}
+function gscanLineText(l) {
+  const ws = gscanLineWords(l);
+  if (ws.length) return gscanJoinWords(ws);
+  return String(l.text || "").replace(/\s+/g, " ").trim();
+}
+function gscanEmptyish(t) {
+  const n = String(t || "").replace(/\s+/g, "");
+  if (n.length < 2) return true;
+  if (/^\d[\d,.\-\/]*$/.test(n)) return true;
+  if (/^[()[\]{}|<>~_\-=+*\/\\.,:;'"`·]+$/.test(n)) return true;
+  if (!/[가-힣A-Za-z]{2}/.test(n)) return true;
+  return false;
+}
+function gscanBrandOf(lineText) {
+  const n = gscanNorm(lineText);
+  if (!n) return null;
+  let best = null;
+  GSCAN_BRANDS.forEach(b => {
+    b.keys.forEach(k => {
+      const kn = gscanNorm(k);
+      if (!kn) return;
+      if (n.indexOf(kn) < 0) return;
+      let score = kn.length;
+      if (kn.length <= 2) score -= 1;          // 짧은 말은 점수를 낮춰 오인을 줄인다
+      if (!best || score > best.score) best = { brand: b, score: score, key: k };
+    });
+  });
+  return best ? best.brand : null;
+}
+function gscanConf(l) {
+  const c = l && (l.confidence != null ? l.confidence : l.conf);
+  return c == null ? 0 : Number(c) || 0;
+}
+function gscanParse(lines) {
+  const res = { exp: "", brand: null, brandFrom: "", product: "", productLine: -1, barcode: "", orderNo: "", text: "" };
+  const texts = lines.map(l => String(l.text || "").replace(/\s+/g, " ").trim());
+  res.text = texts.join("\n");
+
+  /* 유효기간: '유효기간/사용기한/까지' 줄 → 없으면 전체에서 가장 늦은 날짜 */
+  const expKeys = /유효|사용\s*기한|사용\s*기간|만료|까지|교환\s*기한/;
+  let dates = [];
+  lines.forEach((l, i) => {
+    if (!expKeys.test(texts[i])) return;
+    dates = dates.concat(gscanDates(texts[i]));
+  });
+  if (!dates.length) dates = gscanDates(res.text);
+  if (dates.length) res.exp = dates.slice().sort().pop();
+
+  /* 바코드 숫자 (1D 디코더가 실패했을 때의 보조) */
+  const cands = [];
+  texts.forEach((t, i) => {
+    const re = /\d(?:[\d\s\-]{10,26})\d/g;
+    let m;
+    while ((m = re.exec(t))) {
+      const d = m[0].replace(/\D/g, "");
+      if (d.length < 12 || d.length > 20) continue;
+      const head = t.slice(0, Math.max(0, m.index));
+      const bad = /주문|승인|전화|고객|사업자|등록|계좌|카드번호|포인트/.test(head);
+      cands.push({ d: d, bad: bad, i: i });
+    }
+  });
+  const good = cands.filter(c => !c.bad);
+  const pick = good.find(c => c.d.length <= 14) || good[0] || null;
+  if (pick) res.barcode = pick.d;
+
+  /* 주문번호 */
+  texts.forEach(t => {
+    if (!/주문\s*번호/.test(t)) return;
+    const m = t.match(/(\d[\d\s\-]{5,24}\d)/);
+    if (m) {
+      const d = m[1].replace(/\D/g, "");
+      if (d.length >= 6) res.orderNo = d;
+    }
+  });
+
+  /* 브랜드 */
+  let brandIdx = -1;
+  let brandScore = -1;
+  lines.forEach((l, i) => {
+    const txt = gscanLineText(l) + " " + texts[i];
+    if (gscanEmptyish(txt) && !/[가-힣]{2}/.test(texts[i])) return;
+    const b = gscanBrandOf(txt);
+    if (!b) return;
+    const score = (b.keys || []).reduce((s, k) => Math.max(s, gscanNorm(k).length), 0);
+    if (score > brandScore) { brandScore = score; brandIdx = i; res.brand = b; res.brandFrom = txt; }
+  });
+  if (!res.brand) {
+    // 긴 상품명 줄에 브랜드가 섞여 있는 경우
+    lines.forEach((l, i) => {
+      if (res.brand) return;
+      const b = gscanBrandOf(texts[i]);
+      if (b) { res.brand = b; brandIdx = i; }
+    });
+  }
+
+  /* 상품명: 브랜드 줄 다음 줄 → 없으면 브랜드 줄 근처의 글자 줄 */
+  const usable = [];
+  lines.forEach((l, i) => {
+    const txt = gscanLineText(l) || texts[i];
+    if (!txt) return;
+    if (gscanConf(l) < 30) return;
+    const n = txt.replace(/\s+/g, "");
+    if (gscanEmptyish(txt)) return;
+    if (GSCAN_LABEL.test(n)) return;
+    if (gscanDates(txt).length) return;
+    if (/^[\d,]+\s*원$/.test(n)) return;
+    if (n.length > 40) return;
+    usable.push({ i: i, text: txt, conf: gscanConf(l) });
+  });
+  const notBrand = usable.filter(u => {
+    const b = gscanBrandOf(u.text);
+    return !b || gscanNorm(u.text).length > gscanNorm(b.name).length + 2;
+  });
+  let chosen = null;
+  if (brandIdx >= 0) {
+    chosen = notBrand.find(u => u.i === brandIdx + 1) || notBrand.find(u => u.i === brandIdx + 2 && u.i > brandIdx) ||
+      notBrand.filter(u => u.i > brandIdx).sort((a, b) => a.i - b.i)[0] || null;
+  }
+  if (!chosen) {
+    chosen = notBrand.slice().sort((a, b) => b.conf - a.conf)[0] || usable[0] || null;
+  }
+  if (chosen) { res.product = chosen.text; res.productLine = chosen.i; }
+
+  /* 이름 정리 */
+  if (res.brand && res.product) {
+    const bn = res.brand.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    res.product = res.product.replace(new RegExp(bn, "gi"), " ").replace(/\s+/g, " ").trim();
+  }
+  res.product = res.product.replace(/^[:：\-–—·|]+|[:：\-–—·|]+$/g, "").trim();
+  if (res.brand && res.product && gscanNorm(res.product).indexOf(gscanNorm(res.brand.name)) === 0) {
+    res.product = res.product.slice(res.brand.name.length).trim();
+  }
+  return res;
+}
+
+/* 대괄호 속 라틴 글자(예: (106) → (ICE)) 한 번 더 읽기 */
+async function gscanRepairParen(worker, img, lines, idx, product) {
+  const m = String(product || "").match(/^[\(\[]([^\)\]]{0,8})[\)\]]?/);
+  if (!m) return product;
+  if (/^[A-Z]{2,6}$/.test(m[1])) return product;
+  const l = lines[idx];
+  if (!l || !l.words) return product;
+  const w = l.words.find(x => /^[\(\[]/.test(String(x.text || "").trim()));
+  if (!w) return product;
+  const bb = w.bbox;
+  try {
+    const cv = gscanCanvas(img, bb.x0 - 2, bb.y0 - 3, (bb.x1 - bb.x0) + 4, (bb.y1 - bb.y0) + 6, 8);
+    await worker.setParameters({ tessedit_pageseg_mode: "7" });
+    const r = await worker.recognize(cv, {});
+    const txt = String((r && r.data && r.data.text) || "").replace(/\s+/g, "");
+    const got = txt.match(/^[\(\[]?([A-Z]{2,6})[\)\]]?/);
+    if (got && got[1] !== m[1]) return product.replace(/^[\(\[](?:[^\)\]]{0,8})[\)\]]?/, "(" + got[1] + ")");
+  } catch (e) { /* 못 읽으면 원래 값 유지 */ }
+  return product;
+}
+
+/* ---------- 화면 ---------- */
+function gscanSetMsg(html) {
+  const el = $("#giftScanMsg");
+  if (el) el.innerHTML = html;
+}
+function gscanPreview() {
+  const box = $("#giftScanOut");
+  const svg = $("#giftScanBarcode");
+  const num = $("#giftScanNum");
+  const det = $("#giftScanDetail");
+  if (!box || !svg) return;
+  const code = ($("#gBarcode").value || "").replace(/\s/g, "");
+  if (!code) { box.classList.remove("on"); return; }
+  let ok = false;
+  if (window.JsBarcode) {
+    try {
+      JsBarcode(svg, code, { format: "CODE128", displayValue: false, height: 44, width: 2, margin: 2, background: "#ffffff", lineColor: "#000000" });
+      ok = true;
+    } catch (e) { ok = false; }
+  }
+  if (!ok) { box.classList.remove("on"); return; }
+  svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+  if (num) num.textContent = fmtBarcode(code);
+  if (det) det.textContent = "이 바코드로 매장에서 스캔됩니다 · 다르면 위 칸에서 고쳐 주세요";
+  box.classList.add("on");
+}
+function gscanFill(res, img, file) {
+  const got = [];
+  if (res.barcode) { $("#gBarcode").value = res.barcode; got.push("바코드"); }
+  if (res.exp) { $("#gExp").value = res.exp; got.push("유효기간"); }
+  if (res.brand) { $("#gBrand").value = res.brand.short || ""; }
+  let name = "";
+  if (res.brand && res.product && gscanNorm(res.product).indexOf(gscanNorm(res.brand.name)) < 0) name = res.brand.name + " " + res.product;
+  else if (res.brand) name = res.brand.name + (res.product ? "" : "");
+  else if (res.product) name = res.product;
+  if (name) { $("#gName").value = name; got.push("상품명"); }
+  if (res.orderNo && !($("#gOrder").value || "").trim()) $("#gOrder").value = res.orderNo;
+  if (!res.barcode && img) {
+    // 바코드를 못 읽었으면 캡처를 그대로 보관(매장에서 이미지로 보여줄 수 있게)
+    try {
+      const cv = gscanCanvas(img, 0, 0, img.naturalWidth, img.naturalHeight, Math.min(1, 520 / Math.max(img.naturalWidth, img.naturalHeight)));
+      $("#mGift").setAttribute("data-img", cv.toDataURL("image/jpeg", 0.72));
+    } catch (e) {}
+  }
+  gscanPreview();
+  const bits = [];
+  if (res.barcode) bits.push("바코드 " + fmtBarcode(res.barcode));
+  if (res.exp) bits.push("유효기간 " + res.exp.replace(/-/g, "."));
+  if (name) bits.push(name);
+  gscanSetMsg(got.length
+    ? "✅ " + bits.join(" · ") + " — 확인하고 고칠 부분만 고쳐 주세요"
+    : "읽어낸 값이 없어요 · 더 선명한 캡처로 다시 시도하거나 직접 적어 주세요");
+  return got;
+}
+
+async function gscanRun(file) {
+  if (gscanBusy) { toast("아직 읽는 중이에요"); return; }
+  gscanBusy = true;
+  const btn = $("#btnGiftScan");
+  const old = btn ? btn.innerHTML : "";
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="loader"></span>읽는 중'; }
+  $("#giftScanOut").classList.remove("on");
+  let worker = null;
+  let imgUrl = "";
+  try {
+    const loaded = await gscanLoadImage(file);
+    const img = loaded.img;
+    imgUrl = loaded.url;
+    gscanSetMsg("🔎 바코드를 찾는 중…");
+    const tDecode = Date.now();
+    const code = await gscanDecodeBarcode(img);
+    const msDecode = Date.now() - tDecode;
+    gscanSetMsg("📷 바코드와 유효기간을 읽는 중…");
+    await ensureTesseract();
+    worker = await Tesseract.createWorker("kor+eng", 1, {
+      logger: m => {
+        if (m && /recognizing|loading|initializ/.test(m.status || "")) {
+          const pct = Math.round((m.progress || 0) * 100);
+          gscanSetMsg("📷 바코드와 유효기간을 읽는 중… " + pct + "%");
+        }
+      }
+    });
+    const out = await worker.recognize(img, {}, { blocks: true });
+    const msOcr = Date.now() - tDecode - msDecode;
+    const lines = [];
+    ((out.data && out.data.blocks) || []).forEach(b => (b.paragraphs || []).forEach(p => (p.lines || []).forEach(l => {
+      if (l && l.text && l.text.trim()) lines.push(l);
+    })));
+    const res = gscanParse(lines);
+    if (!res.barcode && code && code.value) res.barcode = code.value;
+    if (res.barcode && code && code.value && res.barcode !== code.value) {
+      // 디코더가 읽은 실제 바코드를 우선한다
+      res.barcode = code.value;
+    }
+    if (res.productLine >= 0 && res.product) {
+      res.product = await gscanRepairParen(worker, img, lines, res.productLine, res.product);
+    }
+    const got = gscanFill(res, img, file);
+    window.__gscanLast = { decodeMs: msDecode, ocrMs: msOcr, code: code, result: res };
+    toast(got.length ? "캡처에서 " + got.join("·") + "을 채웠어요" : "읽어낸 값이 없어요 — 직접 적어 주세요");
+  } catch (e) {
+    console.warn("gift scan failed", e);
+    gscanSetMsg("⚠️ " + (e && e.message ? e.message : "인식하지 못했어요") + " · 직접 적어 주세요");
+    toast("인식하지 못했어요 — 직접 적어 주세요");
+  } finally {
+    if (worker) { try { await worker.terminate(); } catch (e) {} }
+    if (imgUrl) { try { URL.revokeObjectURL(imgUrl); } catch (e) {} }
+    gscanBusy = false;
+    if (btn) { btn.disabled = false; btn.innerHTML = old || "📷 캡처에서 자동 채우기"; }
+    const inp = $("#giftScanFile");
+    if (inp) inp.value = "";
+  }
+}
+
+function bindGiftScan() {
+  const btn = $("#btnGiftScan");
+  const inp = $("#giftScanFile");
+  if (!btn || !inp) return;
+  btn.addEventListener("click", () => { inp.value = ""; inp.click(); });
+  inp.addEventListener("change", ev => {
+    const f = (ev.target.files || [])[0];
+    if (f) gscanRun(f);
+  });
+  const code = $("#gBarcode");
+  if (code) code.addEventListener("input", gscanPreview);
 }
 
 /* ==== 50-import.js ==== */
@@ -5387,6 +5898,7 @@ function boot() {
   bindOcr();
   bindPicks();
   bindPickOcr();
+  bindGiftScan();
   bindAuth();
   renderAll();
   initAuth();          /* 로그인 확인 → 로그인 뒤에만 DB 연결 */
