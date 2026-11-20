@@ -16343,6 +16343,7 @@ function iconSVG(key) {
   function applyTab(tab, opts) {
     var wk = weekendMode();
     if (WK_TABS.indexOf(tab) >= 0 && !wk) tab = 'morning';
+    if (wk && (tab === 'morning' || tab === 'evening')) tab = 'wm';   /* 주말엔 평일 탭을 열지 않아요 */
     activeTab = ALL_TABS.indexOf(tab) >= 0 ? tab : (wk ? 'wm' : 'morning');
     for (var i = 0; i < ALL_TABS.length; i++) {
       var name = ALL_TABS[i], on = name === activeTab;
