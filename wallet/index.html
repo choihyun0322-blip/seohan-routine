@@ -873,7 +873,7 @@ function seedCards() {
       ]
     },
     {
-      id: "nepa", name: "하나 네이버페이 머니체크", short: "네페체크", last4: "", rank: 3, color: "hn",
+      id: "nepa", name: "하나 네이버페이 머니체크", short: "네페체크", last4: "", rank: 0, color: "hn",
       target: 0, sub: "체크 · 전 가맹점 1.2%", type: "check",
       benefits: [{ t: "전 가맹점 1.2%", tone: "" }, { t: "실적 부담 없음", tone: "sage" }],
       rules: [{ cats: ["*"], rate: 1.2, cap: 0 }]
@@ -1504,7 +1504,7 @@ function renderCards() {
     else {
       const checks = state.ktChecks[mk] || [];
       ktBox.innerHTML = '<div class="ktrow"><span class="slogo">KT</span>' +
-        '<div class="ktn"><b>' + esc(kt.name) + "</b><small>" + esc(kt.sub || "월간 무료 혜택 체크") + "</small></div>" +
+        '<div class="ktn"><b>' + (kt.rank ? RANK_LABEL[kt.rank] + " " : "") + esc(kt.name) + "</b><small>" + esc(kt.sub || "월간 무료 혜택 체크") + "</small></div>" +
         (kt.benefits[0] ? '<span class="chip amber">' + esc(kt.benefits[0].t) + "</span>" : "") +
         '<div class="ktchecks">' + (kt.checks || []).map((label) => {
           const on = checks.indexOf(label) >= 0;
@@ -2518,37 +2518,39 @@ function bindPicks() {
 let pOcrRows = [];
 function pickOcrFromLines(lines) {
   const rows = [];
+  const skip = /^(완료|마감|선착순|전체|내가|Pick|혜택|모아보기|쿠팡|쇼핑|여행|문화|생활|모빌리티|푸드|전체 Pick 혜택|내가 Pick 한 혜택)$/;
+  const benefitish = /(%|원|할인|쿠폰|적립|무료|증정|청구|제공|DC|배송)/i;
   const dateRe = /(20\d{2})[.\-\/]\s?(\d{1,2})[.\-\/]\s?(\d{1,2})/g;
-  const stop = /^(완료|마감|선착순|전체|내가|Pick|혜택|모아보기|쿠팡|쇼핑|여행|문화|생활|모빌리티|푸드)$/;
   let cur = null;
-  const push = () => {
+  const flush = () => {
     if (!cur) return;
-    const title = (cur.title || "").trim();
-    const benefit = (cur.benefit || []).join(" ").replace(/\s+/g, " ").trim();
-    if (title.length >= 2) {
-      rows.push({
-        issuer: "하나Pick", title: title.slice(0, 40),
-        benefit: benefit.slice(0, 90),
-        exp: cur.exp || "", on: true
-      });
+    const title = String(cur.title || "").trim();
+    const benefit = cur.benefit.join(" ").replace(/\s+/g, " ").trim();
+    if (title.length >= 2 && !skip.test(title)) {
+      rows.push({ issuer: "하나Pick", title: title.slice(0, 40), benefit: benefit.slice(0, 90), exp: cur.exp || "", on: true });
     }
     cur = null;
   };
   lines.forEach(raw => {
-    const line = String(raw || "").trim();
-    if (!line) { return; }
-    const d = line.match(dateRe);
-    if (d) {
-      if (cur && !cur.exp) cur.exp = d[0].replace(/[.\/]/g, "-").replace(/\s/g, "").replace(/-(\d)-/, "-0$1-");
-      return;
+    let line = String(raw || "").replace(/\s+/g, " ").trim();
+    if (!line) return;
+    if (/Pick\s*모아보기|내가\s*Pick|전체\s*Pick/.test(line)) return;
+    const dates = line.match(dateRe);
+    if (dates && dates.length) {
+      const last = dates[dates.length - 1].match(/(\d{4})[.\-\/]\s?(\d{1,2})[.\-\/]\s?(\d{1,2})/);
+      if (last && cur && !cur.exp) cur.exp = last[1] + "-" + pad2(last[2]) + "-" + pad2(last[3]);
+      line = line.replace(dateRe, " ").replace(/\s+/g, " ").trim();
+      if (!line) return;
     }
-    if (stop.test(line.replace(/[\s]/g, ""))) return;
-    const isBenefit = /(할인|쿠폰|적립|청구|무료|증정|%|원)/.test(line);
+    if (skip.test(line.replace(/\s/g, ""))) return;
+    const isBenefit = benefitish.test(line);
+    const short = line.length <= 14;
+    if (cur && short && !isBenefit) { flush(); cur = { title: line, benefit: [], exp: cur && cur.exp || "" }; return; }
     if (!cur) { cur = { title: line, benefit: [], exp: "" }; return; }
-    if (!cur.benefit.length && !isBenefit && line.length <= 14) { push(); cur = { title: line, benefit: [], exp: "" }; return; }
+    if (short && isBenefit && line.length <= 6) { cur.benefit.push(line); return; }
     cur.benefit.push(line);
   });
-  push();
+  flush();
   return rows.slice(0, 30);
 }
 function openPickOcr(rows, message) {
