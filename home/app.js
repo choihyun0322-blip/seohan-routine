@@ -558,7 +558,7 @@ function renderCare() {
   const rest = list.filter(x => x.d > 2);
   $('#careChips').innerHTML = rest.map(x =>
     '<div class="chipc"><span class="e">' + x.c.emoji + '</span>' +
-    '<div class="cn" data-act="careedit" data-id="' + x.c.id + '"><b>' + esc(x.c.name) + '</b><small>' + x.c.days + '일 주기 · ' + md(x.last) + ' 완료</small></div>' +
+    '<div class="cn" data-act="careedit" data-id="' + x.c.id + '"><b>' + esc(x.c.name) + '</b><small>' + x.c.days + '일 주기</small></div>' +
     '<span class="cd ' + (x.d <= 5 ? 'mid' : '') + '">' + dueLabel(x.d) + '</span>' +
     '<button class="mini" data-act="carecomplete" data-id="' + x.c.id + '">✓</button></div>'
   ).join('') || '<div class="empty" style="grid-column:1/-1">등록된 주기 케어가 없어요</div>';
