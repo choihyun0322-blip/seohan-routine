@@ -219,6 +219,31 @@ h1{font-size:21px;font-weight:800;letter-spacing:-.9px;line-height:1.15;white-sp
 .pchip .dd2.mid{color:var(--amber)}
 .pchip .dd2.bad{color:var(--coral)}
 .pchip:active{background:var(--sage-soft);border-color:var(--sage-line)}
+.sgroup{margin-top:7px}
+.sgroup:first-of-type{margin-top:1px}
+.sgroup-h{display:flex;align-items:center;gap:5px;margin-bottom:4px;font-size:9.5px;font-weight:800;color:#8D8478;letter-spacing:-.2px}
+.sgroup-h .pc{background:#F5F1E8;color:#A79C8D;border-radius:5px;padding:0 4px;font-size:9px;font-weight:800}
+
+/* 주말 휴식 카드 */
+.talks.single{grid-template-columns:minmax(0,1fr)}
+.rest-box{background:#F5F9F2;border:1px dashed var(--sage-line);border-radius:12px;padding:11px 12px}
+.rest-p{font-size:12px;font-weight:700;color:var(--sage-d);line-height:1.55;letter-spacing:-.2px}
+.rest-p2{margin-top:5px;font-size:11px;font-weight:600;color:#7E9078;line-height:1.5}
+.memo{margin-top:11px}
+.memo label{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:800;color:#9C9285;margin-bottom:5px;letter-spacing:-.2px}
+.memo label span{font-weight:600;color:#B7AC9C;font-size:9.5px}
+.memo textarea{width:100%;border:1.5px solid var(--line);background:#FFFDFA;border-radius:11px;padding:9px 10px;font-size:13px;font-weight:600;line-height:1.5;resize:vertical;min-height:64px;outline:none}
+.memo textarea:focus{border-color:var(--sage)}
+.memo-hint{margin-top:4px;font-size:9.5px;font-weight:600;color:#B7AC9C}
+
+/* 영수증 등록 */
+.rraw{width:100%;border:1.5px solid var(--line);background:#FFFDFA;border-radius:11px;padding:9px 10px;font-size:12.5px;font-weight:600;line-height:1.55;min-height:76px;resize:vertical;outline:none}
+.rraw:focus{border-color:var(--sage)}
+.rrow{display:grid;grid-template-columns:18px minmax(0,1fr) auto auto;gap:6px;align-items:center;padding:6px 0;border-top:1px dashed var(--line-soft)}
+.rrow input{width:16px;height:16px;accent-color:var(--sage)}
+.rrow .rn{font-size:12px;font-weight:700;letter-spacing:-.3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.rchip{font-size:9px;font-weight:800;padding:4px 6px;border-radius:6px;background:#F5F1E8;color:#9C9285;border:1px solid var(--line);white-space:nowrap}
+.rdup{font-size:8.5px;font-weight:800;color:#B7AC9C;background:#F5F1E8;border-radius:6px;padding:3px 5px;white-space:nowrap}
 .padd{display:flex;gap:5px;margin-top:9px;flex-wrap:wrap}
 .padd input{flex:1 1 130px;min-width:0;border:1px solid var(--line);background:#FFFDFA;border-radius:9px;padding:8px 9px;font-size:12.5px;font-weight:600;outline:none}
 .padd input[type=date]{flex:0 0 118px;font-size:11px;color:var(--sub)}
@@ -398,7 +423,7 @@ h1{font-size:21px;font-weight:800;letter-spacing:-.9px;line-height:1.15;white-sp
     <section id="panel-today">
       <section class="card" id="card-today">
         <div class="card-h">
-          <h2>오늘의 집안일 <span class="chip sage" id="todayChip">금요일 · 재택</span></h2>
+          <h2><span id="todayH">오늘의 집안일</span> <span class="chip sage" id="todayChip">금요일 · 재택</span></h2>
           <div class="prog"><div class="pbar"><i id="todayBar" style="width:0%"></i></div><span class="pnum" id="todayNum">0 / 0</span></div>
         </div>
         <div class="wlabel">
@@ -454,12 +479,26 @@ h1{font-size:21px;font-weight:800;letter-spacing:-.9px;line-height:1.15;white-sp
         <ul class="lrows" id="shopList"></ul>
       </section>
 
+      <section class="card" id="card-receipt">
+        <div class="card-h">
+          <h2>📷 영수증 · 장보기 등록</h2>
+          <span class="chip line">사용량 0%</span>
+        </div>
+        <div class="note" style="margin-bottom:8px">쿠팡 주문내역이나 영수증 내용을 복사해 붙여넣고 <b>품목 뽑기</b>를 누르면 이름만 골라 담아요. 사진(영수증·쿠팡 캡처)은 <b>피클 채팅으로 보내 주시면</b> 제가 읽어서 넣어 드립니다.</div>
+        <textarea class="rraw" id="receiptRaw" placeholder="예)&#10;서울우유 1L 2,890&#10;계란 15구 6,900&#10;신라면 5입 4,280"></textarea>
+        <div style="display:flex;gap:6px;margin-top:7px;flex-wrap:wrap">
+          <button class="btn sm" data-act="receiptparse">🔍 품목 뽑기</button>
+          <button class="btn ghost" data-act="receiptclear">비우기</button>
+        </div>
+        <div id="receiptResult"></div>
+      </section>
+
       <section class="card" id="card-recipes">
         <div class="card-h">
           <h2>🍳 냉장고 재료 &amp; 레시피</h2>
           <span class="chip sage" id="recChip">0개 맞춤</span>
         </div>
-        <div class="wlabel"><span class="l">🧊 보관 구역별 재료</span><span class="r" id="pantryHint">재료를 누르면 구역·유통기한 수정</span></div>
+        <div class="wlabel"><span class="l">🧊 보관 구역별 재료</span><span class="r" id="pantryHint">냉장·냉동은 육류·야채·과일·밀키트로 자동 분류</span></div>
         <div class="pgroups" id="pantry"></div>
         <div class="padd">
           <input id="pantryInput" type="text" placeholder="재료 추가 (예: 애호박)">
@@ -521,6 +560,6 @@ h1{font-size:21px;font-weight:800;letter-spacing:-.9px;line-height:1.15;white-sp
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<script src="app.js?v=105826"></script>
+<script src="app.js?v=119044"></script>
 </body>
 </html>

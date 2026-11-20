@@ -58,6 +58,50 @@ const ZONES = [
 const ZONE_MAP = { fridge: ZONES[0], freezer: ZONES[1], room: ZONES[2], seasoning: ZONES[3] };
 function zoneLabel(z) { const m = ZONE_MAP[z] || ZONE_MAP.fridge; return m.em + ' ' + m.label; }
 
+/* ---------------- 냉장·냉동 안쪽 소분류 ----------------
+   화면에는 육류 → 야채 → 과일 → 밀키트·반찬 → 유제품·기타 순서로 묶는다.
+   품목에는 아무것도 쓰지 않고 이름으로만 추론한다(기존 방 데이터를 건드리지 않음).
+   사용자가 직접 고른 값(p.sub)이 있으면 그것이 우선.                          */
+const SUBS = [
+  { k: 'meat', label: '육류', em: '🥩' },
+  { k: 'veg', label: '야채', em: '🥬' },
+  { k: 'fruit', label: '과일', em: '🍎' },
+  { k: 'meal', label: '밀키트·반찬', em: '🍱' },
+  { k: 'etc', label: '유제품·기타', em: '🥛' }
+];
+const SUB_MAP = {};
+SUBS.forEach(s => { SUB_MAP[s.k] = s; });
+
+/* 판정 순서: 간편식 → 유제품·음료·빵·면 → 육류·수산 → 과일 → 야채 (남는 건 기타) */
+const SUB_KW = {
+  meal: ['해물파전', '김치전', '부추전', '감자전', '동그랑땡', '치즈스틱', '새우튀김', '볶음밥', '떡볶이', '떡갈비', '즉석밥', '햄버그', '커틀릿', '미트볼', '밀키트', '간편식', '도시락', '컵밥', '떡국', '갈비탕', '삼계탕', '육개장', '감자탕', '돈까스', '돈가스', '함박', '덮밥', '반찬', '순대', '족발', '보쌈', '만두', '너겟', '핫도그', '찜닭', '짜장', '라구', '스프', '피자', '튀김', '어묵', '김치', '까스', '파전', '밥'],
+  etc: ['크림치즈', '요구르트', '스파게티', '토르티야', '베이글', '생크림', '마가린', '요거트', '파스타', '계란', '달걀', '순두부', '사이다', '식혜', '두유', '국수', '우유', '치즈', '버터', '두부', '주스', '쥬스', '음료', '탄산', '콜라', '생수', '커피', '식빵', '빵', '면', '당면'],
+  meat: ['돼지고기', '소고기', '쇠고기', '부채살', '삼겹살', '앞다리', '다짐육', '닭다리', '닭가슴', '닭볶음', '닭갈비', '목살', '안심', '등심', '갈비', '차돌', '고등어', '참돔', '생선', '새우', '오징어', '멸치', '전복', '꽃게', '대게', '홍합', '베이컨', '소시지', '비엔나', '스팸', '연어', '갈치', '조개', '닭', '오리', '햄', '굴'],
+  fruit: ['샤인머스캣', '파인애플', '블루베리', '한라봉', '복숭아', '오렌지', '바나나', '무화과', '감귤', '자몽', '레몬', '라임', '수박', '참외', '멜론', '자두', '키위', '망고', '체리', '석류', '딸기', '포도', '단감', '사과', '감', '귤', '배'],
+  veg: ['아스파라거스', '양배추', '브로콜리', '파프리카', '콩나물', '시금치', '샐러드', '양상추', '애호박', '고구마', '당근', '대파', '쪽파', '부추', '무우', '양파', '감자', '마늘', '생강', '버섯', '팽이', '표고', '오이', '호박', '배추', '상추', '깻잎', '토마토', '숙주', '피망', '가지', '청양', '고추', '옥수수', '셀러리', '케일', '비트', '연근', '우엉', '무']
+};
+const SUB_ORDER = ['meal', 'etc', 'meat', 'fruit', 'veg'];
+const SUB_KEYS = {};
+SUB_ORDER.forEach(k => { SUB_KEYS[k] = SUB_KW[k].slice().sort((a, b) => b.length - a.length); });
+function subHit(n, keys) {
+  for (let i = 0; i < keys.length; i++) {
+    const k = keys[i];
+    if (k.length <= 1) { if (n === k) return true; }          // '배'·'무' 같은 한 글자는 이름이 정확히 같을 때만
+    else if (n.indexOf(k) >= 0) return true;
+  }
+  return false;
+}
+function inferSub(name) {
+  const n = norm(name);
+  for (let i = 0; i < SUB_ORDER.length; i++) { if (subHit(n, SUB_KEYS[SUB_ORDER[i]])) return SUB_ORDER[i]; }
+  return 'etc';
+}
+function subOf(p) {
+  if (!p) return 'etc';
+  return (p.sub && SUB_MAP[p.sub]) ? p.sub : inferSub(p.name);
+}
+function subLabel(k) { const m = SUB_MAP[k] || SUB_MAP.etc; return m.em + ' ' + m.label; }
+
 /* 이름 기반 자동 분류 — 위에서부터 먼저 걸리는 구역이 이김 */
 const FREEZER_KW = ['냉동', '만두', '돈까스', '돈가스', '핫도그', '피자', '아이스', '빙과', '감자튀김', '치즈스틱', '너겟', '떡갈비', '냉면', '새우튀김', '가라아게', '볶음밥', '와플'];
 const SEASON_KW = ['간장', '소금', '참기름', '들기름', '된장', '고추장', '쌈장', '춘장', '카레', '후추', '설탕', '알룰로스', '식초', '매실', '올리고당', '물엿', '꿀', '마요', '케찹', '케첩', '굴소스', '쯔유', '다시다', '미원', '참깨', '깨소금', '고춧가루', '청양', '고추가루', '액젓', '젓갈', '허브', '바질', '오레가노', '파슬리', '시나몬', '계피', '소스', '드레싱', '겨자', '와사비', '파프리카장', '육수', '맛술', '미림', '청주', '조미료', '양념'];
@@ -127,7 +171,7 @@ const RHYTHM = {
   3: { em: '빨래통 내놓기', sub: '설거지 패스 OK', hot2: true, tasks: ['빨래통 내놓기', '설거지 패스 (청연 대비 가능)'] },
   4: { em: '청연 방문', sub: '청소의 날', tasks: ['청연 방문 — 청소의 날'] },
   5: { em: '가볍게!', sub: '주말 전 정리', tasks: ['가볍게 정리 · 주말 준비'] },
-  6: { em: '가족 시간', sub: '아이랑 놀기', tasks: [] },
+  6: { em: '가족 시간', sub: '아이랑 놀기', tasks: ['가족 시간 푹 누리기'] },
   0: { em: '주간 정리', sub: '다음 주 준비', tasks: ['주간 정리 · 냉장고 비우기'] }
 };
 
@@ -219,7 +263,7 @@ function seedState() {
   ];
 
   return {
-    v: 4, mode: 'home', day: t, checks: {}, routines, care, shopping, pantry, stock,
+    v: 4, mode: 'home', day: t, checks: {}, memo: {}, routines, care, shopping, pantry, stock,
     settings: JSON.parse(JSON.stringify(DEFAULT_SETTINGS))
   };
 }
@@ -517,7 +561,7 @@ let ROOM = (function () {
 })();
 const LSKEY = 'seohan-home-v3:' + ROOM;   // 기존 기기 데이터를 그대로 살리기 위해 키는 유지
 let state = null;
-let ui = { tab: 'today', filter: 'all', showAllRec: false, recQ: '', recKind: 'all' };
+let ui = { tab: 'today', filter: 'all', showAllRec: false, recQ: '', recKind: 'all', receipt: null };
 let migrated = false;
 
 function allRecipes() {
@@ -590,7 +634,9 @@ function normalize(st, skipMigrate) {
   st.pantry.forEach(p => {
     if (!p.zone || !ZONE_MAP[p.zone]) p.zone = inferZone(p.name);
     if (!p.emoji) p.emoji = guessEmoji(p.name);
+    if (p.sub && !SUB_MAP[p.sub]) delete p.sub;
   });
+  if (!st.memo || typeof st.memo !== 'object' || Array.isArray(st.memo)) st.memo = {};
   st.stock.forEach(s => {
     if (!s.emoji) s.emoji = guessEmoji(s.name);
     if (!s.level) s.level = 'enough';
@@ -621,13 +667,13 @@ function dbg(tag, v) { DBG.push([new Date().toISOString().slice(11, 23), tag, v]
 
 function copy(v) { return JSON.parse(JSON.stringify(v)); }
 function remoteShape(st) {
-  const o = { mode: st.mode, day: st.day, checks: copy(st.checks || {}), settings: copy(st.settings || {}) };
+  const o = { mode: st.mode, day: st.day, checks: copy(st.checks || {}), settings: copy(st.settings || {}), memo: copy(st.memo || {}) };
   LISTS.forEach(k => { const m = {}; (st[k] || []).forEach(it => { m[it.id] = copy(it); }); o[k] = m; });
   return o;
 }
 function localShape(r) {
   if (!r || typeof r !== 'object') return null;
-  const st = { mode: r.mode, day: r.day, checks: r.checks || {}, settings: r.settings || {} };
+  const st = { mode: r.mode, day: r.day, checks: r.checks || {}, settings: r.settings || {}, memo: (r.memo && typeof r.memo === 'object' && !Array.isArray(r.memo)) ? r.memo : {} };
   LISTS.forEach(k => {
     const v = r[k];
     let arr = [];
@@ -919,7 +965,10 @@ function stepHTML(r) {
 }
 function renderToday() {
   const wd = curWd(), rh = RHYTHM[wd];
-  $('#todayChip').textContent = WD[wd] + '요일 · ' + (state.mode === 'home' ? '재택' : '출근');
+  const weekend = (wd === 0 || wd === 6);
+  const dayHead = $('#todayH');
+  if (dayHead) dayHead.textContent = weekend ? '주말 — 집안일은 쉬어요' : '오늘의 집안일';
+  $('#todayChip').textContent = WD[wd] + '요일 · ' + (weekend ? '주말' : (state.mode === 'home' ? '재택' : '출근'));
 
   $('#week').innerHTML = [1, 2, 3, 4, 5, 6, 0].map(d => {
     const r = RHYTHM[d];
@@ -932,6 +981,29 @@ function renderToday() {
     const k = 't' + i, done = !!state.checks[k];
     return '<button class="dtask ' + (done ? 'done' : '') + '" data-act="toggle" data-id="' + k + '">' + (done ? '✓ ' : '') + esc(t) + '</button>';
   }).join('');
+
+  /* ---- 토·일 : 평일 루틴을 돌리지 않고 휴식 카드 + 자유 메모로 전환 ---- */
+  if (weekend) {
+    const memo = (state.memo || {})[todayISO()] || '';
+    const tk = $('#talks');
+    tk.classList.add('single');
+    tk.innerHTML =
+      '<div class="tl rest">' +
+      '<div class="tl-h"><span class="e">🌿</span><b>주말은 루틴 쉬어가요</b><span class="st done">쉬는 날</span></div>' +
+      '<div class="rest-box"><p class="rest-p"><b>토·일</b>에는 평일 아침·저녁 집안일 루틴이 자동으로 멈춰요. <b>월요일</b>에 다시 돌아옵니다.</p>' +
+      '<p class="rest-p2">급한 것만 주기 케어에서 챙기고, 오늘은 아이랑 폭 쉬어요 🧸</p></div>' +
+      '<div class="memo"><label for="weekendMemo">📝 주말 메모 <span>장 볼 것 · 기억할 일</span></label>' +
+      '<textarea id="weekendMemo" rows="3" placeholder="예: 내일 아침 우유 사기 / 서한이 놀이터 데려가기">' + esc(memo) + '</textarea>' +
+      '<div class="memo-hint">적는 대로 자동 저장 — 남편 화면에도 같이 보여요</div></div>' +
+      '</div>';
+    const doneT = tasks.filter((t, i) => state.checks['t' + i]).length;
+    $('#todayNum').textContent = '🌿 쉬는 날' + (tasks.length ? ' · 선택 ' + doneT + '/' + tasks.length : '');
+    $('#todayBar').style.width = (tasks.length ? Math.round(doneT / tasks.length * 100) : 0) + '%';
+    const remCare0 = state.care.filter(c => careDue(c).d <= 2).length;
+    $('#footToday').innerHTML = '🌿 주말 — 루틴은 쉽니다 · 주기 케어 <b>' + remCare0 + '개</b>만 챙기면 돼요';
+    return;
+  }
+  $('#talks').classList.remove('single');
 
   const am = visibleSteps('am'), pm = visibleSteps('pm');
   const amDone = am.filter(r => state.checks[r.id]).length;
@@ -1017,20 +1089,32 @@ function matchRecipe(r, owned) {
 function pantryItemsByZone(z) {
   return state.pantry.filter(p => (p.zone || inferZone(p.name)) === z).sort((a, b) => (a.ord || 0) - (b.ord || 0));
 }
+function pantryChip(p) {
+  const d = p.exp ? diffDays(todayISO(), p.exp) : null;
+  const dd = d == null ? '' : '<span class="dd2 ' + (d < 0 ? 'bad' : (d <= 2 ? 'mid' : '')) + '">' + (d < 0 ? 'D+' + (-d) : (d === 0 ? 'D-DAY' : 'D-' + d)) + '</span>';
+  return '<button class="pchip" data-act="pantryedit" data-id="' + p.id + '">' +
+    '<span class="e">' + (p.emoji || guessEmoji(p.name)) + '</span>' + esc(p.name) + dd + '</button>';
+}
 function renderPantry() {
   const parts = [];
   ZONES.forEach(z => {
     const items = pantryItemsByZone(z.k);
     if (!items.length) return;
+    let inner;
+    if (z.k === 'fridge' || z.k === 'freezer') {
+      // 냉장·냉동은 안쪽을 육류·야채·과일·밀키트·기타로 묶어 보여준다
+      const groups = SUBS.map(sb => ({ sb: sb, items: items.filter(p => subOf(p) === sb.k) })).filter(g => g.items.length);
+      inner = groups.map(g =>
+        '<div class="sgroup"><div class="sgroup-h"><span>' + g.sb.em + ' ' + esc(g.sb.label) + '</span><span class="pc">' + g.items.length + '</span></div>' +
+        '<div class="pantry">' + g.items.map(pantryChip).join('') + '</div></div>'
+      ).join('');
+    } else {
+      inner = '<div class="pantry">' + items.map(pantryChip).join('') + '</div>';
+    }
     parts.push(
       '<div class="pgroup">' +
       '<div class="pgroup-h"><span>' + z.em + ' ' + esc(z.label) + '</span><span class="pc">' + items.length + '</span></div>' +
-      '<div class="pantry">' + items.map(p => {
-        const d = p.exp ? diffDays(todayISO(), p.exp) : null;
-        const dd = d == null ? '' : '<span class="dd2 ' + (d < 0 ? 'bad' : (d <= 2 ? 'mid' : '')) + '">' + (d < 0 ? 'D+' + (-d) : (d === 0 ? 'D-DAY' : 'D-' + d)) + '</span>';
-        return '<button class="pchip" data-act="pantryedit" data-id="' + p.id + '">' +
-          '<span class="e">' + (p.emoji || guessEmoji(p.name)) + '</span>' + esc(p.name) + dd + '</button>';
-      }).join('') + '</div></div>'
+      inner + '</div>'
     );
   });
   $('#pantry').innerHTML = parts.join('') || '<span class="empty" style="padding:10px;grid-column:1/-1">냉장고 재료를 추가해 보세요</span>';
@@ -1098,6 +1182,56 @@ function renderStock() {
   }).join('') || '<div class="empty">생필품을 추가해 보세요</div>';
 }
 
+/* ---------------- 영수증·장보기 텍스트 → 품목 (붙여넣기 방식 · 한도 0%) ---------------- */
+const RECEIPT_STOP = /(합계|총액|총금액|결제|승인|주문|배송|카드|할인|포인트|적립|부가세|과세|상품명|수량|금액|일시|매장|사업자|영수증|거래|잔액|쿠팡|로켓|와우|주소|연락|전화|감사|포장|배달|요청|옵션|무료|출고|도착|구매일|합계액|영수|상품|주문번호)/;
+const LIVING_KW = ['휴지', '화장지', '물티슈', '키친타올', '행주', '세제', '세탁', '섬유유연', '주방', '샴푸', '린스', '컨디셔너', '바디워시', '비누', '핸드워시', '치약', '칫솔', '가글', '수세미', '스펀지', '필터', '봉지', '비닐', '쓰레기', '건전지', '전구', '마스크', '소독', '기저귀', '분유', '양말', '장갑', '호일', '랩', '빨대', '이쑤시개'];
+function receiptCat(name) {
+  const n = String(name || '');
+  return LIVING_KW.some(k => n.indexOf(k) >= 0) ? 'living' : 'food';
+}
+function parseReceiptLines(raw) {
+  const out = [], seen = {};
+  String(raw || '').split(/\r?\n/).forEach(line => {
+    let s = String(line).replace(/[\t|]/g, ' ').replace(/[₩]/g, ' ').trim();
+    if (!s) return;
+    s = s.replace(/^[\s*·•\-–—>=]+/, '').replace(/^\d+[.)]\s*/, '').trim();
+    s = s.replace(/\s*[x×]\s*\d+\s*$/i, '');
+    for (let i = 0; i < 5; i++) {
+      const before = s;
+      s = s.replace(/\s+[\d,.]+\s*(원|개|매|입|팩|봉|병|캔|g|kg|ml|L|리터|%)?$/i, '').trim();
+      if (s === before) break;
+    }
+    s = s.replace(/^\d+\s*(개|매|입|팩|봉)\s+/, '').replace(/\s{2,}/g, ' ').trim();
+    if (s.length < 2 || s.length > 24) return;
+    if (/^[\d,.\s]+$/.test(s)) return;
+    if (RECEIPT_STOP.test(s)) return;
+    if (/[:\/\\]/.test(s)) return;
+    const key = norm(s);
+    if (!key || seen[key]) return;
+    seen[key] = 1;
+    const dupList = state.shopping.some(i => norm(i.name) === norm(s) && !i.done);
+    const dupPantry = state.pantry.some(p => norm(p.name) === norm(s));
+    out.push({ name: s, cat: receiptCat(s), on: !(dupList || dupPantry), dup: !!(dupList || dupPantry) });
+  });
+  return out.slice(0, 40);
+}
+function renderReceipt() {
+  const box = $('#receiptResult');
+  if (!box) return;
+  const list = ui.receipt || [];
+  if (!list.length) { box.innerHTML = ''; return; }
+  box.innerHTML = '<div class="sub-h" style="margin-top:12px"><span class="l">뽑은 품목 ' + list.length + '개 · ' + list.filter(x => x.on).length + '개 선택</span><span class="ln"></span></div>' +
+    list.map((it, i) =>
+      '<div class="rrow"><input type="checkbox" data-act="receipttoggle" data-i="' + i + '"' + (it.on ? ' checked' : '') + '>' +
+      '<span class="rn" data-act="receipttoggle" data-i="' + i + '">' + esc(it.name) + '</span>' +
+      '<button class="rchip" data-act="receiptcat" data-i="' + i + '">' + (it.cat === 'food' ? '🥬 식재료' : '🧻 생필품') + '</button>' +
+      (it.dup ? '<span class="rdup">이미 있음</span>' : '<span></span>') + '</div>'
+    ).join('') +
+    '<div style="display:flex;gap:6px;margin-top:9px;flex-wrap:wrap">' +
+    '<button class="btn sm" data-act="receiptadd" data-mode="list">🛒 구매리스트에 담기</button>' +
+    '<button class="btn ghost" data-act="receiptadd" data-mode="pantry">❄️ 냉장고·재고로 바로 넣기</button></div>';
+}
+
 /* ---------------- render ---------------- */
 function render() {
   renderHeader();
@@ -1108,6 +1242,7 @@ function render() {
   renderPantry();
   renderRecipes();
   renderStock();
+  renderReceipt();
   $('#panel-today').hidden = ui.tab !== 'today';
   $('#panel-shop').hidden = ui.tab !== 'shop';
   $$('.tabs .tab').forEach(b => b.classList.toggle('on', b.dataset.tab === ui.tab));
@@ -1217,13 +1352,24 @@ function viewPantryForm(id) {
   if (!p) return;
   modalView = { k: 'pantryform', id };
   const z = p.zone || inferZone(p.name);
+  const inCold = (z === 'fridge' || z === 'freezer');
+  const curSub = p.sub || '';
   openModal((p.emoji || guessEmoji(p.name)) + ' ' + p.name + ' 수정',
     '<div class="field"><label>보관 구역</label><select id="pZone">' +
     ZONES.map(x => '<option value="' + x.k + '"' + (z === x.k ? ' selected' : '') + '>' + x.em + ' ' + x.label + '</option>').join('') +
     '</select></div>' +
+    '<div class="field" id="pSubField"' + (inCold ? '' : ' style="display:none"') + '><label>소분류 (냉장·냉동 안에서 묶여요)</label><select id="pSub">' +
+    '<option value=""' + (curSub ? '' : ' selected') + '>자동 (이름으로 분류 · 지금 ' + subLabel(subOf(p)) + ')</option>' +
+    SUBS.map(x => '<option value="' + x.k + '"' + (curSub === x.k ? ' selected' : '') + '>' + x.em + ' ' + x.label + '</option>').join('') +
+    '</select></div>' +
     '<div class="field"><label>유통기한 (선택)</label><input id="pExp" type="date" value="' + esc(p.exp || '') + '"></div>' +
     '<div class="note">' + (p.exp ? '지금은 <b>' + md(p.exp) + (diffDays(todayISO(), p.exp) < 0 ? ' (지남)</b>' : ' 까지</b>') : '유통기한을 넣어두면 D-Day가 표시돼요.') + '</div>',
     '<button class="btn coral" data-act="pantrydel" data-id="' + id + '">다 썼어요 🗑️</button><button class="btn sm" data-act="pantrysave" data-id="' + id + '">저장</button>');
+  const zsel = $('#pZone');
+  if (zsel) zsel.onchange = () => {
+    const f = $('#pSubField');
+    if (f) f.style.display = (zsel.value === 'fridge' || zsel.value === 'freezer') ? '' : 'none';
+  };
 }
 function viewSettings() {
   modalView = { k: 'settings' };
@@ -1493,6 +1639,52 @@ document.addEventListener('click', e => {
       break;
     }
 
+    /* --- 영수증·장보기 등록 --- */
+    case 'receiptparse': {
+      const raw = $('#receiptRaw') ? $('#receiptRaw').value : '';
+      const list = parseReceiptLines(raw);
+      ui.receipt = list;
+      renderReceipt();
+      toast(list.length ? '🔍 품목 ' + list.length + '개를 뽑았어요 — 확인하고 담아 주세요' : '품목을 못 찾았어요 — 한 줄에 하나씩 적어 주세요');
+      break;
+    }
+    case 'receiptclear': {
+      ui.receipt = null;
+      if ($('#receiptRaw')) $('#receiptRaw').value = '';
+      renderReceipt();
+      break;
+    }
+    case 'receipttoggle': {
+      const i = Number(el.dataset.i);
+      if (ui.receipt && ui.receipt[i]) { ui.receipt[i].on = !ui.receipt[i].on; renderReceipt(); }
+      break;
+    }
+    case 'receiptcat': {
+      const i = Number(el.dataset.i);
+      if (ui.receipt && ui.receipt[i]) { ui.receipt[i].cat = ui.receipt[i].cat === 'food' ? 'living' : 'food'; renderReceipt(); }
+      break;
+    }
+    case 'receiptadd': {
+      const mode = el.dataset.mode || 'list';
+      const list = (ui.receipt || []).filter(x => x.on);
+      if (!list.length) { toast('담을 품목을 골라 주세요'); break; }
+      let n = 0;
+      mutate(s => {
+        list.forEach(it => {
+          if (mode === 'list') { if (addShopping(it.name, it.cat)) n++; return; }
+          if (it.cat === 'food') {
+            const r = putPantryFromShopping(s, it.name);
+            if (!r || String(r.msg).indexOf('이미') !== 0) n++;
+          } else { putBackStock(s, it.name); n++; }
+        });
+      });
+      ui.receipt = null;
+      if ($('#receiptRaw')) $('#receiptRaw').value = '';
+      renderReceipt();
+      toast(mode === 'list' ? '🛒 ' + n + '개를 구매리스트에 담았어요' : '❄️ ' + n + '개를 냉장고·재고에 넣었어요');
+      break;
+    }
+
     /* --- pantry --- */
     case 'pantryadd': {
       const inp = $('#pantryInput'), exp = $('#pantryExp').value;
@@ -1510,7 +1702,11 @@ document.addEventListener('click', e => {
     case 'pantryedit': viewPantryForm(id); break;
     case 'pantrysave': {
       const z = $('#pZone').value, exp = $('#pExp').value;
-      mutate(s => { const p = s.pantry.find(x => x.id === id); if (p) { p.zone = z; p.exp = exp || ''; } });
+      const subv = $('#pSub') ? $('#pSub').value : '';
+      mutate(s => {
+        const p = s.pantry.find(x => x.id === id);
+        if (p) { p.zone = z; p.exp = exp || ''; if (subv) p.sub = subv; else delete p.sub; }
+      });
       closeModal(); toast('저장했어요');
       break;
     }
@@ -1649,6 +1845,12 @@ document.addEventListener('click', e => {
 /* inputs: Enter to add */
 document.addEventListener('input', e => {
   if (e.target.id === 'recSearch') { ui.recQ = e.target.value; renderRecipes(); }
+  if (e.target.id === 'weekendMemo') {
+    const v = e.target.value;
+    if (!state.memo || typeof state.memo !== 'object') state.memo = {};
+    if (v.trim()) state.memo[todayISO()] = v; else delete state.memo[todayISO()];
+    saveLocal(); schedulePush();      // 글씨는 그대로 두고 저장만 (화면을 다시 그리지 않음)
+  }
 });
 document.addEventListener('keydown', e => {
   if (e.key !== 'Enter') return;
@@ -1684,7 +1886,8 @@ window.__home = {
   get state() { return state; }, get room() { return ROOM; }, log: DBG,
   get sync() { return { state: syncState, dirty, remoteDoc, lastPush }; },
   render, push, seedState, shareLink,
-  zones: ZONES, inferZone, guessEmoji, nameMatches, ownedKeys, stockLevel, stockCount, allRecipes, RECIPES, GEMINI_RECIPES
+  zones: ZONES, inferZone, guessEmoji, nameMatches, ownedKeys, stockLevel, stockCount, allRecipes, RECIPES, GEMINI_RECIPES,
+  subs: SUBS, subOf, inferSub, parseReceiptLines, isWeekend: () => { const w = curWd(); return w === 0 || w === 6; }
 };
 
 document.addEventListener('DOMContentLoaded', boot);
