@@ -15611,7 +15611,12 @@ function iconSVG(key) {
     if (kind === 'we') return DEFAULT_W_EVENING;
     if (kind === 'ws') return DEFAULT_W_STUDY;
     if (kind === 'evening') return state.settings.evening;
-    return kind === 'homework' ? state.settings.homework : state.settings.morning;
+    if (kind === 'homework') return state.settings.homework;
+    /* 등원 준비 '물통·수저통 챙기기'는 언제나 마지막에 있어요 (구름 상태에 없어도 보이게) */
+    var list = state.settings.morning;
+    if (!list || !list.length) return clone(DEFAULT_MORNING);
+    for (var i = 0; i < list.length; i++) if (isBottleItem(list[i])) return list;
+    return list.concat([clone(DEFAULT_MORNING[6])]);
   }
   function itemById(kind, id) {
     var list = itemsOf(kind);
@@ -15801,7 +15806,7 @@ function iconSVG(key) {
      지금 할 일 (시간대 강조)
   ============================================================ */
   function nowSlots() {
-    var timed = state.settings.morning.filter(function (it) { return it.at && /^\d{1,2}:\d{2}$/.test(it.at); });
+    var timed = itemsOf('morning').filter(function (it) { return it.at && /^\d{1,2}:\d{2}$/.test(it.at); });
     timed.sort(function (a, b) { return minutesOf(a.at) - minutesOf(b.at); });
     var out = [], depart = minutesOf(state.settings.departTime);
     for (var i = 0; i < timed.length; i++) {
