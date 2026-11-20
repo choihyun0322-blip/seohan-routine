@@ -454,6 +454,17 @@ h1{font-size:21px;font-weight:800;letter-spacing:-.9px;line-height:1.15;white-sp
           <button class="qadd" data-act="pantryadd">＋</button>
         </div>
         <div class="talks" style="display:none"></div>
+        <div style="display:flex;gap:6px;margin:10px 0 8px;flex-wrap:wrap;align-items:center">
+          <input id="recSearch" type="search" placeholder="🔍 요리명·재료 검색 (예: 닭다리살, 우동, 계란)" style="flex:1;min-width:170px;height:36px;padding:0 12px;border:1.5px solid var(--line);border-radius:11px;background:var(--cream);font-size:12px;font-weight:600;color:var(--ink)">
+          <button class="btn sm" data-act="recipeadd" style="height:36px;padding:0 12px;white-space:nowrap">＋ 레시피 추가</button>
+        </div>
+        <div class="filters" id="recFilters" style="margin-bottom:10px">
+          <button class="fchip on" data-act="recfilter" data-rf="all">전체</button>
+          <button class="fchip" data-act="recfilter" data-rf="ready">바로 가능 ✅</button>
+          <button class="fchip" data-act="recfilter" data-rf="내 레시피">내 레시피 ⭐</button>
+          <button class="fchip" data-act="recfilter" data-rf="유아식">유아식</button>
+          <button class="fchip" data-act="recfilter" data-rf="집밥">집밥</button>
+        </div>
         <div class="recgrid" id="recList"></div>
         <div class="card-foot">
           <button class="btn dashed" data-act="rectoggle" id="recToggle">＋ 레시피 전체 보기</button>

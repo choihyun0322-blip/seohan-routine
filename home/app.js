@@ -16,7 +16,7 @@ const FB = {
 };
 const DBURL = FB.databaseURL;
 const DEFAULT_ROOM = 'choi-home-2026';
-const LISTS = ['routines', 'care', 'shopping', 'pantry', 'stock'];
+const LISTS = ['routines', 'care', 'shopping', 'pantry', 'stock', 'recipes'];
 const WD = ['일', '월', '화', '수', '목', '금', '토'];
 
 /* ---------------- utils ---------------- */
@@ -141,8 +141,20 @@ function seedState() {
   };
 }
 
-/* ---------------- recipes (30) ---------------- */
-const RECIPES = [
+/* ---------------- recipes (30 + 제미나이 내 레시피 9종) ---------------- */
+const GEMINI_RECIPES = [
+  ['지도리 우동', '🍲', '내 레시피', '15분', ['닭다리살', '대파', '우동면', '쯔유', '간장'], '대파 3~4cm를 기름에 노릇하게 구워 덜어두고, 닭다리살은 물기 닦아 앞뒤 바삭하게 구워 한입 크기로 잘라요. 물 400ml + 쯔유 4스푼 + 진간장 1스푼 넣고 5분 끓인 뒤 우동면(또는 떡) 넣고 2~3분 끓여요. 어른 몫만 후추 톡!'],
+  ['크림스파게티', '🍝', '내 레시피', '18분', ['스파게티면', '베이컨', '양파', '마늘', '생크림', '우유', '파마산치즈'], '면은 1분 덜 삶고 면수 반 컵 남겨요. 마늘·베이컨·양파 볶다 생크림 100ml + 우유 100ml 넣고 1분 끓인 뒤 삶은 면과 면수·파마산·소금으로 농도 맞춰요. 서한이 몫 덜고 어른만 통후추!'],
+  ['소시지 오므라이스', '🍳', '내 레시피', '7분', ['밥', '버터', '소시지', '하이라이스소스', '계란'], '밥 130g + 버터 10g + 잘게 썬 소시지 50g + 하이라이스/짜장소스 1스푼 섞고, 푼 계란 1개 올려 전자레인지 3분!'],
+  ['삼색소보로덮밥', '🍱', '내 레시피', '15분', ['밥', '다짐육', '계란', '오이', '간장', '알룰로스', '버터'], '다짐육 100g 볶다 간장 1스푼 + 알룰로스 1스푼으로 졸이고, 계란 스크램블·오이 슬라이스랑 밥 위에 삼색으로 올려요.'],
+  ['꿍팟퐁커리', '🍛', '내 레시피', '15분', ['새우', '대파', '양파', '계란', '우유', '카레가루', '버터'], '버터에 새우 50g 볶아 자르고 대파·양파·카레 1스푼 볶다가 우유 100ml 부어 끓인 뒤 계란물 1개 풀어 부드럽게 섞어요.'],
+  ['생크림김치밥', '🍚', '내 레시피', '12분', ['밥', '김치', '우유', '생크림', '모짜렐라치즈', '버터'], '밥에 버터·다진 김치 1큰술·파프리카장 조금 섞고, 우유 50ml + 생크림 50ml + 치즈 50g 끓여 얹어 먹어요.'],
+  ['오야꼬돈', '🍗', '내 레시피', '15분', ['밥', '닭다리살', '양파', '계란', '간장', '마늘', '알룰로스'], '닭다리정육 150g 껍질부터 각 3분 구워 자른 뒤 양파 2분 볶고 가루육수·간장 1/2스푼·물 3스푼·알룰로스·다진마늘 넣고 계란물 부어 약불로 익혀 밥 위에 올려요.'],
+  ['간장 닭고기 고구마·양배추 찜닭', '🍲', '내 레시피', '25분', ['닭다리살', '고구마', '양배추', '양파', '당근', '팽이버섯', '간장', '마늘'], '고구마·양배추·양파·당근·닭다리살에 간장·다진마늘·물 넣고 푹 끓이다 마지막에 팽이버섯 넣어 숨만 죽여요.'],
+  ['닭고기 양배추·채소 볶음덮밥', '🥘', '내 레시피', '15분', ['닭다리살', '양배추', '애호박', '양파', '당근', '팽이버섯', '밥'], '닭다리살·당근·양파 먼저 볶고 양배추·애호박 넣어 볶다 마지막에 팽이버섯! 서한이 몫 덜어내고 어른만 간 추가해요.']
+].map((r, i) => ({ id: 'my' + (i + 1), name: r[0], emoji: r[1], kind: r[2], time: r[3], ings: r[4], steps: r[5] }));
+
+const RECIPES = GEMINI_RECIPES.concat([
   ['김치볶음밥', '🍚', '집밥', '10분', ['밥', '김치', '계란', '대파', '참기름'], '김치를 잘게 썰어 볶다가 밥·참기름 넣고 비벼요. 계란 프라이는 따로 올려요.'],
   ['계란말이', '🍳', '집밥', '8분', ['계란', '대파', '당근', '소금'], '계란 3개 풀어 다진 채소 넣고 얇게 부쳐 돌돌 말아요.'],
   ['계란찜', '🥚', '집밥', '15분', ['계란', '대파', '새우젓', '물'], '계란에 물 1/2컵 넣고 체에 걸러 뚜껑 덮고 약불 12분 쪄요.'],
@@ -173,7 +185,7 @@ const RECIPES = [
   ['두부조림', '⬜', '유아식', '12분', ['두부', '간장', '대파', '마늘'], '두부 지져 간장·마늘 양념물 붓고 졸여요.'],
   ['소고기애호박볶음', '🥒', '유아식', '12분', ['소고기', '애호박', '양파', '간장'], '다진 소고기 볶다 애호박·양파 넣고 간장 조금.'],
   ['감자당근볶음', '🥕', '유아식', '15분', ['감자', '당근', '양파', '참기름'], '채 썬 감자·당근 푹 익도록 볶아 참기름·소금으로 마무리.']
-].map((r, i) => ({ id: 'rc' + (i + 1), name: r[0], emoji: r[1], kind: r[2], time: r[3], ings: r[4], steps: r[5] }));
+].map((r, i) => ({ id: 'rc' + (i + 1), name: r[0], emoji: r[1], kind: r[2], time: r[3], ings: r[4], steps: r[5] })));
 
 const FREQ = [
   ['우유', 'food'], ['계란', 'food'], ['김치', 'food'], ['두부', 'food'], ['대파', 'food'],
@@ -190,7 +202,10 @@ let ROOM = (function () {
 })();
 const LSKEY = 'seohan-home-v3:' + ROOM;
 let state = null;
-let ui = { tab: 'today', filter: 'all', showAllRec: false };
+let ui = { tab: 'today', filter: 'all', showAllRec: false, recQ: '', recKind: 'all' };
+function allRecipes() {
+  return (state && Array.isArray(state.recipes) ? state.recipes : []).concat(RECIPES);
+}
 
 function normalize(st) {
   if (!st || typeof st !== 'object') return null;
@@ -605,12 +620,24 @@ function renderPantry() {
 }
 function renderRecipes() {
   const owned = ownedSet();
-  const list = RECIPES.map(r => Object.assign({ r }, matchRecipe(r, owned)))
+  const q = norm(ui.recQ || '');
+  const allR = allRecipes();
+  let list = allR.map(r => Object.assign({ r }, matchRecipe(r, owned)))
     .sort((a, b) => b.pct - a.pct || a.miss.length - b.miss.length || a.total - b.total);
   const ready = list.filter(x => x.pct === 100).length;
   $('#recChip').textContent = ready + '개 바로 가능';
-  const show = ui.showAllRec ? list : list.slice(0, 6);
-  $('#recList').innerHTML = show.map(x => {
+  $$('#recFilters .fchip').forEach(b => b.classList.toggle('on', b.dataset.rf === ui.recKind));
+  list = list.filter(x => {
+    if (ui.recKind === 'ready' && x.pct !== 100) return false;
+    else if (ui.recKind !== 'all' && ui.recKind !== 'ready' && x.r.kind !== ui.recKind) return false;
+    if (q) {
+      const hay = norm(x.r.name + ' ' + x.r.kind + ' ' + x.r.ings.join(' '));
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  const show = (ui.showAllRec || q || ui.recKind !== 'all') ? list : list.slice(0, 8);
+  $('#recList').innerHTML = show.length ? show.map(x => {
     const cls = x.pct === 100 ? 'rc full' : 'rc';
     const pcls = x.pct === 100 ? 'good' : (x.pct >= 50 ? 'mid2' : '');
     const ings = x.r.ings.map(i => owned.has(norm(i))
@@ -624,8 +651,10 @@ function renderRecipes() {
       '<div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap">' +
       (x.miss.length ? '<button class="rcbtn" data-act="fillmiss" data-id="' + x.r.id + '">＋ 없는 재료 ' + x.miss.length + '개 담기</button>' : '') +
       '<button class="rcbtn" data-act="recipeview" data-id="' + x.r.id + '">레시피 보기</button></div></div>';
-  }).join('');
-  $('#recToggle').textContent = ui.showAllRec ? '－ 접기' : '＋ 레시피 전체 보기 (' + RECIPES.length + '개)';
+  }).join('') : '<div class="empty" style="grid-column:1/-1;padding:18px">조건에 맞는 레시피가 없어요</div>';
+  const tog = $('#recToggle');
+  tog.style.display = (q || ui.recKind !== 'all') ? 'none' : '';
+  tog.textContent = ui.showAllRec ? '－ 접기' : '＋ 레시피 전체 보기 (' + allR.length + '개)';
 }
 
 /* ---------------- render : stock ---------------- */
@@ -763,8 +792,9 @@ function viewSettings() {
     '<button class="btn sm" data-act="settingsave">설정 저장</button><button class="btn ghost" data-act="close">닫기</button>');
 }
 function viewRecipe(id) {
-  const r = RECIPES.find(x => x.id === id);
+  const r = allRecipes().find(x => x.id === id);
   if (!r) return;
+  const isCustom = (state.recipes || []).some(x => x.id === id);
   const owned = ownedSet();
   modalView = { k: 'recipe', id };
   openModal(r.emoji + ' ' + r.name,
@@ -772,8 +802,39 @@ function viewRecipe(id) {
     '<div style="font-size:10.5px;font-weight:800;color:#9C9285;margin-bottom:6px">재료</div>' +
     '<div class="ings">' + r.ings.map(i => owned.has(norm(i)) ? '<span class="ing">' + esc(i) + '</span>' : '<span class="ing miss">' + esc(i) + ' (없음)</span>').join('') + '</div>' +
     '<div style="font-size:10.5px;font-weight:800;color:#9C9285;margin:14px 0 6px">만드는 법</div>' +
-    '<div style="font-size:12.5px;line-height:1.65;font-weight:600;color:var(--ink2)">' + esc(r.steps) + '</div>',
+    '<div style="font-size:12.5px;line-height:1.65;font-weight:600;color:var(--ink2);white-space:pre-line">' + esc(r.steps) + '</div>',
+    (isCustom ? '<button class="btn ghost" data-act="recipedel" data-id="' + id + '" style="color:var(--coral)">삭제</button><button class="btn ghost" data-act="recipeedit" data-id="' + id + '">수정</button>' : '') +
     '<button class="btn sm" data-act="fillmiss" data-id="' + id + '">없는 재료 담기</button><button class="btn ghost" data-act="close">닫기</button>');
+}
+function parseGeminiRecipe(raw) {
+  const lines = String(raw || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  if (!lines.length) return null;
+  let name = lines[0].replace(/^[#①②③④⑤⑥⑦⑧⑨⑩\d.\-\s]+/, '').replace(/\(.*?\)/g, '').trim();
+  let time = (raw.match(/(\d+\s*~\s*\d+분|\d+분)/) || [])[1] || '15분';
+  let ings = [];
+  lines.forEach(l => {
+    if (/^(재료|주재료|양념|소스)\s*[:：]/.test(l)) {
+      const part = l.replace(/^[^:：]+[:：]/, '').split(/[,·/]/).map(s => s.replace(/\s*\d+.*$/, '').replace(/[()]/g, '').trim()).filter(s => s && s.length <= 15);
+      ings = ings.concat(part);
+    }
+  });
+  return { name, time, ings: Array.from(new Set(ings)).slice(0, 14), steps: lines.slice(1).join('\n') };
+}
+function viewRecipeForm(id) {
+  const r = id ? (state.recipes || []).find(x => x.id === id) : null;
+  modalView = { k: 'recipeform', id: id || null };
+  openModal(r ? '✏️ 레시피 수정' : '🍲 나만의 레시피 추가',
+    '<div class="field"><label>제미나이 등에서 복사한 레시피 통째로 붙여넣기 (선택)</label>' +
+    '<textarea id="rfPaste" rows="3" placeholder="예: 지도리 우동 (15분)&#10;재료: 닭다리살, 대파, 우동면, 쯔유&#10;1. 대파 구워서..." style="width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;font-size:12px"></textarea>' +
+    '<button class="btn ghost" data-act="recipeparse" style="margin-top:4px;font-size:11.5px">✨ 붙여넣은 글 자동 채우기</button></div>' +
+    '<div class="row2"><div class="field"><label>요리 이름</label><input id="rfName" value="' + esc(r ? r.name : '') + '" placeholder="예: 닭다리살 간장조림"></div>' +
+    '<div class="field"><label>조리 시간</label><input id="rfTime" value="' + esc(r ? r.time : '15분') + '"></div></div>' +
+    '<div class="row2"><div class="field"><label>분류</label><select id="rfKind">' +
+    ['내 레시피', '유아식', '집밥'].map(k => '<option value="' + k + '"' + ((r ? r.kind : '내 레시피') === k ? ' selected' : '') + '>' + k + '</option>').join('') +
+    '</select></div><div class="field"><label>아이콘</label><input id="rfEmoji" value="' + esc(r ? r.emoji : '🍲') + '"></div></div>' +
+    '<div class="field"><label>재료 (쉼표로 구분 — 냉장고·장보기랑 자동 연결돼요)</label><input id="rfIngs" value="' + esc(r ? r.ings.join(', ') : '') + '" placeholder="닭다리살, 대파, 양파, 간장"></div>' +
+    '<div class="field"><label>만드는 법</label><textarea id="rfSteps" rows="4" style="width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;font-size:12px">' + esc(r ? r.steps : '') + '</textarea></div>',
+    '<button class="btn sm" data-act="recipesave">저장하기</button><button class="btn ghost" data-act="close">취소</button>');
 }
 
 /* ---------------- actions ---------------- */
@@ -908,7 +969,7 @@ document.addEventListener('click', e => {
       break;
     }
     case 'fillmiss': {
-      const r = RECIPES.find(x => x.id === id);
+      const r = allRecipes().find(x => x.id === id);
       if (!r) return;
       const owned = ownedSet();
       let n = 0;
@@ -919,6 +980,46 @@ document.addEventListener('click', e => {
     }
     case 'recipeview': viewRecipe(id); break;
     case 'rectoggle': ui.showAllRec = !ui.showAllRec; renderRecipes(); break;
+    case 'recfilter': ui.recKind = el.dataset.rf || 'all'; renderRecipes(); break;
+    case 'recipeadd': viewRecipeForm(null); break;
+    case 'recipeedit': viewRecipeForm(id); break;
+    case 'recipeparse': {
+      const p = parseGeminiRecipe($('#rfPaste').value);
+      if (!p) { toast('붙여넣을 레시피 텍스트를 먼저 입력해 주세요'); break; }
+      if (p.name && !$('#rfName').value.trim()) $('#rfName').value = p.name;
+      if (p.time) $('#rfTime').value = p.time;
+      if (p.ings.length && !$('#rfIngs').value.trim()) $('#rfIngs').value = p.ings.join(', ');
+      if (p.steps && !$('#rfSteps').value.trim()) $('#rfSteps').value = p.steps;
+      toast('✨ 레시피 내용 채웠어요 — 확인 후 저장해 주세요');
+      break;
+    }
+    case 'recipesave': {
+      const name = $('#rfName').value.trim();
+      const ings = $('#rfIngs').value.split(/[,，]/).map(s => s.trim()).filter(Boolean);
+      if (!name || !ings.length) { toast('요리 이름과 재료는 꼭 적어 주세요'); break; }
+      const item = {
+        id: (modalView && modalView.id) || uid('cr'),
+        name, emoji: $('#rfEmoji').value.trim() || '🍲',
+        kind: $('#rfKind').value || '내 레시피',
+        time: $('#rfTime').value.trim() || '15분',
+        ings, steps: $('#rfSteps').value.trim() || '재료를 손질해 맛있게 조리해요.',
+        ord: Date.now() % 100000
+      };
+      mutate(s => {
+        if (!Array.isArray(s.recipes)) s.recipes = [];
+        const idx = s.recipes.findIndex(x => x.id === item.id);
+        if (idx >= 0) s.recipes[idx] = item; else s.recipes.unshift(item);
+      });
+      closeModal();
+      toast('🍲 ' + name + ' 저장했어요');
+      break;
+    }
+    case 'recipedel': {
+      mutate(s => { s.recipes = (s.recipes || []).filter(x => x.id !== id); });
+      closeModal();
+      toast('레시피를 지웠어요');
+      break;
+    }
 
     /* --- pantry --- */
     case 'pantryadd': {
@@ -1019,6 +1120,9 @@ function guessEmoji(name) {
 }
 
 /* inputs: Enter to add */
+document.addEventListener('input', e => {
+  if (e.target.id === 'recSearch') { ui.recQ = e.target.value; renderRecipes(); }
+});
 document.addEventListener('keydown', e => {
   if (e.key !== 'Enter') return;
   const id = e.target.id;
