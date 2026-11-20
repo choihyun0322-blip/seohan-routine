@@ -20762,7 +20762,8 @@ function iconSVG(key) {
 
   /* 테스트/점검용 (화면에는 영향 없음) */
   window.__seohanTest = {
-    version: '5.2.0',
+    version: APP_VERSION,
+    built: APP_BUILT,
     storageVersion: STORAGE_VERSION,
     getState: function () { return JSON.parse(JSON.stringify(state)); },
     setState: function (s) { state = s; save(); renderAll(); },
