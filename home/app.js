@@ -1195,10 +1195,15 @@ function parseReceiptLines(raw) {
     let s = String(line).replace(/[\t|]/g, ' ').replace(/[₩]/g, ' ').trim();
     if (!s) return;
     s = s.replace(/^[\s*·•\-–—>=]+/, '').replace(/^\d+[.)]\s*/, '').trim();
-    s = s.replace(/\s*[x×]\s*\d+\s*$/i, '');
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 3; i++) {                       // [쿠팡] (주) 같은 앞머리 떼기
+      const b = s;
+      s = s.replace(/^[\[\(【][^\]\)】]{1,12}[\]\)】]\s*/, '').trim();
+      if (s === b) break;
+    }
+    for (let i = 0; i < 6; i++) {                        // 개수·가격 꼬리 반복 제거
       const before = s;
-      s = s.replace(/\s+[\d,.]+\s*(원|개|매|입|팩|봉|병|캔|g|kg|ml|L|리터|%)?$/i, '').trim();
+      s = s.replace(/\s*[x×]\s*\d+\s*$/i, '').trim();
+      s = s.replace(/\s+[\d,.]+\s*(원|개|매|입|팩|봉|병|캔|g|kg|ml|L|리터|%|구|단|판|세트|박스|줄|마리)?$/i, '').trim();
       if (s === before) break;
     }
     s = s.replace(/^\d+\s*(개|매|입|팩|봉)\s+/, '').replace(/\s{2,}/g, ' ').trim();
