@@ -1,0 +1,3576 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FAF6EF">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="우리집 지갑">
+<title>기프티콘 · 카드 · 가계부 지갑</title>
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@zip.js/zip.js@2.7.52/dist/zip-full.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js" defer></script>
+<style>
+/* ============ tokens ============ */
+:root{
+  --ivory:#FAF6EF; --paper:#FFFFFF; --ink:#2B2721; --ink2:#4A443B; --sub:#857C6F; --mute:#A79C8D;
+  --sage:#5C7F68; --sage-d:#3D5946; --sage-soft:#EDF3E9; --sage-line:#D8E3D3;
+  --coral:#D2694F; --coral-d:#A8472C; --coral-soft:#FBEFE9; --coral-line:#F3D9CE;
+  --amber:#B98726; --amber-d:#8A6316; --amber-soft:#FCF3DF; --amber-line:#F0E0BB;
+  --plum:#6C5F8A; --plum-soft:#F2EFF8; --plum-line:#E7E0F2;
+  --line:#EDE5D8; --line-soft:#F4EEE3;
+  --r-lg:22px; --r-md:16px; --r-sm:11px;
+  --shadow:0 1px 2px rgba(120,96,66,.03),0 10px 26px rgba(120,96,66,.045);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:#E6DED0;font-family:'Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;
+  color:var(--ink);-webkit-font-smoothing:antialiased;word-break:keep-all;font-size:14px;line-height:1.4;
+}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+input,select,textarea{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 10px;font-weight:600;min-width:0;width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--sage-line);outline-offset:0;border-color:#BFD3B8}
+select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,#A79C8D 50%),linear-gradient(135deg,#A79C8D 50%,transparent 50%);background-position:calc(100% - 15px) 50%,calc(100% - 10px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:28px}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:#DCD2C3;border-radius:99px}
+.app{max-width:1180px;margin:0 auto;background:var(--ivory);min-height:100vh;padding:16px 14px calc(28px + env(safe-area-inset-bottom))}
+@media(min-width:900px){.app{padding:26px 30px 22px;box-shadow:0 0 0 1px rgba(0,0,0,.03)}}
+
+/* ============ header ============ */
+.hd{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:2px 2px 14px}
+.hd-l{display:flex;gap:10px;align-items:center;min-width:0}
+.logo{width:46px;height:46px;border-radius:15px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;font-size:23px;box-shadow:var(--shadow);flex:0 0 auto}
+.hd h1{font-size:17px;font-weight:800;letter-spacing:-.7px;line-height:1.18}
+.date{margin-top:3px;font-size:10.5px;color:var(--sub);font-weight:600;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.date .tagday{background:var(--sage-soft);color:var(--sage-d);font-weight:800;font-size:10.5px;padding:2px 7px;border-radius:7px}
+.hd-r{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+.icobtn{width:38px;height:38px;border-radius:13px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;font-size:16px;box-shadow:var(--shadow)}
+.sync{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:9px 12px 9px 10px;font-size:11.5px;font-weight:800;color:var(--sage-d);box-shadow:var(--shadow);white-space:nowrap}
+.sdot{width:8px;height:8px;border-radius:50%;background:#C7BDAE;flex:0 0 auto;transition:background .2s}
+.sdot.on{background:#6FA077;box-shadow:0 0 0 3.5px rgba(111,160,119,.16)}
+.sdot.off{background:#D2A24A;box-shadow:0 0 0 3.5px rgba(210,162,74,.15)}
+.sdot.err{background:var(--coral);box-shadow:0 0 0 3.5px rgba(210,105,79,.15)}
+@media(max-width:559px){.only-desk{display:none}.hd{padding-bottom:10px}.hd h1{font-size:15.5px;letter-spacing:-.6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.logo{width:40px;height:40px;border-radius:13px;font-size:20px}.sync{padding:9px;gap:0}.sync #syncTxt{display:none}.icobtn{width:34px;height:34px;border-radius:11px;font-size:15px}}
+@media(min-width:900px){.hd h1{font-size:27px}.logo{width:54px;height:54px;font-size:26px;border-radius:18px}.hd{padding-bottom:18px}}
+
+/* ============ kpis ============ */
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:16px;padding:11px 12px;box-shadow:var(--shadow);min-width:0}
+.kpi .lb{font-size:10px;font-weight:800;color:var(--mute);display:flex;align-items:center;gap:4px;white-space:nowrap}
+.kpi .vl{font-size:17px;font-weight:800;letter-spacing:-.7px;margin-top:4px;font-variant-numeric:tabular-nums;line-height:1.1;white-space:nowrap}
+.kpi .vl small{font-size:11px;font-weight:800;margin-left:1px;color:var(--sub)}
+.kpi .cm{font-size:9.5px;font-weight:600;color:#B0A596;margin-top:4px;letter-spacing:-.2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kpi.save{border-color:var(--sage-line);background:linear-gradient(180deg,#F7FBF4,#fff)}
+.kpi.save .vl{color:var(--sage-d)}
+.kpi.fixed{border-color:var(--plum-line);background:linear-gradient(180deg,#FBFAFE,#fff)}
+.kpi.fixed .vl{color:#5E5178}
+.kpi.var{border-color:var(--sage-line);background:linear-gradient(180deg,#F9FCF7,#fff)}
+.kpi.var .vl{color:var(--sage-d)}
+@media(min-width:900px){.kpis{grid-template-columns:repeat(4,1fr);gap:12px}.kpi{padding:12px 15px;border-radius:18px}.kpi .vl{font-size:21px}.kpi .lb{font-size:10.5px}.kpi .cm{font-size:10px}}
+
+/* ============ card shell ============ */
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px 13px 13px;box-shadow:var(--shadow);margin-bottom:12px;min-width:0}
+.card-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.card-h h2{font-size:15.5px;font-weight:800;letter-spacing:-.5px;display:flex;align-items:center;gap:7px;min-width:0}
+.card-h .right{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.secnum{width:20px;height:20px;border-radius:7px;background:var(--sage-soft);color:var(--sage-d);font-size:10.5px;font-weight:800;display:grid;place-items:center;flex:0 0 auto}
+@media(min-width:900px){.card{padding:19px 21px 17px;border-radius:26px}.card-h h2{font-size:18.5px}.secnum{width:21px;height:21px;font-size:11px}}
+
+/* chips / buttons */
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:800;padding:4px 8px;border-radius:8px;white-space:nowrap;letter-spacing:-.2px;background:#F5F1E8;color:var(--sub)}
+.chip.sage{background:var(--sage-soft);color:var(--sage-d)}
+.chip.coral{background:var(--coral-soft);color:var(--coral-d)}
+.chip.amber{background:var(--amber-soft);color:var(--amber-d)}
+.chip.line{background:#fff;border:1px solid var(--line);color:var(--sub)}
+.chip.plum{background:var(--plum-soft);color:var(--plum)}
+.chip.zero{background:var(--sage-soft);color:#6C8065}
+.btn{border:0;border-radius:10px;font-weight:800;letter-spacing:-.3px;display:inline-flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap;padding:8px 11px;font-size:11.5px;transition:transform .08s}
+.btn:active{transform:scale(.97)}
+.btn.pri{background:var(--sage);color:#fff;box-shadow:0 2px 6px rgba(95,128,105,.22)}
+.btn.ghost{background:#fff;border:1px solid var(--line);color:var(--sub)}
+.btn.dashed{background:#fff;border:1.5px dashed #E2D7C5;color:#A79C8D}
+.btn.coral{background:var(--coral-soft);color:var(--coral-d);border:1px solid var(--coral-line)}
+.btn.sm{padding:6px 9px;font-size:10.5px;border-radius:8px}
+.btn.tiny{padding:4px 7px;font-size:10px;border-radius:7px}
+.btn[disabled]{opacity:.5;pointer-events:none}
+.linkbtn{color:var(--sage-d);font-weight:800;font-size:11px;text-decoration:underline;text-underline-offset:2px}
+
+/* ============ cards section ============ */
+.cgrid{display:grid;grid-template-columns:1fr;gap:9px}
+.cb{border:1.5px solid var(--line);border-radius:16px;padding:11px 12px 12px;background:#FFFDFA;min-width:0;position:relative}
+.cb.main{border-color:var(--sage-line);background:linear-gradient(180deg,#F8FBF5,#FFFDFA)}
+.cb.lag{border-color:var(--amber-line);background:linear-gradient(180deg,#FFFCF3,#FFFDFA)}
+.cb.done{border-color:var(--sage-line);background:linear-gradient(180deg,#F5FAF2,#FFFDFA)}
+.cb-h{display:flex;align-items:center;gap:8px}
+.clogo{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;font-size:11px;font-weight:800;flex:0 0 auto;letter-spacing:-.5px;background:#F3EEE5;color:#8D8478}
+.clogo.kb{background:#FDF0DC;color:#B87A18}
+.clogo.nv{background:#E9F6EC;color:#2C8A47}
+.clogo.hn{background:#EDF1F8;color:#3F6FA8}
+.clogo.kt{background:#FBE9EC;color:#B03A50}
+.clogo.wo{background:#EFF0FB;color:#4E56A6}
+.clogo.kk{background:#FFF3CC;color:#8A6D0B}
+.clogo.cs{background:#EAF4F6;color:#2F6E7A}
+.cb-h .nm{flex:1;min-width:0}
+.cb-h .nm b{display:block;font-size:12.5px;font-weight:800;letter-spacing:-.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cb-h .nm small{display:block;font-size:9.5px;font-weight:600;color:var(--mute);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rk2{font-size:9.5px;font-weight:800;padding:3px 7px;border-radius:7px;white-space:nowrap;background:#F5F1E8;color:var(--sub)}
+.rk2.sage{background:var(--sage-soft);color:var(--sage-d)}
+.rk2.amber{background:var(--amber-soft);color:var(--amber-d)}
+.rk2.coral{background:var(--coral-soft);color:var(--coral-d)}
+.rk2.line{background:#fff;border:1px solid var(--line);color:var(--sub)}
+.usg{display:flex;align-items:baseline;justify-content:space-between;gap:6px;margin-top:9px}
+.usg .l{font-size:9.5px;font-weight:700;color:var(--mute);white-space:nowrap}
+.usg .v{font-size:15.5px;font-weight:800;letter-spacing:-.5px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.usg .v i{font-style:normal;font-size:10px;font-weight:800;margin-left:1px;color:var(--sub)}
+.grow{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:7px;font-size:9.5px;font-weight:700;color:var(--mute)}
+.grow b{font-weight:800;color:var(--sage-d);white-space:nowrap}
+.grow b.warn{color:var(--amber-d)}
+.grow b.dim{color:var(--mute)}
+.gbar{height:7px;border-radius:99px;background:#F1EADF;overflow:hidden;margin-top:4px}
+.gbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#84A78B,#5C7F68);transition:width .35s}
+.gbar i.low{background:linear-gradient(90deg,#EBC77E,#D8A03E)}
+.gbar i.zero{background:#E5DED2}
+.bens{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.ben{font-size:9.5px;font-weight:800;padding:3px 6px;border-radius:7px;background:#F5F1E8;color:#6F6659;letter-spacing:-.25px;white-space:nowrap}
+.ben b{color:#B0472F}
+.ben.sage{background:var(--sage-soft);color:var(--sage-d)}
+.ben.amber{background:var(--amber-soft);color:var(--amber-d)}
+.cb-edit{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:8px;background:#fff;border:1px solid var(--line);font-size:11px;color:var(--mute);display:grid;place-items:center;opacity:.55}
+.cb:hover .cb-edit,.cb:focus-within .cb-edit{opacity:1}
+.cb-h{padding-right:26px}
+.cb-note{font-size:9px;font-weight:600;color:#B7AC9C;margin-top:6px;letter-spacing:-.2px}
+.ktrow{display:flex;align-items:center;gap:9px;margin-top:10px;border:1px solid var(--line);border-radius:13px;padding:8px 11px;background:#FFFDFA;flex-wrap:wrap}
+.ktrow .slogo{width:26px;height:26px;border-radius:9px;font-size:10px;display:grid;place-items:center;font-weight:800;background:#FBE9EC;color:#B03A50;flex:0 0 auto}
+.ktrow .ktn{flex:1;min-width:120px}
+.ktrow .ktn b{font-size:11.5px;font-weight:800;letter-spacing:-.3px;display:block}
+.ktrow .ktn small{font-size:9.5px;font-weight:600;color:#B0A596;display:block;margin-top:1px}
+.ktchecks{display:flex;flex-wrap:wrap;gap:5px;width:100%}
+.kchk{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;background:#fff;border:1px solid var(--line);border-radius:8px;padding:4px 7px;color:var(--sub)}
+.kchk.on{background:var(--sage-soft);border-color:var(--sage-line);color:var(--sage-d);text-decoration:line-through;opacity:.75}
+.tipbar{margin-top:11px;display:flex;align-items:flex-start;gap:8px;background:#FCF7EA;border:1px solid var(--amber-line);border-radius:14px;padding:10px 12px;flex-wrap:wrap}
+.tipbar .t{font-size:10.5px;font-weight:800;color:var(--amber-d);white-space:nowrap}
+.tipbar .route{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:10.5px;font-weight:600;color:#8C7A55}
+.tipbar .route b{color:#6F5F3C;font-weight:800}
+.tipbar .ar{color:#CBB88C}
+.cnote{margin-top:8px;font-size:9.5px;font-weight:600;color:#B7AC9C;letter-spacing:-.2px}
+@media(min-width:760px){.cgrid{grid-template-columns:1fr 1fr;gap:10px}}
+
+/* ============ ledger ============ */
+.tools{display:grid;grid-template-columns:1fr;gap:7px;margin-bottom:10px}
+.tool{display:flex;align-items:center;gap:9px;border:1.5px dashed #CFDCC9;background:#F6FAF2;border-radius:14px;padding:9px 11px;width:100%;text-align:left}
+.tool .tic{width:30px;height:30px;border-radius:10px;background:#fff;border:1px solid var(--sage-line);display:grid;place-items:center;font-size:15px;flex:0 0 auto}
+.tool .ttx{flex:1;min-width:0}
+.tool .ttx b{display:block;font-size:11.5px;font-weight:800;letter-spacing:-.3px}
+.tool .ttx small{display:block;font-size:9.5px;font-weight:600;color:#8FA089;margin-top:1px}
+.tool .zero{font-size:9px;font-weight:800;background:var(--sage);color:#fff;border-radius:6px;padding:2px 5px;white-space:nowrap}
+@media(min-width:760px){.tools{grid-template-columns:1fr 1fr 1fr}.tool{flex-direction:column;align-items:flex-start;gap:6px}.tool .ttx small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+
+.qform{background:#F6FAF3;border:1.5px solid var(--sage-line);border-radius:14px;padding:8px;margin-bottom:8px}
+.qrow{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.qrow + .qrow{margin-top:7px}
+.qf{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--sage-line);border-radius:10px;padding:0 8px;min-width:0;height:38px}
+.qf .w{font-size:10px;font-weight:800;color:#A9BB9F;flex:0 0 auto}
+.qf input,.qf select{border:0;padding:0;background:transparent;font-size:12px;font-weight:800;color:var(--ink2);height:100%;min-width:0}
+.qf input:focus,.qf select:focus{outline:0}
+.qf input::placeholder{color:#B7AC9C;font-weight:700}
+.qf.amt input{font-size:15px;letter-spacing:-.4px;font-variant-numeric:tabular-nums}
+.qf.seg{padding:2px}
+.qf.seg button{flex:1;font-size:11px;font-weight:800;color:#A9BB9F;border-radius:8px;padding:7px 4px;height:32px}
+.qf.seg button.on{background:var(--plum-soft);color:var(--plum)}
+.qf.seg button.on.v{background:var(--sage-soft);color:var(--sage-d)}
+.qsub{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:7px;flex-wrap:wrap}
+.qchk{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;color:var(--sage-d);background:#fff;border:1px solid var(--sage-line);border-radius:9px;padding:6px 8px}
+.qchk input{width:15px;height:15px;accent-color:var(--sage);padding:0;border-radius:4px}
+.qchk small{font-size:9px;font-weight:700;color:#A9BB9F}
+.qadd{background:var(--sage);color:#fff;border-radius:10px;font-size:12px;font-weight:800;padding:10px 14px;box-shadow:0 2px 6px rgba(95,128,105,.22);flex:1;min-width:110px}
+@media(min-width:760px){.qrow{grid-template-columns:1.1fr 1.4fr .9fr .8fr 1fr}.qrow.one{grid-template-columns:1.1fr 1.4fr .9fr .8fr 1fr}}
+
+.split{margin:12px 0 10px}
+.split-h{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px;gap:8px}
+.split-h span{font-size:10px;font-weight:800;color:var(--mute);letter-spacing:-.2px}
+.split-h b{font-size:12.5px;font-weight:800;letter-spacing:-.4px;font-variant-numeric:tabular-nums}
+.split .bar{display:flex;height:11px;border-radius:99px;overflow:hidden;background:#F1EADF}
+.split .bar i{display:block;height:100%}
+.split .lg{display:flex;justify-content:space-between;margin-top:5px;font-size:9.5px;font-weight:800;letter-spacing:-.2px;gap:8px}
+.split .lg .fx{color:#7C6E9C}
+.split .lg .vr{color:var(--sage-d)}
+
+.fv3{display:grid;grid-template-columns:1fr;gap:9px}
+.fv{border:1.5px solid var(--line);border-radius:15px;padding:11px 12px;background:#FFFDFA;min-width:0;display:flex;flex-direction:column}
+.fv.fixed{border-color:var(--plum-line);background:#FBFAFE}
+.fv.var{border-color:var(--sage-line);background:#F9FCF7}
+.fv-h{display:flex;align-items:center;gap:6px}
+.fv-h .lbl{font-size:10.5px;font-weight:800;color:#7C6E9C;letter-spacing:-.2px;white-space:nowrap}
+.fv.var .fv-h .lbl{color:var(--sage-d)}
+.fv-h .pc{margin-left:auto;font-size:9.5px;font-weight:800;color:#B0A596}
+.fv .amt{font-size:18px;font-weight:800;letter-spacing:-.8px;margin-top:5px;color:#5E5178;font-variant-numeric:tabular-nums}
+.fv.var .amt{color:var(--sage-d)}
+.fv .sub{font-size:9px;font-weight:600;color:#B0A596;margin-top:2px;letter-spacing:-.2px}
+.fvl{list-style:none;margin-top:8px;padding-top:7px;border-top:1px dashed rgba(0,0,0,.06)}
+.fvl li{display:flex;align-items:center;justify-content:space-between;padding:5px 0;font-size:10px;font-weight:600;color:#8D8478;gap:6px}
+.fvl li span{display:flex;align-items:center;gap:4px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fvl li i{font-style:normal;font-size:8.5px;color:#B7AC9C;font-weight:700}
+.fvl li b{font-weight:800;color:var(--ink2);font-variant-numeric:tabular-nums;flex:0 0 auto}
+.fv .empty{font-size:9.5px;color:#B7AC9C;font-weight:600;padding:10px 0;text-align:center;line-height:1.5}
+.recc{border:1px solid var(--line);border-radius:15px;padding:11px 12px;background:#FFFDFA;min-width:0}
+.recc-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;gap:8px}
+.recc-h b{font-size:10.5px;font-weight:800;color:#9C9285}
+.recc-h button{font-size:9.5px;font-weight:800;color:var(--sage-d)}
+.rec{list-style:none;margin-top:3px;max-height:290px;overflow:auto}
+.rec li{display:flex;align-items:center;gap:7px;padding:6px 0;border-top:1px dashed var(--line-soft);min-width:0}
+.rec li:first-child{border-top:0}
+.rec .e{width:22px;height:22px;border-radius:8px;background:#F6F1E8;display:grid;place-items:center;font-size:11px;flex:0 0 auto}
+.rec .n{flex:1;min-width:0;text-align:left}
+.rec .n b{display:block;font-size:10.5px;font-weight:700;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec .n small{display:block;font-size:8.5px;font-weight:600;color:#B7AC9C;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec .a{font-size:10.5px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap;letter-spacing:-.3px}
+.rec .a i{font-style:normal;font-size:8.5px;font-weight:700;color:var(--mute);margin-left:1px}
+.rec .a.zero{color:#B0A596}
+.rec .fx{font-size:8.5px;font-weight:800;background:var(--plum-soft);color:var(--plum);border-radius:5px;padding:1px 4px;margin-left:3px}
+@media(min-width:900px){.fv3{grid-template-columns:.98fr .98fr 1.14fr;gap:10px}}
+
+/* ============ home slim cards (wish/recommend) ============ */
+.slim{display:flex;align-items:center;gap:9px;padding:8px 0;border-top:1px dashed var(--line-soft);min-width:0}
+.slim:first-child{border-top:0}
+.slim .de{width:28px;height:28px;border-radius:10px;background:#F6F1E8;display:grid;place-items:center;font-size:14px;flex:0 0 auto}
+.slim .dn{flex:1;min-width:0}
+.slim .dn b{display:block;font-size:11.5px;font-weight:800;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slim .dn small{display:block;font-size:9.5px;font-weight:600;color:#B0A596;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slim .go{font-size:9.5px;font-weight:800;color:var(--sage-d);background:var(--sage-soft);border-radius:7px;padding:4px 7px;white-space:nowrap}
+.dd{font-size:9.5px;font-weight:800;padding:3px 7px;border-radius:7px;white-space:nowrap;flex:0 0 auto}
+.dd.hot{background:var(--coral-soft);color:var(--coral-d)}
+.dd.mid{background:var(--amber-soft);color:var(--amber-d)}
+.dd.ok{background:var(--sage-soft);color:var(--sage-d)}
+
+/* ============ gifts ============ */
+.gwrap{display:grid;grid-template-columns:1fr;gap:9px}
+.gift{border:1.5px solid var(--amber-line);background:#FFFCF3;border-radius:16px;padding:11px 12px;min-width:0;position:relative}
+.gift.soon{border-color:var(--coral-line);background:linear-gradient(180deg,#FFF7F3,#FFFCF3)}
+.gift-h{display:flex;align-items:center;gap:9px}
+.gift-h .gi{flex:1;min-width:0}
+.gift-h .gi b{display:block;font-size:12.5px;font-weight:800;letter-spacing:-.35px;line-height:1.3;overflow:hidden;text-overflow:ellipsis}
+.gift-h .gi small{display:block;font-size:9.5px;font-weight:600;color:#AE8C4E;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.glogo{width:32px;height:32px;border-radius:10px;background:#fff;border:1px solid #F1E3C6;display:grid;place-items:center;font-size:10px;font-weight:800;color:#A08A62;flex:0 0 auto;letter-spacing:-.5px;overflow:hidden}
+.glogo img{width:100%;height:100%;object-fit:cover}
+.bcode{margin-top:9px;height:50px;border-radius:8px;background:#fff;border:1px solid #F1E3C6;display:flex;align-items:center;justify-content:center;padding:4px 8px;overflow:hidden}
+.bcode svg{width:100%;height:100%;display:block}
+.bcode .bimg{max-height:100%;max-width:100%;object-fit:contain}
+.bnum{margin-top:5px;text-align:center;font-size:10px;font-weight:800;color:#A08A62;letter-spacing:1.2px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gbtns{display:flex;gap:6px;margin-top:9px}
+.gbtns button{flex:1;border-radius:9px;font-size:10.5px;font-weight:800;padding:9px 6px;letter-spacing:-.3px}
+.gbtns .b1{flex:1.4;background:var(--sage);color:#fff;box-shadow:0 2px 6px rgba(95,128,105,.22)}
+.gbtns .b2{background:#fff;color:#9C9285;border:1px solid #EADFC9}
+.gbtns .b3{flex:0 0 34px;background:#fff;border:1px solid #EADFC9;color:var(--mute);font-size:12px}
+.bal{border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:#FFFDFA;margin-top:8px}
+.bal-h{display:flex;align-items:center;gap:8px}
+.bal-h .e{font-size:14px;width:28px;height:28px;border-radius:9px;background:#F6F1E8;display:grid;place-items:center;flex:0 0 auto}
+.bal-h .bn{flex:1;min-width:0}
+.bal-h .bn b{display:block;font-size:11.5px;font-weight:800;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bal-h .bn small{display:block;font-size:9.5px;font-weight:600;color:#B0A596;margin-top:1px}
+.bal-h .bv{font-size:12px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.3px;white-space:nowrap}
+.bal-h .bv i{font-style:normal;font-size:9.5px;color:#B0A596;font-weight:700}
+.bbar{height:5px;border-radius:99px;background:#F1EADF;margin-top:7px;overflow:hidden}
+.bbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#9DB79F,#6E9078)}
+.bbar i.amber{background:linear-gradient(90deg,#EBC77E,#D8A03E)}
+.gsum{margin-top:8px;background:var(--sage-soft);border:1px solid var(--sage-line);border-radius:11px;padding:8px 10px;font-size:9.5px;font-weight:700;color:#6C8065;letter-spacing:-.2px;line-height:1.5}
+.gsum b{color:var(--sage-d);font-weight:800}
+.gnote{font-size:9.5px;font-weight:600;color:#B7AC9C;line-height:1.55;letter-spacing:-.2px;margin-top:9px}
+.gadd{width:100%;border:1.5px dashed #E4DACA;border-radius:12px;padding:11px;text-align:center;font-size:11px;font-weight:800;color:#AEA394;background:#FFFDFA;margin-top:8px}
+@media(min-width:760px){.gwrap{grid-template-columns:1fr 1fr}}
+
+/* ============ footer ============ */
+.foot2{margin-top:12px;display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid var(--line);border-radius:16px;padding:11px 14px;gap:10px;flex-wrap:wrap}
+.foot2 p{font-size:11px;font-weight:700;color:#9C9285;letter-spacing:-.3px}
+.foot2 p b{color:var(--sage-d);font-weight:800}
+.foot2 .r{font-size:10px;font-weight:700;color:#B0A596;display:flex;align-items:center;gap:6px}
+
+/* ============ modal ============ */
+.mask{position:fixed;inset:0;background:rgba(43,39,33,.42);backdrop-filter:blur(2px);display:none;z-index:80;padding:12px;overflow:auto}
+.mask.on{display:flex;align-items:flex-start;justify-content:center}
+.sheet{background:var(--paper);border-radius:20px;width:100%;max-width:520px;margin:auto;box-shadow:0 24px 60px rgba(43,39,33,.28);overflow:hidden;animation:pop .16s ease-out}
+@keyframes pop{from{transform:translateY(8px) scale(.99);opacity:.6}to{transform:none;opacity:1}}
+.sheet-h{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 15px 11px;border-bottom:1px solid var(--line-soft);position:sticky;top:0;background:#fff;z-index:2}
+.sheet-h b{font-size:14px;font-weight:800;letter-spacing:-.4px}
+.sheet-h .x{width:28px;height:28px;border-radius:9px;background:#F6F1E8;color:var(--sub);font-size:15px;display:grid;place-items:center;flex:0 0 auto}
+.sheet-b{padding:13px 15px 16px;max-height:78vh;overflow:auto}
+.sheet-f{padding:11px 15px calc(13px + env(safe-area-inset-bottom));border-top:1px solid var(--line-soft);display:flex;gap:7px;background:#fff;position:sticky;bottom:0}
+.sheet-f .btn{flex:1;padding:12px}
+.fld{margin-bottom:10px}
+.fld label{display:block;font-size:10.5px;font-weight:800;color:var(--mute);margin-bottom:5px;letter-spacing:-.2px}
+.fld .row2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.fld .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+.hint{font-size:9.5px;font-weight:600;color:#B7AC9C;line-height:1.55;margin-top:5px}
+.step-list{list-style:none;counter-reset:s}
+.step-list li{counter-increment:s;position:relative;padding:8px 0 8px 30px;border-top:1px dashed var(--line-soft);font-size:12px;font-weight:600;color:var(--ink2);line-height:1.5}
+.step-list li:first-child{border-top:0}
+.step-list li::before{content:counter(s);position:absolute;left:0;top:8px;width:21px;height:21px;border-radius:7px;background:var(--sage-soft);color:var(--sage-d);font-size:10.5px;font-weight:800;display:grid;place-items:center}
+.step-list li b{font-weight:800;color:var(--sage-d)}
+.codebox{background:#F6F1E8;border:1px solid var(--line);border-radius:10px;padding:9px 10px;font-family:'SF Mono',ui-monospace,Menlo,monospace;font-size:10.5px;line-height:1.5;color:#4A443B;word-break:break-all;white-space:pre-wrap;margin-top:6px}
+.kv{display:flex;justify-content:space-between;gap:8px;font-size:11.5px;font-weight:700;color:var(--sub);padding:5px 0;border-top:1px dashed var(--line-soft)}
+.kv:first-child{border-top:0}
+.kv b{color:var(--ink);font-weight:800;font-variant-numeric:tabular-nums}
+
+/* big barcode */
+.bigmask{position:fixed;inset:0;background:#fff;z-index:120;display:none;flex-direction:column;padding:calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom))}
+.bigmask.on{display:flex}
+.big-close{align-self:flex-end;width:36px;height:36px;border-radius:12px;background:#F6F1E8;color:var(--sub);font-size:18px;display:grid;place-items:center}
+.big-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center}
+.big-body .gname{font-size:19px;font-weight:800;letter-spacing:-.6px;line-height:1.3}
+.big-body .gmeta{font-size:12px;font-weight:700;color:var(--mute)}
+.big-code{width:100%;max-width:640px;background:#fff;padding:10px 0}
+.big-code svg,.big-code canvas,.big-code img{width:100%;height:auto;display:block}
+.big-num{font-size:22px;font-weight:800;letter-spacing:3px;font-variant-numeric:tabular-nums}
+.big-tip{font-size:11.5px;font-weight:700;color:var(--amber-d);background:var(--amber-soft);border:1px solid var(--amber-line);border-radius:12px;padding:9px 12px;line-height:1.5;max-width:440px}
+.big-actions{display:flex;gap:8px;width:100%;max-width:440px}
+.big-actions .btn{flex:1;padding:13px}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:#2F2B26;color:#fff;font-size:12px;font-weight:700;padding:10px 16px;border-radius:999px;z-index:200;opacity:0;transition:.22s;pointer-events:none;max-width:88vw;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* table */
+.tblwrap{overflow:auto;border:1px solid var(--line);border-radius:12px;max-height:60vh}
+table.tbl{width:100%;border-collapse:collapse;font-size:11px;min-width:470px}
+.bigmask.on + .toast{bottom:calc(92px + env(safe-area-inset-bottom))}
+table.tbl th{position:sticky;top:0;background:#F7F3EA;font-size:10px;font-weight:800;color:var(--sub);padding:7px 8px;text-align:left;white-space:nowrap;z-index:1;border-bottom:1px solid var(--line)}
+table.tbl td{padding:6px 8px;border-top:1px solid var(--line-soft);font-weight:600;color:var(--ink2);vertical-align:middle}
+table.tbl tr.dup td{color:#C0B6A6}
+table.tbl tr.off td{color:#C9C0B2;text-decoration:line-through}
+table.tbl td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:800;white-space:nowrap}
+table.tbl input,table.tbl select{padding:4px 6px;font-size:11px;border-radius:7px;min-width:0}
+table.tbl input.w60{width:60px}
+table.tbl input.w90{width:78px}
+table.tbl td.acts{white-space:nowrap;text-align:right}
+.mini{width:24px;height:24px;border-radius:7px;display:inline-grid;place-items:center;font-size:11px;background:#F6F1E8;color:var(--sub);border:0}
+.mini.del{color:var(--coral-d);background:var(--coral-soft)}
+.seg2{display:flex;background:#F1E9DD;border-radius:9px;padding:2px;gap:2px}
+.seg2 button{flex:1;font-size:10.5px;font-weight:800;color:#9C9285;padding:6px 4px;border-radius:7px}
+.seg2 button.on{background:#fff;color:var(--sage-d);box-shadow:0 1px 3px rgba(120,96,66,.12)}
+.seg2.plum button.on{background:#fff;color:var(--plum)}
+.loader{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:4px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.banner{display:flex;align-items:flex-start;gap:8px;border-radius:12px;padding:10px 11px;font-size:11px;font-weight:700;line-height:1.5;margin-bottom:9px}
+.banner.info{background:var(--sage-soft);border:1px solid var(--sage-line);color:#5B6E54}
+.banner.warn{background:var(--amber-soft);border:1px solid var(--amber-line);color:var(--amber-d)}
+.banner.err{background:var(--coral-soft);border:1px solid var(--coral-line);color:var(--coral-d)}
+.banner b{font-weight:800}
+.filelist{list-style:none;font-size:10.5px;font-weight:700;color:var(--sub)}
+.filelist li{display:flex;gap:6px;align-items:center;padding:4px 0;border-top:1px dashed var(--line-soft)}
+.filelist li:first-child{border-top:0}
+.filelist li b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink2);font-weight:800}
+.hidden{display:none!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ============ card-issuer Pick coupons ============ */
+.picksearch{display:flex;align-items:center;gap:7px;background:#fff;border:1.5px solid var(--sage-line);border-radius:13px;padding:0 10px;height:42px;background:#F7FBF4}
+.picksearch .ps-ic{font-size:14px;flex:0 0 auto;opacity:.75}
+.picksearch input{border:0;background:transparent;font-size:12.5px;font-weight:700;height:100%;padding:0}
+.picksearch input:focus{outline:0}
+.picksearch .ps-x{flex:0 0 auto;width:24px;height:24px;border-radius:8px;background:#EAF1E6;color:#7E9178;font-size:11px;display:grid;place-items:center}
+.pickchips{display:flex;gap:5px;margin-top:8px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+.pickchips button{flex:0 0 auto;font-size:10.5px;font-weight:800;padding:5px 9px;border-radius:999px;background:#F5F1E8;color:var(--sub);white-space:nowrap;border:1px solid transparent}
+.pickchips button.on{background:var(--sage-soft);color:var(--sage-d);border-color:var(--sage-line)}
+.pickresult{margin-top:9px;font-size:11px;font-weight:700;color:#5B6E54;background:var(--sage-soft);border:1px solid var(--sage-line);border-radius:10px;padding:8px 10px;line-height:1.5}
+.pickresult b{color:var(--sage-d);font-weight:800}
+.picklist{margin-top:8px}
+.pick{display:flex;align-items:flex-start;gap:9px;border:1px solid var(--line);border-radius:14px;background:#FFFDFA;padding:10px 11px;margin-top:7px;min-width:0}
+.pick:first-child{margin-top:0}
+.pick.used{opacity:.52;background:#FAF8F4}
+.pick .pk-logo{width:34px;height:34px;border-radius:11px;background:#F1F6F2;color:#3D7C63;display:grid;place-items:center;font-size:9.5px;font-weight:800;flex:0 0 auto;letter-spacing:-.4px;text-align:center;line-height:1.1;padding:2px}
+.pick .pk-logo.kb{background:#FDF3DC;color:#A8721A}
+.pick .pk-logo.hy{background:#EAF4EC;color:#2C8A47}
+.pick .pk-body{flex:1;min-width:0}
+.pick .pk-top{display:flex;align-items:center;gap:6px;min-width:0}
+.pick .pk-top b{font-size:12.5px;font-weight:800;letter-spacing:-.35px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pick .pk-title{font-size:11.5px;font-weight:700;color:var(--ink2);margin-top:2px;line-height:1.4;letter-spacing:-.2px}
+.pick .pk-meta{display:flex;align-items:center;gap:5px;margin-top:5px;flex-wrap:wrap;font-size:9.5px;font-weight:700;color:#B0A596}
+.pick .pk-meta .chip{font-size:9px;padding:2px 6px}
+.pick .pk-acts{display:flex;align-items:center;gap:4px;flex:0 0 auto}
+.pick .pk-acts .btn{padding:7px 9px;font-size:10px;white-space:nowrap;flex:0 0 auto}
+.pick .pk-acts .mini{width:26px;height:26px}
+.pickmatch{background:#FFF3D6;border-radius:3px;padding:0 1px}
+@media(max-width:520px){
+  .pick{flex-wrap:wrap}
+  .pick .pk-acts{width:100%;justify-content:flex-end;border-top:1px dashed var(--line-soft);padding-top:6px;margin-top:2px}
+}
+.pickempty{text-align:center;font-size:10.5px;font-weight:600;color:#B7AC9C;line-height:1.7;padding:16px 8px}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="hd">
+    <div class="hd-l">
+      <div class="logo">🎁</div>
+      <div>
+        <h1>기프티콘 · 카드 · 가계부 지갑</h1>
+        <p class="date"><span id="todayLine">불러오는 중…</span><span class="only-desk" id="dateSuffix"></span><span class="tagday" id="roomTag">동기화</span></p>
+      </div>
+    </div>
+    <div class="hd-r">
+      <button class="sync" id="btnSync" title="동기화 상태"><span class="sdot" id="syncDot"></span><span id="syncTxt">연결 중</span></button>
+      <button class="icobtn" id="btnShortcut" title="아이폰 단축어 설정" aria-label="아이폰 단축어 설정">📱</button>
+      <button class="icobtn" id="btnSettings" title="설정" aria-label="설정">⚙️</button>
+    </div>
+  </header>
+
+  <div class="kpis" id="kpis"></div>
+
+  <!-- ===== 1. 카드 ===== -->
+  <section class="card" id="secCards">
+    <div class="card-h">
+      <h2><span class="secnum">1</span>카드별 사용 금액 · 실적 · 혜택</h2>
+      <div class="right">
+        <span class="chip line" id="cardMonthChip">이번 달</span>
+        <button class="btn ghost sm" id="btnCardAdd">＋ 카드</button>
+      </div>
+    </div>
+    <div class="cgrid" id="cardGrid"></div>
+    <div id="ktRow"></div>
+    <div class="tipbar">
+      <span class="t">💡 오프라인 결제 팁</span>
+      <span class="route" id="tipRoute"></span>
+    </div>
+    <div class="cnote">사용액은 아래 가계부에 기록된 내역을 카드별로 자동 합산한 값이에요 · 무이자 할부는 실적에서 빠집니다</div>
+  </section>
+
+  <!-- ===== 2. 카드사 Pick ===== -->
+  <section class="card" id="secPicks">
+    <div class="card-h">
+      <h2><span class="secnum">2</span>카드사 Pick 혜택</h2>
+      <div class="right">
+        <span class="chip line" id="pickChip">0개</span>
+        <button class="btn ghost sm" id="btnPickOcr">📷 캡처</button>
+        <button class="btn ghost sm" id="btnPickAdd">＋ Pick</button>
+      </div>
+    </div>
+    <div class="picksearch">
+      <span class="ps-ic">🔎</span>
+      <input id="pickSearch" placeholder="결제 전 가맹점 확인 — 예: 스타벅스, 이마트, 엔진오일" autocomplete="off">
+      <button class="ps-x hidden" id="pickClear" aria-label="지우기">✕</button>
+    </div>
+    <div class="pickchips" id="pickFilters"></div>
+    <div class="pickresult hidden" id="pickResult"></div>
+    <div class="picklist" id="pickList"></div>
+    <div class="cnote" style="text-align:left">Pick 쿠폰은 결제 전에 여기서 가맹점 이름만 검색해 보세요 — 어느 카드에 무슨 쿠폰이 남았는지 바로 나와요</div>
+  </section>
+
+  <!-- ===== 3. 가계부 ===== -->
+  <section class="card" id="secLedger">
+    <div class="card-h">
+      <h2><span class="secnum">3</span>바로 적는 간편 가계부</h2>
+      <div class="right">
+        <div class="seg2" id="monthNav" style="width:150px">
+          <button id="mPrev" aria-label="지난달">‹</button>
+          <button id="mLabel" class="on" title="이번 달로">11월</button>
+          <button id="mNext" aria-label="다음달">›</button>
+        </div>
+        <span class="chip line" id="ledgerChip">0건</span>
+      </div>
+    </div>
+
+    <div class="tools">
+      <button class="tool" id="btnXlsx">
+        <span class="tic">📂</span>
+        <span class="ttx"><b>뱅크샐러드 엑셀 · ZIP</b><small>고정/변동 자동 분류 · 중복 제외</small></span>
+        <span class="zero">한도 0%</span>
+      </button>
+      <button class="tool" id="btnOcr">
+        <span class="tic">📷</span>
+        <span class="ttx"><b>캡처로 추가</b><small>카드결제 화면을 읽어 표로</small></span>
+        <span class="zero">한도 0%</span>
+      </button>
+      <button class="tool" id="btnShortcut2">
+        <span class="tic">📱</span>
+        <span class="ttx"><b>아이폰 단축어 자동</b><small>결제 문자를 자동으로 기록</small></span>
+        <span class="zero">한도 0%</span>
+      </button>
+    </div>
+    <input type="file" id="fileXlsx" accept=".xlsx,.xls,.csv,.zip" class="hidden">
+    <input type="file" id="fileImg" accept="image/*" capture="environment" multiple class="hidden">
+
+    <form class="qform" id="quickForm" autocomplete="off">
+      <div class="qrow">
+        <div class="qf amt"><span class="w">₩</span><input id="qAmount" inputmode="numeric" placeholder="금액" required></div>
+        <div class="qf"><span class="w">✎</span><input id="qMemo" placeholder="내용 (예: 스타벅스)" required></div>
+        <div class="qf"><select id="qCat" aria-label="카테고리"></select></div>
+        <div class="qf seg" id="qFixedWrap">
+          <button type="button" data-v="var" class="on v">변동</button>
+          <button type="button" data-v="fix">고정</button>
+        </div>
+        <div class="qf"><select id="qCard" aria-label="결제카드"></select></div>
+      </div>
+      <div class="qsub">
+        <label class="qchk"><input type="checkbox" id="qInstallment"> 무이자 할부 <small>실적에서 빼기</small></label>
+        <button class="qadd" type="submit">＋ 기록</button>
+      </div>
+    </form>
+
+    <div class="split">
+      <div class="split-h"><span>이번 달 지출 구성</span><b id="splitTotal">0원</b></div>
+      <div class="bar"><i id="barFix" style="width:0;background:#8E7FB0"></i><i id="barVar" style="width:0;background:#7FA184"></i></div>
+      <div class="lg"><span class="fx" id="lgFix">🔒 고정비 0원 · 0%</span><span class="vr" id="lgVar">🔁 변동비 0원 · 0%</span></div>
+    </div>
+
+    <div class="fv3">
+      <div class="fv fixed">
+        <div class="fv-h"><span class="lbl">🔒 고정비</span><span class="pc" id="fixPc">0%</span></div>
+        <div class="amt" id="fixAmt">0원</div>
+        <div class="sub" id="fixSub">0건</div>
+        <ul class="fvl" id="fixList"></ul>
+        <div class="fvadd" style="display:none"></div>
+      </div>
+      <div class="fv var">
+        <div class="fv-h"><span class="lbl">🔁 변동비</span><span class="pc" id="varPc">0%</span></div>
+        <div class="amt" id="varAmt">0원</div>
+        <div class="sub" id="varSub">0건</div>
+        <ul class="fvl" id="varList"></ul>
+      </div>
+      <div class="recc">
+        <div class="recc-h"><b>최근 지출</b><button id="btnAllTx">전체 보기 →</button></div>
+        <ul class="rec" id="recentList"></ul>
+      </div>
+    </div>
+    <div class="cnote">고정비/변동비는 카테고리로 자동 분류되고, 내역을 누르면 바로 옮길 수 있어요 (같은 곳은 다음에도 기억)</div>
+  </section>
+
+  <!-- ===== 3. 기프티콘 ===== -->
+  <section class="card" id="secGifts">
+    <div class="card-h">
+      <h2><span class="secnum">4</span>기프티콘 &amp; 멤버십 지갑</h2>
+      <div class="right">
+        <span class="chip amber" id="giftChip">0개</span>
+        <button class="btn ghost sm" id="btnGiftAdd">＋ 기프티콘</button>
+      </div>
+    </div>
+    <div class="gwrap" id="giftGrid"></div>
+    <div class="gsum" id="giftSum"></div>
+    <div class="gnote">📌 만료 임박순으로 보여드려요 · 매장에서 [큰 바코드 보기]를 눌러 화면을 크게 켜 두세요 · 화면 밝기는 위로 올려 주세요</div>
+  </section>
+
+  <div class="foot2">
+    <p>🎁 <b id="footSave">이번 달 아낀 0원</b> — <span id="footDetail">카드 0 · 기프티콘 0</span></p>
+    <span class="r"><span class="sdot" id="syncDot2"></span><span id="footSync">동기화 중…</span></span>
+  </div>
+</div>
+
+<!-- ===================== modals ===================== -->
+<div class="mask" id="mCard"><div class="sheet">
+  <div class="sheet-h"><b id="cardModalTitle">카드 추가</b><button class="x" data-close>✕</button></div>
+  <div class="sheet-b">
+    <div class="fld"><label>카드 이름</label><input id="cName" placeholder="예: KB국민 쿠팡와우"></div>
+    <div class="fld"><div class="row3">
+      <div><label>끝 4자리</label><input id="cLast4" inputmode="numeric" maxlength="4" placeholder="9402"></div>
+      <div><label>순위</label><select id="cRank"><option value="1">1순위</option><option value="2">2순위</option><option value="3">3순위</option><option value="0">순위 없음</option></select></div>
+      <div><label>색</label><select id="cColor"><option value="kb">KB 노랑</option><option value="nv">네이버 초록</option><option value="hn">하나 파랑</option><option value="kt">KT 빨강</option><option value="wo">우리 남색</option><option value="kk">카카오 노랑</option><option value="cs">기타</option></select></div>
+    </div></div>
+    <div class="fld"><label>목표 실적 (원) · 0이면 실적 없음</label><input id="cTarget" inputmode="numeric" placeholder="300000"></div>
+    <div class="fld"><label>카드 설명</label><input id="cSub" placeholder="예: 대출 우대금리 방어용"></div>
+    <div class="fld"><label>혜택 (한 줄에 하나 · <b>혜택명|적립율%|한도원</b> 형태로 쓰면 아낀 금액 계산에 들어가요)</label><textarea id="cBen" rows="4" placeholder="편의점 · 카페 2%|2|&#10;일반 1%|1|"></textarea>
+      <div class="hint">예) <code>스벅 · 택시 · OTT 50%|50|10000</code> → 그 카테고리 결제액의 50%, 월 1만원까지</div>
+    </div>
+    <div class="fld"><label>혜택 계산 카테고리 (쉼표)</label><input id="cBenCats" placeholder="식비,생활"></div>
+  </div>
+  <div class="sheet-f"><button class="btn ghost" data-close>취소</button><button class="btn pri" id="cardSave">저장</button></div>
+</div></div>
+
+<div class="mask" id="mGift"><div class="sheet">
+  <div class="sheet-h"><b id="giftModalTitle">기프티콘 추가</b><button class="x" data-close>✕</button></div>
+  <div class="sheet-b">
+    <div class="fld"><label>이름</label><input id="gName" placeholder="예: 메가MGC커피 (ICE)아메리카노"></div>
+    <div class="fld"><div class="row2">
+      <div><label>유효기간</label><input id="gExp" type="date"></div>
+      <div><label>브랜드 표시 (2~3글자)</label><input id="gBrand" maxlength="4" placeholder="메가"></div>
+    </div></div>
+    <div class="fld"><label>바코드 번호 (숫자만)</label><input id="gBarcode" inputmode="numeric" placeholder="509171678961">
+      <div class="hint">쿠폰 번호가 12~14자리면 Code128로 스캔됩니다. 16자리는 쿠폰번호+핀번호일 수 있어요 — 매장 스캔용 번호를 넣어 주세요.</div></div>
+    <div class="fld"><div class="row2">
+      <div><label>금액권 금액 (원)</label><input id="gAmount" inputmode="numeric" placeholder="10000"></div>
+      <div><label>남은 잔액 (원)</label><input id="gBalance" inputmode="numeric" placeholder="10000"></div>
+    </div></div>
+    <div class="fld"><label>주문번호 · 메모</label><input id="gOrder" placeholder="3534184703"></div>
+    <div class="fld"><label>이미지 (선택)</label><input id="gImage" type="file" accept="image/*">
+      <div class="hint">바코드가 없는 모바일 쿠폰은 캡처 이미지를 올려 두면 매장에서 바로 보여줄 수 있어요.</div></div>
+  </div>
+  <div class="sheet-f"><button class="btn ghost" data-close>취소</button><button class="btn pri" id="giftSave">저장</button></div>
+</div></div>
+
+<div class="mask" id="mShortcut"><div class="sheet">
+  <div class="sheet-h"><b>📱 아이폰 단축어 1분 설정</b><button class="x" data-close>✕</button></div>
+  <div class="sheet-b">
+    <div class="banner info">결제 문자나 카드 알림이 오면 <b>자동으로 가계부에 기록</b>돼요. 서버 주소만 단축어에 붙여 넣으면 끝입니다.</div>
+    <div class="fld"><label>1) 이 주소를 복사</label>
+      <div class="codebox" id="scUrl"></div>
+      <div style="display:flex;gap:6px;margin-top:7px;flex-wrap:wrap">
+        <button class="btn pri sm" id="btnCopyScUrl">주소 복사</button>
+        <button class="btn ghost sm" id="btnCopyScJson">JSON 예시 복사</button>
+        <button class="btn ghost sm" id="btnTestInbox">테스트로 한 건 보내기</button>
+      </div>
+    </div>
+    <div class="fld"><label>2) 단축어 앱에서</label>
+      <ol class="step-list">
+        <li><b>단축어 앱 → 자동화 → ＋</b> → <b>메시지</b> (또는 앱: 카드사 앱) 선택</li>
+        <li>보낸 사람에 카드사 번호를 넣고 <b>즉시 실행</b>을 켜요 (iOS 17부터 확인 없이 실행)</li>
+        <li>동작 추가 → <b>URL</b> → 위 주소 붙여넣기</li>
+        <li><b>URL의 콘텐츠 가져오기</b> → 방법 <b>POST</b> → 요청 본문 <b>JSON</b></li>
+        <li>본문에 <code>raw</code> 키를 추가하고 값에 <b>단축어 입력</b>(문자 내용)을 넣어요</li>
+        <li>끝! 지갑 앱을 열면 문자가 자동으로 가계부에 들어와 있어요</li>
+      </ol>
+    </div>
+    <div class="fld"><label>문자 예시 (이런 모양이면 자동 인식)</label>
+      <div class="codebox">[KB국민] 11/20 12,500원 스타벅스
+[하나] 11/20 09:22 스타벅스 5,600원 승인
+{ "amount": 12500, "merchant": "스타벅스", "card": "KB국민" }</div>
+      <div class="hint">승인취소·이체 문자는 자동으로 건너뛰고, 이미 들어온 같은 내역은 두 번 기록하지 않아요.</div>
+    </div>
+  </div>
+  <div class="sheet-f"><button class="btn ghost" data-close>닫기</button></div>
+</div></div>
+
+<div class="mask" id="mPick"><div class="sheet" style="max-width:460px">
+  <div class="sheet-h"><b id="pickModalTitle">Pick 쿠폰 추가</b><button class="x" data-close>✕</button></div>
+  <div class="sheet-b">
+    <div class="fld"><label>가맹점</label><input id="pTitle" placeholder="예: 스피드메이트"></div>
+    <div class="fld"><div class="row2">
+      <div><label>카드사</label><select id="pIssuer">
+        <option>하나Pick</option><option>KB 마이픽</option><option>현대카드</option><option>신한카드</option><option>삼성카드</option><option>우리카드</option><option>기타</option>
+      </select></div>
+      <div><label>만료일</label><input id="pExp" type="date"></div>
+    </div></div>
+    <div class="fld"><label>혜택 내용</label><input id="pBenefit" placeholder="예: 엔진오일 교환 + 차량정비 할인가"></div>
+    <div class="fld"><label>검색 키워드 (쉼표 · 가맹점 이름으로 자동 포함)</label><input id="pKeys" placeholder="엔진오일,차량정비"></div>
+    <div class="fld"><div class="row2">
+      <div><label>아낀 금액 (원 · 선택)</label><input id="pAmount" inputmode="numeric" placeholder="2000"></div>
+      <div><label>메모</label><input id="pNote" placeholder="예: 선착순"></div>
+    </div></div>
+  </div>
+  <div class="sheet-f"><button class="btn ghost" id="pDelete" style="flex:0 0 auto;color:#A8472C">삭제</button><button class="btn ghost" data-close>취소</button><button class="btn pri" id="pickSave">저장</button></div>
+</div></div>
+
+<div class="mask" id="mPickOcr"><div class="sheet" style="max-width:860px">
+  <div class="sheet-h"><b>📷 캡처에서 Pick 읽기</b><button class="x" data-close>✕</button></div>
+  <div class="sheet-b">
+    <div class="banner info" id="pocrMsg"></div>
+    <div class="tblwrap"><table class="tbl" id="pocrTable"></table></div>
+    <div class="hint" style="margin-top:8px">카드사 앱의 Pick 화면을 캡처해 올리면 가맹점·혜택·기간을 읽어 와요 · 잘못 읽힌 곳만 고쳐서 담아 주세요</div>
+  </div>
+  <div class="sheet-f"><button class="btn ghost" data-close>취소</button><button class="btn pri" id="pocrConfirm">선택한 <span id="pocrCount">0</span>건 담기</button></div>
+</div></div>
+
+<div class="mask" id="mTxn"><div class="sheet" style="max-width:440px">
+  <div class="sheet-h"><b>내역 수정</b><button class="x" data-close>✕</button></div>
+  <div class="sheet-b">
+    <div class="fld"><label>내용</label><input id="tMemo"></div>
+    <div class="fld"><div class="row2">
+      <div><label>금액</label><input id="tAmount" inputmode="numeric"></div>
+      <div><label>날짜</label><input id="tDate" type="date"></div>
+    </div></div>
+    <div class="fld"><div class="row2">
+      <div><label>분류</label><select id="tCat"></select></div>
+      <div><label>결제</label><select id="tCard"></select></div>
+    </div></div>
+    <div class="fld"><label>고정 / 변동</label>
+      <button id="tFixed" class="seg2" style="width:100%;padding:10px;font-size:11.5px;font-weight:800">변동비</button>
+    </div>
+    <label class="qchk" style="margin-top:2px"><input type="checkbox" id="tInstall"> 무이자 할부 <small>실적에서 빼기</small></label>
+  </div>
+  <div class="sheet-f"><button class="btn ghost" id="tDelete" style="flex:0 0 auto;color:#A8472C">삭제</button><button class="btn pri" id="tSave">저장</button></div>
+</div></div>
+
+<div class="mask" id="mUse"><div class="sheet" style="max-width:400px">
+  <div class="sheet-h"><b>사용 완료 ✅</b><button class="x" data-close>✕</button></div>
+  <div class="sheet-b">
+    <div class="banner info"><b id="useName"></b> 을(를) 썼어요. 실제 매장 가격을 적으면 이번 달 아낀 금액에 들어갑니다.</div>
+    <div class="fld"><label>아낀 금액 (원)</label><input id="useAmount" inputmode="numeric" placeholder="모르면 비워 두세요"></div>
+    <div class="hint" id="useHint">모르면 비워 두세요 — 사용 기록만 남기고 금액은 0원으로 둡니다.</div>
+  </div>
+  <div class="sheet-f"><button class="btn ghost" data-close>취소</button><button class="btn pri" id="useOk">사용 완료</button></div>
+</div></div>
+
+<div class="mask" id="mSettings"><div class="sheet">
+  <div class="sheet-h"><b>⚙️ 설정 · 동기화</b><button class="x" data-close>✕</button></div>
+  <div class="sheet-b">
+    <div class="fld"><label>방 이름 (room)</label>
+      <div style="display:flex;gap:6px"><input id="setRoom" placeholder="choi-wallet-2026"><button class="btn pri sm" id="btnRoomSave" style="flex:0 0 auto">바꾸기</button></div>
+      <div class="hint">같은 방 이름을 쓰는 기기끼리 실시간으로 같은 장부를 봐요. 6자 이상.</div>
+    </div>
+    <div class="fld"><label>공유 링크</label>
+      <div class="codebox" id="setShare"></div>
+      <div style="display:flex;gap:6px;margin-top:7px"><button class="btn ghost sm" id="btnCopyShare">링크 복사</button></div>
+    </div>
+    <div class="fld"><label>동기화</label>
+      <div id="setSyncInfo" class="hint"></div>
+      <div style="display:flex;gap:6px;margin-top:7px;flex-wrap:wrap">
+        <button class="btn ghost sm" id="btnPushNow">지금 올리기</button>
+        <button class="btn ghost sm" id="btnPullNow">서버에서 받기</button>
+      </div>
+    </div>
+    <div class="fld"><label>데이터</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn ghost sm" id="btnExport">JSON 내보내기</button>
+        <button class="btn ghost sm" id="btnImportDemo">예시 데이터 채우기</button>
+        <button class="btn ghost sm" id="btnClearDemo">예시만 지우기</button>
+      </div>
+      <div class="hint">예시 데이터는 화면을 미리 볼 때만 쓰세요. [예시만 지우기]로 한 번에 지워집니다.</div>
+    </div>
+  </div>
+  <div class="sheet-f"><button class="btn ghost" data-close>닫기</button></div>
+</div></div>
+
+<div class="mask" id="mPass"><div class="sheet" style="max-width:400px">
+  <div class="sheet-h"><b>🔒 비밀번호 입력</b><button class="x" data-close>✕</button></div>
+  <div class="sheet-b">
+    <div class="banner info" id="passMsg">압축 파일에 비밀번호가 걸려 있어요. 브라우저 안에서만 열고, 어디로도 보내지 않습니다.</div>
+    <div class="fld"><label>비밀번호</label><input id="passInput" type="password" autocomplete="off" placeholder="예: 생년월일 6자리">
+      <div class="hint" id="passTry"></div></div>
+  </div>
+  <div class="sheet-f"><button class="btn ghost" data-close>취소</button><button class="btn pri" id="passOk">열기</button></div>
+</div></div>
+
+<div class="mask" id="mImport"><div class="sheet" style="max-width:860px">
+  <div class="sheet-h"><b id="impTitle">가져온 내역 확인</b><button class="x" data-close>✕</button></div>
+  <div class="sheet-b">
+    <div class="banner info" id="impSummary"></div>
+    <div class="tblwrap"><table class="tbl" id="impTable"></table></div>
+    <div class="hint" style="margin-top:8px">체크를 끄면 그 줄은 기록하지 않아요 · 내용·금액·카드를 고칠 수 있어요 · 내 계좌 이체는 자동 제외됩니다</div>
+  </div>
+  <div class="sheet-f"><button class="btn ghost" data-close>취소</button><button class="btn pri" id="impConfirm">선택한 <span id="impCount">0</span>건 기록</button></div>
+</div></div>
+
+<div class="mask" id="mAll"><div class="sheet" style="max-width:860px">
+  <div class="sheet-h"><b id="allTitle">전체 내역</b><button class="x" data-close>✕</button></div>
+  <div class="sheet-b">
+    <div class="tools" style="grid-template-columns:1fr 1fr;margin-bottom:9px">
+      <div class="qf"><select id="allFilter" aria-label="필터">
+        <option value="all">전체</option><option value="fix">고정비</option><option value="var">변동비</option>
+      </select></div>
+      <div class="qf"><select id="allCard" aria-label="카드"></select></div>
+    </div>
+    <div class="tblwrap"><table class="tbl" id="allTable"></table></div>
+    <div class="hint" style="margin-top:8px">날짜·내용·금액을 눌러 고치고, 🔒/🔁 버튼으로 고정↔변동을 옮길 수 있어요.</div>
+  </div>
+  <div class="sheet-f"><button class="btn ghost" id="btnCsv">CSV 내보내기</button><button class="btn ghost" data-close>닫기</button></div>
+</div></div>
+
+<div class="mask" id="mOcr"><div class="sheet" style="max-width:860px">
+  <div class="sheet-h"><b>📷 캡처에서 읽은 내역</b><button class="x" data-close>✕</button></div>
+  <div class="sheet-b">
+    <div class="banner info" id="ocrMsg"></div>
+    <div class="tblwrap"><table class="tbl" id="ocrTable"></table></div>
+    <div class="hint" style="margin-top:8px">잘못 읽힌 숫자만 고쳐 주세요 · 내 계좌 이체로 보이는 줄은 미리 꺼 두었어요</div>
+  </div>
+  <div class="sheet-f"><button class="btn ghost" data-close>취소</button><button class="btn pri" id="ocrConfirm">선택한 <span id="ocrCount">0</span>건 반영</button></div>
+</div></div>
+
+<div class="bigmask" id="bigBarcode">
+  <button class="big-close" id="bigClose" aria-label="닫기">✕</button>
+  <div class="big-body">
+    <div class="gname" id="bigName"></div>
+    <div class="gmeta" id="bigMeta"></div>
+    <div class="big-code" id="bigCode"></div>
+    <div class="big-num" id="bigNum"></div>
+    <div class="big-tip">🔆 화면 밝기를 <b>최대로</b> 올려 주세요 · 바코드를 사각형 안에 맞추면 계산대에서 바로 읽혀요</div>
+  </div>
+  <div class="big-actions">
+    <button class="btn ghost" id="bigDone">사용 완료</button>
+    <button class="btn pri" id="bigBack">닫기</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ==== 00-core.js ==== */
+/* ============================================================
+   기프티콘·카드·가계부 지갑 — core: config, helpers, seed
+   ============================================================ */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDjfzhfe9MKAj_CTKbm4Zq50TEMnpl1tns",
+  authDomain: "seohan-routine-sync.firebaseapp.com",
+  databaseURL: "https://seohan-routine-sync-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "seohan-routine-sync",
+  storageBucket: "seohan-routine-sync.firebasestorage.app",
+  messagingSenderId: "381955483059",
+  appId: "1:381955483059:web:41db087996d3392a3917c6"
+};
+const DEFAULT_ROOM = "choi-wallet-2026";
+const LS_STATE = "wallet-state-v2:";
+const LS_ROOM = "wallet-room-v2";
+const LS_MONTH = "wallet-month-v2";
+
+/* 카테고리: fixed=true 는 고정비 기본값 */
+const CATS = [
+  { n: "식비", e: "🍚", fixed: false },
+  { n: "생활", e: "🧴", fixed: false },
+  { n: "아이", e: "🧒", fixed: false },
+  { n: "교통", e: "🚌", fixed: false },
+  { n: "쇼핑", e: "🛍️", fixed: false },
+  { n: "의료", e: "💊", fixed: false },
+  { n: "문화", e: "🎬", fixed: false },
+  { n: "기타", e: "📌", fixed: false },
+  { n: "유치원비", e: "🏫", fixed: true },
+  { n: "관리비", e: "🏢", fixed: true },
+  { n: "통신", e: "📶", fixed: true },
+  { n: "구독", e: "💳", fixed: true },
+  { n: "보험", e: "🛡️", fixed: true },
+  { n: "교육", e: "📚", fixed: true },
+  { n: "대출", e: "🏦", fixed: true },
+  { n: "세금", e: "🧾", fixed: true }
+];
+const CAT_NAMES = CATS.map(c => c.n);
+const CAT_BY = {};
+CATS.forEach(c => { CAT_BY[c.n] = c; });
+function catEmoji(name) { return (CAT_BY[name] && CAT_BY[name].e) || "📌"; }
+function catFixedDefault(name) { return !!(CAT_BY[name] && CAT_BY[name].fixed); }
+
+/* 결제수단(카드) 옵션 — 현금·기프티콘은 카드 실적 계산에서 빠짐 */
+const PAY_CASH = "cash";
+const PAY_GIFT = "gift";
+
+const RANK_LABEL = { 1: "1순위", 2: "2순위", 3: "3순위", 0: "기타" };
+
+/* ---------- 기본 카드 5종 (최현 님 보유 카드) ---------- */
+function seedCards() {
+  return [
+    {
+      id: "kb", name: "KB국민 쿠팡와우", short: "KB국민", last4: "9402", rank: 1, color: "kb",
+      target: 300000, sub: "대출 우대금리 방어용", type: "credit",
+      benefits: [
+        { t: "편의점 · 카페 2%", tone: "" }, { t: "일반 1%", tone: "" },
+        { t: "2027.04.30까지 무실적", tone: "sage" }
+      ],
+      rules: [
+        { m: ["스타벅스", "메가", "컴포즈", "투썸", "이디야", "카페", "편의점", "GS25", "CU", "세븐일레븐"], rate: 2, cap: 5000 },
+        { cats: ["*"], rate: 1, cap: 0 }
+      ]
+    },
+    {
+      id: "nv", name: "네이버 현대 Ed1", short: "네이버현대", last4: "9006", rank: 2, color: "nv",
+      target: 300000, sub: "네이버플러스 멤버십 무료 조건", type: "credit",
+      benefits: [
+        { t: "네이버플러스 멤버십 무료", tone: "sage" }, { t: "월 4,900원 면제", tone: "" }
+      ],
+      rules: [{ cats: ["*"], rate: 1, cap: 0 }]
+    },
+    {
+      id: "jade", name: "하나 JADE Classic", short: "하나JADE", last4: "", rank: 0, color: "hn",
+      target: 500000, sub: "연회비 12만 · VIP로열", type: "credit",
+      benefits: [
+        { t: "스벅 · 택시 · OTT 50%", tone: "" }, { t: "마트 · 주유 1.2%", tone: "" },
+        { t: "연 바우처 10만", tone: "sage" }
+      ],
+      rules: [
+        { m: ["스타벅스", "택시", "카카오T", "넷플릭스", "유튜브", "티빙", "웨이브", "밀리", "OTT", "왓챠"], rate: 50, cap: 10000 },
+        { m: ["이마트", "홈플러스", "롯데마트", "코스트코", "주유", "GS칼텍스", "SK에너지"], rate: 1.2, cap: 0 },
+        { cats: ["*"], rate: 1, cap: 0 }
+      ]
+    },
+    {
+      id: "nepa", name: "하나 네이버페이 머니체크", short: "네페체크", last4: "", rank: 3, color: "hn",
+      target: 0, sub: "체크 · 전 가맹점 1.2%", type: "check",
+      benefits: [{ t: "전 가맹점 1.2%", tone: "" }, { t: "실적 부담 없음", tone: "sage" }],
+      rules: [{ cats: ["*"], rate: 1.2, cap: 0 }]
+    },
+    {
+      id: "kt", name: "KT VIP · 요고49", short: "KT", last4: "", rank: 3, color: "kt",
+      target: 0, sub: "월간 무료 혜택 체크", type: "benefit",
+      benefits: [{ t: "청연 2,000원 쿠폰", tone: "amber" }, { t: "VIP 초이스 연 6회", tone: "" }],
+      rules: [],
+      checks: ["청연 2,000원 쿠폰", "VIP 초이스 1회", "요고49 쿠폰팩"]
+    }
+  ];
+}
+
+function seedGifts() {
+  return [{
+    id: "g-mega", name: "메가MGC커피 (ICE)아메리카노", brand: "메가",
+    barcode: "509171678961", exp: "2027-02-18", orderNo: "3534184703",
+    amount: 0, balance: 0, used: false, image: "", memo: "", emoji: "🥤"
+  }];
+}
+
+/* ---------- helpers ---------- */
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+function fmt(n) {
+  n = Math.round(Number(n) || 0);
+  return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+function won(n) { return fmt(n) + "원"; }
+function num(v) {
+  if (typeof v === "number") return isFinite(v) ? v : 0;
+  const s = String(v == null ? "" : v).replace(/[^\d.\-]/g, "");
+  const n = parseFloat(s);
+  return isFinite(n) ? n : 0;
+}
+function pad2(n) { return String(n).padStart(2, "0"); }
+function isoDate(d) { return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()); }
+function todayISO() { return isoDate(new Date()); }
+function monthOf(iso) { return String(iso || "").slice(0, 7); }
+function monthLabel(mk) {
+  const [y, m] = String(mk).split("-");
+  return Number(m) + "월";
+}
+function monthTitle(mk) {
+  const [y, m] = String(mk).split("-");
+  return y + "년 " + Number(m) + "월";
+}
+function shiftMonth(mk, delta) {
+  const [y, m] = mk.split("-").map(Number);
+  const d = new Date(y, m - 1 + delta, 1);
+  return d.getFullYear() + "-" + pad2(d.getMonth() + 1);
+}
+function lastDayOfMonth(mk) {
+  const [y, m] = mk.split("-").map(Number);
+  return new Date(y, m, 0).getDate();
+}
+function daysInMonthLeft(mk) {
+  const today = new Date();
+  if (monthOf(todayISO()) !== mk) return 0;
+  return lastDayOfMonth(mk) - today.getDate() + 1;
+}
+function dday(exp) {
+  if (!exp) return null;
+  const t = new Date(exp + "T23:59:59");
+  if (isNaN(t)) return null;
+  const now = new Date();
+  const a = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const b = new Date(t.getFullYear(), t.getMonth(), t.getDate());
+  return Math.round((b - a) / 86400000);
+}
+function ddayChip(d) {
+  if (d == null) return "";
+  if (d < 0) return '<span class="dd hot">만료</span>';
+  if (d === 0) return '<span class="dd hot">D-DAY</span>';
+  if (d <= 14) return '<span class="dd hot">D-' + d + "</span>";
+  if (d <= 60) return '<span class="dd mid">D-' + d + "</span>";
+  return '<span class="dd ok">D-' + d + "</span>";
+}
+function uid(p) {
+  return (p || "id") + "-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+function normKey(s) {
+  return String(s || "").replace(/\s+/g, "").replace(/[()\[\]{}·.,\-_/]/g, "").toLowerCase();
+}
+function debounce(fn, ms) {
+  let t = null;
+  return function () {
+    const args = arguments, ctx = this;
+    clearTimeout(t);
+    t = setTimeout(() => fn.apply(ctx, args), ms);
+  };
+}
+function toast(msg, ms) {
+  const el = document.getElementById("toast");
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add("on");
+  clearTimeout(el.__t);
+  el.__t = setTimeout(() => el.classList.remove("on"), ms || 2200);
+}
+function $(sel, root) { return (root || document).querySelector(sel); }
+function $$(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+function downloadBlob(name, text, type) {
+  const blob = new Blob([text], { type: type || "application/json;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+}
+async function copyText(text, okMsg) {
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove();
+    }
+    toast(okMsg || "복사했어요");
+    return true;
+  } catch (e) {
+    toast("복사가 안 됐어요 — 길게 눌러 선택해 주세요");
+    return false;
+  }
+}
+
+/* ==== 10-state.js ==== */
+/* ============================================================
+   state: 방/월/장부 저장·계산
+   ============================================================ */
+const Room = (function () {
+  const qs = new URLSearchParams(location.search);
+  const fromUrl = (qs.get("room") || "").trim();
+  if (fromUrl.length >= 6) {
+    try { localStorage.setItem(LS_ROOM, fromUrl); } catch (e) {}
+    return fromUrl.replace(/[.#$\[\]\/]/g, "-");
+  }
+  let saved = "";
+  try { saved = localStorage.getItem(LS_ROOM) || ""; } catch (e) {}
+  return saved.length >= 6 ? saved : DEFAULT_ROOM;
+})();
+
+let uiMonth = (function () {
+  try {
+    const m = localStorage.getItem(LS_MONTH);
+    if (m && /^\d{4}-\d{2}$/.test(m)) return m;
+  } catch (e) {}
+  return monthOf(todayISO());
+})();
+
+function seedPicks() {
+  return [
+    { id: "p-speedmate", issuer: "하나Pick", title: "스피드메이트", benefit: "엔진오일 교환 + 차량정비 할인가",
+      exp: "2026-11-30", keys: ["엔진오일", "차량정비", "정비", "오일"], note: "선착순 · 캡처에 완료 표시", used: false, usedAmount: 0 },
+    { id: "p-lfmall", issuer: "하나Pick", title: "LF몰", benefit: "10% 할인 + 20만원 이상 결제 시 1만원 장바구니 쿠폰",
+      exp: "2026-11-30", keys: ["LF몰", "엘에프몰", "LF", "닥스", "라코스테", "쇼핑"], note: "캡처에 완료 표시", used: false, usedAmount: 0 },
+    { id: "p-goodprice", issuer: "하나Pick", title: "착한가격업소", benefit: "2,000원 청구할인",
+      exp: "2026-11-30", keys: ["착한가격", "착한가격업소", "외식", "식당"], note: "선착순 · 캡처에 완료 표시", used: false, usedAmount: 0 }
+  ];
+}
+
+function blankState() {
+  return {
+    version: 2,
+    cards: seedCards(),
+    gifts: seedGifts(),
+    picks: seedPicks(),
+    txns: [],
+    giftUses: [],
+    ktChecks: {},
+    catRules: {},
+    updatedAt: 0
+  };
+}
+
+let state = blankState();
+let applyingRemote = false;
+let lastPushedAt = 0;
+
+function normalizeState(raw) {
+  const s = Object.assign(blankState(), raw || {});
+  s.txns = Array.isArray(s.txns) ? s.txns : [];
+  s.gifts = Array.isArray(s.gifts) ? s.gifts : [];
+  s.giftUses = Array.isArray(s.giftUses) ? s.giftUses : [];
+  s.picks = Array.isArray(s.picks) ? s.picks : seedPicks();
+  s.picks.forEach(p => {
+    p.id = p.id || uid("p");
+    p.used = !!p.used;
+    p.usedAmount = num(p.usedAmount);
+    p.keys = Array.isArray(p.keys) ? p.keys : [];
+    p.title = String(p.title || "").slice(0, 40);
+    p.benefit = String(p.benefit || "").slice(0, 90);
+  });
+  s.cards = Array.isArray(s.cards) && s.cards.length ? s.cards : seedCards();
+  s.catRules = s.catRules && typeof s.catRules === "object" ? s.catRules : {};
+  s.ktChecks = s.ktChecks && typeof s.ktChecks === "object" ? s.ktChecks : {};
+  s.txns.forEach(t => {
+    t.id = t.id || uid("t");
+    t.amount = num(t.amount);
+    t.date = /^\d{4}-\d{2}-\d{2}$/.test(t.date || "") ? t.date : todayISO();
+    t.cat = CAT_BY[t.cat] ? t.cat : "기타";
+    t.fixed = typeof t.fixed === "boolean" ? t.fixed : catFixedDefault(t.cat);
+    t.cardId = t.cardId || PAY_CASH;
+    t.memo = String(t.memo || "").slice(0, 80);
+    t.installment = !!t.installment;
+  });
+  s.cards.forEach(c => {
+    c.id = c.id || uid("c");
+    c.target = num(c.target);
+    c.rank = num(c.rank);
+    c.benefits = Array.isArray(c.benefits) ? c.benefits : [];
+    c.rules = Array.isArray(c.rules) ? c.rules : [];
+    c.checks = Array.isArray(c.checks) ? c.checks : [];
+  });
+  s.gifts.forEach(g => {
+    g.id = g.id || uid("g");
+    g.amount = num(g.amount);
+    g.balance = num(g.balance);
+    g.used = !!g.used;
+  });
+  return s;
+}
+
+function loadLocal() {
+  try {
+    const raw = localStorage.getItem(LS_STATE + Room);
+    if (raw) { state = normalizeState(JSON.parse(raw)); return true; }
+  } catch (e) { console.warn("local load failed", e); }
+  state = blankState();
+  return false;
+}
+
+const saveLocal = function () {
+  try {
+    localStorage.setItem(LS_STATE + Room, JSON.stringify(state));
+  } catch (e) {
+    if (String(e).indexOf("Quota") >= 0) toast("저장 공간이 가득 찼어요 — 기프티콘 이미지를 줄여 주세요");
+  }
+};
+
+function touch() {
+  state.updatedAt = Date.now();
+  saveLocal();
+  if (typeof queuePush === "function") queuePush();
+}
+
+/* ---------- derived ---------- */
+function monthTxns(mk) {
+  mk = mk || uiMonth;
+  return state.txns.filter(t => monthOf(t.date) === mk);
+}
+function sortTxDesc(list) {
+  return list.slice().sort((a, b) => (b.date + (b.ts || "")).localeCompare(a.date + (a.ts || "")) || String(b.id).localeCompare(String(a.id)));
+}
+function cardById(id) {
+  return state.cards.find(c => c.id === id) || null;
+}
+function cardLabel(id) {
+  if (id === PAY_CASH) return "현금";
+  if (id === PAY_GIFT) return "기프티콘";
+  const c = cardById(id);
+  return c ? (c.short || c.name) : "기타";
+}
+function cardStats(card, mk) {
+  const list = monthTxns(mk).filter(t => t.cardId === card.id);
+  let used = 0, perf = 0, inst = 0;
+  list.forEach(t => {
+    used += t.amount;
+    if (t.installment) inst += t.amount; else perf += t.amount;
+  });
+  return { used: used, perf: perf, inst: inst, count: list.length };
+}
+
+/* 카드 혜택 추정: 규칙(가맹점 키워드/카테고리/전체) + 월 한도 */
+function cardSaving(card, mk) {
+  if (!card.rules || !card.rules.length) return 0;
+  const list = monthTxns(mk).filter(t => t.cardId === card.id && t.amount > 0);
+  let total = 0, usedCats = {};
+  const caps = {};
+  card.rules.forEach((rule, i) => {
+    let sub = 0;
+    list.forEach(t => {
+      let hit = false;
+      if (rule.m && rule.m.length) {
+        const hay = (t.memo || "").toLowerCase();
+        hit = rule.m.some(k => hay.indexOf(String(k).toLowerCase()) >= 0);
+      }
+      if (!hit && rule.cats && rule.cats.length) {
+        if (rule.cats.indexOf("*") >= 0) {
+          hit = true;
+          card.rules.slice(0, i).forEach(prev => {
+            if (prev.cats && prev.cats.indexOf(t.cat) >= 0 && prev.cats.indexOf("*") < 0) hit = false;
+            if (prev.m && prev.m.some(k => (t.memo || "").toLowerCase().indexOf(String(k).toLowerCase()) >= 0)) hit = false;
+          });
+        } else if (rule.cats.indexOf(t.cat) >= 0) hit = true;
+      }
+      if (hit) sub += t.amount * (rule.rate || 0) / 100;
+    });
+    if (rule.cap > 0) sub = Math.min(sub, rule.cap);
+    total += sub;
+  });
+  return Math.round(total);
+}
+function cardSavings(mk) {
+  return state.cards.reduce((sum, c) => sum + cardSaving(c, mk), 0);
+}
+function giftUses(mk) {
+  return state.giftUses.filter(u => monthOf(u.date) === mk);
+}
+function giftSaving(mk) {
+  return giftUses(mk).reduce((s, u) => s + num(u.amount), 0);
+}
+function pickSaving(mk) {
+  return state.picks.reduce((s, p) =>
+    s + (p.used && monthOf(p.usedAt || "") === mk ? num(p.usedAmount) : 0), 0);
+}
+function savedTotal(mk) {
+  return cardSavings(mk) + giftSaving(mk) + pickSaving(mk);
+}
+
+/* 고정/변동 토글 규칙 기억 */
+function rememberRule(key, fixed, cat) {
+  if (!key) return;
+  state.catRules[normKey(key)] = { fixed: fixed, cat: cat || null };
+}
+function applyRule(t) {
+  const r = state.catRules[normKey(t.memo)];
+  if (r) {
+    if (typeof r.fixed === "boolean") t.fixed = r.fixed;
+    if (r.cat && CAT_BY[r.cat]) t.cat = r.cat;
+  }
+  return t;
+}
+
+function addTxn(t, opts) {
+  const item = normalizeState({ txns: [Object.assign({}, t)] }).txns[0];
+  item.id = t.id || uid("t");
+  item.ts = t.ts || Date.now();
+  applyRule(item);
+  if (!opts || opts.noDedup !== true) {
+    const dup = state.txns.some(x => x.date === item.date && x.amount === item.amount && normKey(x.memo) === normKey(item.memo));
+    if (dup) return null;
+  }
+  state.txns.push(item);
+  return item;
+}
+
+/* ==== 20-sync.js ==== */
+/* ============================================================
+   sync: Firebase RTDB 실시간 + localStorage 백업
+   ============================================================ */
+let fbApp = null, db = null, stateRef = null, inboxRef = null;
+let syncKind = "connecting";
+let remoteReady = [];
+
+function setSync(kind, text) {
+  syncKind = kind;
+  const dot = $("#syncDot"), dot2 = $("#syncDot2"), txt = $("#syncTxt"), foot = $("#footSync");
+  const cls = kind === "on" ? "on" : kind === "local" ? "off" : kind === "err" ? "err" : "";
+  if (dot) dot.className = "sdot " + cls;
+  if (dot2) dot2.className = "sdot " + cls;
+  if (txt) txt.textContent = text || (kind === "on" ? "실시간 동기화" : kind === "local" ? "이 기기에만" : "연결 중");
+  if (foot) foot.textContent = kind === "on" ? "실시간 동기화 중" : kind === "local" ? "이 기기에 저장 중" : "동기화 확인 중";
+  const info = $("#setSyncInfo");
+  if (info) {
+    info.innerHTML = "상태: <b>" + esc(text || kind) + "</b> · 방 <b>" + esc(Room) + "</b><br>" +
+      "마지막 저장 " + (state.updatedAt ? new Date(state.updatedAt).toLocaleString("ko-KR") : "없음");
+  }
+}
+
+const doPush = function () {
+  if (!stateRef) return;
+  try {
+    const payload = JSON.parse(JSON.stringify(state));
+    payload.updatedAt = state.updatedAt || Date.now();
+    lastPushedAt = payload.updatedAt;
+    stateRef.set(payload, err => {
+      if (err) {
+        setSync("err", "동기화 실패");
+        console.warn("push failed", err);
+      } else {
+        setSync("on", "실시간 동기화");
+      }
+    });
+  } catch (e) {
+    console.warn("push error", e);
+  }
+};
+const queuePush = debounce(function () { doPush(); }, 600);
+
+function adoptRemote(remote) {
+  applyingRemote = true;
+  const keepKt = state.ktChecks;
+  state = normalizeState(remote);
+  if (remote && remote.ktChecks) state.ktChecks = remote.ktChecks; else state.ktChecks = keepKt || {};
+  saveLocal();
+  applyingRemote = false;
+  if (typeof renderAll === "function") renderAll();
+}
+
+function initSync() {
+  setSync("connecting", "연결 중");
+  if (!window.firebase || !firebase.database) {
+    setSync("local", "이 기기에만");
+    return;
+  }
+  try {
+    if (!firebase.apps || !firebase.apps.length) fbApp = firebase.initializeApp(FIREBASE_CONFIG);
+    else fbApp = firebase.app();
+    db = firebase.database();
+    stateRef = db.ref("rooms/" + Room + "/state");
+    inboxRef = db.ref("rooms/" + Room + "/inbox");
+  } catch (e) {
+    console.warn("firebase init failed", e);
+    setSync("local", "이 기기에만");
+    return;
+  }
+
+  db.ref(".info/connected").on("value", snap => {
+    if (snap.val() === true) {
+      if (syncKind !== "on") setSync("on", "실시간 동기화");
+    } else {
+      setSync("local", "오프라인 저장 중");
+    }
+  });
+
+  let first = true;
+  stateRef.on("value", snap => {
+    const remote = snap.val();
+    if (first) {
+      first = false;
+      if (!remote || !remote.updatedAt) {
+        touch(); doPush();
+      } else if ((remote.updatedAt || 0) > (state.updatedAt || 0) + 500) {
+        adoptRemote(remote);
+      } else if ((remote.updatedAt || 0) < (state.updatedAt || 0) - 500) {
+        doPush();
+      } else {
+        adoptRemote(remote);
+      }
+      return;
+    }
+    if (!remote) { doPush(); return; }
+    if (Math.abs((remote.updatedAt || 0) - lastPushedAt) < 20) return; // 내가 방금 올린 것
+    if ((remote.updatedAt || 0) > (state.updatedAt || 0) + 400) adoptRemote(remote);
+  });
+
+  inboxRef.on("child_added", snap => {
+    const v = snap.val();
+    const n = ingestInboxItem(v, snap.key);
+    snap.ref.remove().catch(() => {});
+    if (n > 0) {
+      touch();
+      renderAll();
+      toast("📱 결제 " + n + "건을 자동으로 기록했어요");
+    }
+  });
+
+  // 앱을 다시 열 때 남아 있는 inbox 비우기 (이벤트를 놓친 경우)
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") drainInbox();
+  });
+  setTimeout(drainInbox, 1200);
+}
+
+function drainInbox() {
+  if (!inboxRef) return;
+  inboxRef.once("value").then(snap => {
+    const v = snap.val();
+    if (!v) return;
+    let n = 0;
+    Object.keys(v).forEach(k => {
+      n += ingestInboxItem(v[k], k);
+      inboxRef.child(k).remove().catch(() => {});
+    });
+    if (n > 0) { touch(); renderAll(); toast("📱 결제 " + n + "건을 자동으로 기록했어요"); }
+  }).catch(() => {});
+}
+
+function pullNow() {
+  if (!stateRef) { toast("동기화가 꺼져 있어요 (이 기기에만 저장)"); return; }
+  stateRef.once("value").then(snap => {
+    const remote = snap.val();
+    if (!remote) { toast("서버에 저장된 장부가 없어요 — 지금 올릴게요"); doPush(); return; }
+    adoptRemote(remote);
+    toast("서버 기록으로 맞췄어요");
+  }).catch(e => { toast("받기 실패: " + e.message); });
+}
+
+function inboxUrl() {
+  return FIREBASE_CONFIG.databaseURL + "/rooms/" + encodeURIComponent(Room) + "/inbox.json";
+}
+function shareUrl() {
+  const u = new URL(location.href);
+  u.search = "?room=" + encodeURIComponent(Room);
+  u.hash = "";
+  return u.toString();
+}
+
+/* ==== 30-render.js ==== */
+/* ============================================================
+   render: 화면 그리기
+   ============================================================ */
+const WEEKDAY = ["일", "월", "화", "수", "목", "금", "토"];
+function todayLineText() {
+  const d = new Date();
+  return (d.getMonth() + 1) + "월 " + d.getDate() + "일 " + WEEKDAY[d.getDay()] + "요일";
+}
+function man(n) {
+  n = num(n);
+  if (n >= 10000 && n % 10000 === 0) return (n / 10000) + "만";
+  return fmt(n);
+}
+
+function renderAll() {
+  const tl = $("#todayLine");
+  if (tl) tl.textContent = todayLineText();
+  const sfx = $("#dateSuffix");
+  if (sfx) sfx.textContent = " · 살림 관제소와 따로 쓰는 지갑";
+  const rt = $("#roomTag");
+  if (rt) { rt.textContent = "공유 방"; rt.title = "방 이름: " + Room + " (눌러서 공유 링크 복사)"; }
+  renderKpis();
+  renderCards();
+  renderPicks();
+  renderLedger();
+  renderGifts();
+  renderFoot();
+  syncMonthNav();
+  setSync(syncKind === "on" ? "on" : syncKind === "local" ? "local" : "connecting");
+}
+
+function syncMonthNav() {
+  const lab = $("#mLabel");
+  if (lab) lab.textContent = monthLabel(uiMonth);
+  const chip = $("#cardMonthChip");
+  if (chip) chip.textContent = monthTitle(uiMonth) + " 기준";
+}
+
+/* ---------- KPI ---------- */
+function renderKpis() {
+  const box = $("#kpis");
+  if (!box) return;
+  const mk = uiMonth;
+  const list = monthTxns(mk);
+  const spend = list.reduce((s, t) => s + t.amount, 0);
+  const fixList = list.filter(t => t.fixed && !t.installmentOnly);
+  const varList = list.filter(t => !t.fixed);
+  const fix = fixList.reduce((s, t) => s + t.amount, 0);
+  const vr = varList.reduce((s, t) => s + t.amount, 0);
+  const prev = monthTxns(shiftMonth(mk, -1)).reduce((s, t) => s + t.amount, 0);
+  const diff = prev > 0 ? Math.round((spend - prev) / prev * 100) : null;
+  const cs = cardSavings(mk), gs = giftSaving(mk), ps = pickSaving(mk);
+  const save = cs + gs + ps;
+
+  box.innerHTML =
+    '<div class="kpi save"><div class="lb">💰 ' + monthLabel(mk) + " 아낀 금액</div>" +
+      '<div class="vl">' + fmt(save) + "<small>원</small></div>" +
+      '<div class="cm">카드 ' + fmt(cs) + " + 기프티콘 " + fmt(gs) + " + Pick " + fmt(ps) + "</div></div>" +
+    '<div class="kpi"><div class="lb">💸 ' + monthLabel(mk) + " 지출</div>" +
+      '<div class="vl">' + fmt(spend) + "<small>원</small></div>" +
+      '<div class="cm">' + list.length + "건" + (diff == null ? " · 지난달 기록 없음" : diff === 0 ? " · 지난달과 같아요" : diff > 0 ? " · 지난달보다 " + diff + "% 많아요" : " · 지난달보다 " + Math.abs(diff) + "% 적어요") + "</div></div>" +
+    '<div class="kpi fixed"><div class="lb">🔒 고정비</div>' +
+      '<div class="vl">' + fmt(fix) + "<small>원</small></div>" +
+      '<div class="cm">' + (spend ? Math.round(fix / spend * 100) : 0) + "% · " + fixList.length + "건 · 매달 같은 돈</div></div>" +
+    '<div class="kpi var"><div class="lb">🔁 변동비</div>' +
+      '<div class="vl">' + fmt(vr) + "<small>원</small></div>" +
+      '<div class="cm">' + (spend ? Math.round(vr / spend * 100) : 0) + "% · " + varList.length + "건 · 쓴 만큼 나가는 돈</div></div>";
+}
+
+/* ---------- 카드 ---------- */
+function renderCards() {
+  const grid = $("#cardGrid");
+  if (!grid) return;
+  const mk = uiMonth;
+  const cards = state.cards.slice().sort((a, b) => {
+    const ra = a.rank || 9, rb = b.rank || 9;
+    if (ra !== rb) return ra - rb;
+    return (b.target || 0) - (a.target || 0);
+  });
+  let usedSum = 0, usedCards = 0;
+  let html = "";
+  cards.filter(c => c.type !== "benefit").forEach(c => {
+    const st = cardStats(c, mk);
+    if (st.used > 0) { usedSum += st.used; usedCards++; }
+    const pct = c.target > 0 ? Math.min(100, Math.round(st.perf / c.target * 100)) : 0;
+    const remain = c.target - st.perf;
+    let cls = "";
+    if (c.target > 0) {
+      if (remain <= 0) cls = "main";
+      else if (daysInMonthLeft(mk) <= 12) cls = "lag";
+      else cls = "";
+    }
+    const saving = cardSaving(c, mk);
+    html += '<div class="cb ' + cls + '" data-card="' + esc(c.id) + '">' +
+      '<button class="cb-edit" data-edit-card="' + esc(c.id) + '" aria-label="카드 수정">✎</button>' +
+      '<div class="cb-h">' +
+        '<div class="clogo ' + esc(c.color || "cs") + '">' + esc(c.logoText || logoText(c)) + "</div>" +
+        '<div class="nm"><b>' + esc(c.name) + "</b><small>" + esc((c.last4 ? c.last4 + " · " : "") + (c.sub || "")) + "</small></div>" +
+        (c.rank ? '<span class="rk2 ' + (c.rank === 1 ? "sage" : c.rank === 2 ? "sage" : "line") + '">' + RANK_LABEL[c.rank] + "</span>" : "") +
+      "</div>" +
+      '<div class="usg"><span class="l">' + monthLabel(mk) + ' 사용</span><span class="v"' + (st.used ? "" : ' style="color:#B0A596"') + ">" + fmt(st.used) + "<i>원</i></span></div>" +
+      (c.target > 0
+        ? '<div class="grow"><span>목표 실적 ' + man(c.target) + "</span>" +
+          (remain <= 0
+            ? "<b>달성 ✅ " + man(-remain) + " 초과</b>"
+            : "<b" + (daysInMonthLeft(mk) <= 12 ? ' class="warn"' : "") + ">" + man(remain) + " 남음</b>") +
+          "</div><div class=\"gbar\"><i class=\"" + (pct >= 100 ? "" : pct >= 60 ? "" : "low") + "\" style=\"width:" + pct + '%"></i></div>'
+        : '<div class="grow"><span>실적 조건 없음</span><b class="dim">' + esc((c.benefits[0] && c.benefits[0].t) || "혜택 카드") + "</b></div><div class=\"gbar\"><i class=\"zero\" style=\"width:0\"></i></div>") +
+      (st.inst > 0 ? '<div class="cb-note">무이자 할부 ' + fmt(st.inst) + "원은 실적에서 빠져요 → 실적 반영 " + fmt(st.perf) + "원</div>" : "") +
+      '<div class="bens">' + c.benefits.map(b => '<span class="ben ' + esc(b.tone || "") + '">' + esc(b.t) + "</span>").join("") + "</div>" +
+      (saving > 0 ? '<div class="cb-note">이번 달 혜택 추정 ' + won(saving) + "</div>" : "") +
+      "</div>";
+  });
+  if (!cards.some(c => c.type !== "benefit")) html = '<div class="banner info">카드를 추가하면 실적·혜택을 함께 볼 수 있어요</div>';
+  grid.innerHTML = html;
+  const chip = $("#cardMonthChip");
+  if (chip) chip.textContent = monthTitle(mk) + " · " + usedCards + "장 " + fmt(usedSum) + "원";
+
+  // KT 혜택 체크
+  const kt = cards.find(c => c.type === "benefit");
+  const ktBox = $("#ktRow");
+  if (ktBox) {
+    if (!kt) { ktBox.innerHTML = ""; }
+    else {
+      const checks = state.ktChecks[mk] || [];
+      ktBox.innerHTML = '<div class="ktrow"><span class="slogo">KT</span>' +
+        '<div class="ktn"><b>' + esc(kt.name) + "</b><small>" + esc(kt.sub || "월간 무료 혜택 체크") + "</small></div>" +
+        (kt.benefits[0] ? '<span class="chip amber">' + esc(kt.benefits[0].t) + "</span>" : "") +
+        '<div class="ktchecks">' + (kt.checks || []).map((label) => {
+          const on = checks.indexOf(label) >= 0;
+          return '<button class="kchk ' + (on ? "on" : "") + '" data-kt="' + esc(label) + '">' + (on ? "✅ " : "☐ ") + esc(label) + "</button>";
+        }).join("") + "</div></div>";
+    }
+  }
+
+  // 결제 팁
+  const tip = $("#tipRoute");
+  if (tip) {
+    const kb = cardById("kb"), jade = cardById("jade"), nepa = cardById("nepa");
+    tip.innerHTML =
+      '<span>편의점 · 카페 → <b>' + esc(kb ? kb.short : "KB국민") + ' 2%</b></span><span class="ar">|</span>' +
+      '<span>스타벅스 · 택시 → <b>' + esc(jade ? jade.short : "하나 JADE") + ' 50%</b></span><span class="ar">|</span>' +
+      '<span>나머지 → <b>' + esc(nepa ? nepa.short : "네페체크") + ' 1.2%</b></span>';
+  }
+}
+function logoText(c) {
+  const map = { kb: "KB", nv: "N", hn: "하나", kt: "KT", wo: "우리", kk: "K", cs: "카드" };
+  return map[c.color] || "카드";
+}
+
+/* ---------- 가계부 ---------- */
+function renderLedger() {
+  const mk = uiMonth;
+  const list = monthTxns(mk);
+  const spend = list.reduce((s, t) => s + t.amount, 0);
+  const fixList = list.filter(t => t.fixed);
+  const varList = list.filter(t => !t.fixed);
+  const fix = fixList.reduce((s, t) => s + t.amount, 0);
+  const vr = varList.reduce((s, t) => s + t.amount, 0);
+  const pctF = spend ? Math.round(fix / spend * 100) : 0;
+  const pctV = spend ? 100 - pctF : 0;
+
+  const chip = $("#ledgerChip");
+  if (chip) chip.textContent = list.length + "건 · 고정 " + fixList.length + " / 변동 " + varList.length;
+
+  $("#splitTotal").textContent = won(spend);
+  $("#barFix").style.width = pctF + "%";
+  $("#barVar").style.width = pctV + "%";
+  $("#lgFix").textContent = "🔒 고정비 " + won(fix) + " · " + pctF + "%";
+  $("#lgVar").textContent = "🔁 변동비 " + won(vr) + " · " + pctV + "%";
+
+  $("#fixPc").textContent = pctF + "%";
+  $("#fixAmt").textContent = won(fix);
+  $("#fixSub").textContent = fixList.length + "건" + (fixList.length ? " · 매달 나가는 돈" : "");
+  $("#varPc").textContent = pctV + "%";
+  $("#varAmt").textContent = won(vr);
+  const day = new Date();
+  const dayN = monthOf(todayISO()) === mk ? day.getDate() : lastDayOfMonth(mk);
+  $("#varSub").textContent = varList.length + "건 · 하루 평균 " + won(vr / Math.max(1, dayN));
+
+  $("#fixList").innerHTML = groupRows(fixList, fix);
+  $("#varList").innerHTML = groupRows(varList, vr);
+
+  const recent = sortTxDesc(list).slice(0, 10);
+  $("#recentList").innerHTML = recent.length
+    ? recent.map(t => {
+      const c = cardById(t.cardId);
+      return '<li data-txn="' + esc(t.id) + '" title="누르면 고정↔변동">' +
+        '<span class="e">' + catEmoji(t.cat) + "</span>" +
+        '<span class="n"><b>' + esc(t.memo || t.cat) + "</b><small>" + esc(t.cat) + " · " + esc(cardLabel(t.cardId)) + (t.installment ? " · 할부" : "") + " · " + esc(t.date.slice(5).replace("-", "/")) + "</small></span>" +
+        '<span class="a' + (t.amount ? "" : " zero") + '">' + fmt(t.amount) + "<i>원</i>" + (t.fixed ? '<span class="fx">🔒</span>' : "") + "</span>" +
+        '<button class="mini" data-open-txn="' + esc(t.id) + '" aria-label="수정">✎</button>' +
+        "</li>";
+    }).join("")
+    : '<li style="border:0;display:block;padding:16px 0;text-align:center;color:#B7AC9C;font-weight:600;font-size:10.5px;line-height:1.6">' +
+      monthLabel(mk) + " 기록이 아직 없어요<br>위에서 한 줄 적거나 엑셀을 올려 주세요</li>";
+}
+
+function groupRows(list, total) {
+  if (!list.length) return '<li style="border:0;justify-content:center;color:#B7AC9C;font-size:9.5px;font-weight:600">아직 없어요</li>';
+  const map = {};
+  list.forEach(t => { map[t.cat] = (map[t.cat] || 0) + t.amount; });
+  return Object.keys(map).sort((a, b) => map[b] - map[a]).slice(0, 6).map(cat =>
+    "<li><span>" + catEmoji(cat) + " " + esc(cat) + " <i>" + (total ? Math.round(map[cat] / total * 100) : 0) + "%</i></span><b>" + fmt(map[cat]) + "</b></li>"
+  ).join("");
+}
+
+/* ---------- 기프티콘 ---------- */
+function renderGifts() {
+  const grid = $("#giftGrid");
+  if (!grid) return;
+  const gifts = state.gifts.slice().sort((a, b) => {
+    if (a.used !== b.used) return a.used ? 1 : -1;
+    const da = dday(a.exp), db = dday(b.exp);
+    if (da == null && db == null) return 0;
+    if (da == null) return 1;
+    if (db == null) return -1;
+    return da - db;
+  });
+  const active = gifts.filter(g => !g.used);
+  $("#giftChip").textContent = active.length + "개 · 임박순";
+
+  let html = gifts.map(g => {
+    const d = dday(g.exp);
+    const soon = d != null && d <= 14;
+    const bal = num(g.balance), amt = num(g.amount);
+    const barcodeBlock = g.barcode
+      ? '<div class="bcode"><svg data-barcode="' + esc(g.barcode) + '" class="bcsvg"></svg></div><div class="bnum">' + esc(fmtBarcode(g.barcode)) + "</div>"
+      : (g.image ? '<div class="bcode"><img class="bimg" src="' + esc(g.image) + '" alt="쿠폰 이미지"></div>' : '<div class="bcode" style="color:#C7B89C;font-size:10px;font-weight:800">바코드 없이 이름으로 사용</div>');
+    const balBlock = amt > 0
+      ? '<div class="bbar"><i class="' + (bal / amt < 0.35 ? "amber" : "") + '" style="width:' + Math.max(0, Math.min(100, Math.round(bal / amt * 100))) + '%"></i></div>' +
+        '<div class="bal-h" style="margin-top:6px"><span class="e">🪙</span><div class="bn"><b>남은 금액</b><small>쓴 만큼 차감돼요</small></div><span class="bv">' + fmt(bal) + "<i> / " + fmt(amt) + "</i></span>" +
+        '<button class="btn ghost tiny" data-gift-bal="' + esc(g.id) + '">차감</button></div>'
+      : "";
+    return '<div class="gift ' + (soon ? "soon" : "") + '" data-gift="' + esc(g.id) + '"' + (g.used ? ' style="opacity:.55"' : "") + ">" +
+      '<div class="gift-h"><div class="glogo">' + (g.image ? '<img src="' + esc(g.image) + '" alt="">' : esc(g.brand || (g.emoji || "🎁"))) + "</div>" +
+        '<div class="gi"><b>' + esc(g.name) + (g.used ? " (사용 완료)" : "") + "</b><small>" +
+          (g.exp ? "~" + g.exp.replace(/-/g, ".") : "유효기간 없음") + (g.orderNo ? " · 주문 " + esc(g.orderNo) : "") + (g.memo ? " · " + esc(g.memo) : "") + "</small></div>" +
+        (g.used ? '<span class="dd ok">완료</span>' : ddayChip(d)) + "</div>" +
+      barcodeBlock + balBlock +
+      '<div class="gbtns">' +
+        '<button class="b1" data-big="' + esc(g.id) + '"' + (g.barcode || g.image ? "" : " disabled") + ">큰 바코드 보기</button>" +
+        (g.used ? '<button class="b2" data-unuse="' + esc(g.id) + '">되돌리기</button>' : '<button class="b2" data-use="' + esc(g.id) + '">사용 완료 ✅</button>') +
+        '<button class="b3" data-edit-gift="' + esc(g.id) + '" aria-label="수정">✎</button>' +
+      "</div></div>";
+  }).join("");
+  html += '<button class="gadd" id="btnGiftAdd2">＋ 기프티콘 추가 (바코드 · 이미지)</button>';
+  grid.innerHTML = html;
+  drawBarcodes(grid);
+
+  const cs = cardSavings(uiMonth), gs = giftSaving(uiMonth), ps = pickSaving(uiMonth);
+  $("#giftSum").innerHTML = "✂️ 금액권 잔액은 쓸 때마다 자동 차감 · " + monthLabel(uiMonth) + " 기프티콘으로 <b>" + won(gs) + "</b> 아꼈어요 · 카드·Pick까지 합치면 <b>" + won(cs + gs + ps) + "</b>";
+}
+
+function fmtBarcode(b) {
+  const s = String(b || "").replace(/\s+/g, "");
+  if (s.length === 12) return s.slice(0, 4) + " " + s.slice(4, 8) + " " + s.slice(8, 12);
+  if (s.length === 13) return s.slice(0, 4) + " " + s.slice(4, 8) + " " + s.slice(8, 13);
+  if (s.length === 16) return s.slice(0, 4) + " " + s.slice(4, 8) + " " + s.slice(8, 12) + " " + s.slice(12, 16);
+  return s.replace(/(\d{4})(?=\d)/g, "$1 ");
+}
+
+function drawBarcodes(root) {
+  if (!window.JsBarcode) return;
+  $$("[data-barcode]", root || document).forEach(svg => {
+    if (svg.getAttribute("data-drawn") === "1") return;
+    const code = svg.getAttribute("data-barcode");
+    try {
+      JsBarcode(svg, code, {
+        format: "CODE128", displayValue: false, height: 42, width: 1.3,
+        margin: 0, background: "#ffffff", lineColor: "#2F2B26"
+      });
+      svg.setAttribute("data-drawn", "1");
+      svg.setAttribute("preserveAspectRatio", "none");
+    } catch (e) {
+      svg.outerHTML = '<div style="font-size:9px;color:#B0A596">바코드를 그릴 수 없는 번호예요</div>';
+    }
+  });
+}
+
+/* ---------- foot ---------- */
+function renderFoot() {
+  const cs = cardSavings(uiMonth), gs = giftSaving(uiMonth), ps = pickSaving(uiMonth);
+  const el = $("#footSave");
+  if (el) el.textContent = monthLabel(uiMonth) + " 아낀 " + won(cs + gs + ps);
+  const d = $("#footDetail");
+  if (d) {
+    const expiring = state.gifts.filter(g => !g.used && dday(g.exp) != null && dday(g.exp) <= 14).length;
+    const left = state.picks.filter(p => !p.used).length;
+    d.textContent = "카드 " + fmt(cs) + " · 기프티콘 " + fmt(gs) + " · Pick " + fmt(ps) +
+      (expiring ? " · 만료 임박 " + expiring + "개" : "") + (left ? " · Pick " + left + "개 남음" : "");
+  }
+}
+
+/* ---------- 카드사 Pick 혜택 ---------- */
+let pickQuery = "";
+let pickFilter = "all";
+
+function pickHay(p) {
+  return [p.title, p.benefit, p.issuer, p.note].concat(p.keys || []).join(" ").toLowerCase();
+}
+function pickMatches(p, q) {
+  if (!q) return true;
+  return q.toLowerCase().trim().split(/\s+/).filter(Boolean).every(w => pickHay(p).indexOf(w) >= 0);
+}
+function hl(text, q) {
+  const safe = esc(text);
+  if (!q) return safe;
+  const words = q.trim().split(/\s+/).filter(Boolean)
+    .map(w => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .filter(w => w.length > 0);
+  if (!words.length) return safe;
+  try {
+    return safe.replace(new RegExp("(" + words.join("|") + ")", "gi"), '<span class="pickmatch">$1</span>');
+  } catch (e) { return safe; }
+}
+function issuerShort(issuer) {
+  const s = String(issuer || "").replace(/Pick|마이픽/g, "").trim();
+  if (/KB|국민/.test(issuer || "")) return "KB";
+  if (/현대/.test(issuer || "")) return "현대";
+  if (/하나/.test(issuer || "")) return "하나";
+  return s.slice(0, 3) || "Pick";
+}
+function issuerClass(issuer) {
+  if (/KB|국민/.test(issuer || "")) return "kb";
+  if (/현대|네이버/.test(issuer || "")) return "hy";
+  return "";
+}
+function renderPicks() {
+  const listBox = $("#pickList");
+  if (!listBox) return;
+  const q = pickQuery.trim();
+  const chips = $("#pickFilters");
+  const issuers = ["all"].concat(Array.from(new Set(state.picks.map(p => p.issuer))));
+  const labels = { all: "전체", unused: "안 쓴 Pick" };
+  if (chips) {
+    chips.innerHTML = issuers.map(i => '<button data-pf="' + esc(i) + '" class="' + (pickFilter === i ? "on" : "") + '">' + esc(labels[i] || i) + "</button>").join("") +
+      '<button data-pf="unused" class="' + (pickFilter === "unused" ? "on" : "") + '">' + (labels.unused) + "</button>";
+  }
+
+  let list = state.picks.slice();
+  if (pickFilter === "unused") list = list.filter(p => !p.used);
+  else if (pickFilter !== "all") list = list.filter(p => p.issuer === pickFilter);
+  if (q) list = list.filter(p => pickMatches(p, q));
+  const matchedAll = q ? state.picks.filter(p => pickMatches(p, q)) : [];
+  list.sort((a, b) => {
+    if (a.used !== b.used) return a.used ? 1 : -1;
+    const da = dday(a.exp), db = dday(b.exp);
+    if (da == null && db == null) return 0;
+    if (da == null) return 1;
+    if (db == null) return -1;
+    return da - db;
+  });
+
+  const active = state.picks.filter(p => !p.used);
+  $("#pickChip").textContent = active.length + "개 남음";
+
+
+  const res = $("#pickResult");
+  if (res) {
+    if (q) {
+      const avail = matchedAll.filter(p => !p.used);
+      res.classList.remove("hidden");
+      res.innerHTML = avail.length
+        ? "🔎 <b>" + esc(q) + "</b> → 쓸 수 있는 Pick <b>" + avail.length + "건</b> · " +
+          avail.slice(0, 3).map(p => esc(p.issuer) + " " + esc(p.benefit || p.title)).join(" / ")
+        : "🔎 <b>" + esc(q) + "</b> → 지금 쓸 수 있는 Pick 쿠폰이 없어요" +
+          (matchedAll.length ? " (사용 완료 " + matchedAll.length + "건)" : "");
+    } else {
+      res.classList.add("hidden");
+    }
+  }
+
+  listBox.innerHTML = list.length ? list.map(p => {
+    const d = dday(p.exp);
+    const expired = d != null && d < 0 && !p.used;
+    return '<div class="pick ' + (p.used ? "used" : "") + '" data-pick="' + esc(p.id) + '">' +
+      '<div class="pk-logo ' + issuerClass(p.issuer) + '">' + esc(issuerShort(p.issuer)) + "</div>" +
+      '<div class="pk-body">' +
+        '<div class="pk-top"><b>' + hl(p.title, q) + "</b>" + (p.used ? '<span class="dd ok">사용</span>' : expired ? '<span class="dd hot">만료</span>' : ddayChip(d)) + "</div>" +
+        '<div class="pk-title">' + hl(p.benefit, q) + "</div>" +
+        '<div class="pk-meta"><span class="chip ' + (issuerClass(p.issuer) === "kb" ? "amber" : "sage") + '">' + esc(p.issuer) + "</span>" +
+          (p.exp ? "<span>" + esc(p.exp.replace(/-/g, ".")) + " 마감</span>" : "") +
+          (p.note ? "<span>· " + esc(p.note) + "</span>" : "") +
+          (p.used && p.usedAmount ? "<span>· " + won(p.usedAmount) + " 아낌</span>" : "") +
+        "</div>" +
+      "</div>" +
+      '<div class="pk-acts">' +
+        (p.used
+          ? '<button class="btn ghost sm" data-pick-unuse="' + esc(p.id) + '">되돌리기</button>'
+          : '<button class="btn sm pri" data-pick-use="' + esc(p.id) + '">사용 완료 ✅</button>') +
+        '<button class="mini" data-pick-edit="' + esc(p.id) + '" aria-label="수정">✎</button>' +
+      "</div></div>";
+  }).join("") : '<div class="pickempty">' + (q ? "‘" + esc(q) + "’ 로 쓸 Pick 쿠폰이 없어요<br>카드사 앱에서 담아 온 뒤 [＋ Pick]으로 넣어 두세요" : "Pick 쿠폰을 담아 두면 결제 전에 여기서 바로 찾을 수 있어요") + "</div>";
+}
+
+/* ==== 40-actions.js ==== */
+/* ============================================================
+   actions: 입력·수정·모달
+   ============================================================ */
+function openModal(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add("on");
+  const first = el.querySelector("input,select,textarea");
+  if (first && window.innerWidth > 760) setTimeout(() => first.focus(), 60);
+}
+function closeModal(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove("on");
+}
+function closeAll() {
+  $$(".mask.on").forEach(m => m.classList.remove("on"));
+  const big = $("#bigBarcode");
+  if (big) big.classList.remove("on");
+}
+function editingCardId() { return $("#mCard").getAttribute("data-id") || ""; }
+function editingGiftId() { return $("#mGift").getAttribute("data-id") || ""; }
+
+/* ---------- 선택지 채우기 ---------- */
+function fillSelects() {
+  const cat = $("#qCat");
+  if (cat && !cat.options.length) {
+    const gv = CATS.filter(c => !c.fixed).map(c => '<option value="' + esc(c.n) + '">' + c.e + " " + esc(c.n) + "</option>").join("");
+    const gf = CATS.filter(c => c.fixed).map(c => '<option value="' + esc(c.n) + '">' + c.e + " " + esc(c.n) + "</option>").join("");
+    cat.innerHTML = '<optgroup label="변동비">' + gv + '</optgroup><optgroup label="고정비">' + gf + "</optgroup>";
+  }
+  const sel = $("#qCard");
+  if (sel) {
+    const cur = sel.value;
+    sel.innerHTML = state.cards.filter(c => c.type !== "benefit").map(c => '<option value="' + esc(c.id) + '">' + esc(c.short || c.name) + "</option>").join("") +
+      '<option value="' + PAY_CASH + '">현금</option><option value="' + PAY_GIFT + '">기프티콘</option>';
+    if (cur) sel.value = cur;
+    if (!sel.value) sel.value = state.cards.length ? state.cards[0].id : PAY_CASH;
+  }
+  const allCard = $("#allCard");
+  if (allCard) {
+    allCard.innerHTML = '<option value="all">카드 전체</option>' + state.cards.map(c => '<option value="' + esc(c.id) + '">' + esc(c.short || c.name) + "</option>").join("") +
+      '<option value="' + PAY_CASH + '">현금</option><option value="' + PAY_GIFT + '">기프티콘</option>';
+  }
+}
+
+/* ---------- 빠른 입력 ---------- */
+let quickFixed = false;
+function bindQuick() {
+  $$("#qFixedWrap button").forEach(b => {
+    b.addEventListener("click", () => {
+      quickFixed = b.getAttribute("data-v") === "fix";
+      $$("#qFixedWrap button").forEach(x => {
+        x.classList.toggle("on", x === b);
+        x.classList.toggle("v", !quickFixed);
+      });
+    });
+  });
+  const amt = $("#qAmount");
+  if (amt) amt.addEventListener("input", () => {
+    const raw = amt.value.replace(/[^\d]/g, "");
+    amt.value = raw ? fmt(raw) : "";
+  });
+  const form = $("#quickForm");
+  if (form) form.addEventListener("submit", ev => {
+    ev.preventDefault();
+    const amount = num($("#qAmount").value);
+    const memo = ($("#qMemo").value || "").trim();
+    if (!amount) { toast("금액을 넣어 주세요"); $("#qAmount").focus(); return; }
+    if (!memo) { toast("내용을 넣어 주세요"); $("#qMemo").focus(); return; }
+    const date = dateForMonth(uiMonth);
+    const t = addTxn({
+      date: date, amount: amount, memo: memo,
+      cat: $("#qCat").value, fixed: quickFixed,
+      cardId: $("#qCard").value, installment: $("#qInstallment").checked
+    });
+    if (!t) { toast("같은 날 같은 내역이 이미 있어요"); return; }
+    touch();
+    $("#qAmount").value = ""; $("#qMemo").value = ""; $("#qInstallment").checked = false;
+    renderAll();
+    toast((t.fixed ? "고정비" : "변동비") + "로 " + won(amount) + " 기록했어요");
+    $("#qMemo").focus();
+  });
+}
+function dateForMonth(mk) {
+  const today = todayISO();
+  if (monthOf(today) === mk) return today;
+  const day = Math.min(new Date().getDate(), lastDayOfMonth(mk));
+  return mk + "-" + pad2(day);
+}
+
+/* ---------- 미리 정의된 목록 ---------- */
+function bindMonthNav() {
+  $("#mPrev").addEventListener("click", () => { uiMonth = shiftMonth(uiMonth, -1); rememberMonth(); renderAll(); });
+  $("#mNext").addEventListener("click", () => { uiMonth = shiftMonth(uiMonth, 1); rememberMonth(); renderAll(); });
+  $("#mLabel").addEventListener("click", () => { uiMonth = monthOf(todayISO()); rememberMonth(); renderAll(); toast("이번 달로 왔어요"); });
+}
+function rememberMonth() { try { localStorage.setItem(LS_MONTH, uiMonth); } catch (e) {} }
+
+/* ---------- 카드 추가/수정 ---------- */
+function openCardModal(id) {
+  const m = $("#mCard");
+  const c = id ? cardById(id) : null;
+  m.setAttribute("data-id", c ? c.id : "");
+  $("#cardModalTitle").textContent = c ? "카드 수정" : "카드 추가";
+  $("#cName").value = c ? c.name : "";
+  $("#cLast4").value = c ? c.last4 || "" : "";
+  $("#cRank").value = c ? String(c.rank || 0) : "0";
+  $("#cColor").value = c ? (c.color || "cs") : "cs";
+  $("#cTarget").value = c && c.target ? fmt(c.target) : "";
+  $("#cSub").value = c ? c.sub || "" : "";
+  $("#cBen").value = c ? c.benefits.map(b => b.t + (b.rate ? "|" + b.rate + "|" + (b.cap || "") : "")).join("\n") : "";
+  $("#cBenCats").value = c ? [].concat.apply([], c.rules.filter(r => r.cats && r.cats.indexOf("*") < 0).map(r => r.cats)).join(",") : "";
+  let del = $("#cDelete");
+  if (!del) {
+    del = document.createElement("button");
+    del.id = "cDelete"; del.className = "btn ghost";
+    del.style.flex = "0 0 auto"; del.textContent = "삭제";
+    $("#mCard .sheet-f").insertBefore(del, $("#cardSave"));
+    del.addEventListener("click", () => {
+      const id2 = editingCardId();
+      if (!id2) return;
+      if (!confirm("이 카드를 지울까요? 기록된 내역은 '기타'로 남아요.")) return;
+      state.cards = state.cards.filter(x => x.id !== id2);
+      touch(); closeModal("mCard"); fillSelects(); renderAll(); clearAll(); toast("카드를 지웠어요");
+    });
+  }
+  del.style.display = c ? "" : "none";
+  openModal("mCard");
+}
+function openCardNew() { openCardModal(""); }
+
+function saveCard() {
+  const id = editingCardId();
+  const name = ($("#cName").value || "").trim();
+  if (!name) { toast("카드 이름을 넣어 주세요"); return; }
+  const benefits = ($("#cBen").value || "").split("\n").map(l => l.trim()).filter(Boolean).map(l => {
+    const parts = l.split("|");
+    const b = { t: parts[0].trim(), tone: "" };
+    if (parts[1] && num(parts[1]) > 0) { b.rate = num(parts[1]); b.cap = num(parts[2]); }
+    return b;
+  });
+  const catList = ($("#cBenCats").value || "").split(",").map(s => s.trim()).filter(s => CAT_BY[s]);
+  const rules = [];
+  const rateBens = benefits.filter(b => b.rate > 0);
+  if (rateBens.length === 1) rules.push({ cats: catList.length ? catList : ["*"], rate: rateBens[0].rate, cap: rateBens[0].cap || 0 });
+  else if (rateBens.length > 1) {
+    // 첫 규칙은 지정 카테고리, 마지막은 나머지
+    rateBens.forEach((b, i) => {
+      const last = i === rateBens.length - 1;
+      rules.push({ cats: last ? ["*"] : (catList.length ? catList : ["*"]), rate: b.rate, cap: b.cap || 0 });
+    });
+  }
+  const data = {
+    id: id || uid("c"),
+    name: name,
+    last4: ($("#cLast4").value || "").replace(/[^\d]/g, "").slice(0, 4),
+    rank: num($("#cRank").value),
+    color: $("#cColor").val || $("#cColor").value,
+    target: num($("#cTarget").value),
+    sub: ($("#cSub").value || "").trim(),
+    benefits: benefits,
+    rules: rules,
+    type: id ? (cardById(id) || {}).type || "credit" : "credit",
+    checks: id ? (cardById(id) || {}).checks || [] : []
+  };
+  data.short = name.replace(/\s+/g, " ").split(" ")[0].slice(0, 8);
+  if (id) {
+    state.cards = state.cards.map(c => c.id === id ? Object.assign(c, data) : c);
+  } else {
+    state.cards.push(data);
+  }
+  touch(); closeModal("mCard"); fillSelects(); renderAll();
+  toast(id ? "카드를 고쳤어요" : "카드를 추가했어요");
+}
+function clearAll() { /* placeholder for future */ }
+
+/* ---------- 기프티콘 ---------- */
+function openGiftModal(id) {
+  const m = $("#mGift");
+  const g = id ? state.gifts.find(x => x.id === id) : null;
+  m.setAttribute("data-id", g ? g.id : "");
+  $("#giftModalTitle").textContent = g ? "기프티콘 수정" : "기프티콘 추가";
+  $("#gName").value = g ? g.name : "";
+  $("#gExp").value = g ? g.exp || "" : "";
+  $("#gBrand").value = g ? g.brand || "" : "";
+  $("#gBarcode").value = g ? g.barcode || "" : "";
+  $("#gAmount").value = g && g.amount ? fmt(g.amount) : "";
+  $("#gBalance").value = g && g.amount ? fmt(g.balance) : "";
+  $("#gOrder").value = g ? g.orderNo || g.memo || "" : "";
+  $("#gImage").value = "";
+  m.setAttribute("data-img", g ? g.image || "" : "");
+  let del = $("#gDelete");
+  if (!del) {
+    del = document.createElement("button");
+    del.id = "gDelete"; del.className = "btn ghost";
+    del.style.flex = "0 0 auto"; del.textContent = "삭제";
+    $("#mGift .sheet-f").insertBefore(del, $("#giftSave"));
+    del.addEventListener("click", () => {
+      const id2 = editingGiftId();
+      if (!id2) return;
+      if (!confirm("이 기프티콘을 지울까요?")) return;
+      state.gifts = state.gifts.filter(x => x.id !== id2);
+      touch(); closeModal("mGift"); renderAll(); toast("지웠어요");
+    });
+  }
+  del.style.display = g ? "" : "none";
+  openModal("mGift");
+}
+function openGiftNew() { openGiftModal(""); }
+
+function compressImage(file, cb) {
+  const fr = new FileReader();
+  fr.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      const max = 520;
+      let w = img.width, h = img.height;
+      if (w > max || h > max) {
+        const r = Math.min(max / w, max / h);
+        w = Math.round(w * r); h = Math.round(h * r);
+      }
+      const cv = document.createElement("canvas");
+      cv.width = w; cv.height = h;
+      const ctx = cv.getContext("2d");
+      ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(img, 0, 0, w, h);
+      cb(cv.toDataURL("image/jpeg", 0.72));
+    };
+    img.onerror = () => cb("");
+    img.src = fr.result;
+  };
+  fr.onerror = () => cb("");
+  fr.readAsDataURL(file);
+}
+
+function saveGift() {
+  const id = editingGiftId();
+  const name = ($("#gName").value || "").trim();
+  if (!name) { toast("이름을 넣어 주세요"); return; }
+  const barcode = ($("#gBarcode").value || "").replace(/[^\dA-Za-z\-]/g, "");
+  const amount = num($("#gAmount").value);
+  const balance = $("#gBalance").value ? num($("#gBalance").value) : amount;
+  const old = id ? state.gifts.find(x => x.id === id) : null;
+  const data = {
+    id: id || uid("g"),
+    name: name,
+    brand: ($("#gBrand").value || "").trim() || name.slice(0, 2),
+    barcode: barcode,
+    exp: $("#gExp").value || "",
+    orderNo: ($("#gOrder").value || "").trim(),
+    amount: amount,
+    balance: Math.min(amount || balance, balance),
+    image: $("#mGift").getAttribute("data-img") || "",
+    used: old ? !!old.used : false,
+    memo: old ? old.memo || "" : ""
+  };
+  const file = $("#gImage").files && $("#gImage").files[0];
+  const finish = () => {
+    if (id) state.gifts = state.gifts.map(g => g.id === id ? Object.assign(g, data) : g);
+    else state.gifts.push(data);
+    touch(); closeModal("mGift"); renderAll();
+    toast(id ? "기프티콘을 고쳤어요" : "기프티콘을 추가했어요");
+  };
+  if (file) compressImage(file, url => { if (url) data.image = url; finish(); });
+  else finish();
+}
+
+/* 사용 완료: 아낀 금액 물어보기 */
+let usingGiftId = "";
+let usingPickId = "";
+function askUseGift(id) {
+  const g = state.gifts.find(x => x.id === id);
+  if (!g) return;
+  usingGiftId = id; usingPickId = "";
+  $("#useName").textContent = g.name;
+  $("#useAmount").value = g.amount ? fmt(g.balance || g.amount) : "";
+  $("#useHint").textContent = "실제 매장 가격을 적으면 이번 달 아낀 금액에 들어갑니다. 모르면 비워 두세요.";
+  $("#mUse").setAttribute("data-id", id);
+  openModal("mUse");
+}
+function confirmUseGift() {
+  if (usingPickId) { confirmUsePick(); return; }
+  const g = state.gifts.find(x => x.id === usingGiftId);
+  if (!g) { closeModal("mUse"); return; }
+  const value = num($("#useAmount").value);
+  g.used = true;
+  state.giftUses.push({ id: uid("gu"), date: dateForMonth(uiMonth), amount: value, giftId: g.id, name: g.name });
+  addTxn({
+    date: dateForMonth(uiMonth), amount: 0, memo: g.name,
+    cat: "식비", fixed: false, cardId: PAY_GIFT, installment: false
+  }, { noDedup: true });
+  touch(); closeModal("mUse"); closeModal("bigBarcode"); $("#bigBarcode").classList.remove("on");
+  renderAll();
+  toast(value ? "사용 완료 · " + won(value) + " 아낀 걸로 기록했어요" : "사용 완료로 표시했어요");
+}
+
+/* 큰 바코드 */
+function openBig(id) {
+  const g = state.gifts.find(x => x.id === id);
+  if (!g) return;
+  $("#bigName").textContent = g.name;
+  const d = dday(g.exp);
+  $("#bigMeta").textContent = (g.exp ? "유효기간 " + g.exp.replace(/-/g, ".") : "") +
+    (d != null ? " · " + (d < 0 ? "만료됨" : "D-" + d) : "") + (g.orderNo ? " · 주문 " + g.orderNo : "");
+  const box = $("#bigCode");
+  box.innerHTML = "";
+  if (g.barcode && window.JsBarcode) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    box.appendChild(svg);
+    try {
+      JsBarcode(svg, g.barcode, { format: "CODE128", displayValue: false, height: 150, width: 2.6, margin: 4, background: "#ffffff", lineColor: "#000000" });
+      svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+    } catch (e) {
+      box.innerHTML = '<div style="font-weight:800;color:#A8472C">바코드를 그릴 수 없는 번호예요</div>';
+    }
+    $("#bigNum").textContent = fmtBarcode(g.barcode);
+  } else if (g.image) {
+    box.innerHTML = '<img src="' + esc(g.image) + '" alt="쿠폰">';
+    $("#bigNum").textContent = "";
+  } else {
+    box.innerHTML = '<div style="font-weight:800;color:#857C6F">바코드 없이 이름으로 사용하는 쿠폰이에요</div>';
+    $("#bigNum").textContent = "";
+  }
+  $("#bigDone").onclick = () => askUseGift(id);
+  $("#bigBarcode").classList.add("on");
+}
+
+function toggleUse(id, used) {
+  const g = state.gifts.find(x => x.id === id);
+  if (!g) return;
+  g.used = used;
+  if (!used) state.giftUses = state.giftUses.filter(u => u.giftId !== id);
+  touch(); renderAll();
+  toast(used ? "사용 완료로 표시했어요" : "되돌렸어요");
+}
+
+/* ---------- KT 체크 ---------- */
+function toggleKt(label) {
+  const mk = uiMonth;
+  const arr = (state.ktChecks[mk] || []).slice();
+  const i = arr.indexOf(label);
+  if (i >= 0) arr.splice(i, 1); else arr.push(label);
+  state.ktChecks[mk] = arr;
+  touch(); renderCards();
+  toast(i >= 0 ? "체크를 풀었어요" : "혜택 사용 체크!");
+}
+
+/* ---------- 전체 내역 ---------- */
+function openAll() {
+  renderAllTx(); fillSelects(); openModal("mAll");
+}
+function renderAllTx() {
+  const tbl = $("#allTable");
+  if (!tbl) return;
+  const filter = $("#allFilter").value || "all";
+  const cf = $("#allCard").value || "all";
+  let list = monthTxns(uiMonth);
+  if (filter === "fix") list = list.filter(t => t.fixed);
+  if (filter === "var") list = list.filter(t => !t.fixed);
+  if (cf !== "all") list = list.filter(t => t.cardId === cf);
+  list = sortTxDesc(list);
+  $("#allTitle").textContent = monthTitle(uiMonth) + " 내역 " + list.length + "건";
+  const head = "<thead><tr><th>날짜</th><th>내용</th><th>분류</th><th>고정/변동</th><th>결제</th><th>금액</th><th>할부</th><th></th></tr></thead>";
+  const rows = list.map(t => {
+    const catOpts = CATS.map(c => '<option value="' + esc(c.n) + '"' + (c.n === t.cat ? " selected" : "") + ">" + esc(c.n) + "</option>").join("");
+    const cardOpts = state.cards.map(c => '<option value="' + esc(c.id) + '"' + (c.id === t.cardId ? " selected" : "") + ">" + esc(c.short || c.name) + "</option>").join("") +
+      '<option value="' + PAY_CASH + '"' + (t.cardId === PAY_CASH ? " selected" : "") + ">현금</option>" +
+      '<option value="' + PAY_GIFT + '"' + (t.cardId === PAY_GIFT ? " selected" : "") + ">기프티콘</option>";
+    return "<tr data-id=\"" + esc(t.id) + "\">" +
+      '<td><input type="date" class="w90" data-f="date" value="' + esc(t.date) + '"></td>' +
+      '<td><input data-f="memo" value="' + esc(t.memo) + '"></td>' +
+      '<td><select data-f="cat">' + catOpts + "</select></td>" +
+      '<td><button class="chip ' + (t.fixed ? "plum" : "sage") + '" data-f="fixed">' + (t.fixed ? "🔒 고정" : "🔁 변동") + "</button></td>" +
+      '<td><select data-f="cardId">' + cardOpts + "</select></td>" +
+      '<td class="num"><input class="w90" data-f="amount" inputmode="numeric" value="' + fmt(t.amount) + '"></td>' +
+      '<td style="text-align:center"><input type="checkbox" data-f="installment" style="width:16px;height:16px;accent-color:#5C7F68;padding:0;border:0"' + (t.installment ? " checked" : "") + "></td>" +
+      '<td class="acts"><button class="mini del" data-del="' + esc(t.id) + '" aria-label="삭제">✕</button></td></tr>';
+  }).join("");
+  tbl.innerHTML = head + "<tbody>" + (rows || '<tr><td colspan="8" style="text-align:center;color:#B7AC9C;padding:18px">기록이 없어요</td></tr>') + "</tbody>";
+}
+function updateTxn(id, field, value) {
+  const t = state.txns.find(x => x.id === id);
+  if (!t) return;
+  if (field === "amount") t.amount = num(value);
+  else if (field === "fixed") {
+    t.fixed = !t.fixed;
+    rememberRule(t.memo, t.fixed, t.cat);
+  } else if (field === "installment") t.installment = !!value;
+  else if (field === "date") t.date = value || t.date;
+  else if (field === "memo") { t.memo = String(value).slice(0, 80); if (state.catRules[normKey(t.memo)]) applyRule(t); }
+  else if (field === "cat") { t.cat = CAT_BY[value] ? value : t.cat; if (!state.catRules[normKey(t.memo)]) t.fixed = catFixedDefault(t.cat); }
+  else if (field === "cardId") t.cardId = value;
+  touch(); renderAll(); renderAllTx();
+}
+function deleteTxn(id) {
+  state.txns = state.txns.filter(t => t.id !== id);
+  touch(); renderAll(); renderAllTx();
+}
+
+/* ---------- 내역 상세 편집 ---------- */
+let editingTxnId = "";
+function openTxn(id) {
+  const t = state.txns.find(x => x.id === id);
+  if (!t) return;
+  editingTxnId = id;
+  $("#tMemo").value = t.memo;
+  $("#tAmount").value = fmt(t.amount);
+  $("#tDate").value = t.date;
+  $("#tCat").innerHTML = CATS.map(c => '<option value="' + esc(c.n) + '"' + (c.n === t.cat ? " selected" : "") + ">" + esc(c.n) + "</option>").join("");
+  $("#tCard").innerHTML = state.cards.map(c => '<option value="' + esc(c.id) + '"' + (c.id === t.cardId ? " selected" : "") + ">" + esc(c.short || c.name) + "</option>").join("") +
+    '<option value="' + PAY_CASH + '"' + (t.cardId === PAY_CASH ? " selected" : "") + ">현금</option>" +
+    '<option value="' + PAY_GIFT + '"' + (t.cardId === PAY_GIFT ? " selected" : "") + ">기프티콘</option>";
+  $("#tFixed").textContent = t.fixed ? "🔒 고정비" : "🔁 변동비";
+  $("#tFixed").className = "seg2 " + (t.fixed ? "plum" : "");
+  $("#tInstall").checked = !!t.installment;
+  openModal("mTxn");
+}
+function saveTxn() {
+  const t = state.txns.find(x => x.id === editingTxnId);
+  if (!t) return;
+  t.memo = ($("#tMemo").value || "").trim() || t.memo;
+  t.amount = num($("#tAmount").value);
+  t.date = $("#tDate").value || t.date;
+  const oldCat = t.cat;
+  t.cat = $("#tCat").value;
+  if (oldCat !== t.cat && !state.catRules[normKey(t.memo)]) t.fixed = catFixedDefault(t.cat);
+  t.cardId = $("#tCard").value;
+  t.installment = $("#tInstall").checked;
+  touch(); closeModal("mTxn"); renderAll(); if ($("#mAll").classList.contains("on")) renderAllTx();
+  toast("내역을 고쳤어요");
+}
+
+/* ---------- 최근 내역 토글 ---------- */
+function toggleTxnFixed(id) {
+  const t = state.txns.find(x => x.id === id);
+  if (!t) return;
+  t.fixed = !t.fixed;
+  rememberRule(t.memo, t.fixed, t.cat);
+  touch(); renderAll();
+  toast((t.memo || "이 내역") + " → " + (t.fixed ? "고정비" : "변동비") + "로 옮겼어요 (다음에도 기억)");
+}
+
+/* ---------- 설정 ---------- */
+function openSettings() {
+  $("#setRoom").value = Room;
+  $("#setShare").textContent = shareUrl();
+  setSync(syncKind === "on" ? "on" : syncKind === "local" ? "local" : "connecting");
+  openModal("mSettings");
+}
+function bindSettings() {
+  $("#btnSettings").addEventListener("click", openSettings);
+  $("#btnRoomSave").addEventListener("click", () => {
+    const v = ($("#setRoom").value || "").trim().replace(/[.#$\[\]\/]/g, "-");
+    if (v.length < 6) { toast("방 이름은 6자 이상으로 해 주세요"); return; }
+    location.href = location.pathname + "?room=" + encodeURIComponent(v);
+  });
+  $("#btnCopyShare").addEventListener("click", () => copyText(shareUrl(), "공유 링크를 복사했어요"));
+  $("#btnPushNow").addEventListener("click", () => { touch(); doPush(); toast("서버에 올렸어요"); });
+  $("#btnPullNow").addEventListener("click", pullNow);
+  $("#btnExport").addEventListener("click", () => {
+    downloadBlob("wallet-" + new Date().toISOString().slice(0, 10) + ".json", JSON.stringify(state, null, 2));
+    toast("내보냈어요");
+  });
+  $("#btnImportDemo").addEventListener("click", fillDemo);
+  $("#btnClearDemo").addEventListener("click", clearDemo);
+}
+
+function fillDemo() {
+  const mk = uiMonth;
+  const d = n => mk + "-" + pad2(Math.min(n, lastDayOfMonth(mk)));
+  const rows = [
+    [d(25), 320000, "유치원비", "유치원비", "kb", true, "demo"],
+    [d(25), 212400, "아파트 관리비", "관리비", "kb", true, "demo"],
+    [d(13), 89000, "KT 통신요금", "통신", "kb", true, "demo"],
+    [d(17), 17000, "넷플릭스", "구독", "jade", true, "demo"],
+    [d(5), 15400, "유튜브 프리미엄", "구독", "nv", true, "demo"],
+    [d(6), 9900, "밀리의서재", "구독", "nv", true, "demo"],
+    [d(19), 43200, "이마트", "식비", "jade", false, "demo"],
+    [d(20), 7500, "쿠팡", "생활", "kb", false, "demo"],
+    [d(20), 2800, "스타벅스", "식비", "jade", false, "demo"],
+    [d(18), 45000, "청소연구소 이용권", "생활", "nepa", false, "demo"],
+    [d(16), 24000, "배스킨라빈스", "아이", "nv", false, "demo"],
+    [d(15), 68000, "쿠팡", "생활", "kb", false, "demo"],
+    [d(14), 12400, "GS25", "식비", "kb", false, "demo"],
+    [d(13), 3200, "택시", "교통", "jade", false, "demo"],
+    [d(12), 15600, "미술학원", "교육", "kb", false, "demo"],
+    [d(11), 29800, "올리브영", "쇼핑", "nv", false, "demo"],
+    [d(10), 8400, "메가MGC커피", "식비", "kb", false, "demo"],
+    [d(3), 96000, "아이 옷", "아이", "nv", false, "demo"],
+    [d(2), 35000, "병원", "의료", "kb", false, "demo"],
+    [d(8), 120000, "자동차보험", "보험", "kb", true, "demo"]
+  ];
+  rows.forEach(r => {
+    addTxn({ date: r[0], amount: r[1], memo: r[2], cat: r[3], cardId: r[4], fixed: r[5], installment: false, demo: true }, { noDedup: true });
+  });
+  // 무이자 할부 예시 하나
+  addTxn({ date: d(9), amount: 600000, memo: "노트북 무이자 6개월", cat: "쇼핑", cardId: "nv", fixed: false, installment: true, demo: true }, { noDedup: true });
+  if (!state.gifts.some(g => g.id === "g-demo-bal")) {
+    state.gifts.push({ id: "g-demo-bal", name: "배민 상품권 10,000원권", brand: "배민", barcode: "", exp: shiftMonth(mk, 2) + "-28", amount: 10000, balance: 8000, used: false, image: "", emoji: "🛵", demo: true });
+    state.gifts.push({ id: "g-demo-olive", name: "올리브영 50,000원권", brand: "올리브", barcode: "", exp: shiftMonth(mk, 1) + "-31", amount: 50000, balance: 32500, used: false, image: "", emoji: "🧴", demo: true });
+  }
+  if (!state.giftUses.some(u => u.demo)) {
+    state.giftUses.push({ id: uid("gu"), date: d(17), amount: 4500, giftId: "g-mega", name: "메가MGC커피", demo: true });
+  }
+  touch(); closeModal("mSettings"); renderAll();
+  toast("예시 데이터를 채웠어요 — 실제 기록과 섞이지 않게 나중에 지워 주세요");
+}
+function clearDemo() {
+  const before = state.txns.length;
+  state.txns = state.txns.filter(t => !t.demo);
+  state.gifts = state.gifts.filter(g => !g.demo);
+  state.giftUses = state.giftUses.filter(u => !u.demo);
+  touch(); closeModal("mSettings"); renderAll();
+  toast("예시 " + (before - state.txns.length) + "건을 지웠어요");
+}
+
+/* ---------- 단축어 ---------- */
+function openShortcut() {
+  $("#scUrl").textContent = inboxUrl();
+  openModal("mShortcut");
+}
+function bindShortcut() {
+  $("#btnShortcut").addEventListener("click", openShortcut);
+  $("#btnShortcut2").addEventListener("click", openShortcut);
+  $("#btnCopyScUrl").addEventListener("click", () => copyText(inboxUrl(), "단축어 주소를 복사했어요"));
+  $("#btnCopyScJson").addEventListener("click", () => copyText('{"raw":"[KB국민] 11/20 12,500원 스타벅스"}', "JSON 예시를 복사했어요"));
+  $("#btnTestInbox").addEventListener("click", async () => {
+    const btn = $("#btnTestInbox");
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loader"></span>보내는 중';
+    try {
+      const r = await fetch(inboxUrl(), {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ raw: "[테스트] " + (new Date().getMonth() + 1) + "/" + new Date().getDate() + " 1,000원 편의점" })
+      });
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      toast("보냈어요 — 잠시 뒤 자동으로 기록됩니다");
+      setTimeout(drainInbox, 900);
+    } catch (e) {
+      toast("전송 실패: " + e.message);
+    }
+    btn.disabled = false;
+    btn.textContent = "테스트로 한 건 보내기";
+  });
+}
+
+/* ---------- 공통 모달 바인딩 ---------- */
+function bindModals() {
+  $$("[data-close]").forEach(b => b.addEventListener("click", () => b.closest(".mask").classList.remove("on")));
+  $$(".mask").forEach(m => m.addEventListener("click", ev => { if (ev.target === m) m.classList.remove("on"); }));
+  $("#bigClose").addEventListener("click", () => $("#bigBarcode").classList.remove("on"));
+  $("#bigBack").addEventListener("click", () => $("#bigBarcode").classList.remove("on"));
+  document.addEventListener("keydown", ev => { if (ev.key === "Escape") closeAll(); });
+
+  $("#btnCardAdd").addEventListener("click", openCardNew);
+  $("#cardSave").addEventListener("click", saveCard);
+  $("#btnGiftAdd").addEventListener("click", openGiftNew);
+  $("#giftSave").addEventListener("click", saveGift);
+  $("#btnAllTx").addEventListener("click", openAll);
+  $("#allFilter").addEventListener("change", renderAllTx);
+  $("#allCard").addEventListener("change", renderAllTx);
+  $("#quickForm").addEventListener("keydown", ev => { if (ev.key === "Enter" && ev.target.tagName === "INPUT") { ev.preventDefault(); $("#quickForm").requestSubmit ? $("#quickForm").requestSubmit() : $("#quickForm").dispatchEvent(new Event("submit")); } });
+  $("#useOk").addEventListener("click", confirmUseGift);
+  $("#tSave").addEventListener("click", saveTxn);
+  $("#tDelete").addEventListener("click", () => { if (editingTxnId) { deleteTxn(editingTxnId); closeModal("mTxn"); toast("지웠어요"); } });
+  $("#tFixed").addEventListener("click", () => {
+    const t = state.txns.find(x => x.id === editingTxnId);
+    if (!t) return;
+    t.fixed = !t.fixed;
+    $("#tFixed").textContent = t.fixed ? "🔒 고정비" : "🔁 변동비";
+    $("#tFixed").className = "seg2 " + (t.fixed ? "plum" : "");
+  });
+  $("#btnCsv").addEventListener("click", exportCsv);
+}
+
+function exportCsv() {
+  const list = sortTxDesc(monthTxns(uiMonth));
+  const head = "날짜,내용,분류,고정/변동,결제수단,금액,할부\n";
+  const body = list.map(t => [t.date, t.memo, t.cat, t.fixed ? "고정" : "변동", cardLabel(t.cardId), t.amount, t.installment ? "무이자" : ""]
+    .map(v => '"' + String(v).replace(/"/g, '""') + '"').join(",")).join("\n");
+  downloadBlob("wallet-" + uiMonth + ".csv", "\ufeff" + head + body, "text/csv;charset=utf-8");
+  toast("CSV로 내보냈어요");
+}
+
+/* ---------- 이벤트 위임 ---------- */
+function bindDelegates() {
+  document.addEventListener("click", ev => {
+    const t = ev.target.closest ? ev.target.closest("[data-edit-card],[data-edit-gift],[data-big],[data-use],[data-unuse],[data-gift-bal],[data-kt],[data-txn],[data-open-txn],[data-del],[data-pick-use],[data-pick-unuse],[data-pick-edit]") : null;
+    if (!t) return;
+    if (t.hasAttribute("data-pick-use")) { askUsePick(t.getAttribute("data-pick-use")); return; }
+    if (t.hasAttribute("data-pick-unuse")) { unusePick(t.getAttribute("data-pick-unuse")); return; }
+    if (t.hasAttribute("data-pick-edit")) { openPickModal(t.getAttribute("data-pick-edit")); return; }
+    if (t.hasAttribute("data-edit-card")) { ev.stopPropagation(); openCardModal(t.getAttribute("data-edit-card")); return; }
+    if (t.hasAttribute("data-edit-gift")) { openGiftModal(t.getAttribute("data-edit-gift")); return; }
+    if (t.hasAttribute("data-big")) { openBig(t.getAttribute("data-big")); return; }
+    if (t.hasAttribute("data-use")) { askUseGift(t.getAttribute("data-use")); return; }
+    if (t.hasAttribute("data-unuse")) { toggleUse(t.getAttribute("data-unuse"), false); return; }
+    if (t.hasAttribute("data-gift-bal")) { ev.stopPropagation(); openGiftModal(t.getAttribute("data-gift-bal")); toast("남은 잔액을 고쳐 주세요"); return; }
+    if (t.hasAttribute("data-kt")) { toggleKt(t.getAttribute("data-kt")); return; }
+    if (t.hasAttribute("data-del")) { const id = t.getAttribute("data-del"); if (confirm("이 내역을 지울까요?")) deleteTxn(id); return; }
+    if (t.hasAttribute("data-open-txn")) { ev.stopPropagation(); openTxn(t.getAttribute("data-open-txn")); return; }
+    if (t.hasAttribute("data-txn")) {
+      if (ev.target.closest("button, .mini")) return;
+      toggleTxnFixed(t.getAttribute("data-txn"));
+    }
+  });
+  document.addEventListener("click", ev => {
+    if (ev.target.closest("#btnGiftAdd2")) openGiftNew();
+  });
+  const allTbl = $("#allTable");
+  if (allTbl) {
+    allTbl.addEventListener("change", ev => {
+      const f = ev.target.getAttribute("data-f");
+      const tr = ev.target.closest("tr");
+      if (!f || !tr) return;
+      const id = tr.getAttribute("data-id");
+      let v = ev.target.value;
+      if (f === "installment") v = ev.target.checked;
+      updateTxn(id, f, v);
+    });
+    allTbl.addEventListener("click", ev => {
+      const b = ev.target.closest('[data-f="fixed"]');
+      if (!b) return;
+      const tr = b.closest("tr");
+      updateTxn(tr.getAttribute("data-id"), "fixed", null);
+    });
+  }
+  const roomTag = $("#roomTag");
+  if (roomTag) roomTag.addEventListener("click", () => copyText(shareUrl(), "공유 링크를 복사했어요"));
+  $("#btnSync").addEventListener("click", () => { doPush(); toast(syncKind === "on" ? "동기화 중이에요" : "이 기기에 저장 중이에요"); });
+}
+
+/* ==== 45-picks.js ==== */
+/* ============================================================
+   카드사 Pick(선택형 청구할인) 쿠폰
+   ============================================================ */
+function openPickModal(id) {
+  const p = id ? state.picks.find(x => x.id === id) : null;
+  $("#mPick").setAttribute("data-id", p ? p.id : "");
+  $("#pickModalTitle").textContent = p ? "Pick 쿠폰 수정" : "Pick 쿠폰 추가";
+  $("#pTitle").value = p ? p.title : "";
+  $("#pIssuer").value = p ? p.issuer : "하나Pick";
+  if (!$("#pIssuer").value) $("#pIssuer").value = "기타";
+  $("#pExp").value = p ? p.exp || "" : "";
+  $("#pBenefit").value = p ? p.benefit : "";
+  $("#pKeys").value = p ? (p.keys || []).join(",") : "";
+  $("#pAmount").value = p && p.usedAmount ? fmt(p.usedAmount) : "";
+  $("#pNote").value = p ? p.note || "" : "";
+  $("#pDelete").style.display = p ? "" : "none";
+  openModal("mPick");
+}
+function savePick() {
+  const id = $("#mPick").getAttribute("data-id");
+  const title = ($("#pTitle").value || "").trim();
+  if (!title) { toast("가맹점 이름을 넣어 주세요"); $("#pTitle").focus(); return; }
+  const keys = ($("#pKeys").value || "").split(",").map(s => s.trim()).filter(Boolean);
+  const data = {
+    id: id || uid("p"),
+    issuer: $("#pIssuer").value,
+    title: title,
+    benefit: ($("#pBenefit").value || "").trim(),
+    exp: $("#pExp").value || "",
+    keys: Array.from(new Set([title].concat(keys))),
+    note: ($("#pNote").value || "").trim(),
+    used: id ? !!(state.picks.find(x => x.id === id) || {}).used : false,
+    usedAt: id ? (state.picks.find(x => x.id === id) || {}).usedAt || "" : "",
+    usedAmount: id ? num((state.picks.find(x => x.id === id) || {}).usedAmount) : 0
+  };
+  const amt = num($("#pAmount").value);
+  if (id && amt) { data.usedAmount = amt; }
+  if (id) state.picks = state.picks.map(p => p.id === id ? Object.assign(p, data) : p);
+  else state.picks.push(data);
+  touch(); closeModal("mPick"); renderAll();
+  toast(id ? "Pick 쿠폰을 고쳤어요" : "Pick 쿠폰을 담았어요");
+}
+function deletePick(id) {
+  state.picks = state.picks.filter(p => p.id !== id);
+  touch(); renderAll(); toast("지웠어요");
+}
+function askUsePick(id) {
+  const p = state.picks.find(x => x.id === id);
+  if (!p) return;
+  usingPickId = id; usingGiftId = "";
+  $("#useName").textContent = p.issuer + " · " + p.title;
+  $("#useAmount").value = "";
+  $("#useHint").textContent = "실제 할인받은 금액을 적으면 이번 달 아낀 금액에 들어갑니다. 모르면 비워 두세요.";
+  openModal("mUse");
+}
+function confirmUsePick() {
+  const p = state.picks.find(x => x.id === usingPickId);
+  if (!p) { closeModal("mUse"); return; }
+  const value = num($("#useAmount").value);
+  p.used = true;
+  p.usedAt = dateForMonth(uiMonth);
+  p.usedAmount = value;
+  usingPickId = "";
+  touch(); closeModal("mUse"); renderAll();
+  toast(value ? "Pick 사용 완료 · " + won(value) + " 아꼈어요" : "Pick 사용 완료로 표시했어요");
+}
+function unusePick(id) {
+  const p = state.picks.find(x => x.id === id);
+  if (!p) return;
+  p.used = false; p.usedAt = ""; p.usedAmount = 0;
+  touch(); renderAll(); toast("되돌렸어요");
+}
+
+function bindPicks() {
+  $("#btnPickAdd").addEventListener("click", () => openPickModal(""));
+  $("#pickSave").addEventListener("click", savePick);
+  $("#pDelete").addEventListener("click", () => {
+    const id = $("#mPick").getAttribute("data-id");
+    if (!id || !confirm("이 Pick 쿠폰을 지울까요?")) return;
+    closeModal("mPick"); deletePick(id);
+  });
+  const s = $("#pickSearch");
+  s.addEventListener("input", () => {
+    pickQuery = s.value;
+    $("#pickClear").classList.toggle("hidden", !s.value);
+    renderPicks();
+  });
+  s.addEventListener("keydown", ev => {
+    if (ev.key === "Enter") ev.preventDefault();
+  });
+  $("#pickClear").addEventListener("click", () => {
+    pickQuery = ""; s.value = ""; $("#pickClear").classList.add("hidden"); renderPicks();
+  });
+  $("#pickFilters").addEventListener("click", ev => {
+    const b = ev.target.closest("[data-pf]");
+    if (!b) return;
+    pickFilter = b.getAttribute("data-pf");
+    renderPicks();
+  });
+  $("#btnPickOcr").addEventListener("click", () => {
+    imgMode = "pick";
+    $("#fileImg").value = "";
+    $("#fileImg").click();
+  });
+}
+
+/* 캡처에서 Pick 읽기 결과 */
+let pOcrRows = [];
+function pickOcrFromLines(lines) {
+  const rows = [];
+  const dateRe = /(20\d{2})[.\-\/]\s?(\d{1,2})[.\-\/]\s?(\d{1,2})/g;
+  const stop = /^(완료|마감|선착순|전체|내가|Pick|혜택|모아보기|쿠팡|쇼핑|여행|문화|생활|모빌리티|푸드)$/;
+  let cur = null;
+  const push = () => {
+    if (!cur) return;
+    const title = (cur.title || "").trim();
+    const benefit = (cur.benefit || []).join(" ").replace(/\s+/g, " ").trim();
+    if (title.length >= 2) {
+      rows.push({
+        issuer: "하나Pick", title: title.slice(0, 40),
+        benefit: benefit.slice(0, 90),
+        exp: cur.exp || "", on: true
+      });
+    }
+    cur = null;
+  };
+  lines.forEach(raw => {
+    const line = String(raw || "").trim();
+    if (!line) { return; }
+    const d = line.match(dateRe);
+    if (d) {
+      if (cur && !cur.exp) cur.exp = d[0].replace(/[.\/]/g, "-").replace(/\s/g, "").replace(/-(\d)-/, "-0$1-");
+      return;
+    }
+    if (stop.test(line.replace(/[\s]/g, ""))) return;
+    const isBenefit = /(할인|쿠폰|적립|청구|무료|증정|%|원)/.test(line);
+    if (!cur) { cur = { title: line, benefit: [], exp: "" }; return; }
+    if (!cur.benefit.length && !isBenefit && line.length <= 14) { push(); cur = { title: line, benefit: [], exp: "" }; return; }
+    cur.benefit.push(line);
+  });
+  push();
+  return rows.slice(0, 30);
+}
+function openPickOcr(rows, message) {
+  pOcrRows = rows;
+  $("#pocrMsg").innerHTML = message;
+  renderPickOcr();
+  openModal("mPickOcr");
+}
+function renderPickOcr() {
+  const tbl = $("#pocrTable");
+  const head = "<thead><tr><th>담기</th><th>카드사</th><th>가맹점</th><th>혜택</th><th>만료일</th></tr></thead>";
+  const rows = pOcrRows.map((r, i) =>
+    "<tr data-i=\"" + i + "\">" +
+      '<td style="text-align:center"><input type="checkbox" data-f="on" data-i="' + i + '"' + (r.on ? " checked" : "") + ' style="width:16px;height:16px;accent-color:#5C7F68;border:0;padding:0"></td>' +
+      '<td><select data-f="issuer" data-i="' + i + '">' + ["하나Pick", "KB 마이픽", "현대카드", "신한카드", "삼성카드", "기타"].map(o => "<option" + (o === r.issuer ? " selected" : "") + ">" + o + "</option>").join("") + "</select></td>" +
+      '<td><input data-f="title" data-i="' + i + '" value="' + esc(r.title) + '"></td>' +
+      '<td><input data-f="benefit" data-i="' + i + '" value="' + esc(r.benefit) + '"></td>' +
+      '<td><input type="date" class="w90" data-f="exp" data-i="' + i + '" value="' + esc(r.exp) + '"></td>' +
+    "</tr>").join("");
+  tbl.innerHTML = head + "<tbody>" + (rows || '<tr><td colspan="5" style="text-align:center;color:#B7AC9C;padding:18px">읽어낸 항목이 없어요 — 직접 [＋ Pick]으로 담아 주세요</td></tr>') + "</tbody>";
+  $("#pocrCount").textContent = pOcrRows.filter(r => r.on).length;
+}
+function bindPickOcr() {
+  $("#pocrTable").addEventListener("change", ev => {
+    const i = Number(ev.target.getAttribute("data-i"));
+    const f = ev.target.getAttribute("data-f");
+    if (isNaN(i) || !f || !pOcrRows[i]) return;
+    pOcrRows[i][f] = f === "on" ? ev.target.checked : ev.target.value;
+    $("#pocrCount").textContent = pOcrRows.filter(r => r.on).length;
+  });
+  $("#pocrConfirm").addEventListener("click", () => {
+    const sel = pOcrRows.filter(r => r.on && r.title);
+    sel.forEach(r => {
+      state.picks.push({
+        id: uid("p"), issuer: r.issuer || "하나Pick", title: r.title,
+        benefit: r.benefit || "", exp: r.exp || "",
+        keys: [r.title], note: "캡처로 담음", used: false, usedAt: "", usedAmount: 0
+      });
+    });
+    touch(); closeModal("mPickOcr"); renderAll();
+    toast(sel.length + "건을 Pick 목록에 담았어요");
+  });
+}
+
+/* ==== 50-import.js ==== */
+/* ============================================================
+   가져오기: 뱅크샐러드 엑셀/ZIP/CSV (브라우저 안에서만 처리)
+   ============================================================ */
+let importRows = [];
+let imgMode = "txn";
+
+function isPk(b) { return b.length > 3 && b[0] === 0x50 && b[1] === 0x4B; }
+function isCfb(b) { return b.length > 3 && b[0] === 0xD0 && b[1] === 0xCF && b[2] === 0x11 && b[3] === 0xE0; }
+
+function bytesToText(bytes) {
+  try { return new TextDecoder("utf-8", { fatal: true }).decode(bytes).replace(/^\uFEFF/, ""); }
+  catch (e) {
+    try { return new TextDecoder("euc-kr").decode(bytes); }
+    catch (e2) { return new TextDecoder("utf-8").decode(bytes); }
+  }
+}
+
+function bindImport() {
+  $("#btnXlsx").addEventListener("click", () => { $("#fileXlsx").value = ""; $("#fileXlsx").click(); });
+  $("#fileXlsx").addEventListener("change", ev => {
+    const f = ev.target.files && ev.target.files[0];
+    if (f) handleSpreadsheet(f);
+  });
+  $("#impConfirm").addEventListener("click", confirmImport);
+  $("#impTable").addEventListener("change", ev => {
+    const i = Number(ev.target.getAttribute("data-i"));
+    const f = ev.target.getAttribute("data-f");
+    if (isNaN(i) || !f || !importRows[i]) return;
+    if (f === "on") importRows[i].on = ev.target.checked;
+    else if (f === "fixed") importRows[i].fixed = ev.target.value === "fix";
+    else if (f === "amount") importRows[i].amount = num(ev.target.value);
+    else importRows[i][f] = ev.target.value;
+    updateImpCount();
+  });
+  $("#impTable").addEventListener("click", ev => {
+    const b = ev.target.closest('[data-f="fixedbtn"]');
+    if (!b) return;
+    const i = Number(b.getAttribute("data-i"));
+    importRows[i].fixed = !importRows[i].fixed;
+    renderImport();
+  });
+}
+
+/* ---------- 비밀번호 모달 ---------- */
+let passResolve = null;
+function askPassword(msg, tries) {
+  return new Promise(resolve => {
+    passResolve = resolve;
+    $("#passMsg").textContent = msg || "압축 파일에 비밀번호가 걸려 있어요. 브라우저 안에서만 열고, 어디로도 보내지 않습니다.";
+    $("#passTry").textContent = tries ? "다시 시도 (" + tries + "/3)" : "";
+    $("#passInput").value = "";
+    openModal("mPass");
+    setTimeout(() => $("#passInput").focus(), 80);
+  });
+}
+function bindPass() {
+  $("#passOk").addEventListener("click", () => {
+    const v = $("#passInput").value;
+    const r = passResolve; passResolve = null;
+    closeModal("mPass");
+    if (r) r(v);
+  });
+  $("#passInput").addEventListener("keydown", ev => { if (ev.key === "Enter") { ev.preventDefault(); $("#passOk").click(); } });
+  $$("#mPass [data-close]").forEach(b => b.addEventListener("click", () => {
+    const r = passResolve; passResolve = null;
+    if (r) r(null);
+  }));
+  const mask = $("#mPass");
+  mask.addEventListener("click", ev => {
+    if (ev.target === mask && passResolve) { const r = passResolve; passResolve = null; r(null); }
+  });
+}
+
+/* ---------- 파일 열기 ---------- */
+function hasRows(wb) {
+  if (!wb || !wb.SheetNames) return false;
+  return wb.SheetNames.some(n => {
+    const ws = wb.Sheets[n];
+    if (!ws || !ws["!ref"]) return false;
+    const range = XLSX.utils.decode_range(ws["!ref"]);
+    return range.e.r - range.s.r >= 1;
+  });
+}
+
+async function handleSpreadsheet(file) {
+  const name = (file.name || "").toLowerCase();
+  toast("파일을 여는 중…");
+  try {
+    const buf = await file.arrayBuffer();
+    const bytes = new Uint8Array(buf);
+    let wb = null;
+
+    if (/\.csv$/.test(name)) {
+      wb = XLSX.read(bytesToText(bytes), { type: "string", raw: false });
+    } else if (isPk(bytes)) {
+      try {
+        wb = XLSX.read(bytes, { type: "array", cellDates: true });
+        if (!hasRows(wb)) throw new Error("empty");
+      } catch (e) {
+        wb = await openZipArchive(file);
+      }
+    } else if (isCfb(bytes)) {
+      wb = await openEncryptedWorkbook(bytes);
+    } else {
+      wb = XLSX.read(bytes, { type: "array", cellDates: true });
+    }
+
+    if (!hasRows(wb)) { toast("표를 찾지 못했어요 — 다른 파일로 해 보세요"); return; }
+    const parsed = parseWorkbook(wb);
+    if (!parsed.rows.length) {
+      toast(parsed.excluded ? "이체·입금 " + parsed.excluded + "건만 있어서 새로 담을 내역이 없어요" : "새로 담을 내역이 없어요");
+      return;
+    }
+    openImport(parsed);
+  } catch (e) {
+    console.warn("spreadsheet failed", e);
+    toast("열지 못했어요: " + (e.message || e));
+  }
+}
+
+async function openZipArchive(file) {
+  if (!window.zip) throw new Error("압축 도구를 불러오지 못했어요 (인터넷 확인)");
+  try { zip.configure({ useWebWorkers: false }); } catch (e) {}
+  const zr = new zip.ZipReader(new zip.BlobReader(file));
+  const entries = await zr.getEntries();
+  const target = entries
+    .filter(e => /\.(xlsx|xls|csv)$/i.test(e.filename) && !/^__MACOSX/.test(e.filename))
+    .sort((a, b) => (b.uncompressedSize || 0) - (a.uncompressedSize || 0))[0];
+  if (!target) throw new Error("압축 안에 엑셀·CSV 파일이 없어요");
+  let pwd = "";
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const opts = pwd ? { password: pwd } : undefined;
+      const data = await target.getData(new zip.Uint8ArrayWriter(), opts);
+      try { zr.close(); } catch (e) {}
+      if (/\.csv$/i.test(target.filename)) return XLSX.read(bytesToText(data), { type: "string", raw: false });
+      return XLSX.read(data, { type: "array", cellDates: true });
+    } catch (err) {
+      if (!target.encrypted) throw new Error("압축을 풀지 못했어요: " + (err.message || err));
+      const p = await askPassword("비밀번호가 걸린 압축 파일이에요. (뱅크샐러드 내보내기 비밀번호)", attempt > 1 ? attempt : 0);
+      if (p === null) throw new Error("취소했어요");
+      pwd = p;
+    }
+  }
+  throw new Error("비밀번호가 맞지 않아요");
+}
+
+async function openEncryptedWorkbook(bytes) {
+  let pwd = "";
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    if (attempt > 1 || !pwd) {
+      const p = await askPassword("암호가 걸린 엑셀이에요. 파일 비밀번호를 넣어 주세요.", attempt > 1 ? attempt - 1 : 0);
+      if (p === null) throw new Error("취소했어요");
+      pwd = p;
+    }
+    try {
+      return XLSX.read(bytes, { type: "array", cellDates: true, password: pwd });
+    } catch (e1) {
+      if (typeof decryptXlsx !== "function") throw new Error("암호가 걸린 엑셀은 열 수 없어요 — ZIP으로 내보내 주세요");
+      try {
+        const plain = await decryptXlsx(bytes, pwd);
+        return XLSX.read(plain, { type: "array", cellDates: true });
+      } catch (e2) {
+        if (attempt === 3) throw new Error("비밀번호가 맞지 않거나 열 수 없는 암호 방식이에요");
+      }
+    }
+  }
+  throw new Error("비밀번호가 맞지 않아요");
+}
+
+/* ---------- 표 해석 ---------- */
+const SUPPLIER_CAT = {
+  "식비": "식비", "카페": "식비", "카페/간식": "식비", "간식": "식비", "외식": "식비", "배달": "식비",
+  "마트": "생활", "편의점": "생활", "생활": "생활", "생필품": "생활", "세탁": "생활",
+  "교통": "교통", "주유": "교통", "대중교통": "교통", "택시": "교통", "주차": "교통",
+  "쇼핑": "쇼핑", "온라인쇼핑": "쇼핑", "뷰티": "쇼핑", "의류": "쇼핑", "패션": "쇼핑",
+  "의료": "의료", "병원": "의료", "약국": "의료", "건강": "의료",
+  "문화": "문화", "여가": "문화", "취미": "문화", "도서": "문화", "영화": "문화",
+  "교육": "교육", "학원": "교육", "육아": "아이", "아이": "아이", "반려동물": "생활",
+  "통신": "통신", "인터넷": "통신", "주거": "관리비", "공과금": "관리비", "관리비": "관리비",
+  "보험": "보험", "세금": "세금", "이자": "대출", "수수료": "기타", "기타": "기타"
+};
+const CAT_GUESS = [
+  [/식비|카페|커피|간식|외식|배달|음식|식당|베이커리|치킨|피자|스타벅스|메가|투썸|이디야|컴포즈|빽다방|배스킨|던킨|맥도날드|버거|김밥|분식/, "식비"],
+  [/이마트|홈플러스|롯데마트|코스트코|마트|편의점|GS25|CU|세븐|생필품|다이소|세탁|청소/, "생활"],
+  [/육아|아이|키즈|유아|장난감|아동|어린이|서한/, "아이"],
+  [/주유|주차|택시|버스|지하철|교통|KTX|카카오T|티머니/, "교통"],
+  [/올리브영|무신사|쿠팡|쇼핑|의류|패션|뷰티|화장품/, "쇼핑"],
+  [/병원|약국|의료|치과|한의원/, "의료"],
+  [/영화|도서|공연|문화|넷플릭스|유튜브|티빙|웨이브|밀리|구독/, "문화"],
+  [/통신|인터넷|휴대폰|KT|SKT|LG U/, "통신"],
+  [/관리비|공과금|전기|가스|수도|아파트/, "관리비"],
+  [/보험/, "보험"],
+  [/학원|유치원|어린이집|교재|교육/, "교육"],
+  [/대출|이자|카드대금|할부금/, "대출"],
+  [/세금|국세|지방세|과태료/, "세금"]
+];
+
+function parseDateCell(v) {
+  if (v == null || v === "") return "";
+  if (v instanceof Date && !isNaN(v)) return isoDate(v);
+  if (typeof v === "number" && v > 20000 && v < 60000) {
+    try {
+      const d = XLSX.SSF.parse_date_code(v);
+      return d.y + "-" + pad2(d.m) + "-" + pad2(d.d);
+    } catch (e) { return ""; }
+  }
+  let s = String(v).trim();
+  s = s.replace(/년|월/g, "-").replace(/일/g, "").replace(/[./]/g, "-").replace(/\s+.*/, "");
+  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (m) return m[1] + "-" + pad2(m[2]) + "-" + pad2(m[3]);
+  m = s.match(/^(\d{1,2})-(\d{1,2})$/);
+  if (m) return new Date().getFullYear() + "-" + pad2(m[1]) + "-" + pad2(m[2]);
+  m = String(v).match(/(\d{4})\D(\d{1,2})\D(\d{1,2})/);
+  if (m) return m[1] + "-" + pad2(m[2]) + "-" + pad2(m[3]);
+  return "";
+}
+
+function matchCardId(text) {
+  const s = String(text || "");
+  if (!s) return "";
+  if (/현금/.test(s)) return PAY_CASH;
+  if (/기프티콘|상품권|쿠폰/.test(s)) return PAY_GIFT;
+  if (/네이버\s?페이|네페/.test(s) && /하나/.test(s)) return "nepa";
+  if (/현대/.test(s) || /9006/.test(s)) return "nv";
+  if (/국민|KB/i.test(s) || /9402/.test(s)) return "kb";
+  if (/하나/.test(s)) return "jade";
+  const c = state.cards.find(c => (c.short && s.indexOf(c.short) >= 0) || (c.name && s.indexOf(c.name) >= 0) || (c.last4 && s.indexOf(c.last4) >= 0));
+  return c ? c.id : "";
+}
+
+function guessCategory(text, given) {
+  const g = String(given || "").trim();
+  if (g && SUPPLIER_CAT[g]) return SUPPLIER_CAT[g];
+  if (g && CAT_BY[g]) return g;
+  const s = String(text || "");
+  for (const [re, cat] of CAT_GUESS) if (re.test(s)) return cat;
+  return "기타";
+}
+
+function isTransferRow(typeVal, memo, catVal) {
+  const t = String(typeVal || "") + " " + String(catVal || "");
+  const m = String(memo || "");
+  if (/이체/.test(t) || /이체/.test(m)) return true;
+  if (/내\s?계좌/.test(m)) return true;
+  if (/최현|케이최현/.test(m) && /이체|송금|입금/.test(t + m)) return true;
+  return false;
+}
+function isIncomeRow(typeVal, amountCell) {
+  const t = String(typeVal || "");
+  if (/수입|입금|충전/.test(t)) return true;
+  if (typeof amountCell === "number" && amountCell < 0) return true;
+  if (/^[-−]/.test(String(amountCell || "").trim())) return true;
+  return false;
+}
+
+function findHeader(rows) {
+  const pats = [/날짜|일시|거래일|사용일|승인일|결제일|날자/, /내용|사용처|가맹점|상호|적요|이용처/, /금액|결제액|사용액|출금|승인금액|거래금액/];
+  for (let i = 0; i < Math.min(rows.length, 20); i++) {
+    const row = rows[i] || [];
+    const hits = pats.filter(re => row.some(c => re.test(String(c)))).length;
+    if (hits >= 2) return i;
+  }
+  return -1;
+}
+
+function parseWorkbook(wb) {
+  let best = null, bestScore = 0;
+  wb.SheetNames.forEach(n => {
+    const ws = wb.Sheets[n];
+    if (!ws || !ws["!ref"]) return;
+    const m = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false, defval: "", blankrows: false });
+    const h = findHeader(m);
+    const score = h >= 0 ? m.length : 0;
+    if (score > bestScore) { bestScore = score; best = { name: n, rows: m, header: h }; }
+  });
+  if (!best) return { rows: [], excluded: 0, sheet: "" };
+
+  const rows = best.rows;
+  const headerRow = rows[best.header] || [];
+  const idx = {};
+  headerRow.forEach((h, i) => {
+    const s = String(h).trim();
+    if (!s) return;
+    if (idx.date == null && /날짜|일시|거래일|사용일|승인일|결제일|날자/.test(s)) idx.date = i;
+    else if (idx.time == null && /시간|시각/.test(s)) idx.time = i;
+    else if (idx.memo == null && /내용|사용처|가맹점|상호|적요|이용처|상대/.test(s)) idx.memo = i;
+    else if (idx.amount == null && /금액|결제액|사용액|출금|승인금액|거래금액/.test(s)) idx.amount = i;
+    else if (idx.card == null && /결제수단|카드|계좌|수단|결제방법/.test(s)) idx.card = i;
+    else if (idx.cat == null && /카테고리|분류명/.test(s)) idx.cat = i;
+    else if (idx.type == null && /구분|타입|입출금|수입지출|거래구분|^분류$/.test(s)) idx.type = i;
+    else if (idx.inst == null && /할부/.test(s)) idx.inst = i;
+    else if (idx.memo2 == null && /메모|비고|노트/.test(s)) idx.memo2 = i;
+  });
+  if (idx.date == null && idx.amount == null) return { rows: [], excluded: 0, sheet: best.name };
+
+  const existing = {};
+  state.txns.forEach(t => { existing[t.date + "|" + t.amount + "|" + normKey(t.memo)] = 1; });
+
+  const out = [];
+  let excluded = 0, dup = 0;
+  for (let r = best.header + 1; r < rows.length; r++) {
+    const row = rows[r] || [];
+    const rawAmount = idx.amount != null ? row[idx.amount] : "";
+    const rawDate = idx.date != null ? row[idx.date] : "";
+    const plainAmount = num(String(rawAmount).replace(/[^\d.\-]/g, ""));
+    if (!plainAmount && !rawDate) continue;
+    const typeVal = idx.type != null ? row[idx.type] : "";
+    const memo = String((idx.memo != null ? row[idx.memo] : "") || (idx.memo2 != null ? row[idx.memo2] : "") || "").trim().slice(0, 80);
+    if (!memo && !plainAmount) continue;
+    if (/^(합계|총계|소계)/.test(memo)) continue;
+    if (isTransferRow(typeVal, memo, idx.cat != null ? row[idx.cat] : "")) { excluded++; continue; }
+    if (isIncomeRow(typeVal, rawAmount)) { excluded++; continue; }
+    const date = parseDateCell(rawDate) || parseDateCell(row[0]) || "";
+    if (!date) { excluded++; continue; }
+    const amount = Math.abs(plainAmount);
+    if (!amount) continue;
+    const key = date + "|" + amount + "|" + normKey(memo);
+    const cat = guessCategory(memo, idx.cat != null ? row[idx.cat] : "");
+    const item = {
+      on: !existing[key],
+      date: date, memo: memo || cat, amount: amount, cat: cat,
+      fixed: catFixedDefault(cat),
+      cardId: matchCardId(idx.card != null ? row[idx.card] : ""),
+      installment: idx.inst != null ? /할부/.test(String(row[idx.inst])) && !/일시불/.test(String(row[idx.inst])) : false,
+      dup: !!existing[key]
+    };
+    if (item.dup) dup++;
+    out.push(item);
+  }
+  return { rows: out, excluded: excluded, dup: dup, sheet: best.name };
+}
+
+/* ---------- 미리보기 ---------- */
+function openImport(parsed) {
+  importRows = parsed.rows;
+  $("#impTitle").textContent = "가져온 내역 확인 (" + parsed.rows.length + "건)";
+  const fresh = parsed.rows.filter(r => r.on).length;
+  $("#impSummary").innerHTML = "📄 <b>" + esc(parsed.sheet || "표") + "</b>에서 " + parsed.rows.length + "건을 읽었어요 · " +
+    "새 내역 <b>" + fresh + "건</b>" +
+    (parsed.dup ? " · 이미 있는 " + parsed.dup + "건은 체크를 풀어 뒀어요" : "") +
+    (parsed.excluded ? " · 내 계좌 이체·입금 " + parsed.excluded + "건은 자동 제외" : "");
+  renderImport();
+  openModal("mImport");
+}
+function updateImpCount() {
+  $("#impCount").textContent = importRows.filter(r => r.on).length;
+}
+function renderImport() {
+  const tbl = $("#impTable");
+  const cardOpts = (sel) => state.cards.map(c => '<option value="' + esc(c.id) + '"' + (c.id === sel ? " selected" : "") + ">" + esc(c.short || c.name) + "</option>").join("") +
+    '<option value="' + PAY_CASH + '"' + (sel === PAY_CASH ? " selected" : "") + ">현금</option>" +
+    '<option value="' + PAY_GIFT + '"' + (sel === PAY_GIFT ? " selected" : "") + ">기프티콘</option>" +
+    '<option value=""' + (!sel ? " selected" : "") + ">기타</option>";
+  const head = "<thead><tr><th>담기</th><th>날짜</th><th>내용</th><th>분류</th><th>고정/변동</th><th>결제</th><th>금액</th></tr></thead>";
+  const body = importRows.map((r, i) =>
+    '<tr class="' + (r.dup ? "dup" : "") + '" data-i="' + i + '">' +
+      '<td style="text-align:center"><input type="checkbox" data-f="on" data-i="' + i + '"' + (r.on ? " checked" : "") + ' style="width:16px;height:16px;accent-color:#5C7F68;border:0;padding:0"></td>' +
+      '<td><input type="date" class="w90" data-f="date" data-i="' + i + '" value="' + esc(r.date) + '"></td>' +
+      '<td><input data-f="memo" data-i="' + i + '" value="' + esc(r.memo) + '" style="min-width:110px"></td>' +
+      '<td><select data-f="cat" data-i="' + i + '">' + CATS.map(c => '<option value="' + esc(c.n) + '"' + (c.n === r.cat ? " selected" : "") + ">" + esc(c.n) + "</option>").join("") + "</select></td>" +
+      '<td><button class="chip ' + (r.fixed ? "plum" : "sage") + '" data-f="fixedbtn" data-i="' + i + '">' + (r.fixed ? "🔒 고정" : "🔁 변동") + "</button></td>" +
+      '<td><select data-f="cardId" data-i="' + i + '">' + cardOpts(r.cardId) + "</select></td>" +
+      '<td class="num"><input class="w90" data-f="amount" data-i="' + i + '" inputmode="numeric" value="' + fmt(r.amount) + '"></td>' +
+    "</tr>").join("");
+  tbl.innerHTML = head + "<tbody>" + (body || '<tr><td colspan="7" style="text-align:center;color:#B7AC9C;padding:18px">가져올 내역이 없어요</td></tr>') + "</tbody>";
+  updateImpCount();
+}
+function confirmImport() {
+  const sel = importRows.filter(r => r.on);
+  let added = 0;
+  sel.forEach(r => {
+    const t = addTxn({
+      date: r.date, amount: r.amount, memo: r.memo, cat: r.cat,
+      fixed: r.fixed, cardId: r.cardId || PAY_CASH, installment: r.installment
+    });
+    if (t) added++;
+  });
+  touch(); closeModal("mImport"); renderAll();
+  toast(added + "건을 가계부에 담았어요" + (sel.length - added ? " (중복 " + (sel.length - added) + "건 제외)" : ""));
+}
+
+/* ==== 55-xlsx-crypt.js ==== */
+/* ============================================================
+   암호 걸린 XLSX (ECMA-376 Agile) — 브라우저 안에서만 복호화
+   AES-CBC 복호화(순수 JS) + SHA-512(WebCrypto)
+   ============================================================ */
+const MiniAES = (function () {
+  function mul(a, b) {
+    let p = 0;
+    for (let i = 0; i < 8; i++) {
+      if (b & 1) p ^= a;
+      const hi = a & 0x80;
+      a = (a << 1) & 0xff;
+      if (hi) a ^= 0x1b;
+      b >>= 1;
+    }
+    return p;
+  }
+  function inv(a) {
+    if (!a) return 0;
+    for (let b = 1; b < 256; b++) if (mul(a, b) === 1) return b;
+    return 0;
+  }
+  const sbox = new Uint8Array(256), isbox = new Uint8Array(256);
+  for (let i = 0; i < 256; i++) {
+    let s = inv(i), x = s;
+    for (let k = 0; k < 4; k++) { x = ((x << 1) | (x >> 7)) & 0xff; s ^= x; }
+    s ^= 0x63;
+    sbox[i] = s;
+  }
+  for (let i = 0; i < 256; i++) isbox[sbox[i]] = i;
+
+  function expandKey(key) {
+    const nk = key.length / 4;
+    const nr = nk + 6;
+    const w = [];
+    for (let i = 0; i < nk; i++) w.push([key[4 * i], key[4 * i + 1], key[4 * i + 2], key[4 * i + 3]]);
+    let rcon = 1;
+    for (let i = nk; i < 4 * (nr + 1); i++) {
+      let t = w[i - 1].slice();
+      if (i % nk === 0) {
+        t = [sbox[t[1]] ^ rcon, sbox[t[2]], sbox[t[3]], sbox[t[0]]];
+        rcon = mul(rcon, 2);
+      } else if (nk > 6 && i % nk === 4) {
+        t = [sbox[t[0]], sbox[t[1]], sbox[t[2]], sbox[t[3]]];
+      }
+      const prev = w[i - nk];
+      w.push([prev[0] ^ t[0], prev[1] ^ t[1], prev[2] ^ t[2], prev[3] ^ t[3]]);
+    }
+    return { w: w, nr: nr };
+  }
+
+  function addRoundKey(st, w, round) {
+    for (let c = 0; c < 4; c++) {
+      const k = w[round * 4 + c];
+      for (let r = 0; r < 4; r++) st[r][c] ^= k[r];
+    }
+  }
+  function invShiftRows(st) {
+    for (let r = 1; r < 4; r++) {
+      const row = [st[r][0], st[r][1], st[r][2], st[r][3]];
+      for (let c = 0; c < 4; c++) st[r][(c + r) % 4] = row[c];
+    }
+  }
+  function invSubBytes(st) {
+    for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) st[r][c] = isbox[st[r][c]];
+  }
+  function invMixColumns(st) {
+    for (let c = 0; c < 4; c++) {
+      const a0 = st[0][c], a1 = st[1][c], a2 = st[2][c], a3 = st[3][c];
+      st[0][c] = mul(a0, 14) ^ mul(a1, 11) ^ mul(a2, 13) ^ mul(a3, 9);
+      st[1][c] = mul(a0, 9) ^ mul(a1, 14) ^ mul(a2, 11) ^ mul(a3, 13);
+      st[2][c] = mul(a0, 13) ^ mul(a1, 9) ^ mul(a2, 14) ^ mul(a3, 11);
+      st[3][c] = mul(a0, 11) ^ mul(a1, 13) ^ mul(a2, 9) ^ mul(a3, 14);
+    }
+  }
+  function decryptBlock(block, w, nr) {
+    const st = [[], [], [], []];
+    for (let c = 0; c < 4; c++) for (let r = 0; r < 4; r++) st[r][c] = block[4 * c + r];
+    addRoundKey(st, w, nr);
+    for (let round = nr - 1; round >= 1; round--) {
+      invShiftRows(st);
+      invSubBytes(st);
+      addRoundKey(st, w, round);
+      invMixColumns(st);
+    }
+    invShiftRows(st);
+    invSubBytes(st);
+    addRoundKey(st, w, 0);
+    const out = new Uint8Array(16);
+    for (let c = 0; c < 4; c++) for (let r = 0; r < 4; r++) out[4 * c + r] = st[r][c];
+    return out;
+  }
+  return { decryptBlock: decryptBlock, expandKey: expandKey };
+})();
+
+function aesCbcDecrypt(key, iv, data) {
+  const ks = MiniAES.expandKey(key);
+  const out = new Uint8Array(data.length);
+  let prev = iv;
+  for (let off = 0; off < data.length; off += 16) {
+    const block = data.subarray(off, off + 16);
+    const plain = MiniAES.decryptBlock(block, ks.w, ks.nr);
+    for (let i = 0; i < 16; i++) out[off + i] = plain[i] ^ prev[i];
+    prev = block;
+  }
+  return out;
+}
+
+function toBytes(c) {
+  if (c instanceof Uint8Array) return c;
+  if (typeof c === "string") {
+    const out = new Uint8Array(c.length);
+    for (let i = 0; i < c.length; i++) out[i] = c.charCodeAt(i) & 0xff;
+    return out;
+  }
+  return new Uint8Array(c || []);
+}
+function b64bytes(s) {
+  const bin = atob(String(s || ""));
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+function catBytes() {
+  let len = 0;
+  for (let i = 0; i < arguments.length; i++) len += arguments[i].length;
+  const out = new Uint8Array(len);
+  let o = 0;
+  for (let i = 0; i < arguments.length; i++) { out.set(arguments[i], o); o += arguments[i].length; }
+  return out;
+}
+function le32(n) {
+  const b = new Uint8Array(4);
+  b[0] = n & 0xff; b[1] = (n >>> 8) & 0xff; b[2] = (n >>> 16) & 0xff; b[3] = (n >>> 24) & 0xff;
+  return b;
+}
+function utf16leBytes(s) {
+  const out = new Uint8Array(s.length * 2);
+  for (let i = 0; i < s.length; i++) {
+    const c = s.charCodeAt(i);
+    out[2 * i] = c & 0xff; out[2 * i + 1] = c >> 8;
+  }
+  return out;
+}
+async function sha(algo, data) {
+  return new Uint8Array(await crypto.subtle.digest(algo, data));
+}
+
+async function agileIteratedHash(salt, password, spinCount, hashAlgo) {
+  let h = await sha(hashAlgo, catBytes(salt, utf16leBytes(password)));
+  const counter = new Uint8Array(4);
+  for (let i = 0; i < spinCount; i++) {
+    counter[0] = i & 0xff; counter[1] = (i >>> 8) & 0xff; counter[2] = (i >>> 16) & 0xff; counter[3] = (i >>> 24) & 0xff;
+    h = await sha(hashAlgo, catBytes(counter, h));
+  }
+  return h;
+}
+async function agileKeyFromHash(h, blockKey, hashAlgo, keyBytes) {
+  const f = await sha(hashAlgo, catBytes(h, blockKey));
+  return f.slice(0, keyBytes);
+}
+
+async function decryptXlsx(bytes, password) {
+  const CFB = XLSX.CFB;
+  if (!CFB) throw new Error("암호 해제 도구 없음");
+  const cfb = CFB.read(bytes, { type: "array" });
+  const infoEntry = CFB.find(cfb, "EncryptionInfo") || CFB.find(cfb, "EncryptionInfoStream");
+  const pkgEntry = CFB.find(cfb, "EncryptedPackage") || CFB.find(cfb, "EncryptedPackageStream");
+  if (!infoEntry || !pkgEntry) throw new Error("암호 형식이 아니에요");
+
+  const info = toBytes(infoEntry.content);
+  let xml = "";
+  try { xml = new TextDecoder("utf-8").decode(info.slice(8)); } catch (e) {}
+  if (xml.indexOf("<encryption") < 0) throw new Error("지원하지 않는 암호 방식(XOR/표준)이에요");
+
+  const doc = new DOMParser().parseFromString(xml, "application/xml");
+  const findEl = (name) => {
+    const all = doc.getElementsByTagName("*");
+    for (let i = 0; i < all.length; i++) if (all[i].localName === name) return all[i];
+    return null;
+  };
+  const encKeyEl = findEl("encryptedKey");   // 비밀번호 키 암호화기
+  const keyDataEl = findEl("keyData");
+  const getAttr = (el, name) => (el && el.getAttribute(name)) || null;
+  const src = encKeyEl || keyDataEl;
+  if (!src) throw new Error("암호 정보를 읽지 못했어요");
+
+  const encSalt = b64bytes(getAttr(src, "saltValue"));
+  const spinCount = Math.min(parseInt(getAttr(src, "spinCount") || "100000", 10), 10000000);
+  const keyBits = parseInt(getAttr(src, "keyBits") || "256", 10);
+  const blockSize = parseInt(getAttr(src, "blockSize") || "16", 10);
+  const hashSize = parseInt(getAttr(src, "hashSize") || "64", 10);
+  const hashAlgoMap = { SHA1: "SHA-1", SHA256: "SHA-256", SHA384: "SHA-384", SHA512: "SHA-512" };
+  const hashAlgo = hashAlgoMap[(getAttr(src, "hashAlgorithm") || "SHA512").toUpperCase()] || "SHA-512";
+  if ((getAttr(src, "cipherAlgorithm") || "AES").toUpperCase() !== "AES") throw new Error("AES 암호만 열 수 있어요");
+
+  const BK_IN = new Uint8Array([0xfe, 0xa7, 0xd2, 0x76, 0x3b, 0x4b, 0x9e, 0x79]);
+  const BK_H = new Uint8Array([0xd7, 0xaa, 0x0f, 0x6d, 0x30, 0x61, 0x34, 0x4e]);
+  const BK_ENCKEY = new Uint8Array([0x14, 0x6e, 0x0b, 0xe7, 0xab, 0xac, 0xd0, 0xd6]);
+  const ivSalt = encSalt.slice(0, blockSize);
+
+  const h = await agileIteratedHash(encSalt, password, spinCount, hashAlgo);
+  const keyInput = await agileKeyFromHash(h, BK_IN, hashAlgo, keyBits / 8);
+  const keyHash = await agileKeyFromHash(h, BK_H, hashAlgo, keyBits / 8);
+
+  const encInput = b64bytes(getAttr(src, "encryptedVerifierHashInput"));
+  const encHash = b64bytes(getAttr(src, "encryptedVerifierHashValue"));
+  if (!encInput.length || !encHash.length) throw new Error("암호 검증 값을 찾지 못했어요");
+  const okInput = aesCbcDecrypt(keyInput, ivSalt, encInput);
+  const okHash = aesCbcDecrypt(keyHash, ivSalt, encHash);
+  const verifier = await sha(hashAlgo, okInput);
+  for (let i = 0; i < Math.min(hashSize, verifier.length); i++) {
+    if (verifier[i] !== okHash[i]) throw new Error("비밀번호가 맞지 않아요");
+  }
+
+  let key;
+  const encKeyValue = getAttr(src, "encryptedKeyValue");
+  if (encKeyValue) {
+    const keyEnc = await agileKeyFromHash(h, BK_ENCKEY, hashAlgo, keyBits / 8);
+    key = aesCbcDecrypt(keyEnc, ivSalt, b64bytes(encKeyValue)).slice(0, keyBits / 8);
+  } else {
+    key = await agileKeyFromHash(h, new Uint8Array(0), hashAlgo, keyBits / 8);
+  }
+
+  const pkgSalt = keyDataEl ? b64bytes(getAttr(keyDataEl, "saltValue")) : encSalt;
+  const pkg = toBytes(pkgEntry.content);
+  let total = 0;
+  for (let i = 7; i >= 0; i--) total = total * 256 + pkg[i];
+  const enc = pkg.slice(8);
+  const out = new Uint8Array(enc.length);
+  const segmentSize = 4096;
+  for (let off = 0, idx = 0; off < enc.length; off += segmentSize, idx++) {
+    const seg = enc.subarray(off, Math.min(off + segmentSize, enc.length));
+    const padded = new Uint8Array(Math.ceil(seg.length / 16) * 16);
+    padded.set(seg);
+    const iv = (await sha(hashAlgo, catBytes(pkgSalt, le32(idx)))).slice(0, blockSize);
+    out.set(aesCbcDecrypt(key, iv, padded), off);
+  }
+  return out.slice(0, total);
+}
+
+/* ==== 60-ocr.js ==== */
+/* ============================================================
+   무료 OCR (Tesseract.js, 브라우저 안에서만)
+   ============================================================ */
+let ocrRows = [];
+let ocrBusy = false;
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = src; s.async = true;
+    s.onload = resolve;
+    s.onerror = () => reject(new Error("불러오지 못했어요"));
+    document.head.appendChild(s);
+  });
+}
+async function ensureTesseract() {
+  if (window.Tesseract) return;
+  try {
+    await loadScript("https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js");
+  } catch (e) {
+    throw new Error("글자 인식 도구를 불러오지 못했어요 (인터넷 확인)");
+  }
+}
+
+function bindOcr() {
+  $("#btnOcr").addEventListener("click", () => {
+    imgMode = "txn";
+    $("#fileImg").value = "";
+    $("#fileImg").click();
+  });
+  $("#fileImg").addEventListener("change", ev => {
+    const files = Array.prototype.slice.call(ev.target.files || []);
+    if (files.length) runOcrFiles(files, imgMode);
+  });
+  $("#ocrTable").addEventListener("change", ev => {
+    const i = Number(ev.target.getAttribute("data-i"));
+    const f = ev.target.getAttribute("data-f");
+    if (isNaN(i) || !f || !ocrRows[i]) return;
+    if (f === "on") ocrRows[i].on = ev.target.checked;
+    else if (f === "amount") ocrRows[i].amount = num(ev.target.value);
+    else ocrRows[i][f] = ev.target.value;
+    const cnt = $("#ocrCount");
+  if (cnt) cnt.textContent = ocrRows.filter(r => r.on).length;
+  });
+  $("#ocrConfirm").addEventListener("click", () => {
+    const sel = ocrRows.filter(r => r.on && r.amount > 0);
+    let n = 0;
+    sel.forEach(r => {
+      const t = addTxn({
+        date: r.date || dateForMonth(uiMonth), amount: r.amount, memo: r.memo || "캡처 결제",
+        cat: r.cat, fixed: r.fixed, cardId: r.cardId || PAY_CASH, installment: false
+      });
+      if (t) n++;
+    });
+    touch(); closeModal("mOcr"); renderAll();
+    toast(n + "건을 가계부에 반영했어요");
+  });
+}
+
+async function runOcrFiles(files, mode) {
+  if (ocrBusy) { toast("아직 읽는 중이에요"); return; }
+  ocrBusy = true;
+  const msgBox = mode === "pick" ? $("#pocrMsg") : $("#ocrMsg");
+  if (mode === "pick") openPickOcr([], "글자 인식 도구를 준비하는 중…");
+  else { ocrRows = []; $("#ocrMsg").textContent = "글자 인식 도구를 준비하는 중…"; renderOcr(); openModal("mOcr"); }
+  let worker = null;
+  try {
+    await ensureTesseract();
+    const lines = [];
+    worker = await Tesseract.createWorker("kor+eng", 1, {
+      logger: m => {
+        if (m && /recognizing|loading|initializ/.test(m.status || "")) {
+          const pct = Math.round((m.progress || 0) * 100);
+          if (msgBox) msgBox.textContent = "📷 글자를 읽는 중… " + pct + "%";
+        }
+      }
+    });
+    for (let i = 0; i < files.length; i++) {
+      const res = await worker.recognize(files[i]);
+      String((res && res.data && res.data.text) || "").split(/\n+/).forEach(l => lines.push(l.trim()));
+    }
+    await worker.terminate().catch(() => {});
+    worker = null;
+    if (mode === "pick") {
+      const rows = pickOcrFromLines(lines);
+      openPickOcr(rows, rows.length
+        ? "📷 캡처에서 <b>" + rows.length + "건</b>을 읽었어요 · 가맹점·혜택·기간을 확인하고 담아 주세요"
+        : "📷 Pick 목록을 찾지 못했어요 · 더 선명한 캡처로 다시 시도하거나 [＋ Pick]으로 직접 담아 주세요");
+    } else {
+      ocrRows = parseOcrLines(lines);
+      $("#ocrMsg").innerHTML = ocrRows.length
+        ? "📷 <b>" + ocrRows.length + "건</b>을 읽었어요 · 잘못 읽힌 숫자만 고쳐 주세요"
+        : "읽어낸 결제 내역이 없어요 · 결제 목록이 크게 보이는 캡처로 다시 시도해 주세요";
+      renderOcr();
+    }
+  } catch (e) {
+    console.warn("ocr failed", e);
+    const msg = "글자를 읽지 못했어요: " + (e.message || e);
+    if (mode === "pick") openPickOcr([], msg); else { $("#ocrMsg").textContent = msg; }
+  } finally {
+    if (worker) { try { await worker.terminate(); } catch (e) {} }
+    ocrBusy = false;
+    $("#fileImg").value = "";
+  }
+}
+
+/* OCR 줄 → 결제 내역 후보 */
+function parseOcrLines(lines) {
+  const rows = [];
+  const seen = {};
+  lines.forEach(raw => {
+    const line = String(raw || "").replace(/\s+/g, " ").trim();
+    if (line.length < 4) return;
+    const amountM = line.match(/([0-9][0-9,]{2,})\s*원/);
+    if (!amountM) return;
+    let amount = num(amountM[1]);
+    if (!amount) return;
+    if (/잔액|누적|포인트|한도/.test(line.slice(0, amountM.index))) return;
+    const isTransfer = /이체|입금|출금|충전/.test(line);
+    const dateM = line.match(/(20\d{2})[.\-\/](\d{1,2})[.\-\/](\d{1,2})/) || line.match(/(\d{1,2})[.\-\/](\d{1,2})/);
+    let date = "";
+    if (dateM && dateM.length === 4) date = dateM[1] + "-" + pad2(dateM[2]) + "-" + pad2(dateM[3]);
+    else if (dateM) {
+      const y = new Date().getFullYear();
+      date = y + "-" + pad2(dateM[1]) + "-" + pad2(dateM[2]);
+      if (monthOf(date) > monthOf(todayISO())) date = (y - 1) + "-" + pad2(dateM[1]) + "-" + pad2(dateM[2]);
+    }
+    if (!date) date = dateForMonth(uiMonth);
+    let memo = line
+      .replace(/(20\d{2})[.\-\/]\d{1,2}[.\-\/]\d{1,2}/g, " ")
+      .replace(/\d{1,2}[.\-\/]\d{1,2}/g, " ")
+      .replace(/\d{1,2}:\d{2}/g, " ")
+      .replace(/[0-9][0-9,]*\s*원/g, " ")
+      .replace(/\[[^\]]*\]/g, " ")
+      .replace(/(승인|결제|사용|취소|일시불|할부|체크|신용|카드|누적|잔액|정상|완료)/g, " ")
+      .replace(/(KB국민|KB|국민|하나|현대|신한|삼성|우리|롯데|카카오뱅크|네이버페이|토스)/g, " ")
+      .replace(/[_|]/g, " ")
+      .replace(/\b[A-Za-z0-9]{1,2}\b/g, " ")
+      .replace(/[^\w가-힣\s&·.\-]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    memo = memo.slice(0, 40) || "캡처 결제";
+    const key = date + "|" + amount + "|" + normKey(memo);
+    if (seen[key]) return;
+    seen[key] = 1;
+    const cat = guessCategory(memo + " " + line, "");
+    rows.push({
+      on: !isTransfer, date: date, memo: memo, amount: amount, cat: cat,
+      fixed: catFixedDefault(cat), cardId: matchCardId(line), transfer: isTransfer
+    });
+  });
+  return rows.slice(0, 60);
+}
+
+function renderOcr() {
+  const tbl = $("#ocrTable");
+  const cardOpts = (sel) => state.cards.map(c => '<option value="' + esc(c.id) + '"' + (c.id === sel ? " selected" : "") + ">" + esc(c.short || c.name) + "</option>").join("") +
+    '<option value="' + PAY_CASH + '"' + (sel === PAY_CASH ? " selected" : "") + ">현금</option>" +
+    '<option value="' + PAY_GIFT + '"' + (sel === PAY_GIFT ? " selected" : "") + ">기프티콘</option>" +
+    '<option value=""' + (!sel ? " selected" : "") + ">기타</option>";
+  const head = "<thead><tr><th>담기</th><th>날짜</th><th>내용</th><th>분류</th><th>결제</th><th>금액</th></tr></thead>";
+  const body = ocrRows.map((r, i) =>
+    '<tr class="' + (r.transfer ? "off" : "") + '" data-i="' + i + '">' +
+      '<td style="text-align:center"><input type="checkbox" data-f="on" data-i="' + i + '"' + (r.on ? " checked" : "") + ' style="width:16px;height:16px;accent-color:#5C7F68;border:0;padding:0"></td>' +
+      '<td><input type="date" class="w90" data-f="date" data-i="' + i + '" value="' + esc(r.date) + '"></td>' +
+      '<td><input data-f="memo" data-i="' + i + '" value="' + esc(r.memo) + '" style="min-width:110px"></td>' +
+      '<td><select data-f="cat" data-i="' + i + '">' + CATS.map(c => '<option value="' + esc(c.n) + '"' + (c.n === r.cat ? " selected" : "") + ">" + esc(c.n) + "</option>").join("") + "</select></td>" +
+      '<td><select data-f="cardId" data-i="' + i + '">' + cardOpts(r.cardId) + "</select></td>" +
+      '<td class="num"><input class="w90" data-f="amount" data-i="' + i + '" inputmode="numeric" value="' + fmt(r.amount) + '"></td>' +
+    "</tr>").join("");
+  tbl.innerHTML = head + "<tbody>" + (body || '<tr><td colspan="6" style="text-align:center;color:#B7AC9C;padding:18px">읽어낸 내역이 없어요</td></tr>') + "</tbody>";
+  const cnt = $("#ocrCount");
+  if (cnt) cnt.textContent = ocrRows.filter(r => r.on).length;
+}
+
+/* ==== 65-inbox.js ==== */
+/* ============================================================
+   아이폰 단축어 → Firebase inbox 자동 기록
+   ============================================================ */
+function pickAmountFromText(t) {
+  const re = /([0-9][0-9,]{2,})\s*원/g;
+  let m, best = 0;
+  while ((m = re.exec(t)) !== null) {
+    const before = t.slice(Math.max(0, m.index - 6), m.index);
+    if (/잔액|한도|누적|포인트|잔여/.test(before)) continue;
+    const v = num(m[1]);
+    if (v > 0) { best = v; break; }
+  }
+  return best;
+}
+
+function parseSmsText(text, extra) {
+  const out = [];
+  if (text == null) return out;
+  const raw = String(text).trim();
+  if (!raw) return out;
+
+  // JSON 한 덩어리
+  if (/^[{\[]/.test(raw)) {
+    try {
+      const j = JSON.parse(raw);
+      const list = Array.isArray(j) ? j : [j];
+      list.forEach(it => {
+        if (!it) return;
+        const amt = num(it.amount || it.amt || it.price || it.금액);
+        const merch = String(it.merchant || it.memo || it.name || it.가맹점 || "").trim();
+        if (amt > 0) {
+          out.push({
+            amount: amt, memo: merch || "결제",
+            date: it.date ? parseDateCell(it.date) || todayISO() : todayISO(),
+            cardId: it.card ? matchCardId(it.card) : "",
+            cat: guessCategory(merch + " " + raw, ""),
+            fixed: catFixedDefault(guessCategory(merch + " " + raw, ""))
+          });
+        } else if (it.raw || it.text) {
+          parseSmsText(it.raw || it.text, extra).forEach(x => out.push(x));
+        }
+      });
+      return out;
+    } catch (e) { /* 문자열로 계속 */ }
+  }
+
+  if (/승인\s*취소|취소\s*승인|거절|실패|미승인/.test(raw)) return out;
+  if (/이체|입금|출금|잔액\s*조회|자동이체|충전/.test(raw) && !/승인|결제/.test(raw)) return out;
+
+  const amount = pickAmountFromText(raw);
+  if (!amount) return out;
+
+  let cardId = matchCardId(raw);
+  const bracket = (raw.match(/^\[([^\]]+)\]/) || [])[1] || "";
+  if (!cardId && bracket) cardId = matchCardId(bracket);
+
+  let date = todayISO();
+  const dm = raw.match(/(20\d{2})[.\-\/](\d{1,2})[.\-\/](\d{1,2})/);
+  if (dm) date = dm[1] + "-" + pad2(dm[2]) + "-" + pad2(dm[3]);
+  else {
+    const m2 = raw.match(/(\d{1,2})\s*[\/.월]\s*(\d{1,2})/);
+    if (m2) {
+      const y = new Date().getFullYear();
+      let d = y + "-" + pad2(m2[1]) + "-" + pad2(m2[2]);
+      if (monthOf(d) > monthOf(todayISO())) d = (y - 1) + "-" + pad2(m2[1]) + "-" + pad2(m2[2]);
+      date = d;
+    }
+  }
+
+  let memo = raw
+    .replace(/^\[[^\]]*\]\s*/, " ")
+    .replace(/\([^)]*\)/g, " ")
+    .replace(/(20\d{2})[.\-\/]\d{1,2}[.\-\/]\d{1,2}/g, " ")
+    .replace(/\d{1,2}\s*[\/.]\s*\d{1,2}/g, " ")
+    .replace(/\d{1,2}:\d{2}(:\d{2})?/g, " ")
+    .replace(/[0-9][0-9,]*\s*원/g, " ")
+    .replace(/(승인|결제|사용|일시불|할부|체크|신용|카드|누적|잔액|정상|완료|승인번호|가맹점|원)/g, " ")
+    .replace(/[0-9]{4,}/g, " ")
+    .replace(/[^\w가-힣\s&·.\-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  memo = memo.slice(0, 40) || "카드 결제";
+  const cat = guessCategory(memo + " " + raw, "");
+  out.push({
+    amount: amount, memo: memo, date: date, cardId: cardId,
+    cat: cat, fixed: catFixedDefault(cat),
+    installment: /무이자\s?할부|할부/.test(raw) && !/일시불/.test(raw)
+  });
+  return out.slice(0, 5);
+}
+
+function ingestInboxItem(v, key) {
+  let items = [];
+  if (v == null) return 0;
+  if (typeof v === "string") items = parseSmsText(v);
+  else if (typeof v === "object") {
+    const rawText = v.raw || v.text || v.body || v.message || "";
+    const amt = num(v.amount || v.amt || v.금액);
+    if (amt > 0) {
+      const merch = String(v.merchant || v.memo || v.name || v.가맹점 || "").trim() || "결제";
+      const cat = guessCategory(merch, "");
+      items = [{
+        amount: amt, memo: merch, date: v.date ? parseDateCell(v.date) || todayISO() : todayISO(),
+        cardId: v.card ? matchCardId(v.card) : "", cat: cat, fixed: catFixedDefault(cat)
+      }];
+    }
+    if (!items.length && rawText) items = parseSmsText(rawText);
+  }
+  let n = 0;
+  items.forEach(it => {
+    const t = addTxn({
+      date: it.date || todayISO(), amount: it.amount, memo: it.memo,
+      cat: it.cat, fixed: it.fixed, cardId: it.cardId || PAY_CASH,
+      installment: !!it.installment, src: "shortcut"
+    });
+    if (t) n++;
+  });
+  return n;
+}
+
+/* ==== 90-boot.js ==== */
+/* ============================================================
+   boot
+   ============================================================ */
+function boot() {
+  loadLocal();
+  fillSelects();
+  bindMonthNav();
+  bindQuick();
+  bindModals();
+  bindDelegates();
+  bindSettings();
+  bindShortcut();
+  bindImport();
+  bindPass();
+  bindOcr();
+  bindPicks();
+  bindPickOcr();
+  renderAll();
+  initSync();
+
+  window.addEventListener("load", () => {
+    drawBarcodes();
+    if (window.JsBarcode) renderGifts();
+  });
+  // 배경에서 조용히 최신 상태 유지
+  setInterval(() => { if (syncKind !== "on") saveLocal(); }, 15000);
+
+  // 테스트/디버그용
+  window.__wallet = {
+    get state() { return state; },
+    room: Room,
+    addTxn: addTxn,
+    touch: touch,
+    saveLocal: saveLocal,
+    renderAll: renderAll,
+    cardStats: cardStats,
+    savedTotal: savedTotal,
+    pickSaving: pickSaving,
+    giftSaving: giftSaving,
+    parseSmsText: parseSmsText,
+    ingestInboxItem: ingestInboxItem,
+    pickOcrFromLines: pickOcrFromLines,
+    parseOcrLines: parseOcrLines,
+    parseWorkbook: parseWorkbook,
+    toggleTxnFixed: toggleTxnFixed,
+    openTxn: openTxn,
+    openPickModal: openPickModal,
+    savePick: savePick,
+    setMonth: function (m) { uiMonth = m; rememberMonth(); renderAll(); },
+    get month() { return uiMonth; }
+  };
+}
+
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+else boot();
+
+</script>
+</body>
+</html>
