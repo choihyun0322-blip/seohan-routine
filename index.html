@@ -7621,8 +7621,8 @@ function iconSVG(key) {
         morning: state.settings.morning,
         evening: state.settings.evening,
         homework: state.settings.homework,
-        supplies: state.settings.supplies,
-        cheerTts: !!state.settings.cheerTts
+        supplies: state.settings.supplies
+        /* cheerTts 는 기기마다 다른 설정이라 구름에 올리지 않아요 */
       }
     };
   }
@@ -7741,7 +7741,6 @@ function iconSVG(key) {
       if (Array.isArray(s.evening)) state.settings.evening = sanitizeItems('evening', s.evening, DEFAULT_EVENING);
       if (Array.isArray(s.homework)) state.settings.homework = sanitizeItems('homework', s.homework, DEFAULT_HOMEWORK);
       if (s.supplies && typeof s.supplies === 'object') state.settings.supplies = sanitizeSupplies(s.supplies);
-      if (typeof s.cheerTts === 'boolean') state.settings.cheerTts = s.cheerTts;
       try { pruneDaily(); } catch (e) { /* 무시 */ }
     }
     if (p.sight) state.sight = sanitizeSight(p.sight);
