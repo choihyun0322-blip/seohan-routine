@@ -1075,6 +1075,22 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
 .sync-pill.wait{color:#a16207}
 .sync-pill .txt{max-width:7.4rem; overflow:hidden; text-overflow:ellipsis}
 
+/* ---- 🔄 최신 버전 새로고침 + 버전 표기 ---- */
+.refresh-btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:2rem; height:2rem; padding:0; border-radius:999px;
+  background:#fff; border:2px solid #ece9f7; box-shadow:0 2px 0 rgba(42,42,60,.06);
+  cursor:pointer; color:#6b6880; flex:0 0 auto; -webkit-tap-highlight-color:transparent;
+}
+.refresh-btn:active{transform:translateY(2px); box-shadow:none}
+.refresh-btn .refresh-ico{font-size:.9rem; line-height:1; display:block}
+.refresh-btn.busy .refresh-ico{animation:spinOnce .9s linear infinite}
+@keyframes spinOnce{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.app-ver{
+  font-size:.58rem; font-weight:900; letter-spacing:.02em; color:#a5a2b8;
+  white-space:nowrap; user-select:none; -webkit-user-select:none;
+}
+
 .cheer-btn{
   display:inline-flex; align-items:center; gap:.28rem; height:2rem; padding:0 .6rem;
   border-radius:999px; background:linear-gradient(180deg,#fff0f6,#ffd9e8);
@@ -1088,6 +1104,7 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
 @media (max-width:900px){
   .sync-pill .txt{display:none}
   .sync-pill{width:2rem; padding:0; justify-content:center}
+  .app-ver{display:none}
   .cheer-btn-txt{display:none}
   .cheer-btn{width:2rem; padding:0; justify-content:center}
 }
@@ -1692,6 +1709,10 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
       <button class="sync-pill off" id="syncDot" type="button" aria-live="polite">
         <span class="dot off" aria-hidden="true"></span><span class="txt" id="syncDotText">오프라인</span>
       </button>
+      <button class="refresh-btn" id="btnRefreshApp" type="button" aria-label="최신 버전으로 새로고침" title="최신 버전으로 새로고침">
+        <span class="refresh-ico" aria-hidden="true">🔄</span>
+      </button>
+      <span class="app-ver" id="appVer" title="앱 버전">v5.3.0</span>
       <button class="wake-btn" id="btnWakeQuick" type="button" aria-pressed="false" aria-label="화면 켜짐 유지" title="화면 켜짐 유지">
         <span class="wake-ico" id="wakeQuickIcon" aria-hidden="true">🌙</span><span class="wake-txt" id="wakeQuickText">꺼짐</span>
       </button>
@@ -13607,6 +13628,10 @@ function iconSVG(key) {
   ============================================================ */
   var STORAGE_KEY = 'seohan-numberblocks-routine-v1';
   var STORAGE_VERSION = 5;            /* v5: ☁️ 실시간 동기화 · 💌 응원 · 🧩 넘버블럭스 도감 */
+  var APP_VERSION = '5.3.0';          /* v5.3: 도장 취소·중복 발행 수정 · 🔄 새로고침 버튼 */
+  var APP_BUILT = '2026-11-21';
+  var CELEBRATE_UNDO_MS = 10000;      /* 전체 완료 후 10초 안에 취소하면 축하·도감 해금을 되돌려요 */
+  var UNDO_TTL = 90 * 1000;           /* 방금 취소한 체크는 90초 동안 원격 상태보다 우선해요 */
   var AUTO_TAB_MIN = 15 * 60;         /* 오후 3시부터는 방과 후 탭을 먼저 보여줘요 */
   var WEEK_ORDER = ['mon', 'tue', 'wed', 'thu', 'fri'];
   var WEEK_KEY_BY_DAY = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
@@ -14424,8 +14449,25 @@ function iconSVG(key) {
       date: date, morning: {}, evening: {}, homework: {}, supplies: {}, order: [],
       sight: { pos: 0, ok: 0, no: 0, last: '' },
       sightBonus: 0,
-      celebrated: { morning: false, evening: false, homework: false, sight: false }
+      celebrated: { morning: false, evening: false, homework: false, sight: false },
+      cele: {},           /* kind → { at: 축하한 시각, n: 그때 해금한 넘버블럭스 } */
+      undo: []            /* 방금 취소한 체크 { k: '아침:id', at } — 원격 동기화가 되살리지 못하게 */
     };
+  }
+  /* cele 기록은 화면 표시용 보조 정보라 형식이 어질어지면 버려요 */
+  function sanitizeCele(raw) {
+    var out = {};
+    if (!raw || typeof raw !== 'object') return out;
+    for (var k in raw) {
+      if (!Object.prototype.hasOwnProperty.call(raw, k)) continue;
+      var v = raw[k];
+      if (!v || typeof v !== 'object') continue;
+      var at = Math.max(0, Math.round(Number(v.at) || 0));
+      var n = Math.max(0, Math.round(Number(v.n) || 0));
+      if (!at) continue;
+      out[String(k)] = { at: at, n: n };
+    }
+    return out;
   }
   function baseSettings() {
     return {
@@ -14678,6 +14720,14 @@ function iconSVG(key) {
         fd.celebrated.homework = !!day.celebrated.homework;
         fd.celebrated.sight = !!day.celebrated.sight;
       }
+      fd.cele = sanitizeCele(day.cele);
+      if (Array.isArray(day.undo) && day.undo.length) {
+        for (var ui = 0; ui < day.undo.length && ui < 60; ui++) {
+          var ue = day.undo[ui];
+          if (!ue || typeof ue.k !== 'string' || !(Number(ue.at) > 0)) continue;
+          fd.undo.push({ k: ue.k.slice(0, 80), at: Math.round(Number(ue.at)) });
+        }
+      }
       if (day.sight && typeof day.sight === 'object') {
         fd.sight = {
           pos: Math.max(0, Math.min(5, Math.round(Number(day.sight.pos) || 0))),
@@ -14728,6 +14778,7 @@ function iconSVG(key) {
   currentLang = state.settings.lang === 'ko' ? 'ko' : 'en';
 
   var storageOK = true;
+  var saveLocalSilent = false;   /* 기기 안에만 남는 값(날씨·소리 등)을 저장할 때 구름으로 올리지 않아요 */
   function save() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -14738,7 +14789,13 @@ function iconSVG(key) {
         toast(L('toastStorage'));
       }
     }
+    if (saveLocalSilent) return;
     cloudLocalChanged();
+  }
+  /* 구름 payload 에 들어가지 않는 값만 바뀌었을 때: 다른 기기의 최신 체크를 덮어쓰지 않도록 로컬만 저장 */
+  function saveLocalOnly() {
+    saveLocalSilent = true;
+    try { save(); } finally { saveLocalSilent = false; }
   }
 
   /* ============================================================
@@ -14762,6 +14819,80 @@ function iconSVG(key) {
     for (var i = 0; i < list.length; i++) if (bag[list[i].id]) n++;
     return n;
   }
+
+  /* 지금 체크된 항목만 순서대로 (order 에 빠진 것이 있어도 하나도 놓치지 않아요) */
+  function checkedKeys() {
+    var out = [], seen = {}, order = Array.isArray(state.daily.order) ? state.daily.order : [];
+    var kinds = ['morning', 'evening', 'homework'];
+    var i, k;
+    for (i = 0; i < order.length; i++) {
+      var key = order[i];
+      if (typeof key !== 'string' || seen[key]) continue;
+      var p = key.split(':');
+      if (p.length !== 2 || kinds.indexOf(p[0]) < 0) continue;
+      var bag = state.daily[p[0]] || {};
+      if (!bag[p[1]]) continue;
+      if (!itemById(p[0], p[1])) continue;
+      seen[key] = 1;
+      out.push({ key: key, kind: p[0], id: p[1] });
+    }
+    for (i = 0; i < kinds.length; i++) {
+      var kd = kinds[i], b = state.daily[kd] || {};
+      for (k in b) {
+        if (!Object.prototype.hasOwnProperty.call(b, k) || !b[k]) continue;
+        var kk = kd + ':' + k;
+        if (seen[kk]) continue;
+        if (!itemById(kd, k)) continue;
+        seen[kk] = 1;
+        out.push({ key: kk, kind: kd, id: k });
+      }
+    }
+    return out;
+  }
+
+  /* order 를 실제 체크된 항목과 똑같이 맞춰요 (중복·유령 항목·누락 정리) */
+  function reconcileOrder() {
+    if (!state.daily) return;
+    if (!Array.isArray(state.daily.order)) state.daily.order = [];
+    state.daily.order = checkedKeys().map(function (x) { return x.key; });
+  }
+
+  /* ---- 방금 취소한 체크 기억 (원격 상태가 되살리지 못하게) ---- */
+  function undoList() {
+    if (!Array.isArray(state.daily.undo)) state.daily.undo = [];
+    return state.daily.undo;
+  }
+  function markUndo(kind, id) {
+    var arr = undoList(), key = kind + ':' + String(id), now = Date.now(), hit = false;
+    var cutoff = now - 30 * 60 * 1000;
+    for (var i = arr.length - 1; i >= 0; i--) {
+      if (!arr[i] || !(Number(arr[i].at) > cutoff)) { arr.splice(i, 1); continue; }
+      if (arr[i].k === key) { arr[i].at = now; hit = true; }
+    }
+    if (!hit) arr.push({ k: key, at: now });
+    if (arr.length > 60) arr.splice(0, arr.length - 60);
+  }
+  function clearUndo(kind, id) {
+    var arr = undoList(), key = kind + ':' + String(id);
+    for (var i = arr.length - 1; i >= 0; i--) if (arr[i] && arr[i].k === key) arr.splice(i, 1);
+  }
+  /* 원격 상태가 remoteAt 시각 것이면, 그보다 나중에 취소한 체크는 지워요 */
+  function applyUndoMarks(remoteAt) {
+    var arr = undoList(), now = Date.now(), changed = false;
+    var cutoff = now - 30 * 60 * 1000;
+    for (var i = arr.length - 1; i >= 0; i--) {
+      if (!arr[i] || !(Number(arr[i].at) > cutoff)) continue;
+      var t = Number(arr[i].at) || 0;
+      if (remoteAt && t <= remoteAt) continue;
+      var p = String(arr[i].k).split(':');
+      if (p.length < 2) continue;
+      var kind = p[0], id = p.slice(1).join(':'), key = kind + ':' + id;
+      if (state.daily[kind] && state.daily[kind][id]) { delete state.daily[kind][id]; changed = true; }
+      var idx = (state.daily.order || []).indexOf(key);
+      if (idx >= 0) { state.daily.order.splice(idx, 1); changed = true; }
+    }
+    return changed;
+  }
   function earnedIn(daily) {
     if (!daily) return 0;
     return Object.keys(daily.morning || {}).length +
@@ -14769,10 +14900,14 @@ function iconSVG(key) {
       Object.keys(daily.homework || {}).length +
       0;   /* Sight Words 는 공부용 — 도장을 주지 않아요 */
   }
-  function earnedToday() { return earnedIn(state.daily); }
+  function earnedToday() { return checkedKeys().length; }
   function totalStickers() {
     var t = earnedToday();
-    for (var k in state.history) t += state.history[k].earned || 0;
+    for (var k in state.history) {
+      if (!Object.prototype.hasOwnProperty.call(state.history, k)) continue;
+      if (k === state.daily.date) continue;   /* 오늘 것은 이미 셌어요 (중복 합산 방지) */
+      t += state.history[k].earned || 0;
+    }
     return t;
   }
   function totalItems() {
@@ -14822,6 +14957,7 @@ function iconSVG(key) {
       if (p[0] === 'homework') return !!hIds[p[1]];
       return false;
     });
+    reconcileOrder();   /* 체크된 것과 도장 목록을 정확히 일치시켜요 */
   }
 
   function phaseAt(date, startMin, departMin) {
@@ -15039,7 +15175,7 @@ function iconSVG(key) {
           min: typeof mn === 'number' ? Math.round(mn) : temp,
           at: Date.now()
         };
-        save();
+        saveLocalOnly();   /* 날씨는 이 기기 화면용 — 구름 state 를 덮어쓰지 않아요 */
         renderWeather();
         clearTimeout(to);
         done();
@@ -15574,23 +15710,21 @@ function iconSVG(key) {
 
   function renderStamps(newKey) {
     var row = $('stampRow');
-    var order = state.daily.order.slice();
+    var keys = checkedKeys();
     row.innerHTML = '';
     var shown = 0;
-    for (var i = 0; i < order.length; i++) {
-      var p = order[i].split(':');
-      var it = itemById(p[0], p[1]);
+    for (var i = 0; i < keys.length; i++) {
+      var it = itemById(keys[i].kind, keys[i].id);
       if (!it) continue;
-      if (!state.daily[p[0]][p[1]]) continue;
       var st = document.createElement('div');
-      st.className = 'stamp' + (newKey && newKey === order[i] ? ' new' : '');
+      st.className = 'stamp' + (newKey && newKey === keys[i].key ? ' new' : '');
       st.title = itemLabel(it);
       st.innerHTML = nbSVG(it.num);
       row.appendChild(st);
       shown++;
     }
     $('stampEmpty').classList.toggle('hide', shown > 0);
-    var today = earnedToday();
+    var today = shown;
     $('stampTotal').textContent = Lf(today === 1 ? 'stampTodayOne' : 'stampToday', { n: today });
     var all = totalStickers();
     $('weekTotal').textContent = Lf(all === 1 ? 'weekTotalOne' : 'weekTotal', { n: all });
@@ -15601,11 +15735,12 @@ function iconSVG(key) {
     strip.innerHTML = '';
     var now = new Date();
     var total = Math.max(1, totalItems());
+    var todayEarned = earnedToday();
     for (var i = 6; i >= 0; i--) {
       var d = addDays(now, -i);
       var key = ymd(d);
       var earned = 0;
-      if (key === state.daily.date) earned = earnedIn(state.daily);
+      if (key === state.daily.date) earned = todayEarned;
       else if (state.history[key]) earned = state.history[key].earned || 0;
       var ratio = Math.max(0, Math.min(1, earned / total));
       var cell = document.createElement('div');
@@ -15676,10 +15811,14 @@ function iconSVG(key) {
       delete state.daily[kind][id];
       var idx = state.daily.order.indexOf(key);
       if (idx >= 0) state.daily.order.splice(idx, 1);
+      markUndo(kind, id);              /* 방금 취소 — 원격 상태가 되살리지 못하게 기억 */
     } else {
       state.daily[kind][id] = true;
       if (state.daily.order.indexOf(key) < 0) state.daily.order.push(key);
+      clearUndo(kind, id);
     }
+    reconcileOrder();
+    if (wasDone) maybeUndoCelebrate(kind);   /* 완료 직후 취소면 축하·도감 해금도 되돌림 */
     save();
     var row = rowEl;
     if (!row) {
@@ -15691,9 +15830,14 @@ function iconSVG(key) {
     if (row) {
       row.classList.toggle('done', !wasDone);
       row.setAttribute('aria-pressed', wasDone ? 'false' : 'true');
+      /* 같은 항목을 빠르게 여러 번 눌러도 애니메이션이 겹치지 않게 */
+      row.classList.remove('just-done');
       if (!wasDone) {
-        row.classList.add('just-done');
-        (function (el) { setTimeout(function () { el.classList.remove('just-done'); }, 520); })(row);
+        (function (el) {
+          void el.offsetWidth;
+          el.classList.add('just-done');
+          setTimeout(function () { el.classList.remove('just-done'); }, 520);
+        })(row);
       }
     }
     if (!wasDone) beep('stamp'); else beep('undo');
@@ -15713,9 +15857,53 @@ function iconSVG(key) {
     if (checkedCount(kind) !== items.length) return;
     if (state.daily.celebrated[kind]) return;
     state.daily.celebrated[kind] = true;
+    if (!state.daily.cele) state.daily.cele = {};
+    state.daily.cele[kind] = { at: Date.now(), n: 0 };
     save();
     celebrate(kind);
-    dexAward(kind);
+    var n = dexAward(kind);          /* 이때 해금한 넘버블럭스를 기록해 두면 되돌릴 수 있어요 */
+    if (n) {
+      var rec = state.daily.cele[kind] || { at: Date.now(), n: 0 };
+      rec.n = n;
+      state.daily.cele[kind] = rec;
+      save();
+    }
+  }
+
+  /* 마지막 항목을 눌렀다가 10초 안에 취소한 경우: 축하·도감 해금을 깨끗하게 되돌립니다 */
+  function maybeUndoCelebrate(kind) {
+    var items = itemsOf(kind);
+    if (!items.length) return;
+    if (checkedCount(kind) >= items.length) return;      /* 아직 다시 다 채웠어요 */
+    if (!state.daily.celebrated[kind]) return;
+    var rec = (state.daily.cele || {})[kind] || null;
+    var at = rec ? Number(rec.at) || 0 : 0;
+    if (!at) return;                                     /* 언제 축하했는지 모르면 건드리지 않아요 */
+    if (Date.now() - at > CELEBRATE_UNDO_MS) return;      /* 10초가 지났으면 그냥 획득으로 봐요 */
+    state.daily.celebrated[kind] = false;
+    var n = Number(rec.n) || 0;
+    if (n) {
+      var d = dexState();
+      var stampAt = Number(d.unlocked[String(n)]) || 0;
+      if (stampAt && stampAt >= at) {
+        /* 쿠폰 마일스톤을 이미 받았다면 그 아래로는 내리지 않아요 */
+        var after = dexCount() - 1, okDrop = true;
+        for (var i = 0; i < DEX_MILESTONES.length; i++) {
+          if (d.coupons[String(DEX_MILESTONES[i])] && after < DEX_MILESTONES[i]) okDrop = false;
+        }
+        if (okDrop) {
+          delete d.unlocked[String(n)];
+          delete d.seen[String(n)];
+          renderDexPill();
+          if (!dexModalHidden()) renderDexGrid();
+          if (dexPopOpen === n) hideDexPop();
+        }
+      }
+    }
+    delete state.daily.cele[kind];
+    var layer = $('celebrate');
+    if (layer) { layer.classList.remove('on'); layer.innerHTML = ''; }
+    if (celebrateTimer) { clearTimeout(celebrateTimer); celebrateTimer = null; }
   }
 
   function celebrateText(kind, word) {
@@ -19457,6 +19645,14 @@ function iconSVG(key) {
       fd.celebrated.homework = !!raw.celebrated.homework;
       fd.celebrated.sight = !!raw.celebrated.sight;
     }
+    fd.cele = sanitizeCele(raw.cele);
+    if (Array.isArray(raw.undo) && raw.undo.length) {
+      for (var ui = 0; ui < raw.undo.length && ui < 60; ui++) {
+        var ue = raw.undo[ui];
+        if (!ue || typeof ue.k !== 'string' || !(Number(ue.at) > 0)) continue;
+        fd.undo.push({ k: ue.k.slice(0, 80), at: Math.round(Number(ue.at)) });
+      }
+    }
     if (raw.sight && typeof raw.sight === 'object') {
       fd.sight = {
         pos: Math.max(0, Math.min(5, Math.round(Number(raw.sight.pos) || 0))),
@@ -19489,8 +19685,57 @@ function iconSVG(key) {
     return out;
   }
 
-  function cloudApply(p) {
-    if (!p || typeof p !== 'object') return;
+  /* 도감은 한 번 열린 친구가 절대 사라지지 않도록 합집합으로만 합쳐요 (중복 해금·기록 손실 방지) */
+  function mergeDexState(raw) {
+    var inc = sanitizeDex(raw), d = dexState(), changed = false, k;
+    for (k in inc.unlocked) {
+      if (!Object.prototype.hasOwnProperty.call(inc.unlocked, k)) continue;
+      if (!d.unlocked[k]) { d.unlocked[k] = inc.unlocked[k]; changed = true; }
+      else if (Number(inc.unlocked[k]) < Number(d.unlocked[k])) d.unlocked[k] = inc.unlocked[k];
+    }
+    for (k in inc.seen) if (inc.seen[k] && !d.seen[k]) { d.seen[k] = true; changed = true; }
+    for (k in inc.coupons) if (inc.coupons[k] && !d.coupons[k]) { d.coupons[k] = inc.coupons[k]; changed = true; }
+    for (k in inc.couponsUsed) if (inc.couponsUsed[k] && !d.couponsUsed[k]) { d.couponsUsed[k] = true; changed = true; }
+    return changed;
+  }
+
+  /* 날짜별 기록은 더 많이 받은 쪽을 남겨요 */
+  function mergeHistory(local, raw) {
+    var inc = sanitizeHistory(raw), out = local || {}, k;
+    for (k in inc) {
+      if (!Object.prototype.hasOwnProperty.call(inc, k)) continue;
+      if (!out[k]) { out[k] = inc[k]; continue; }
+      if (Number(inc[k].earned) > Number(out[k].earned)) out[k] = inc[k];
+    }
+    var keys = Object.keys(out).sort();
+    while (keys.length > 90) delete out[keys.shift()];
+    return out;
+  }
+
+  /* 취소 기록 두 벌을 합쳐요 (같은 항목은 더 나중 시각으로) */
+  function mergeUndo(a, b) {
+    var out = [], idx = {}, i, e;
+    var lists = [a || [], b || []];
+    for (i = 0; i < lists[0].length; i++) {
+      e = lists[0][i];
+      if (!e || typeof e.k !== 'string') continue;
+      if (idx[e.k] === undefined) { idx[e.k] = out.length; out.push({ k: e.k, at: Number(e.at) || 0 }); }
+      else if ((Number(e.at) || 0) > out[idx[e.k]].at) out[idx[e.k]].at = Number(e.at) || 0;
+    }
+    for (i = 0; i < lists[1].length; i++) {
+      e = lists[1][i];
+      if (!e || typeof e.k !== 'string') continue;
+      if (idx[e.k] === undefined) { idx[e.k] = out.length; out.push({ k: e.k, at: Number(e.at) || 0 }); }
+      else if ((Number(e.at) || 0) > out[idx[e.k]].at) out[idx[e.k]].at = Number(e.at) || 0;
+    }
+    out.sort(function (x, y) { return x.at - y.at; });
+    if (out.length > 60) out = out.slice(out.length - 60);
+    return out;
+  }
+
+  function cloudApply(p, at) {
+    if (!p || typeof p !== 'object') return false;
+    var extra = false, k;
     var s = p.settings;
     if (s && typeof s === 'object') {
       if (typeof s.startTime === 'string' && /^\d{1,2}:\d{2}$/.test(s.startTime)) state.settings.startTime = normTime(s.startTime, state.settings.startTime);
@@ -19502,11 +19747,26 @@ function iconSVG(key) {
       try { pruneDaily(); } catch (e) { /* 무시 */ }
     }
     if (p.sight) state.sight = sanitizeSight(p.sight);
-    if (p.dex) state.dex = sanitizeDex(p.dex);
-    if (p.history) state.history = sanitizeHistory(p.history);
+    if (p.dex) extra = mergeDexState(p.dex) || extra;
+    if (p.history) state.history = mergeHistory(state.history, p.history);
     if (p.daily && typeof p.daily === 'object' && p.daily.date === todayKey()) {
-      state.daily = sanitizeDaily(p.daily);
+      var prevCele = (state.daily && state.daily.celebrated) || {};
+      var prevRec = (state.daily && state.daily.cele) || {};
+      var prevUndo = (state.daily && state.daily.undo) || [];
+      var incoming = sanitizeDaily(p.daily);
+      /* 이미 축하한 완료는 유지 — 두 기기가 번갈아 써도 축하·도감이 다시 발행되지 않아요 */
+      for (k in prevCele) {
+        if (!Object.prototype.hasOwnProperty.call(prevCele, k)) continue;
+        if (!prevCele[k]) continue;
+        incoming.celebrated[k] = true;
+        if (!incoming.cele[k] && prevRec[k]) incoming.cele[k] = { at: prevRec[k].at, n: prevRec[k].n };
+      }
+      incoming.undo = mergeUndo(prevUndo, incoming.undo);
+      state.daily = incoming;
+      if (applyUndoMarks(Number(at) || 0)) extra = true;   /* 방금 취소한 체크는 되살리지 않아요 */
+      reconcileOrder();
     }
+    return extra;
   }
 
   function cloudForcePush() {
@@ -19533,20 +19793,29 @@ function iconSVG(key) {
     /* 구름이 새 기기의 빈 상태인데 이 기기에 기록이 있으면 이 기기 것을 올려요 */
     if (payloadLooksEmpty(v.payload) && cloudHasData()) { cloudPush(true); return; }
     if (CLOUD.dirty && CLOUD.seeded && CLOUD.lastLocalAt > at) { cloudPush(true); return; }
+    var firstSync = !CLOUD.seeded;
     CLOUD.lastAppliedAt = at;
     CLOUD.seeded = true;
     var beforeDex = dexCount();
-    var firstSync = !CLOUD.seeded;
     var localDaily = firstSync && CLOUD.dirty ? clone(state.daily) : null;
     var localDex = firstSync && CLOUD.dirty ? clone(dexState()) : null;
     CLOUD.applying = true;
+    var patched = false;
     try {
-      cloudApply(v.payload);
+      patched = cloudApply(v.payload, at);
       if (localDaily) mergeDailyFrom(localDaily);
       if (localDex) mergeDexFrom(localDex);
       save();
     } finally {
       CLOUD.applying = false;
+    }
+    /* 이 상태를 이미 받았으니, 의미 없는 재푸시(날씨 등)로 다른 기기 기록을 덮지 않게 해요 */
+    CLOUD.lastPushedJson = JSON.stringify(cloudPayload());
+    if (patched) {
+      /* 되살아난 체크를 다시 지우는 등 원격과 달라졌으면 그 차이를 구름에도 반영 */
+      CLOUD.dirty = true;
+      CLOUD.lastLocalAt = Date.now();
+      cloudForcePush();
     }
     renderAll();
     dexCheckMilestones(true);
@@ -20321,6 +20590,8 @@ function iconSVG(key) {
     });
     var qw = $('btnWakeQuick');
     if (qw) qw.addEventListener('click', toggleWakeQuick);
+    var rf = $('btnRefreshApp');
+    if (rf) rf.addEventListener('click', function () { forceRefreshApp(rf); });
     $('btnKeepAlive').addEventListener('click', function () {
       var on = this.getAttribute('aria-checked') !== 'true';
       this.setAttribute('aria-checked', on ? 'true' : 'false');
@@ -20412,7 +20683,56 @@ function iconSVG(key) {
     renderNow(now);
   }
 
+  /* ============================================================
+     🔄 최신 버전으로 새로고침
+     iOS 홈화면 앱은 그냥 다시 열면 예전 파일이 남아 있을 수 있어요.
+     캐시를 비우고 주소에 _v=시각 을 붙여 새로 받아온 뒤 주소는 깔끔하게 되돌려요.
+  ============================================================ */
+  var refreshing = false;
+  function cleanVersionParam() {
+    try {
+      var u = new URL(location.href);
+      if (!u.searchParams.has('_v')) return;
+      u.searchParams.delete('_v');
+      history.replaceState(null, '', u.pathname + (u.search || '') + (u.hash || ''));
+    } catch (e) { /* 주소 정리는 실패해도 괜찮아요 */ }
+  }
+  function forceRefreshApp(btn) {
+    if (refreshing) return;
+    refreshing = true;
+    if (btn) btn.classList.add('busy');
+    toast(dx('최신 버전을 다시 받는 중…', 'Getting the latest version…'));
+    var go = function () {
+      try {
+        var u = new URL(location.href);
+        u.searchParams.delete('_v');
+        u.searchParams.set('_v', String(Date.now()));
+        location.replace(u.href);
+      } catch (e) {
+        location.reload();
+      }
+    };
+    var timer = setTimeout(go, 1500);   /* 캐시 정리가 늦어져도 그냥 새로 받아요 */
+    var stepCache = function () {
+      if (!('caches' in window) || !caches.keys) return Promise.resolve();
+      return caches.keys().then(function (ks) {
+        return Promise.all(ks.map(function (k) { return caches.delete(k); }));
+      });
+    };
+    var stepSW = function () {
+      if (!navigator.serviceWorker || !navigator.serviceWorker.getRegistrations) return Promise.resolve();
+      return navigator.serviceWorker.getRegistrations().then(function (rs) {
+        return Promise.all(rs.map(function (r) { return r.unregister(); }));
+      });
+    };
+    stepCache().catch(function () {}).then(stepSW).catch(function () {}).then(function () {
+      clearTimeout(timer);
+      go();
+    });
+  }
+
   function init() {
+    cleanVersionParam();
     pruneDaily();
     ensureToday(true);
     applyLang();
@@ -20421,6 +20741,10 @@ function iconSVG(key) {
     bindEvents();
     updateWakeUI();
     updateKeepAliveUI();
+    if ($('appVer')) {
+      $('appVer').textContent = 'v' + APP_VERSION;
+      $('appVer').title = dx('앱 버전 ', 'App version ') + APP_VERSION + ' · ' + APP_BUILT;
+    }
     if (state.settings.wakeWanted) applyWake();
     if (state.settings.keepAlive) startKeepAlive();
     loadWeather(false);
