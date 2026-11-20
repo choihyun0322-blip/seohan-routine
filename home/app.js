@@ -1801,8 +1801,11 @@ document.addEventListener('click', e => {
       mutate(s => {
         const p = s.pantry.find(x => x.id === id);
         if (p) {
+          const oldEm = p.emoji || guessEmoji(p.name);
+          const g = guessEmoji(name);
           p.name = name;
-          p.emoji = em || guessEmoji(name);
+          /* 아이콘을 직접 건드리지 않았으면 새 이름에 맞는 아이콘으로 */
+          p.emoji = (em && em !== oldEm) ? em : (g !== '🧴' || !oldEm ? g : oldEm);
           p.zone = z; p.exp = exp || '';
           if (subv) p.sub = subv; else delete p.sub;
         }
