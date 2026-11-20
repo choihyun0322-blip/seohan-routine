@@ -3621,7 +3621,7 @@ function parseWorkbook(wb) {
       date: date, memo: memo || (type === "income" ? "수입" : cat), amount: amount, type: type, cat: cat,
       fixed: type === "income" ? false : catFixedDefault(cat),
       cardId: type === "income" ? (/카드|체크/.test(String(cardRaw)) ? (matchCardId(cardRaw) || PAY_ACCOUNT) : PAY_ACCOUNT) : matchCardId(cardRaw),
-      installment: type === "income" ? false : (idx.inst != null ? /할부/.test(String(row[idx.inst])) && !/일시불/.test(String(row[idx.inst])) : false),
+      installment: type === "income" ? false : (idx.inst != null ? /무이자|할부/.test(String(row[idx.inst])) && !/일시불/.test(String(row[idx.inst])) : false),
       dup: !!existing[key]
     };
     if (type === "income") income++;
