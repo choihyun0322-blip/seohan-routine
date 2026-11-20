@@ -6921,7 +6921,8 @@ function iconSVG(key) {
     if (CLOUD.applying) return;
     CLOUD.dirty = true;
     CLOUD.lastLocalAt = Date.now();
-    if (!CLOUD.ready) return;
+    /* 아직 방 상태를 한 번도 못 받았으면, 받은 뒤에 합쳐서 올려요 */
+    if (!CLOUD.ready || !CLOUD.seeded) return;
     if (CLOUD.pushTimer) clearTimeout(CLOUD.pushTimer);
     CLOUD.pushTimer = setTimeout(function () {
       CLOUD.pushTimer = null;
@@ -6947,39 +6948,32 @@ function iconSVG(key) {
     };
   }
 
-  function cloudHasData() {
-    if (Object.keys(state.history || {}).length) return true;
-    if (earnedToday() > 0) return true;
-    if (Object.keys(dexState().unlocked).length) return true;
-    if (state.sight && (Object.keys(state.sight.words || {}).length || (state.sight.extra || []).length)) return true;
-    var base = baseSettings();
-    ['startTime', 'departTime', 'morning', 'evening', 'homework', 'supplies'].forEach(function (k) {
-      if (JSON.stringify(state.settings[k]) !== JSON.stringify(base[k])) CLOUD.settingsTouched = true;
-    });
-    return !!CLOUD.settingsTouched;
-  }
-
-  function payloadHasData(p) {
-    if (!p || typeof p !== 'object') return false;
-    if (p.history && Object.keys(p.history).length) return true;
-    var d = p.daily;
-    if (d && typeof d === 'object') {
-      if ((d.morning && Object.keys(d.morning).length) || (d.evening && Object.keys(d.evening).length) ||
-          (d.homework && Object.keys(d.homework).length) || (d.supplies && Object.keys(d.supplies).length) ||
-          Number(d.sightBonus) > 0) return true;
+  /* 기록이 없는 '새 기기'의 상태인지 (이 기기 기록을 덮어쓰지 않게) */
+  function payloadLooksEmpty(p) {
+    if (!p || typeof p !== 'object') return true;
+    var d = p.daily || {}, checks = 0, k;
+    var kinds = ['morning', 'evening', 'homework', 'supplies'];
+    for (k = 0; k < kinds.length; k++) checks += Object.keys(d[kinds[k]] || {}).length;
+    if (checks > 0) return false;
+    if (Number(d.sightBonus) > 0 || Number(d.clearedAt) > 0) return false;
+    if (p.history && Object.keys(p.history).length) return false;
+    if (p.dex && p.dex.unlocked && Object.keys(p.dex.unlocked).length) return false;
+    var sw = (p.sight && p.sight.words) || {};
+    for (k in sw) {
+      if (!Object.prototype.hasOwnProperty.call(sw, k)) continue;
+      var r = sw[k];
+      if (r && (Number(r.ok) > 0 || Number(r.no) > 0 || Number(r.streak) > 0)) return false;
     }
-    if (p.dex && p.dex.unlocked && Object.keys(p.dex.unlocked).length) return true;
-    if (p.sight && ((p.sight.words && Object.keys(p.sight.words).length) || (p.sight.extra && p.sight.extra.length))) return true;
-    var base = baseSettings(), s = p.settings;
-    if (s && typeof s === 'object') {
-      var keys = ['startTime', 'departTime', 'morning', 'evening', 'homework', 'supplies'], i;
-      for (i = 0; i < keys.length; i++) {
-        if (JSON.stringify(s[keys[i]]) !== JSON.stringify(base[keys[i]])) return true;
-      }
-    }
-    return false;
+    if (p.sight && p.sight.extra && p.sight.extra.length) return false;
+    return true;
   }
-
+  function payloadHasData(p) { return !payloadLooksEmpty(p); }
+  function cloudHasData() { return !payloadLooksEmpty(cloudPayload()); }
+  function payloadChecks(p) {
+    var d = (p && p.daily) || {}, n = 0, kinds = ['morning', 'evening', 'homework', 'supplies'];
+    for (var i = 0; i < kinds.length; i++) n += Object.keys(d[kinds[i]] || {}).length;
+    return n;
+  }
   function cloudPush(force) {
     if (!CLOUD.ready || !CLOUD.roomRef || CLOUD.applying) return;
     var payload = cloudPayload();
@@ -6996,11 +6990,12 @@ function iconSVG(key) {
       }).catch(function (err) {
         CLOUD.dirty = true;
         CLOUD.error = (err && err.code) || 'write-failed';
-        renderSyncDot(CLOUD.connected ? 'error' : 'off');
+        renderSyncDot(CLOUD.connected ? 'err' : 'off');
       });
     } catch (e) {
       CLOUD.dirty = true;
       CLOUD.error = 'write-failed';
+      renderSyncDot(CLOUD.connected ? 'err' : 'off');
     }
   }
 
@@ -7034,6 +7029,7 @@ function iconSVG(key) {
       };
     }
     fd.sightBonus = Math.max(0, Math.min(99, Math.round(Number(raw.sightBonus) || 0)));
+    if (Number(raw.clearedAt) > 0) fd.clearedAt = Math.max(0, Math.round(Number(raw.clearedAt)));
     return fd;
   }
 
@@ -7097,15 +7093,20 @@ function iconSVG(key) {
       return;
     }
     if (at <= CLOUD.lastAppliedAt) return;
-    /* 구름이 비어 있는 기본값인데 이 기기에 기록이 있으면 이 기기 것을 올려요 */
-    if (!payloadHasData(v.payload) && cloudHasData()) { cloudPush(true); return; }
-    if (CLOUD.dirty && CLOUD.lastLocalAt > at) { cloudPush(true); return; }
+    /* 구름이 새 기기의 빈 상태인데 이 기기에 기록이 있으면 이 기기 것을 올려요 */
+    if (payloadLooksEmpty(v.payload) && cloudHasData()) { cloudPush(true); return; }
+    if (CLOUD.dirty && CLOUD.seeded && CLOUD.lastLocalAt > at) { cloudPush(true); return; }
     CLOUD.lastAppliedAt = at;
     CLOUD.seeded = true;
     var beforeDex = dexCount();
+    var firstSync = !CLOUD.seeded;
+    var localDaily = firstSync && CLOUD.dirty ? clone(state.daily) : null;
+    var localDex = firstSync && CLOUD.dirty ? clone(dexState()) : null;
     CLOUD.applying = true;
     try {
       cloudApply(v.payload);
+      if (localDaily) mergeDailyFrom(localDaily);
+      if (localDex) mergeDexFrom(localDex);
       save();
     } finally {
       CLOUD.applying = false;
@@ -7116,6 +7117,32 @@ function iconSVG(key) {
       toast(dx('🧩 도감에 새 친구가 왔어요! (' + afterDex + '/' + DEX_MAX + ')', '🧩 A new friend joined the dex! (' + afterDex + '/' + DEX_MAX + ')'));
     }
     renderSyncDot(CLOUD.connected ? 'on' : 'off');
+  }
+
+  /* 첫 동기화 때 이 기기에서 먼저 누른 체크·도감을 구름 상태에 합쳐요 */
+  function mergeDailyFrom(localDaily) {
+    if (!localDaily || !state.daily || localDaily.date !== state.daily.date) return;
+    if (Number(localDaily.clearedAt) > Number(state.daily.clearedAt || 0)) return;
+    if (!Array.isArray(state.daily.order)) state.daily.order = [];
+    ['morning', 'evening', 'homework', 'supplies'].forEach(function (kind) {
+      var bag = localDaily[kind] || {};
+      if (!state.daily[kind]) state.daily[kind] = {};
+      for (var k in bag) {
+        if (!Object.prototype.hasOwnProperty.call(bag, k) || !bag[k]) continue;
+        state.daily[kind][String(k)] = true;
+        var key = kind + ':' + String(k);
+        if (state.daily.order.indexOf(key) < 0) state.daily.order.push(key);
+      }
+    });
+    state.daily.sightBonus = Math.max(Number(state.daily.sightBonus) || 0, Number(localDaily.sightBonus) || 0);
+  }
+  function mergeDexFrom(localDex) {
+    if (!localDex || !localDex.unlocked) return;
+    var d = dexState();
+    for (var k in localDex.unlocked) {
+      if (!Object.prototype.hasOwnProperty.call(localDex.unlocked, k)) continue;
+      if (!d.unlocked[k] || Number(d.unlocked[k]) > Number(localDex.unlocked[k])) d.unlocked[k] = localDex.unlocked[k];
+    }
   }
 
   function onCloudCheer(snap) {
@@ -7250,11 +7277,8 @@ function iconSVG(key) {
     CLOUD.db.ref('.info/connected').on('value', function (snap) {
       CLOUD.connected = !!snap.val();
       renderSyncDot(CLOUD.connected ? 'on' : 'off');
-      if (CLOUD.connected) {
-        if (!CLOUD.seeded || CLOUD.dirty) {
-          if (cloudHasData()) cloudPush(true);
-        }
-      }
+      /* 방 상태를 한 번 받은 뒤에만, 그리고 이 기기에 올릴 기록이 있을 때만 올려요 */
+      if (CLOUD.connected && CLOUD.seeded && CLOUD.dirty && cloudHasData()) cloudPush(true);
     });
     CLOUD.ready = true;
     renderSyncDot('wait');
@@ -7582,6 +7606,7 @@ function iconSVG(key) {
       var flags = state.daily.celebrated;
       state.daily = freshDaily(todayKey());
       state.daily.celebrated = flags;
+      state.daily.clearedAt = Date.now();
       save();
       cloudForcePush();   /* 연결된 다른 기기의 오늘 체크도 함께 지워요 */
       renderAll();
@@ -7760,6 +7785,13 @@ function iconSVG(key) {
       dot: function () {
         var e = $('syncDot');
         return e ? e.className : '';
+      },
+      debug: function () {
+        return {
+          ready: CLOUD.ready, connected: CLOUD.connected, seeded: CLOUD.seeded,
+          dirty: CLOUD.dirty, lastAppliedAt: CLOUD.lastAppliedAt, lastLocalAt: CLOUD.lastLocalAt,
+          error: CLOUD.error, room: CLOUD.room
+        };
       }
     },
     sight: {
