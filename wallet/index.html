@@ -2410,6 +2410,8 @@ async function afterKeyReady() {
     setSync("err", "암호화 동기화 실패");
     toast("서버에 암호문을 올리지 못했어요 — [지금 올리기]를 다시 눌러 주세요");
   }
+  if (stateRef) setSync(keyReady() ? "on" : "locked", keyReady() ? "실시간 동기화 · 암호문" : "암호 열쇠 필요");
+  else if (syncKind === "connecting") setSync("local", "이 기기에만 저장");
   renderAuthUi();
 }
 
