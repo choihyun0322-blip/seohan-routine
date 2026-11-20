@@ -929,7 +929,7 @@ body.locked .app,body.locked .toast{visibility:hidden}
     <div class="fld"><label>고정 / 변동</label>
       <button id="tFixed" class="seg2" style="width:100%;padding:10px;font-size:11.5px;font-weight:800">변동비</button>
     </div>
-    <div class="fld" id="tDutchWrap"><label>🤝 더치페이</label>
+    <div class="fld" id="tDutchWrap">
       <label class="qchk" style="border-radius:10px"><input type="checkbox" id="tDutch"> 🤝 더치페이 <small>실적은 전액 · 지출은 내 몫만</small></label>
       <div class="dutchbox hidden" id="tDutchBox">
         <div class="dquick" id="tDutchBtns">
@@ -2829,7 +2829,7 @@ function renderLedger() {
       const inc = isIncomeT(t);
       const dt = dutchOn(t);
       const shown = dt ? spendAmt(t) : t.amount;
-      const small = (dt ? '<b class="dchip">🤝 더치 (결제 ' + fmt(t.amount) + '원)</b> · ' + (inc ? "수입" : esc(t.cat)) : (inc ? "수입" : esc(t.cat))) +
+      const small = (dt ? '<span class="dchip">🤝 더치 (결제 ' + fmt(t.amount) + '원)</span> · ' + (inc ? "수입" : esc(t.cat)) : (inc ? "수입" : esc(t.cat))) +
         " · " + esc(cardLabel(t.cardId)) + (t.myShare != null && dt && t.dutchN ? " · " + t.dutchN + "명" : "") + (t.installment ? " · 할부" : "") + " · " + esc(t.date.slice(5).replace("-", "/"));
       return '<li data-txn="' + esc(t.id) + '" title="' + (dt
           ? "🤝 더치페이 · 결제 " + won(t.amount) + " · 내 몫 " + won(spendAmt(t)) + (t.dutchN ? " (" + t.dutchN + "명)" : "") + " — 누르면 고정↔변동"
