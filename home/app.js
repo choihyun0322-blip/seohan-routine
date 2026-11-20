@@ -1264,7 +1264,7 @@ function renderStock() {
 }
 
 /* ---------------- 영수증·장보기 텍스트 → 품목 (붙여넣기 방식 · 한도 0%) ---------------- */
-const RECEIPT_STOP = /(합계|총액|총금액|결제|승인|주문|배송|카드|할인|포인트|적립|부가세|과세|상품명|수량|금액|일시|매장|사업자|영수증|거래|잔액|쿠팡|로켓|와우|주소|연락|전화|감사|포장|배달|요청|옵션|무료|출고|도착|구매일|합계액|영수|상품|주문번호)/;
+const RECEIPT_STOP = /(합계|총액|총금액|결제|승인|주문|배송|카드|할인|포인트|적립|부가세|과세|상품명|수량|금액|일시|매장|사업자|영수증|거래|잔액|쿠팡|로켓|와우|주소|연락|전화|감사|포장|배달|요청|옵션|무료|출고|도착|구매일|합계액|영수|상품|주문번호|가맹점|상호|소계|결제수단|판매처|일시불|할부|거스름|현금|유효기간|입금|출금)/;
 const LIVING_KW = ['휴지', '화장지', '물티슈', '키친타올', '행주', '세제', '세탁', '섬유유연', '주방', '샴푸', '린스', '컨디셔너', '바디워시', '비누', '핸드워시', '치약', '칫솔', '가글', '수세미', '스펀지', '필터', '봉지', '비닐', '쓰레기', '건전지', '전구', '마스크', '소독', '기저귀', '분유', '양말', '장갑', '호일', '랩', '빨대', '이쑤시개'];
 function receiptCat(name) {
   const n = String(name || '');
@@ -1939,9 +1939,12 @@ document.addEventListener('click', e => {
     /* --- 영수증·장보기 등록 --- */
     case 'receiptparse': {
       const raw = $('#receiptRaw') ? $('#receiptRaw').value : '';
-      const list = parseReceiptLines(raw);
+      const meta = parseReceiptMeta(raw);
+      const mk = norm(meta.merchant || '');
+      /* 결제처 이름 줄(예: '이마트 영통점')은 품목이 아니므로 뺀다 */
+      const list = parseReceiptLines(raw).filter(it => !mk || norm(it.name).indexOf(mk) < 0);
       ui.receipt = list;
-      ui.receiptMeta = list.length ? parseReceiptMeta(raw) : null;
+      ui.receiptMeta = list.length ? meta : null;
       renderReceipt();
       toast(list.length ? '🔍 품목 ' + list.length + '개를 뽑았어요 — 확인하고 담아 주세요' : '품목을 못 찾았어요 — 한 줄에 하나씩 적어 주세요');
       break;
