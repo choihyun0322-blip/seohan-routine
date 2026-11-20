@@ -2288,6 +2288,19 @@ function bindQuick() {
           quickFixed = false;
           const c = $("#qCat");
           if (c) c.value = "기타";
+          const card = $("#qCard");
+          if (card) card.value = PAY_ACCOUNT;
+        } else {
+          const c = $("#qCat");
+          if (c && !c.value) c.value = "식비";
+          quickFixed = c ? catFixedDefault(c.value) : false;
+          $$("#qFixedWrap button").forEach(x => {
+            const on = (x.getAttribute("data-v") === "fix") === quickFixed;
+            x.classList.toggle("on", on);
+            x.classList.toggle("v", !quickFixed);
+          });
+          const card = $("#qCard");
+          if (card && card.value === PAY_ACCOUNT) card.value = state.cards.length ? state.cards[0].id : PAY_CASH;
         }
       });
     });
@@ -2296,6 +2309,17 @@ function bindQuick() {
   if (amt) amt.addEventListener("input", () => {
     const raw = amt.value.replace(/[^\d]/g, "");
     amt.value = raw ? fmt(raw) : "";
+  });
+  // 고정비 카테고리를 고르면 고정비로 미리 바꿔 준다 (예외는 버튼으로 전환)
+  const catSel = $("#qCat");
+  if (catSel) catSel.addEventListener("change", () => {
+    if (quickType === "income") return;
+    quickFixed = catFixedDefault(catSel.value);
+    $$("#qFixedWrap button").forEach(x => {
+      const on = (x.getAttribute("data-v") === "fix") === quickFixed;
+      x.classList.toggle("on", on);
+      x.classList.toggle("v", !quickFixed);
+    });
   });
   const form = $("#quickForm");
   if (form) form.addEventListener("submit", ev => {
