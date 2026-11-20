@@ -14041,7 +14041,8 @@ function iconSVG(key) {
       celebrateWsTitle: '오늘 공부 완료!',
       celebrateWsSub: '네 장 모두 끝냈어요. 머리가 반짝반짝!',
       celebrateMealTitle: '🍚 밥 3끼 완벽!',
-      celebrateMealSub: '보너스로 넘버블럭스 {n}이 도감에 왔어요!',
+      celebrateMealSub: '도감에 새 친구가 왔어요! 넘버블럭스 {n} 🧩',
+      celebrateMealFull: '도감을 다 모았어요! 오늘도 최고예요!',
       heroMorningChip: '아침 준비',
       heroBeforeChip: '아침 준비 시작 전',
       departChip: '출발 {t}',
@@ -14375,7 +14376,8 @@ function iconSVG(key) {
       celebrateWsTitle: 'Study Done!',
       celebrateWsSub: 'All four pages finished. Shiny brain!',
       celebrateMealTitle: '🍚 All Three Meals!',
-      celebrateMealSub: 'Bonus Numberblock {n} joined your dex!',
+      celebrateMealSub: 'A new friend joined the dex! Numberblock {n} 🧩',
+      celebrateMealFull: 'You collected every Numberblock! Amazing!',
       heroMorningChip: 'Morning Prep',
       heroBeforeChip: 'Before morning prep',
       departChip: 'Leave {t}',
@@ -16981,7 +16983,9 @@ function iconSVG(key) {
     if (kind === 'wl') return { title: L('celebrateWlTitle'), sub: L('celebrateWlSub') };
     if (kind === 'we') return { title: L('celebrateWeTitle'), sub: L('celebrateWeSub') };
     if (kind === 'ws') return { title: L('celebrateWsTitle'), sub: L('celebrateWsSub') };
-    if (kind === 'meal') return { title: L('celebrateMealTitle'), sub: Lf('celebrateMealSub', { n: word || '' }) };
+    if (kind === 'meal') {
+      return { title: L('celebrateMealTitle'), sub: word ? Lf('celebrateMealSub', { n: word }) : L('celebrateMealFull') };
+    }
     return { title: L('celebrateMorningTitle'), sub: L('celebrateMorningSub') };
   }
 
