@@ -544,6 +544,8 @@ const DISH_SUB = ['볶음밥','떡볶이','김치전','부추전','감자전','�
 const DISH_TAIL = ['전','국','탕','죽','찌개','볶음','무침','조림','구이','찜','덮밥','떡국'];
 /* 완제품 자체가 레시피 재료일 때(만두·소스·어묵)는 그 완제품을 그대로 봐준다 */
 const DISH_OWN = ['만두','어묵','소스','스프','핫도그','너겟','떡','떡볶이','김밥','피자','돈까스','돈가스','짜장','탕','국','밥','쥬스','주스','음료','볶음','무침','조림','찜','와플','샐러드','순대','족발','보쌈','김치전','부추전','파전','해물파전','감자전'];
+/* 한 글자 재료라도 이름 끝에 붙으면 재료로 봐주는 말 — 소면·즉석밥·찹쌀 */
+const ONE_TAIL_OK = ['밥','면','닭','햄','김','쌀','콩','팥','떡','밤'];
 function stripMods(n) {
   let s = n;
   for (let g = 0; g < 4; g++) {
@@ -582,9 +584,9 @@ function containHit(ing, cand) {
   if (a === b) return true;
   const atStart = b.length > a.length && b.indexOf(a) === 0;
   const atEnd = b.length > a.length && b.slice(-a.length) === a;
-  /* 한 글자 재료(밥·면·김)는 이름 끝에 붙을 때만 — 김치 안의 '김' 같은 오매칭을 막는다 */
+  /* 한 글자 재료(밥·면·김)는 이름 끝에 붙는 몇 가지 경우만 — 김치 안의 '김', 콩나물 안의 '물' 같은 오매칭을 막는다 */
   if (a.length < 2) {
-    if (!atEnd) return false;
+    if (!atEnd || ONE_TAIL_OK.indexOf(a) < 0) return false;
   } else if (!atStart && !atEnd) return false;
   if (!isDishName(b)) return true;                                    // 소고기국거리 · 포기김치
   const rest = atStart ? b.slice(a.length) : b.slice(0, b.length - a.length);
