@@ -578,10 +578,14 @@ function candsOf(name) {
 /* ing 가 cand 의 앞이나 뒤에만 붙은 경우 — 완제품 통짜면 원재료로 치지 않는다 */
 function containHit(ing, cand) {
   const a = norm(ing), b = norm(cand);
-  if (a.length < 2 || b.length < 2) return false;
+  if (!a || !b) return false;
   if (a === b) return true;
-  const atStart = b.indexOf(a) === 0, atEnd = b.slice(-a.length) === a;
-  if (!atStart && !atEnd) return false;
+  const atStart = b.length > a.length && b.indexOf(a) === 0;
+  const atEnd = b.length > a.length && b.slice(-a.length) === a;
+  /* 한 글자 재료(밥·면·김)는 이름 끝에 붙을 때만 — 김치 안의 '김' 같은 오매칭을 막는다 */
+  if (a.length < 2) {
+    if (!atEnd) return false;
+  } else if (!atStart && !atEnd) return false;
   if (!isDishName(b)) return true;                                    // 소고기국거리 · 포기김치
   const rest = atStart ? b.slice(a.length) : b.slice(0, b.length - a.length);
   if (modsOnly(rest)) return true;                                    // 냉동만두 · 즉석밥
