@@ -614,7 +614,7 @@ function saveLocal() { try { localStorage.setItem(LSKEY, JSON.stringify(state));
    - 남의 변경 → 스트림 이벤트를 받고 전체 문서를 다시 읽어 통째로 반영
    ------------------------------------------------------------------ */
 const SPATH = '/rooms/' + encodeURIComponent(ROOM) + '/state';
-let remoteDoc = null, baseRemote = null, es = null;
+let remoteDoc = null, baseRemote = null, es = null, lastPush = null;
 let dirty = false, pushTimer = null, refetchTimer = null, needRefetch = false, syncState = 'off';
 const DBG = [];
 function dbg(tag, v) { DBG.push([new Date().toISOString().slice(11, 23), tag, v]); if (DBG.length > 200) DBG.shift(); }
@@ -692,6 +692,7 @@ async function push() {
   // 방을 아직 한 번도 못 읽었으면(방이 비었는지 모르면) 밀지 않는다 — 남의 데이터를 덮을 수 있다
   if (baseRemote === null) { scheduleRefetch(200); return; }
   const patch = buildPatch();
+  lastPush = { keys: Object.keys(patch), status: null };
   dbg('push', Object.keys(patch).length + ' keys');
   if (!Object.keys(patch).length) { dirty = false; setSync('ok'); return; }
   try {
@@ -700,6 +701,7 @@ async function push() {
       method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(patch)
     });
     if (!r.ok) throw new Error('HTTP ' + r.status);
+    lastPush.status = r.status;
     baseRemote = applyLeaves(baseRemote, patch);
     dirty = hasDiff();
     try { localStorage.removeItem(LSKEY + ':pending'); } catch (e) { }
@@ -736,10 +738,9 @@ async function fetchState() {
 function applyRemote(doc) {
   const raw = localShape(doc);
   if (!raw) return;
-  const pre = normalize(localShape(doc), true);   // 마이그레이션 전 기준선 (여기에 없는 변화만 밀어 올린다)
+  baseRemote = remoteShape(localShape(copy(doc)));   // 서버에 실제로 있는 그대로가 기준선(마이그레이션 전)
   migrated = false;
   const st = normalize(raw);
-  baseRemote = remoteShape(pre);
   const same = JSON.stringify(st) === JSON.stringify(state);
   dbg('apply', 'r' + st.routines.length + ' p' + st.pantry.length + ' k' + st.stock.length);
   state = st; saveLocal();
@@ -850,7 +851,7 @@ function renderAlerts() {
   const box = $('#alerts');
   const out = [];
   const none = state.stock.filter(s => stockLevel(s) === 'none');
-  const lowNum = state.stock.filter(s => isNum(s) && stockCount(s) > 0 && stockCount(s) <= 2);
+  const lowNum = state.stock.filter(s => isNum(s) && stockCount(s) > 0 && stockCount(s) <= 1);
   if (none.length) {
     out.push({
       cls: '', ic: '🔴', title: '다 떨어진 생필품 ' + none.length + '개',
@@ -1681,7 +1682,7 @@ function boot() {
 
 window.__home = {
   get state() { return state; }, get room() { return ROOM; }, log: DBG,
-  get sync() { return { state: syncState, dirty, remoteDoc }; },
+  get sync() { return { state: syncState, dirty, remoteDoc, lastPush }; },
   render, push, seedState, shareLink,
   zones: ZONES, inferZone, guessEmoji, nameMatches, ownedKeys, stockLevel, stockCount, allRecipes, RECIPES, GEMINI_RECIPES
 };
