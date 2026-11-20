@@ -3630,6 +3630,7 @@ function deleteTxn(id) {
 let editingTxnId = "";
 let txnType = "expense";
 let txnDutchN = null;   /* 더치페이 인원 수 (직접 입력하면 null) */
+let dutchBackup = null; /* 수입으로 잠시 바꿀 때 더치 설정을 기억했다 복구 */
 
 function dutchFieldVisible() {
   const wrap = $("#tDutchWrap");
@@ -3707,6 +3708,7 @@ function openTxn(id) {
   /* 더치페이 */
   const dt = dutchOn(t);
   txnDutchN = dt ? (t.dutchN || null) : null;
+  dutchBackup = null;
   if ($("#tDutch")) $("#tDutch").checked = dt;
   if ($("#tMyShare")) $("#tMyShare").value = dt ? fmt(spendAmt(t)) : "";
   dutchFieldVisible();
@@ -4093,7 +4095,16 @@ function bindModals() {
     if (!b) return;
     txnType = b.getAttribute("data-v") === "income" ? "income" : "expense";
     $$("#tType button").forEach(x => x.classList.toggle("on", x === b));
-    if (txnType === "income" && $("#tDutch")) $("#tDutch").checked = false;
+    if (txnType === "income") {
+      const cb = $("#tDutch");
+      if (cb && cb.checked) dutchBackup = { share: $("#tMyShare").value, n: txnDutchN };
+      if (cb) cb.checked = false;
+    } else if (dutchBackup) {
+      if ($("#tDutch")) $("#tDutch").checked = true;
+      if ($("#tMyShare")) $("#tMyShare").value = dutchBackup.share || "";
+      txnDutchN = dutchBackup.n || null;
+      dutchBackup = null;
+    }
     dutchFieldVisible(); renderDutchBox();
   });
   $("#tFixed").addEventListener("click", () => {
