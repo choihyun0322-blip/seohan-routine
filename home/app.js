@@ -647,11 +647,12 @@ function allRecipes() {
 function isNum(it) { return !!(it && it.useCount); }
 function stockCount(it) { const c = Number(it && it.count); return Number.isFinite(c) ? Math.max(0, Math.round(c)) : 0; }
 function stockMax(it) { const m = Number(it && it.max); return Number.isFinite(m) && m > 0 ? Math.round(m) : 10; }
+function isToothbrush(it) { return !!(it && /칫솔/.test(String(it.name || ''))); }
 /* 부족으로 볼 남은 개수 — 품목의 적정량(max)에 맞춰 정한다.
-   칫솔처럼 적정량이 작은 품목은 2개 이하일 때만 부족, 휴지·물티슈 같은 대용량은 max의 40%(최대 5개). */
+   칫솔은 0개일 때만 없음(1개 이상이면 충분), 적정량이 작은 품목은 2개 이하, 휴지·물티슈 같은 대용량은 max의 40%(최대 5개). */
 function lowThreshold(it) {
   const m = stockMax(it);
-  if (it && /칫솔/.test(String(it.name))) return Math.min(2, m);      // 칫솔 2종: 3개 이상이면 충분
+  if (isToothbrush(it)) return 0;                                    // 칫솔 2종: 1개 이상이면 충분
   if (m <= 6) return Math.min(2, m);                                 // 적정량이 작은 품목도 2개 기준
   return Math.max(2, Math.min(5, Math.floor(m * 0.4)));              // 대용량: max 10 → 4개, max 20 → 5개
 }
@@ -662,7 +663,13 @@ function levelFromCount(c, it) {
   return cnt <= lowThreshold(it) ? 'low' : 'enough';
 }
 function stockLevel(it) { if (!it) return 'enough'; return isNum(it) ? levelFromCount(stockCount(it), it) : (it.level || 'enough'); }
-function countFromLevel(l, it) { const v = l === 'none' ? 0 : (l === 'low' ? 2 : 6); return Math.min(v, Math.max(1, stockMax(it))); }
+function countFromLevel(l, it) {
+  const m = Math.max(1, stockMax(it));
+  if (l === 'none') return 0;
+  // 칫솔은 '부족' 단계가 없지만, 예전에 'low'로 저장된 값은 0이 아닌 최소 1개로 옮긴다
+  if (l === 'low') return Math.min(isToothbrush(it) ? Math.max(1, lowThreshold(it)) : 2, m);
+  return Math.min(6, m);
+}
 
 /* ---------------- migration (이름 기반 자동 분류 · 칫솔 2종 · 수량 관리) ---------------- */
 function migrate(st) {
@@ -704,7 +711,7 @@ function migrate(st) {
       if (g !== '🧴') { it.emoji = g; ch = true; }
     }
   });
-  // 5) 수량 품목의 부족 기준을 적정량(max)에 맞춰 다시 계산 (칫솔 3개 = 충분)
+  // 5) 수량 품목의 부족 기준을 적정량(max)에 맞춰 다시 계산 (칫솔 1개 이상 = 충분)
   st.stock.forEach(s => {
     if (!isNum(s)) return;
     const lv = levelFromCount(stockCount(s), s);
@@ -967,10 +974,10 @@ function useLinkedStock(s, careItem) {
   if (isNum(it)) {
     it.count = Math.max(0, stockCount(it) - 1);
     it.level = levelFromCount(it.count, it);
-    return { name: it.name, left: it.count };
+    return { name: it.name, left: it.count, low: it.level !== 'enough' };
   }
   it.level = it.level === 'enough' ? 'low' : 'none';
-  return { name: it.name, left: null };
+  return { name: it.name, left: null, low: it.level !== 'enough' };
 }
 
 /* ---------------- render : header ---------------- */
@@ -991,7 +998,7 @@ function renderAlerts() {
   const box = $('#alerts');
   const out = [];
   const none = state.stock.filter(s => stockLevel(s) === 'none');
-  const lowNum = state.stock.filter(s => isNum(s) && stockCount(s) > 0 && stockCount(s) <= 1);
+  const lowNum = state.stock.filter(s => isNum(s) && stockCount(s) > 0 && stockCount(s) <= 1 && stockLevel(s) !== 'enough');
   if (none.length) {
     out.push({
       cls: '', ic: '🔴', title: '다 떨어진 생필품 ' + none.length + '개',
@@ -1278,7 +1285,7 @@ function renderStock() {
       '<div class="sn" data-act="stockedit" data-id="' + s.id + '"><b>' + esc(s.name) + '</b>' +
       '<small><span class="lvl ' + lvc.cls + '">' + (isNum(s) ? stockCount(s) + '개' : lvc.t) + '</span> ' + (inList ? '장바구니 ✓' : (isNum(s) ? '수량 관리' : '')) + '</small></div>' +
       '<div class="sbtn">' + ctr +
-      (lv !== 'enough' && !inList ? '<button class="send" data-act="stocksend" data-id="' + s.id + '">🛒</button>' : '') +
+      (lv !== 'enough' && !inList ? '<button class="send" data-act="stocksend" data-id="' + s.id + '">🛒 담기</button>' : '') +
       (!isNum(s) && lv === 'low' ? '<button data-act="stocknumon" data-id="' + s.id + '">숫자로</button>' : '') +
       '</div></div>';
   }).join('') || '<div class="empty">생필품을 추가해 보세요</div>';
@@ -1629,7 +1636,7 @@ function viewCareForm(id) {
     '<div class="field"><label>완료하면 재고에서 1개 빼기 (선택)</label><select id="cStock"><option value="">— 연결 안 함 —</option>' +
     stockNames.map(n => '<option value="' + esc(n) + '"' + (v.stock === n ? ' selected' : '') + '>' + esc(n) + '</option>').join('') +
     '</select></div>' +
-    '<div class="note">완료를 누르면 오늘 날짜로 리셋되고 다음 D-Day가 자동으로 잡혀요. 재고를 연결하면 완료할 때마다 1개씩 줄고, 1개 이하면 알려드려요.</div>',
+    '<div class="note">완료를 누르면 오늘 날짜로 리셋되고 다음 D-Day가 자동으로 잡혀요. 재고를 연결하면 완료할 때마다 1개씩 줄고, 남은 개수가 부족 기준 이하로 내려가면 알려드려요.</div>',
     '<button class="btn sm" data-act="caresave" data-id="' + (id || '') + '">저장</button>' +
     (id ? '<button class="btn coral" data-act="caredelete" data-id="' + id + '">삭제</button>' : '<button class="btn ghost" data-act="close">취소</button>'));
 }
@@ -1644,6 +1651,7 @@ function viewStockForm(id, draft) {
   const nm = d.name != null ? d.name : s.name;
   const thr = lowThreshold({ name: nm, max: max });
   const level = d.level || s.level || 'enough';
+  const inShop = state.shopping.some(i => norm(i.name) === norm(nm) && !i.done);
   openModal('생필품 수정',
     '<div class="row2"><div class="field"><label>이름</label><input id="sName" type="text" value="' + esc(d.name != null ? d.name : s.name) + '"></div>' +
     '<div class="field"><label>아이콘</label><input id="sEmoji" type="text" maxlength="4" value="' + esc(d.emoji != null ? d.emoji : (s.emoji || '🧴')) + '"></div></div>' +
@@ -1655,8 +1663,17 @@ function viewStockForm(id, draft) {
       '</select></div>') +
     '<div class="toggle" style="border-top:1px dashed var(--line)"><div class="t"><b>개수 관리 사용</b><small>켜면 5·4·3처럼 숫자로 조절해요 (부족 기준은 적정량에 맞춤)</small></div>' +
     '<button class="sw ' + (useCount ? 'on' : '') + '" data-act="stocknumtoggle" data-id="' + id + '"><i></i></button></div>' +
-    '<div class="note">' + (useCount ? '숫자가 <b>0</b>이면 없음, <b>' + thr + '개 이하</b>면 부족으로 표시되고 구매리스트에 담을 수 있어요.' + (/칫솔/.test(String(nm)) ? ' 칫솔은 <b>3개 이상</b>이면 충분이에요.' : '') : '충분 / 부족 / 없음 3단으로 관리해요. 개수까지 세고 싶은 품목은 위 토글을 켜세요.') + '</div>',
-    '<button class="btn sm" data-act="stocksave" data-id="' + id + '">저장</button><button class="btn coral" data-act="stockdelete" data-id="' + id + '">삭제</button>');
+    '<div class="note">' + (useCount
+      ? (isToothbrush({ name: nm })
+        ? '숫자가 <b>0</b>이면 없음, <b>1개 이상</b>이면 충분으로 표시돼요.'
+        : '숫자가 <b>0</b>이면 없음, <b>' + thr + '개 이하</b>면 부족으로 표시되고 구매리스트에 담을 수 있어요.')
+      : '충분 / 부족 / 없음 3단으로 관리해요. 개수까지 세고 싶은 품목은 위 토글을 켜세요.') + '</div>',
+    '<div style="display:flex;flex-direction:column;gap:7px;width:100%">' +
+    '<button class="btn ' + (inShop ? 'ghost' : 'coral') + '" data-act="stockshop" data-id="' + id + '" style="width:100%;justify-content:center;padding:11px">' +
+    (inShop ? '✓ 장보기에 담김' : '🛒 장보기 담기') + '</button>' +
+    '<div style="display:flex;gap:7px">' +
+    '<button class="btn sm" data-act="stocksave" data-id="' + id + '" style="flex:1;justify-content:center">저장</button>' +
+    '<button class="btn coral" data-act="stockdelete" data-id="' + id + '" style="flex:1;justify-content:center">삭제</button></div></div>');
 }
 function viewPantryForm(id) {
   const p = state.pantry.find(x => x.id === id);
@@ -1842,8 +1859,8 @@ document.addEventListener('click', e => {
       let msg = '✅ ' + item.name + ' 완료 — 다음은 ' + md(addDays(todayISO(), item.days || 1)) + '이에요';
       if (used) msg += ' · ' + used.name + ' ' + (used.left == null ? '재고 한 단계 줄었어요' : used.left + '개 남음');
       toast(msg);
-      if (used && used.left != null && used.left <= 1) {
-        setTimeout(() => toast('⚠️ ' + used.name + '이(가) ' + used.left + '개 남았어요 — 미리 사 두세요'), 2200);
+      if (used && used.left != null && used.low) {
+        setTimeout(() => toast('⚠️ ' + used.name + (used.left > 0 ? '이(가) ' + used.left + '개 남았어요' : '이(가) 다 떨어졌어요') + ' — 미리 사 두세요'), 2200);
       }
       haptic();
       break;
@@ -2148,6 +2165,13 @@ document.addEventListener('click', e => {
       if (addShopping(it.name, 'living')) { mutate(s => { }); toast(it.name + ' 구매리스트에 담았어요'); }
       break;
     }
+    case 'stockshop': {
+      const it = state.stock.find(x => x.id === id);
+      if (!it) return;
+      if (state.shopping.some(i => norm(i.name) === norm(it.name) && !i.done)) { toast('이미 장보기에 있어요: ' + it.name); break; }
+      if (addShopping(it.name, 'living')) { mutate(s => { }); closeModal(); toast(it.name + ' — 장보기에 담았어요 🛒'); }
+      break;
+    }
     case 'stockedit': viewStockForm(id); break;
     case 'stocksave': {
       const name = ($('#sName').value || '').trim();
@@ -2281,4 +2305,4 @@ window.__home = {
 
 document.addEventListener('DOMContentLoaded', boot);
 
-/* cache-bust: 2026-11-21 부족 기준·레시피 재료 판정 수정 */
+/* cache-bust: 2026-11-21 칫솔 1개 이상=충분 기준 반영 */
