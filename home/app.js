@@ -102,6 +102,62 @@ function subOf(p) {
 }
 function subLabel(k) { const m = SUB_MAP[k] || SUB_MAP.etc; return m.em + ' ' + m.label; }
 
+/* ---------------- 육류 소그룹 (육류 안쪽에서 한 단계 더) ----------------
+   냉장·냉동의 '육류'로 묶인 품목을 🐔닭고기 / 🐷돼지고기 / 🐮소고기 / 🥩기타 육류 / 🐟수산 으로 나눈다.
+   품목에는 아무것도 쓰지 않고 이름으로만 판단한다(방 데이터 구조 무변경).
+   판정 순서
+     ① 어종이 이름에 드러난 것(닭·닭고기·돼지·돈육·한우·소고기·오리 …) — 부위 이름보다 먼저 본다
+        예) 소고기-목살 → 소고기(목살에 끌려가지 않음), 닭목살 → 닭고기, 돼지고기-앞다리 → 돼지고기
+     ② 부위 이름(삼겹·목살·등심·갈비 …) — 닭 > 돼지 > 소 순서
+        예) 등갈비 → 돼지(돼지 부위가 소 '갈비'보다 먼저), LA갈비 → 소, 돼지불고기 → 돼지, 닭안심 → 닭
+     ③ 어느 쪽도 아니면 기타 육류(다짐육·양념육 등)
+   수산은 육류로 잡히는 생선·조개를 따로 모은 묶음이다(고등어가 '기타 육류'에 섞이지 않게). */
+const MEAT_GROUPS = [
+  { k: 'chicken', label: '닭고기', em: '🐔' },
+  { k: 'pork', label: '돼지고기', em: '🐷' },
+  { k: 'beef', label: '소고기', em: '🐮' },
+  { k: 'etc', label: '기타 육류', em: '🥩' },
+  { k: 'fish', label: '수산·해산물', em: '🐟' }
+];
+const MEAT_MAP = {};
+MEAT_GROUPS.forEach(g => { MEAT_MAP[g.k] = g; });
+/* ① 어종이 이름에 드러난 것 — 부위 이름보다 우선 */
+const MEAT_ANIMAL = {
+  chicken: ['닭', '치킨', '삼계', '영계', '토종닭'],
+  pork: ['돼지', '돈육', '한돈', '베이컨', '소시지', '비엔나', '스팸', '햄'],
+  beef: ['소고기', '쇠고기', '한우', '우삼겹', '차돌', '소갈비', '소불고기', '소등심', '소안심'],
+  fish: ['고등어', '갈치', '연어', '참돔', '조기', '명태', '대구', '삼치', '꽁치', '멸치', '새우', '오징어', '낙지', '주꾸미', '조개', '굴', '전복', '홍합', '꽃게', '대게', '킹크랩', '명란', '생선', '수산', '해산물', '참치', '광어', '우럭', '방어', '숭어', '장어', '미꾸라지', '꼬막', '바지락', '가리비', '소라', '해물', '진미채', '북어', '황태', '건새우', '쥐치', '아귀', '도미', '농어', '병어', '임연수', '가자미', '서대', '양미리', '한치', '문어', '랍스터'],
+  etc: ['오리', '양고기', '양갈비', '양꼬치', '염소', '거위', '말고기', '사슴', '토끼']
+};
+const MEAT_ANIMAL_ORDER = ['chicken', 'pork', 'beef', 'fish', 'etc'];
+/* ② 부위 이름 — 닭 > 돼지 > 소 순서로 본다(등갈비가 소 '갈비'로 새지 않게) */
+const MEAT_CUT = {
+  chicken: ['닭가슴살', '닭다리', '닭안심', '닭봉', '닭날개', '닭목살', '닭발', '닭갈비', '닭볶음탕'],
+  pork: ['삼겹', '오겹', '목살', '목심', '앞다리', '뒷다리', '항정', '가브리', '갈매기', '등갈비', '대패', '제육', '돈까스', '돈가스'],
+  beef: ['부채살', '등심', '안심', '채끝', '갈비', '양지', '사태', '불고기', '스테이크', '육전', '샤브', '살치', '토시', '치마', '업진', '안창']
+};
+const MEAT_CUT_ORDER = ['chicken', 'pork', 'beef'];
+const MEAT_KEYS = {};
+MEAT_ANIMAL_ORDER.forEach(k => { MEAT_KEYS[k] = (MEAT_ANIMAL[k] || []).map(norm); });
+MEAT_CUT_ORDER.forEach(k => { MEAT_KEYS['c' + k] = (MEAT_CUT[k] || []).map(norm); });
+function meatGroupName(name) {
+  const n = norm(name);
+  if (!n) return 'etc';
+  for (let i = 0; i < MEAT_ANIMAL_ORDER.length; i++) {
+    const k = MEAT_ANIMAL_ORDER[i];
+    const keys = MEAT_KEYS[k];
+    for (let j = 0; j < keys.length; j++) { if (keys[j] && n.indexOf(keys[j]) >= 0) return k; }
+  }
+  for (let i = 0; i < MEAT_CUT_ORDER.length; i++) {
+    const k = MEAT_CUT_ORDER[i];
+    const keys = MEAT_KEYS['c' + k];
+    for (let j = 0; j < keys.length; j++) { if (keys[j] && n.indexOf(keys[j]) >= 0) return k; }
+  }
+  return 'etc';
+}
+function meatGroupOf(p) { return meatGroupName(p && p.name); }
+function meatLabel(k) { const m = MEAT_MAP[k] || MEAT_MAP.etc; return m.em + ' ' + m.label; }
+
 /* 이름 기반 자동 분류 — 위에서부터 먼저 걸리는 구역이 이김 */
 const FREEZER_KW = ['냉동', '만두', '돈까스', '돈가스', '핫도그', '피자', '아이스', '빙과', '감자튀김', '치즈스틱', '너겟', '떡갈비', '냉면', '새우튀김', '가라아게', '볶음밥', '와플'];
 const SEASON_KW = ['간장', '소금', '참기름', '들기름', '된장', '고추장', '쌈장', '춘장', '카레', '후추', '설탕', '알룰로스', '식초', '매실', '올리고당', '물엿', '꿀', '마요', '케찹', '케첩', '굴소스', '쯔유', '다시다', '미원', '참깨', '깨소금', '고춧가루', '청양', '고추가루', '액젓', '젓갈', '허브', '바질', '오레가노', '파슬리', '시나몬', '계피', '소스', '드레싱', '겨자', '와사비', '파프리카장', '육수', '맛술', '미림', '청주', '조미료', '양념'];
@@ -1209,12 +1265,20 @@ function renderPantry() {
     if (!items.length) return;
     let inner;
     if (z.k === 'fridge' || z.k === 'freezer') {
-      // 냉장·냉동은 안쪽을 육류·야채·과일·밀키트·기타로 묶어 보여준다
+      // 냉장·냉동은 안쪽을 육류·야채·과일·밀키트·기타로 묶고, 육류는 닭·돼지·소·기타·수산으로 한 번 더 묶는다
       const groups = SUBS.map(sb => ({ sb: sb, items: items.filter(p => subOf(p) === sb.k) })).filter(g => g.items.length);
-      inner = groups.map(g =>
-        '<div class="sgroup"><div class="sgroup-h"><span>' + g.sb.em + ' ' + esc(g.sb.label) + '</span><span class="pc">' + g.items.length + '</span></div>' +
-        '<div class="pantry">' + g.items.map(pantryChip).join('') + '</div></div>'
-      ).join('');
+      inner = groups.map(g => {
+        const head = '<div class="sgroup-h"><span>' + g.sb.em + ' ' + esc(g.sb.label) + '</span><span class="pc">' + g.items.length + '</span></div>';
+        if (g.sb.k !== 'meat') {
+          return '<div class="sgroup">' + head + '<div class="pantry">' + g.items.map(pantryChip).join('') + '</div></div>';
+        }
+        const mg = MEAT_GROUPS.map(m => ({ m: m, items: g.items.filter(p => meatGroupName(p.name) === m.k) })).filter(x => x.items.length);
+        const sub = mg.map(x =>
+          '<div class="msub"><div class="msub-h"><span>' + x.m.em + ' ' + esc(x.m.label) + '</span><span class="mc">' + x.items.length + '</span></div>' +
+          '<div class="pantry">' + x.items.map(pantryChip).join('') + '</div></div>'
+        ).join('');
+        return '<div class="sgroup">' + head + '<div class="msubs">' + sub + '</div></div>';
+      }).join('');
     } else {
       inner = '<div class="pantry">' + items.map(pantryChip).join('') + '</div>';
     }
@@ -1225,7 +1289,7 @@ function renderPantry() {
     );
   });
   const hint = $('#pantryHint');
-  if (hint) hint.textContent = q ? '🔍 “' + ui.pantryQ.trim() + '” ' + shown + '개 찾음' : '냉장·냉동은 육류·야채·과일·밀키트로 자동 분류';
+  if (hint) hint.textContent = q ? '🔍 “' + ui.pantryQ.trim() + '” ' + shown + '개 찾음' : '냉장·냉동은 육류·야채·과일·밀키트로, 육류는 닭·돼지·소로 자동 분류';
   $('#pantry').innerHTML = parts.join('') || '<span class="empty" style="padding:10px;grid-column:1/-1">' + (q ? '검색 결과가 없어요 — 다른 이름으로 찾아보세요' : '식자재를 추가해 보세요') + '</span>';
 }
 function renderRecipes() {
@@ -2296,6 +2360,7 @@ window.__home = {
   render, push, seedState, shareLink,
   zones: ZONES, inferZone, guessEmoji, nameMatches, ownedKeys, stockLevel, stockCount, allRecipes, RECIPES, GEMINI_RECIPES,
   subs: SUBS, subOf, inferSub, parseReceiptLines, isWeekend: () => { const w = curWd(); return w === 0 || w === 6; },
+  meats: MEAT_GROUPS, meatGroupName, meatGroupOf,
   parseReceiptMeta, guessReceiptAmount, guessReceiptDate, guessReceiptMerchant, guessReceiptCard,
   cardForWallet, walletPayload, sendToWalletLedger, WALLET_INBOX,
   get receiptMeta() { return ui.receiptMeta; },
