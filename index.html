@@ -74,6 +74,21 @@ ul{padding:0; list-style:none}
 .clock{text-align:right; line-height:1.05}
 .clock-time{font-size:clamp(1.25rem,2.1vw,1.7rem); font-weight:900; letter-spacing:-.02em; font-variant-numeric:tabular-nums}
 .clock-day{font-size:.7rem; font-weight:800; color:var(--ink-faint)}
+/* ---- 🕐 바늘시계 (헤더 · 실시간) ---- */
+.analog-btn{
+  flex:0 0 auto; width:3.05rem; height:3.05rem; padding:0; border-radius:50%;
+  border:2px solid #ece9f7; background:#fff; cursor:pointer;
+  box-shadow:0 3px 0 rgba(42,42,60,.08), 0 8px 18px rgba(42,42,60,.07);
+  display:grid; place-items:center; -webkit-tap-highlight-color:transparent;
+}
+.analog-btn:active{transform:translateY(2px); box-shadow:0 1px 0 rgba(42,42,60,.08)}
+.analog-svg{width:100%; height:100%; display:block}
+.analog-svg .cl-hour{stroke:#ef4444; stroke-width:7; stroke-linecap:round}
+.analog-svg .cl-min{stroke:#2563eb; stroke-width:4.4; stroke-linecap:round}
+.analog-svg .cl-sec{stroke:#f472b6; stroke-width:1.4; stroke-linecap:round}
+.analog-svg .cl-pin{fill:#2a2a3c}
+.analog-svg .cl-pin2{fill:#fff}
+.analog-svg text{font-family:var(--font); font-size:12.5px; font-weight:900; fill:#2a2a3c}
 .icon-btn{
   width:3rem; height:3rem; border-radius:16px; border:none; cursor:pointer;
   background:#fff; color:var(--ink); display:grid; place-items:center;
@@ -525,6 +540,19 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
   flex:0 0 auto; width:2.1rem; height:2.1rem; border-radius:11px; border:none; cursor:pointer;
   background:#fff0f0; color:#dc2626; font-size:1.05rem; font-weight:900; display:grid; place-items:center;
 }
+/* ---- 루틴 순서 바꾸기 (▲▼) ---- */
+.move-grp{flex:0 0 auto; display:flex; gap:.22rem; align-items:center; touch-action:manipulation}
+.mv-btn{
+  flex:0 0 auto; width:2.4rem; height:2.4rem; min-width:2.4rem; min-height:2.4rem; padding:0;
+  border-radius:11px; border:2px solid #e6e2f3; background:#f8f6ff; color:#5b46c9;
+  display:grid; place-items:center; cursor:pointer;
+  -webkit-tap-highlight-color:transparent; touch-action:manipulation;
+}
+.mv-btn svg{width:1rem; height:1rem; display:block}
+.mv-btn:active:not([disabled]){transform:translateY(1px); background:#ece6ff}
+.mv-btn[disabled]{opacity:.26; background:#f5f4f9; color:#a6a3b8; border-color:#eeecf6; cursor:default}
+.edit-row.just-moved{animation:rowFlash .55s ease}
+@keyframes rowFlash{0%{background:#efe9ff}70%{background:#f7f4ff}100%{background:transparent}}
 .ghost-btn{
   font-family:inherit; font-size:.82rem; font-weight:900; padding:.5rem .8rem; border-radius:12px;
   border:2px solid #e6e2f3; background:#fff; color:#4b3fa8; cursor:pointer; align-self:flex-start;
@@ -543,6 +571,23 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
 }
 .primary-btn:active{transform:translateY(2px); box-shadow:0 2px 0 #46379e}
 .modal-foot{display:flex; justify-content:flex-end; gap:.5rem; padding:.7rem 1.1rem calc(.8rem + env(safe-area-inset-bottom)); border-top:1px solid var(--line); background:#fff}
+/* ---- 🕐 크게 보는 시계 놀이 ---- */
+.clock-panel{width:min(96vw,36rem)}
+.clock-body{align-items:center; gap:.75rem}
+#clockBig{width:min(70vmin,80vw,26rem); height:auto; aspect-ratio:1/1; flex:0 0 auto}
+.clock-read{text-align:center; line-height:1.15}
+#clockDigital{display:block; font-size:1.7rem; font-weight:900; letter-spacing:-.02em; font-variant-numeric:tabular-nums}
+#clockWords{font-size:1rem; font-weight:800; color:var(--ink-soft); margin-top:.2rem}
+.clock-legs{display:flex; gap:.9rem; flex-wrap:wrap; justify-content:center; font-size:.78rem; font-weight:800; color:var(--ink-faint)}
+.clock-legs .leg{display:inline-flex; align-items:center; gap:.32rem}
+.clock-legs .leg i{display:block; border-radius:999px}
+.clock-legs .leg.hour i{width:1.25rem; height:.36rem; background:#ef4444}
+.clock-legs .leg.min i{width:1.9rem; height:.24rem; background:#2563eb}
+@media (orientation:landscape) and (max-height:520px){
+  #clockBig{width:min(52vmin,15rem)}
+  #clockDigital{font-size:1.3rem}
+  .clock-body{gap:.5rem}
+}
 .edit-sup{display:flex; flex-direction:column; gap:.4rem}
 .edit-sup .edit-row{display:flex; align-items:center}
 .edit-sup input{font-size:.86rem}
@@ -689,6 +734,7 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
   .icon-palette{grid-template-columns:repeat(6,minmax(0,1fr))}
   .edit-fields{grid-template-columns:1fr}
 }
+
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important}
 }
@@ -1766,6 +1812,21 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
 .meal-star.on{filter:none; opacity:1; animation:bowlPop .5s cubic-bezier(.2,1.6,.4,1)}
 .meal-note{margin-top:.5rem; font-size:.78rem; font-weight:800; color:var(--ink-faint); text-align:center; line-height:1.35}
 .meal-note.on{color:#0f7a44}
+/* 좁은 화면: 헤더 버튼을 조금 줄여 한 줄에 모두 들어오게 (390·360px 실측) */
+@media (max-width:620px){
+  .topbar{gap:.4rem}
+  .topbar-right{gap:.32rem}
+  .clock{display:none}
+  .analog-btn{width:2.55rem; height:2.55rem}
+  .icon-btn{width:2.6rem; height:2.6rem; border-radius:13px}
+  .lang-btn{padding:.3rem .38rem}
+}
+@media (max-width:380px){
+  .topbar-right{gap:.24rem}
+  .icon-btn{width:2.35rem; height:2.35rem}
+  .analog-btn{width:2.3rem; height:2.3rem}
+  .lang-btn{padding:.22rem .28rem}
+}
 </style>
 </head>
 <body>
@@ -1792,7 +1853,7 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
       <button class="refresh-btn" id="btnRefreshApp" type="button" aria-label="최신 버전으로 새로고침" title="최신 버전으로 새로고침">
         <span class="refresh-ico" aria-hidden="true">🔄</span>
       </button>
-      <span class="app-ver" id="appVer" title="앱 버전">v5.4.0</span>
+      <span class="app-ver" id="appVer" title="앱 버전">v5.5.0</span>
       <button class="wake-btn" id="btnWakeQuick" type="button" aria-pressed="false" aria-label="화면 켜짐 유지" title="화면 켜짐 유지">
         <span class="wake-ico" id="wakeQuickIcon" aria-hidden="true">🌙</span><span class="wake-txt" id="wakeQuickText">꺼짐</span>
       </button>
@@ -1807,6 +1868,9 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
           <span class="flag" aria-hidden="true">🇰🇷</span><span class="code">KR</span>
         </button>
       </div>
+      <button class="analog-btn" id="btnClock" type="button" data-i18n-aria="clockOpenAria" aria-label="시계 크게 보기" aria-haspopup="dialog" aria-controls="clockModal" title="시계 크게 보기">
+        <svg class="analog-svg" id="analogClock" viewBox="0 0 100 100" aria-hidden="true" focusable="false"></svg>
+      </button>
       <div class="clock" aria-live="off">
         <div class="clock-time" id="clockTime">--:--</div>
         <div class="clock-day" id="clockDay">불러오는 중</div>
@@ -2634,6 +2698,34 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
 </div>
 
 <!-- 💌 응원 보내기 -->
+<!-- 🕐 시간 공부: 크게 보는 바늘시계 -->
+<div class="modal" id="clockModal" hidden>
+  <div class="modal-backdrop" data-clock-close="1"></div>
+  <div class="modal-panel clock-panel" role="dialog" aria-modal="true" aria-labelledby="clockTitle">
+    <header class="modal-head">
+      <h2 id="clockTitle" data-i18n="clockTitle">🕐 시계 놀이</h2>
+      <button class="icon-btn small" type="button" data-clock-close="1" data-i18n-aria="close" aria-label="닫기">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true">
+          <line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line>
+        </svg>
+      </button>
+    </header>
+    <div class="modal-body clock-body">
+      <svg class="analog-svg" id="clockBig" viewBox="0 0 100 100" role="img" aria-label="바늘시계"></svg>
+      <div class="clock-read">
+        <strong id="clockDigital">--:--</strong>
+        <p id="clockWords">—</p>
+      </div>
+      <div class="clock-legs">
+        <span class="leg hour"><i aria-hidden="true"></i><span data-i18n="clockLegHour">시침 · 짧고 빨강</span></span>
+        <span class="leg min"><i aria-hidden="true"></i><span data-i18n="clockLegMin">분침 · 길고 파랑</span></span>
+      </div>
+      <button class="primary-btn" id="btnClockSay" type="button" data-i18n="clockSay">🔊 지금 시각 읽어 줘</button>
+      <p class="hint" id="clockHint" data-i18n="clockHint">짧은 빨간 시침이 가리키는 숫자가 ‘시’, 긴 파란 분침이 가리키는 숫자가 ‘분’이에요.</p>
+    </div>
+  </div>
+</div>
+
 <div class="modal" id="cheerModal" hidden>
   <div class="modal-backdrop" data-cheer-close="1"></div>
   <div class="modal-panel cheer-panel" role="dialog" aria-modal="true" aria-labelledby="cheerTitle">
@@ -13690,7 +13782,7 @@ window.VOICE_AUDIO = {
    — 글자를 못 읽는 만 4세도 그림만 보고 무엇인지 알 수 있게
    ============================================================ */
 var ICON_ORDER = [
-  'bed', 'water', 'wash', 'tooth', 'meal', 'dinner', 'hands', 'toys', 'bath', 'shower',
+  'bed', 'water', 'wash', 'tooth', 'toilet', 'meal', 'dinner', 'hands', 'toys', 'bath', 'shower',
   'bottle', 'prep', 'sleep', 'bag', 'dress', 'book', 'abc', 'math', 'shapes', 'puzzle',
   'uniform', 'indoor', 'ballet', 'gym', 'sneakers', 'bookclub', 'star'
 ];
@@ -13698,6 +13790,7 @@ var ICON_ORDER = [
 var ICON_BG = {
   bed: '#FFF1DC', water: '#E4F5FF', wash: '#E8F4FF', tooth: '#EDF9F3', meal: '#FFF3E0',
   dinner: '#FFF0F3', hands: '#E4F6FF', toys: '#FFF1DE', bath: '#E3F6FF', shower: '#E6F7FF',
+  toilet: '#E6F7F0',
   bottle: '#FFF6DA', prep: '#FFF0F6',
   sleep: '#F0ECFF', bag: '#FFF0DE', dress: '#FFF0F4', book: '#FFF4E6', abc: '#FFF7DA',
   math: '#E6F4FF', shapes: '#FFF0F6', puzzle: '#F2EBFF', uniform: '#EEF3FA', indoor: '#F0F8FF',
@@ -13759,6 +13852,15 @@ var ICONS = {
     '<circle cx="33.6" cy="6.6" r="2.4" fill="#FFFFFF" opacity=".92"/>' +
     '<circle cx="29" cy="12.6" r="1.7" fill="#FFFFFF" opacity=".8"/>' +
     '<circle cx="27.4" cy="24" r="1.4" fill="#DBE9F5"/><circle cx="34.6" cy="24" r="1.4" fill="#DBE9F5"/>',
+
+  /* 화장실 가기 — 물탱크·파란 물이 보이는 변기 (옆모습) */
+  toilet: '<path d="M12.6 8.2h11.8a3.8 3.8 0 0 1 3.8 3.8v9.2H12.6z" fill="#F4FAFF" stroke="#9FC2DC" stroke-width="2.2" stroke-linejoin="round"/>' +
+    '<ellipse cx="24.4" cy="11.2" rx="3" ry="1.6" fill="#4FB6E8"/>' +
+    '<path d="M13.4 21.6h15.6c8.8 0 13.4 3.8 13.4 9 0 5.6-4.8 9.2-11.8 9.2H18c-3.2 0-5.4-2.2-5.4-5z" fill="#FFFFFF" stroke="#9FC2DC" stroke-width="2.2" stroke-linejoin="round"/>' +
+    '<ellipse cx="27.8" cy="23" rx="13.6" ry="4" fill="#E4F5FF" stroke="#9FC2DC" stroke-width="2.2"/>' +
+    '<ellipse cx="28.4" cy="23.4" rx="8.8" ry="2.3" fill="#6FCDF2"/>' +
+    '<path d="M19.8 39.2h12.4v3.2H19.8z" fill="#E4F5FF" stroke="#9FC2DC" stroke-width="1.9" stroke-linejoin="round"/>' +
+    '<path d="M8.8 42.6h30.4" stroke="#9FC2DC" stroke-width="2.8" stroke-linecap="round"/>',
 
   /* 밥 먹기 — 밥그릇과 숟가락 */
   meal: '<path d="M16 5.4c-1.9 1.9 1.9 3.1 0 5M22 4.4c-1.9 1.9 1.9 3.1 0 5M28 5.4c-1.9 1.9 1.9 3.1 0 5" stroke="#D8C4AC" stroke-width="2.4" fill="none" stroke-linecap="round"/>' +
@@ -13940,7 +14042,7 @@ function iconSVG(key) {
   ============================================================ */
   var STORAGE_KEY = 'seohan-numberblocks-routine-v1';
   var STORAGE_VERSION = 6;            /* v6: 🏖️ 주말·공휴일 모드 · 물통·수저통 · 내일 준비물 삭제 */
-  var APP_VERSION = '5.4.0';          /* v5.4: 주말·공휴일 모드 · Study 탭 · 밥 3끼 보너스 · 1~100 넘버블럭스 SVG */
+  var APP_VERSION = '5.5.0';          /* v5.5: 루틴 순서 바꾸기(▲▼) · 시간 공부용 바늘시계(헤더 + 크게 보기) · 화장실 아이콘 */
   var APP_BUILT = '2026-11-21';
   var CELEBRATE_UNDO_MS = 10000;      /* 전체 완료 후 10초 안에 취소하면 축하·도감 해금을 되돌려요 */
   var UNDO_TTL = 90 * 1000;           /* 방금 취소한 체크는 90초 동안 원격 상태보다 우선해요 */
@@ -14218,6 +14320,17 @@ function iconSVG(key) {
       newItemKo: '새 항목',
       newItemEn: 'New item',
       setMorningAtHint: '시각을 넣으면 그 시간에 큰 그림이 뜨고, 다음 항목 시각까지 강조돼요.',
+      moveUpAria: '루틴 순서 위로 올리기',
+      moveDownAria: '루틴 순서 아래로 내리기',
+
+      /* ---- 🕐 바늘시계 ---- */
+      clockOpenAria: '시계 크게 보기',
+      clockAria: '바늘시계',
+      clockTitle: '🕐 시계 놀이',
+      clockHint: '짧은 빨간 시침이 가리키는 숫자가 ‘시’, 긴 파란 분침이 가리키는 숫자가 ‘분’이에요.',
+      clockLegHour: '시침 · 짧고 빨강',
+      clockLegMin: '분침 · 길고 파랑',
+      clockSay: '🔊 지금 시각 읽어 줘',
 
       /* ---- 🔤 Sight Words ---- */
       tabSight: 'Sight Words',
@@ -14553,6 +14666,17 @@ function iconSVG(key) {
       newItemKo: '새 항목',
       newItemEn: 'New item',
       setMorningAtHint: 'Add a time and the big picture pops up then, staying until the next item time.',
+      moveUpAria: 'Move routine up',
+      moveDownAria: 'Move routine down',
+
+      /* ---- 🕐 Analog clock ---- */
+      clockOpenAria: 'Open the big clock',
+      clockAria: 'Analog clock',
+      clockTitle: '🕐 Clock Play',
+      clockHint: 'The short red hand shows the hour; the long blue hand shows the minutes.',
+      clockLegHour: 'Hour · short & red',
+      clockLegMin: 'Minute · long & blue',
+      clockSay: '🔊 Read the time to me',
 
       /* ---- 🔤 Sight Words ---- */
       tabSight: 'Sight Words',
@@ -16107,7 +16231,133 @@ function iconSVG(key) {
     $('progressEnd').textContent = state.settings.departTime;
   }
 
+  /* ============================================================
+     🕐 바늘시계 (시간 공부용)
+     · 헤더 미니 시계 + 누르면 크게 보는 모달 시계가 같은 tick() 으로 움직여요
+     · 숫자 1~12 큰 글씨, 5분 눈금·1분 눈금
+     · 시침(짧고 굵게 빨강) / 분침(길고 파랑) / 초침(가늘게 분홍)
+  ============================================================ */
+  var CLOCK_FACE = null;
+
+  function clockFaceSVG() {
+    if (CLOCK_FACE) return CLOCK_FACE;
+    var s = '<circle cx="50" cy="50" r="48" fill="#fffdf9" stroke="#ece9f7" stroke-width="2"/>';
+    var i;
+    for (i = 0; i < 60; i++) {
+      var five = i % 5 === 0;
+      /* 50 이 중심이라 위쪽(12시 방향) 눈금은 y = 50 - 반지름 */
+      var yIn = five ? 7 : 4.6, yOut = 3;
+      s += '<line x1="50" y1="' + yIn + '" x2="50" y2="' + yOut + '" transform="rotate(' +
+        (i * 6) + ' 50 50)" stroke="' + (five ? '#7d76a8' : '#d6d1e6') +
+        '" stroke-width="' + (five ? 2.4 : 1.1) + '" stroke-linecap="round"/>';
+    }
+    for (i = 1; i <= 12; i++) {
+      var a = i * 30 * Math.PI / 180;
+      var x = 50 + 32 * Math.sin(a);
+      var y = 50 - 32 * Math.cos(a);
+      s += '<text x="' + x.toFixed(2) + '" y="' + y.toFixed(2) + '" dy="0.35em" text-anchor="middle">' + i + '</text>';
+    }
+    CLOCK_FACE = s;
+    return s;
+  }
+
+  var CLOCK_HANDS =
+    '<line class="cl-hour" x1="50" y1="52" x2="50" y2="26"/>' +
+    '<line class="cl-min" x1="50" y1="52" x2="50" y2="21.5"/>' +
+    '<line class="cl-sec" x1="50" y1="54" x2="50" y2="23"/>' +
+    '<circle class="cl-pin2" cx="50" cy="50" r="4.8"/>' +
+    '<circle class="cl-pin" cx="50" cy="50" r="2.3"/>';
+
+  function buildClockFaces() {
+    ['analogClock', 'clockBig'].forEach(function (id) {
+      var svg = $(id);
+      if (!svg || svg.getAttribute('data-built') === '1') return;
+      svg.innerHTML = clockFaceSVG() + CLOCK_HANDS;
+      svg.setAttribute('data-built', '1');
+    });
+  }
+
+  function clockHourKo(h) {
+    return ['열두', '한', '두', '세', '네', '다섯', '여섯', '일곱', '여덟', '아홉', '열', '열한'][h % 12];
+  }
+  function clockSinoKo(n) {
+    var d = ['', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구'];
+    var t = Math.floor(n / 10), o = n % 10, s = '';
+    if (t === 1) s = '십';
+    else if (t > 1) s = d[t] + '십';
+    if (o) s += d[o];
+    return s;
+  }
+  function clockNumEn(n) {
+    var one = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
+      'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+    var ten = ['', '', 'twenty', 'thirty', 'forty', 'fifty'];
+    if (n < 20) return one[n] || String(n);
+    return ten[Math.floor(n / 10)] + (n % 10 ? '-' + one[n % 10] : '');
+  }
+  function clockWords(now) {
+    var h24 = now.getHours(), m = now.getMinutes();
+    var h = h24 % 12; if (h === 0) h = 12;
+    if (isKo()) {
+      return '지금은 ' + (h24 < 12 ? '오전' : '오후') + ' ' + clockHourKo(h) + ' 시 ' +
+        (m === 0 ? '정각' : clockSinoKo(m) + ' 분') + '이에요.';
+    }
+    /* 9:08 → "It's nine oh eight a.m." 처럼 아이가 읽기 좋은 말로 */
+    return "It's " + clockNumEn(h) +
+      (m === 0 ? " o'clock" : (m < 10 ? ' oh ' + clockNumEn(m) : ' ' + clockNumEn(m))) +
+      ' ' + (h24 < 12 ? 'a.m.' : 'p.m.');
+  }
+
+  function renderAnalogClock(now) {
+    buildClockFaces();
+    var h24 = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+    var hAng = (h24 % 12) * 30 + m * 0.5 + s / 120;
+    var mAng = m * 6 + s * 0.1;
+    var sAng = s * 6;
+    ['analogClock', 'clockBig'].forEach(function (id) {
+      var svg = $(id);
+      if (!svg) return;
+      var hh = svg.querySelector('.cl-hour');
+      var mm = svg.querySelector('.cl-min');
+      var ss = svg.querySelector('.cl-sec');
+      if (hh) hh.setAttribute('transform', 'rotate(' + hAng.toFixed(3) + ' 50 50)');
+      if (mm) mm.setAttribute('transform', 'rotate(' + mAng.toFixed(3) + ' 50 50)');
+      if (ss) ss.setAttribute('transform', 'rotate(' + sAng.toFixed(3) + ' 50 50)');
+      svg.setAttribute('aria-label', L('clockAria') + ' ' + pad2(h24) + ':' + pad2(m));
+    });
+    if ($('clockDigital')) $('clockDigital').textContent = pad2(h24) + ':' + pad2(m);
+    if ($('clockWords')) $('clockWords').textContent = clockWords(now);
+  }
+
+  function clockModalOpen() {
+    var m = $('clockModal');
+    return !!(m && !m.hidden);
+  }
+  function openClock() {
+    var modal = $('clockModal');
+    if (!modal) return;
+    buildClockFaces();
+    renderAnalogClock(new Date());
+    modal.hidden = false;
+    document.documentElement.classList.add('modal-open');
+    var b = $('btnClockSay');
+    if (b) setTimeout(function () { b.focus(); }, 140);
+  }
+  function closeClock() {
+    var modal = $('clockModal');
+    if (!modal || modal.hidden) return;
+    modal.hidden = true;
+    document.documentElement.classList.remove('modal-open');
+    if ($('btnClock')) { try { $('btnClock').focus({ preventScroll: true }); } catch (e) {} }
+  }
+  function sayClockTime() {
+    var txt = clockWords(new Date());
+    if (isKo()) speakKorean(txt, 1);
+    else speakOut(txt, { lang: 'en', rate: 0.9 });
+  }
+
   function renderClock(now) {
+    renderAnalogClock(now);
     $('clockTime').textContent = pad2(now.getHours()) + ':' + pad2(now.getMinutes());
     var day = now.getDay();
     $('clockDay').textContent = isKo()
@@ -17249,6 +17499,59 @@ function iconSVG(key) {
     });
   }
 
+  /* ============================================================
+     ▲▼ 루틴 순서 바꾸기 (설정 모달)
+     · 행을 DOM 에서 바로 위/아래 이웃과 자리만 바꿔요 (데이터는 저장할 때 읽어요)
+     · 첫 행의 ▲, 마지막 행의 ▼ 는 비활성
+  ============================================================ */
+  var MV_UP_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5.4l6.6 9.6H5.4z" fill="currentColor"/></svg>';
+  var MV_DN_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 18.6L5.4 9h13.2z" fill="currentColor"/></svg>';
+
+  function editRowsOf(box) {
+    var out = [];
+    if (!box) return out;
+    for (var i = 0; i < box.children.length; i++) {
+      var el = box.children[i];
+      if (el && el.classList && el.classList.contains('edit-row')) out.push(el);
+    }
+    return out;
+  }
+
+  function refreshMoveOrder(box) {
+    var rows = editRowsOf(box);
+    for (var i = 0; i < rows.length; i++) {
+      var up = rows[i].querySelector('.mv-up');
+      var dn = rows[i].querySelector('.mv-down');
+      var first = i === 0, last = i === rows.length - 1;
+      if (up) { up.disabled = first; up.setAttribute('aria-disabled', first ? 'true' : 'false'); }
+      if (dn) { dn.disabled = last; dn.setAttribute('aria-disabled', last ? 'true' : 'false'); }
+    }
+  }
+
+  function moveEditRow(row, dir) {
+    var box = row && row.parentNode;
+    if (!box) return;
+    var rows = editRowsOf(box);
+    var i = rows.indexOf(row);
+    var j = i + dir;
+    if (i < 0 || j < 0 || j >= rows.length) return;
+    var wasBtn = document.activeElement && document.activeElement.classList &&
+      document.activeElement.classList.contains('mv-btn');
+    if (dir < 0) box.insertBefore(row, rows[j]);
+    else box.insertBefore(row, rows[j + 1] || null);
+    refreshMoveOrder(box);
+    row.classList.remove('just-moved');
+    void row.offsetWidth;               /* 애니메이션을 다시 틀어요 */
+    row.classList.add('just-moved');
+    setTimeout(function () { row.classList.remove('just-moved'); }, 560);
+    /* 키보드·연속 클릭으로 여러 번 옮길 수 있게 초점을 이어 줘요 */
+    if (wasBtn) {
+      var next = row.querySelector(dir < 0 ? '.mv-up' : '.mv-down');
+      if (!next || next.disabled) next = row.querySelector(dir < 0 ? '.mv-down' : '.mv-up');
+      if (next && !next.disabled) { try { next.focus({ preventScroll: true }); } catch (e) { next.focus(); } }
+    }
+  }
+
   function itemRow(it, kind) {
     var row = document.createElement('div');
     row.className = 'edit-row';
@@ -17295,8 +17598,31 @@ function iconSVG(key) {
     del.setAttribute('aria-label', L('delAria'));
     del.textContent = '×';
     del.addEventListener('click', function () {
-      if (row.parentNode) row.parentNode.removeChild(row);
+      var box = row.parentNode;
+      if (!box) return;
+      box.removeChild(row);
+      refreshMoveOrder(box);
     });
+
+    /* ▲▼ 순서 바꾸기 버튼 (아이패드·모바일에서 누르기 좋게 2.4rem) */
+    var moveGrp = document.createElement('span');
+    moveGrp.className = 'move-grp';
+    var upBtn = document.createElement('button');
+    upBtn.type = 'button';
+    upBtn.className = 'mv-btn mv-up';
+    upBtn.innerHTML = MV_UP_SVG;
+    upBtn.setAttribute('aria-label', L('moveUpAria'));
+    upBtn.title = L('moveUpAria');
+    upBtn.addEventListener('click', function () { moveEditRow(row, -1); });
+    var dnBtn = document.createElement('button');
+    dnBtn.type = 'button';
+    dnBtn.className = 'mv-btn mv-down';
+    dnBtn.innerHTML = MV_DN_SVG;
+    dnBtn.setAttribute('aria-label', L('moveDownAria'));
+    dnBtn.title = L('moveDownAria');
+    dnBtn.addEventListener('click', function () { moveEditRow(row, 1); });
+    moveGrp.appendChild(upBtn);
+    moveGrp.appendChild(dnBtn);
 
     row.appendChild(grip);
     row.appendChild(pick);
@@ -17318,6 +17644,7 @@ function iconSVG(key) {
       row.appendChild(atWrap);
     }
 
+    row.appendChild(moveGrp);
     row.appendChild(del);
 
     var pal = document.createElement('div');
@@ -17351,6 +17678,7 @@ function iconSVG(key) {
       var box = $(cfg.list);
       box.innerHTML = '';
       draft[kind].forEach(function (it) { box.appendChild(itemRow(it, kind)); });
+      refreshMoveOrder(box);
       setHintText(kind, draft[kind].length);
     });
 
@@ -17426,6 +17754,7 @@ function iconSVG(key) {
     var cfg = SET_LIST[kind];
     var row = itemRow(it, kind);
     $(cfg.list).appendChild(row);
+    refreshMoveOrder($(cfg.list));
     var input = row.querySelector('.edit-en');
     input.focus();
     input.select();
@@ -21386,11 +21715,18 @@ function iconSVG(key) {
     }
 
     $('btnSettings').addEventListener('click', openSettings);
+    if ($('btnClock')) $('btnClock').addEventListener('click', openClock);
+    if ($('btnClockSay')) $('btnClockSay').addEventListener('click', sayClockTime);
+    document.querySelectorAll('[data-clock-close]').forEach(function (el) {
+      el.addEventListener('click', closeClock);
+    });
+    buildClockFaces();
     document.querySelectorAll('[data-close]').forEach(function (el) {
       el.addEventListener('click', closeSettings);
     });
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'Escape') return;
+      if (clockModalOpen()) { closeClock(); return; }
       if (!$('talkModal').hidden) { closeTalk(); return; }
       if (!$('settingsModal').hidden) closeSettings();
     });
