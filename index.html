@@ -923,6 +923,16 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
 /* 새 단어 추가 */
 .card-sight-add .sight-add-form{margin-top:.35rem; display:flex; flex-direction:column; gap:.5rem}
 .card-sight-add .sight-add-form[hidden]{display:none}
+.sight-add-actions{display:flex; align-items:center; gap:.3rem; flex:0 0 auto}
+.mini-btn.qr{background:#eaf3ff; color:#1d4ed8; border:2px solid #cfe2ff; padding:.32rem .55rem}
+.mini-btn.qr:active{transform:translateY(1px)}
+
+/* 설정 모달에서 해당 묶음으로 이동했을 때 잠깐 강조 */
+@keyframes setFlash{
+  0%{background:rgba(139,92,246,.16); box-shadow:0 0 0 3px rgba(139,92,246,.35)}
+  100%{background:transparent; box-shadow:0 0 0 3px rgba(139,92,246,0)}
+}
+.set-group.flash{border-radius:16px; animation:setFlash 1.6s ease-out 1}
 .field textarea{
   font-family:inherit; font-size:.92rem; font-weight:800; color:var(--ink);
   padding:.5rem .6rem; border-radius:12px; border:2px solid #e6e2f3; background:#fbfaff;
@@ -1766,8 +1776,9 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
   box-shadow:0 3px 0 rgba(91,70,201,.16); cursor:pointer;
 }
 .wk-play-btn:active{transform:translateY(2px); box-shadow:0 1px 0 rgba(91,70,201,.16)}
-.wk-sight-back{max-width:1500px; margin:0 auto .55rem; width:100%}
-.wk-sight-back[hidden]{display:none}
+/* 주말 Study 탭 아래로 Sight Words 이어 보기 */
+.wk-sight-inline{width:100%; max-width:1500px; margin:.55rem auto 0; flex:0 0 auto}
+.wk-sight-inline[hidden]{display:none}
 .wk-tabbar[hidden]{display:none}
 
 /* 주말 루틴은 크고 또렷하게 */
@@ -1791,6 +1802,26 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
   .wk-side{grid-area:wkside; overflow:auto; min-height:0}
   .check-list.big .check-row{min-height:3.6rem}
   .panel-morning .card-morning, .panel-evening .card-homework{overflow:auto}
+  /* 📖 Study 탭: 숙제를 위에 두고 바로 아래에 Sight Words 3열을 이어 붙여요 */
+  #panelWs{flex:0 0 auto; min-height:auto}
+  #panelWs .wk-board{flex:0 0 auto; grid-template-rows:auto auto; align-items:start}
+  #panelWs .wk-list-card{align-self:start; min-height:0}
+  #panelWs .wk-list-card .check-list.big{max-height:none; overflow:visible}
+  #panelWs .wk-side{overflow:visible}
+  #panelWs .wk-hero{padding-bottom:.5rem}
+  #panelWs .wk-hero .wk-big{font-size:clamp(1.55rem,2.9vh,1.95rem)}
+  #panelWs .card-meal .meal-row{margin-top:.1rem}
+  #panelWs .card-meal .meal-chip{padding:.3rem .16rem .28rem; border-radius:12px}
+  #panelWs .card-meal .m-emoji{font-size:.95rem}
+  #panelWs .card-meal .m-bowl{font-size:1.02rem}
+  #panelWs .card-meal .meal-stars{margin-top:.26rem; font-size:1rem}
+  #panelWs .card-meal .meal-note{margin-top:.22rem; font-size:.7rem}
+  #panelWs .card-week .card-head{margin-bottom:.26rem}
+  #panelWs .card-week .stamp{width:1.95rem; height:1.95rem}
+  #panelWs .card-week .stamp svg{width:1.45rem; height:1.45rem}
+  #panelWs .card-week .stamp-row{min-height:1.95rem}
+  #panelWs .card-week .week-day .bar{height:1.5rem}
+  .wk-sight-inline{margin-top:.6rem}
 }
 
 /* ===== 🍚 밥 3끼 보너스 ===== */
@@ -1853,7 +1884,7 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
       <button class="refresh-btn" id="btnRefreshApp" type="button" aria-label="최신 버전으로 새로고침" title="최신 버전으로 새로고침">
         <span class="refresh-ico" aria-hidden="true">🔄</span>
       </button>
-      <span class="app-ver" id="appVer" title="앱 버전">v5.6.0</span>
+      <span class="app-ver" id="appVer" title="앱 버전">v5.6.1</span>
       <button class="wake-btn" id="btnWakeQuick" type="button" aria-pressed="false" aria-label="화면 켜짐 유지" title="화면 켜짐 유지">
         <span class="wake-ico" id="wakeQuickIcon" aria-hidden="true">🌙</span><span class="wake-txt" id="wakeQuickText">꺼짐</span>
       </button>
@@ -2299,9 +2330,6 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
             <div class="progress-track"><div class="progress-fill wk-fill study-fill"></div></div>
             <div class="progress-meta"><span class="wk-pct">0%</span><span class="wk-meta-r" data-i18n="wkMetaStudy">오늘의 공부</span></div>
           </div>
-          <button class="wk-play-btn" id="btnSightPlay" type="button" aria-haspopup="dialog" aria-controls="panelSight">
-            <span aria-hidden="true">🔤</span><span data-i18n="wkSightPlay">Sight Words 단어 놀이</span>
-          </button>
         </section>
 
         <section class="card wk-list-card">
@@ -2319,15 +2347,14 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
           <div class="stamp-slot" id="stampSlotWs"></div>
         </div>
       </div>
+
+      <!-- 주말·공휴일 Study 탭에서는 Sight Words 보드를 이 아래로 옮겨와 이어 보여줘요 -->
+      <div class="wk-sight-inline panel-sight" id="wkSightInline" hidden></div>
     </div>
 
     <!-- ===== Sight Words 탭 ===== -->
     <div class="panel panel-sight" id="panelSight" role="tabpanel" aria-labelledby="tabSight" hidden>
-      <div class="board">
-
-        <div class="wk-sight-back" id="wkSightBack" hidden>
-          <button class="ghost-btn" id="btnSightBack" type="button">← <span data-i18n="wkSightBack">Study로 돌아가기</span></button>
-        </div>
+      <div class="board" id="sightBoard">
 
         <div class="col col-a">
 
@@ -2422,7 +2449,10 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
           <section class="card card-sight-add" aria-labelledby="sightAddTitle">
             <div class="card-head">
               <h2 id="sightAddTitle" data-i18n="sightAddTitle">새 단어 추가</h2>
-              <button class="mini-btn" id="btnToggleAdd" type="button" aria-expanded="false">열기</button>
+              <div class="sight-add-actions">
+                <button class="mini-btn qr" id="btnSightQrShortcut" type="button" data-i18n="sightQrShortcut" aria-haspopup="dialog" aria-controls="settingsModal">📷 사진 QR 업로드</button>
+                <button class="mini-btn" id="btnToggleAdd" type="button" aria-expanded="false">열기</button>
+              </div>
             </div>
             <div class="sight-add-form" id="sightAddForm" hidden>
               <div class="field-row">
@@ -2643,7 +2673,7 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
         </div>
       </section>
 
-      <section class="set-group">
+      <section class="set-group" id="setSightGroup">
         <h3 data-i18n="setSightH">🔤 Sight Words 단어 넣기</h3>
         <p class="hint" data-i18n="setSightHint">12월처럼 새 단어를 준비할 때, 책 사진의 QR을 읽거나 여러 단어를 한 번에 붙여 넣어요.</p>
         <div class="sight-tools-row">
@@ -14042,8 +14072,8 @@ function iconSVG(key) {
   ============================================================ */
   var STORAGE_KEY = 'seohan-numberblocks-routine-v1';
   var STORAGE_VERSION = 6;            /* v6: 🏖️ 주말·공휴일 모드 · 물통·수저통 · 내일 준비물 삭제 */
-  var APP_VERSION = '5.6.0';          /* v5.6: 다이소 3,000원 쿠폰 20개마다 → 30·60·90종마다(3단계) */
-  var APP_BUILT = '2026-11-21';
+  var APP_VERSION = '5.6.1';          /* v5.6.1: 주말 Study 아래 Sight Words 이어 보기 · 3열 정렬 고정 · 새 단어 카드에 사진 QR 바로가기 */
+  var APP_BUILT = '2026-11-22';
   var CELEBRATE_UNDO_MS = 10000;      /* 전체 완료 후 10초 안에 취소하면 축하·도감 해금을 되돌려요 */
   var UNDO_TTL = 90 * 1000;           /* 방금 취소한 체크는 90초 동안 원격 상태보다 우선해요 */
   var AUTO_TAB_MIN = 15 * 60;         /* 오후 3시부터는 방과 후 탭을 먼저 보여줘요 */
@@ -14381,6 +14411,7 @@ function iconSVG(key) {
       sightQrOpen: 'EOS 원어민 음원 열기',
       toastSightQrLinked: '{w} — QR 링크를 연결했어요 🔗',
       sightAddTitle: '새 단어 추가',
+      sightQrShortcut: '📷 사진 QR 업로드',
       sightAddOpen: '열기',
       sightAddClose: '닫기',
       sightAddWord: '영어 단어',
@@ -14727,6 +14758,7 @@ function iconSVG(key) {
       sightQrOpen: 'Open the EOS native recording',
       toastSightQrLinked: '{w} — QR link attached 🔗',
       sightAddTitle: 'Add a Word',
+      sightQrShortcut: '📷 Photo QR upload',
       sightAddOpen: 'Open',
       sightAddClose: 'Close',
       sightAddWord: 'English word',
@@ -16529,9 +16561,22 @@ function iconSVG(key) {
       btn.setAttribute('aria-disabled', holidayLocked() ? 'true' : 'false');
       btn.title = holidayLocked() ? L('holidayAutoTitle') : (wk ? L('holidayOffTitle') : L('holidayOnTitle'));
     }
-    var back = $('wkSightBack');
-    if (back) back.hidden = !wk;
+    syncSightMount();
     if (opts && opts.switchTab) applyTab(resolveTab(new Date()), { keepScroll: true });
+  }
+
+  /* 주말·공휴일 Study 탭에서는 Sight Words 보드를 Study 아래로 옮겨 이어 보여 줘요.
+     평일에는 다시 🔤 Sight Words 탭 안으로 되돌립니다. */
+  function syncSightMount() {
+    var board = $('sightBoard'), mount = $('wkSightInline'), host = $('panelSight');
+    if (!board || !mount || !host) return;
+    var wk = weekendMode();
+    mount.hidden = !wk;
+    if (wk) {
+      if (board.parentNode !== mount) mount.appendChild(board);
+    } else if (board.parentNode !== host) {
+      host.appendChild(board);
+    }
   }
 
   function setHoliday(on) {
@@ -16596,7 +16641,7 @@ function iconSVG(key) {
   function applyTab(tab, opts) {
     var wk = weekendMode();
     if (WK_TABS.indexOf(tab) >= 0 && !wk) tab = 'morning';
-    if (wk && (tab === 'morning' || tab === 'evening')) tab = 'wm';   /* 주말엔 평일 탭을 열지 않아요 */
+    if (wk && (tab === 'morning' || tab === 'evening' || tab === 'sight')) tab = 'wm';   /* 주말엔 평일 탭을 열지 않아요 */
     activeTab = ALL_TABS.indexOf(tab) >= 0 ? tab : (wk ? 'wm' : 'morning');
     for (var i = 0; i < ALL_TABS.length; i++) {
       var name = ALL_TABS[i], on = name === activeTab;
@@ -16615,8 +16660,9 @@ function iconSVG(key) {
     moveStamps(activeTab);
     moveMealCard(activeTab);
     renderTabCounts();
-    if (activeTab === 'sight') { renderSight(); }   /* 탭 진입만으로는 소리 없음 */
+    if (activeTab === 'sight' || (wk && activeTab === 'ws')) { renderSight(); }   /* 탭 진입만으로는 소리 없음 */
     if (WK_TABS.indexOf(activeTab) >= 0) renderWeekend();
+    syncSightMount();
     if (!opts || !opts.keepScroll) { var m = $('main'); if (m) m.scrollTop = 0; }
   }
 
@@ -16635,7 +16681,7 @@ function iconSVG(key) {
     var wk = weekendMode();
     var ui = state.ui || {};
     var manual = (ui.tabDate === todayKey() && ALL_TABS.indexOf(ui.tabManual) >= 0) ? ui.tabManual : '';
-    if (manual === 'sight') return 'sight';
+    if (manual === 'sight') return wk ? 'ws' : 'sight';   /* 주말엔 Study 탭에 Sight Words 가 함께 보여요 */
     if (manual) {
       if (wk ? WK_TABS.indexOf(manual) >= 0 : (manual === 'morning' || manual === 'evening')) return manual;
     }
@@ -16644,7 +16690,12 @@ function iconSVG(key) {
 
   /* 지금 화면에 보이는 탭들 (키보드 이동용) */
   function visibleTabs() {
-    return weekendMode() ? WK_TABS.concat(['sight']) : ['morning', 'evening', 'sight'];
+    return weekendMode() ? WK_TABS.slice() : ['morning', 'evening', 'sight'];
+  }
+
+  /* 🔤 Sight Words 가 지금 화면에 보이는지 (평일 탭 · 주말 Study 안쪽 모두) */
+  function sightOnScreen() {
+    return activeTab === 'sight' || (activeTab === 'ws' && weekendMode());
   }
 
   function monthDay(d) {
@@ -17462,13 +17513,22 @@ function iconSVG(key) {
   ============================================================ */
   var draft = null;
 
-  function openSettings() {
+  function openSettings(opts) {
     draft = clone(state.settings);
     fillSettingsForm();
     syncFillSettings();
     $('settingsModal').hidden = false;
     document.documentElement.classList.add('modal-open');
-    setTimeout(function () { $('setStart').focus(); }, 120);
+    var atSight = !!(opts && opts.focusSight === true);
+    setTimeout(function () {
+      if (!atSight) { $('setStart').focus(); return; }
+      /* 🔤 Sight Words 단어 넣기 자리로 이동하고 잠깐 강조해요 */
+      var sec = $('setSightGroup');
+      if (!sec) return;
+      sec.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      sec.classList.add('flash');
+      setTimeout(function () { sec.classList.remove('flash'); }, 1700);
+    }, 160);
   }
   function closeSettings() {
     $('settingsModal').hidden = true;
@@ -18615,7 +18675,7 @@ function iconSVG(key) {
     renderSightHero();
     renderSightQuestion();
     /* 사용자가 [다음 문제] 등을 직접 눌렀을 때만 소리가 나요 (탭 진입·자동 넘김은 조용히) */
-    if (allowSpeak === true && activeTab === 'sight') {
+    if (allowSpeak === true && sightOnScreen()) {
       if (mode === 'listen') speakWord(target.w, 0.9);
       else if (ex) speakEn(sentenceWithout(ex[0], target.w) || ex[0], 0.9);  /* 빈칸 놀이: 답은 빼고 문장만 */
     }
@@ -18845,7 +18905,7 @@ function iconSVG(key) {
     if (sightTimer) clearTimeout(sightTimer);
     sightTimer = setTimeout(function () {
       sightTimer = null;
-      if (activeTab !== 'sight' || document.hidden) return;
+      if (!sightOnScreen() || document.hidden) return;
       nextSightQuestion();
     }, ms);
   }
@@ -21697,11 +21757,7 @@ function iconSVG(key) {
     /* 🏖️ 공휴일 토글 */
     var hol = $('btnHoliday');
     if (hol) hol.addEventListener('click', function () { setHoliday(!weekendMode()); });
-    /* 📖 Study 탭 ↔ 🔤 Sight Words */
-    var sp = $('btnSightPlay');
-    if (sp) sp.addEventListener('click', function () { chooseTab('sight'); });
-    var sb = $('btnSightBack');
-    if (sb) sb.addEventListener('click', function () { chooseTab('ws'); });
+    /* 📖 Study 탭 --------------- 🔤 Sight Words 는 주말에도 Study 아래에 함께 보여요 */
     bindSightEvents();
     bindSightImport();
     bindTalkEvents();
@@ -21719,6 +21775,8 @@ function iconSVG(key) {
     }
 
     $('btnSettings').addEventListener('click', openSettings);
+    var qs = $('btnSightQrShortcut');
+    if (qs) qs.addEventListener('click', function () { openSettings({ focusSight: true }); });
     if ($('btnClock')) $('btnClock').addEventListener('click', openClock);
     if ($('btnClockSay')) $('btnClockSay').addEventListener('click', sayClockTime);
     document.querySelectorAll('[data-clock-close]').forEach(function (el) {
