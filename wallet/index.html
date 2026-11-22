@@ -718,6 +718,77 @@ body.locked .app,body.locked .toast{visibility:hidden}
   .tr-acts .mini{margin-left:0}
 }
 
+/* ============ 2차 업데이트: 연말정산 · 쿠팡 쪼개기 · 고정비 상세 ============ */
+/* 고정비·변동비 분류 줄 — 누르면 건별 상세 */
+.fvl li.fvcat{cursor:pointer;border-radius:8px;padding:5px 4px;margin:0 -4px;transition:background .12s}
+.fvl li.fvcat:hover,.fvl li.fvcat:active{background:#F6F1E8}
+.fvl li.fvcat b{display:inline-flex;align-items:center;gap:2px}
+.fvl li.fvcat .fvar{font-style:normal;font-size:11px;color:#C9BEB0;font-weight:800;line-height:1}
+.fvl li.fvcat:hover .fvar{color:var(--sage-d)}
+
+/* 고정비·변동비 상세 모달 */
+.fvsum{background:#F8F4EB;border-radius:12px;padding:10px 12px;margin-bottom:9px}
+.fvsum-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.fvsum-h span{font-size:10.5px;font-weight:800;color:#8D8478;letter-spacing:-.2px}
+.fvsum-h b{font-size:16px;font-weight:800;letter-spacing:-.6px;font-variant-numeric:tabular-nums}
+.fvsum-s{font-size:9.5px;font-weight:700;color:#A79C8D;margin-top:3px;line-height:1.5}
+.fvrows{display:flex;flex-direction:column;gap:5px}
+.fvrow{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:#FFFDFA;border:1px solid var(--line);border-radius:12px;padding:9px 10px}
+.fvrow:active{background:#F6F1E8}
+.fvrow .fvd{flex:0 0 auto;font-size:9.5px;font-weight:800;color:#B0A596;font-variant-numeric:tabular-nums;min-width:34px}
+.fvrow .fvm{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.fvrow .fvm b{font-size:11.5px;font-weight:800;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fvrow .fvm small{font-size:9px;font-weight:700;color:#A79C8D;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fvrow .fva{flex:0 0 auto;font-size:12px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.4px}
+.fvrow .fva i{font-style:normal;font-size:9px;font-weight:700;color:#A79C8D;margin-left:1px}
+.fvrow .fve{flex:0 0 auto;font-size:10px;color:#C9BEB0;font-weight:800}
+
+/* 캡처 모드 토글 · 쿠팡 쪼개기 바 */
+.ocrmode{margin-bottom:9px}
+.ocrmode button{font-size:11px;padding:8px 6px}
+.cpbar{display:grid;grid-template-columns:1fr 1.15fr;gap:7px;margin-bottom:9px}
+.cpbar .qf{height:36px}
+.cpbar .qf input,.cpbar .qf select{font-size:12px}
+.cpnote{grid-column:1/-1;font-size:9.5px;font-weight:700;color:#A79C8D;line-height:1.5}
+.cpmis{color:var(--coral-d)}
+
+/* 연말정산 요약 */
+.taxhead{display:flex;align-items:center;gap:7px;margin-bottom:9px}
+.taxhead .qf{flex:0 0 118px;height:36px}
+.taxchip{margin-left:auto;font-size:9.5px;font-weight:800;color:var(--sage-d);background:var(--sage-soft);border-radius:8px;padding:5px 8px;white-space:nowrap}
+.taxgross{background:#F6FAF3;border:1.5px solid var(--sage-line);border-radius:13px;padding:10px 11px;margin-bottom:10px}
+.taxgross label{display:block;font-size:10px;font-weight:800;color:var(--mute);margin-bottom:5px;letter-spacing:-.2px}
+.taxgross-row{display:flex;gap:6px}
+.taxgross-row input{flex:1;min-width:0;border:1px solid var(--sage-line);border-radius:9px;padding:9px 10px;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;text-align:right}
+.taxgross-row .btn{flex:0 0 auto}
+.taxbar-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-top:9px;font-size:10px;font-weight:800;color:#8D8478}
+.taxbar-h b{color:var(--ink2);font-variant-numeric:tabular-nums}
+.taxbar-h span.ok{color:var(--sage-d)}
+.taxbar{height:10px;border-radius:99px;background:#EDE6DA;overflow:hidden;margin-top:5px}
+.taxbar i{display:block;height:100%;background:var(--sage);border-radius:99px;transition:width .25s}
+.taxbar i.low{background:var(--amber)}
+.taxbar-note{margin-top:6px;font-size:9.5px;font-weight:700;color:#A79C8D;line-height:1.55}
+.taxbar-note b{color:var(--ink2)}
+.txdim{color:#C0B6A6;font-weight:700}
+.taxlist{display:flex;flex-direction:column;gap:6px}
+.taxrow{display:flex;align-items:center;gap:9px;background:#FFFDFA;border:1px solid var(--line);border-radius:13px;padding:10px 11px}
+.taxrow.zero{opacity:.62}
+.taxrow .te{flex:0 0 auto;width:28px;height:28px;border-radius:9px;background:#F6F1E8;display:grid;place-items:center;font-size:14px}
+.taxrow .tn{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.taxrow .tn b{font-size:11.5px;font-weight:800;letter-spacing:-.3px}
+.taxrow .tn small{font-size:9px;font-weight:700;color:#A79C8D;line-height:1.4}
+.taxrow .tn .txnote{color:var(--amber-d)}
+.taxrow .ta{flex:0 0 auto;text-align:right;display:flex;flex-direction:column;gap:2px}
+.taxrow .ta b{font-size:13px;font-weight:800;letter-spacing:-.4px;font-variant-numeric:tabular-nums}
+.taxrow .ta b i{font-style:normal;font-size:9px;font-weight:700;color:#A79C8D;margin-left:1px}
+.taxrow .ta small{font-size:9px;font-weight:700;color:var(--sage-d)}
+.taxsum{margin-top:10px;border-top:1px dashed var(--line);padding-top:9px;display:flex;flex-direction:column;gap:5px}
+.taxsum div{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-size:10px;font-weight:800;color:#8D8478}
+.taxsum div b{font-size:12.5px;color:var(--sage-d);font-variant-numeric:tabular-nums;letter-spacing:-.3px}
+@media(min-width:760px){.tools{grid-template-columns:1fr 1fr}}
+.fvl li.fvmore{cursor:pointer;justify-content:center;padding:6px 0 2px;font-size:9px;font-weight:800;color:var(--sage-d)}
+.fvl li.fvmore:hover{color:var(--sage)}
+
 </style>
 </head>
 <body>
@@ -766,6 +837,7 @@ body.locked .app,body.locked .toast{visibility:hidden}
             <button id="mNext" aria-label="다음달">›</button>
           </div>
           <span class="chip line" id="ledgerChip">0건</span>
+          <button class="btn ghost sm" id="btnTax" title="연말정산 요약 — 한 해 카드·대중교통·의료비·기부금">📊 연말정산</button>
           <button class="btn ghost sm" id="btnWipeLedger" title="가계부 내역만 지우기">🗑 내역 지우기</button>
         </div>
       </div>
@@ -779,6 +851,11 @@ body.locked .app,body.locked .toast{visibility:hidden}
         <button class="tool" id="btnOcr">
           <span class="tic">📷</span>
           <span class="ttx"><b>캡처로 추가</b><small>카드결제 화면을 읽어 표로</small></span>
+          <span class="zero">한도 0%</span>
+        </button>
+        <button class="tool" id="btnCoupang">
+          <span class="tic">🛒</span>
+          <span class="ttx"><b>쿠팡 품목별 쪼개기</b><small>주문서 캡처 하나를 품목마다 한 줄로</small></span>
           <span class="zero">한도 0%</span>
         </button>
         <button class="tool" id="btnShortcut2">
@@ -841,7 +918,7 @@ body.locked .app,body.locked .toast{visibility:hidden}
           <ul class="rec" id="recentList"></ul>
         </div>
       </div>
-      <div class="cnote">고정비·변동비는 카테고리로 자동 분류되고, 내역을 누르면 바로 옮길 수 있어요 (같은 곳은 다음에도 기억) · 고정 8종 / 변동 8종으로 틀을 고정했습니다</div>
+      <div class="cnote">고정비·변동비는 카테고리로 자동 분류되고, 내역을 누르면 바로 옮길 수 있어요 (같은 곳은 다음에도 기억) · 분류 이름을 누르면 그 달 건별 상세가 열립니다</div>
     </section>
 
     <section class="card" id="secCardUse">
@@ -1394,11 +1471,47 @@ body.locked .app,body.locked .toast{visibility:hidden}
 <div class="mask" id="mOcr"><div class="sheet" style="max-width:860px">
   <div class="sheet-h"><b>📷 캡처에서 읽은 내역</b><button class="x" data-close>✕</button></div>
   <div class="sheet-b">
+    <div class="seg2 ocrmode" id="ocrMode" role="tablist">
+      <button type="button" data-m="txn" class="on">📄 결제 내역</button>
+      <button type="button" data-m="coupang">🛒 쿠팡 품목 쪼개기</button>
+    </div>
     <div class="banner info" id="ocrMsg"></div>
-    <div class="tblwrap"><table class="tbl" id="ocrTable"></table></div>
-    <div class="hint" style="margin-top:8px">잘못 읽힌 숫자만 고쳐 주세요 · 내 계좌 이체로 보이는 줄은 미리 꺼 두었어요</div>
+    <div class="cpbar hidden" id="cpBar">
+      <div class="qf"><span class="w">📅</span><input type="date" id="cpDate" aria-label="쿠팡 결제 날짜"></div>
+      <div class="qf"><select id="cpCard" aria-label="쿠팡 결제수단"></select></div>
+      <div class="cpnote" id="cpNote">품목마다 한 줄로 담깁니다 · 날짜·결제수단은 바꾸면 전체에 바로 적용돼요</div>
+    </div>
+    <div class="tblwrap cards-wrap"><table class="tbl" id="ocrTable"></table></div>
+    <div class="hint" style="margin-top:8px" id="ocrHint">잘못 읽힌 숫자만 고쳐 주세요 · 내 계좌 이체로 보이는 줄은 미리 꺼 두었어요</div>
   </div>
   <div class="sheet-f"><button class="btn ghost" data-close>취소</button><button class="btn pri" id="ocrConfirm">선택한 <span id="ocrCount">0</span>건 반영</button></div>
+</div></div>
+
+<div class="mask" id="mFvDetail"><div class="sheet" style="max-width:460px">
+  <div class="sheet-h"><b id="fvTitle">상세 내역</b><button class="x" data-close>✕</button></div>
+  <div class="sheet-b" id="fvBody"></div>
+  <div class="sheet-f"><button class="btn ghost" data-close>닫기</button><button class="btn pri" id="fvAllBtn">전체 내역에서 보기</button></div>
+</div></div>
+
+<div class="mask" id="mTax"><div class="sheet" style="max-width:560px">
+  <div class="sheet-h"><b>📊 연말정산 요약</b><button class="x" data-close>✕</button></div>
+  <div class="sheet-b">
+    <div class="taxhead">
+      <div class="qf" style="height:36px"><span class="w">📅</span><select id="taxYear" aria-label="연도"></select></div>
+      <div class="taxchip" id="taxChip">0건</div>
+    </div>
+    <div class="taxgross">
+      <label for="taxGross">총급여 (선택 입력 · 이 기기에 저장)</label>
+      <div class="taxgross-row">
+        <input id="taxGross" inputmode="numeric" placeholder="예: 48,000,000">
+        <button class="btn ghost sm" id="taxGrossSave">저장</button>
+      </div>
+      <div class="taxbar-wrap" id="taxBarWrap"></div>
+    </div>
+    <div class="taxlist" id="taxList"></div>
+    <div class="hint" style="margin-top:8px">가계부에 적힌 내역을 결제한 날 기준으로 모은 <b>참고용 요약</b>이에요 · 더치페이·기간 나누기와 상관없이 결제 전액으로 잡고, 🚇 대중교통은 40%로 따로 빼 중복되지 않게 했습니다 · 실제 공제는 부양가족·소득 조건에 따라 달라집니다</div>
+  </div>
+  <div class="sheet-f"><button class="btn ghost" data-close>닫기</button><button class="btn pri" id="taxCsv">CSV로 내보내기</button></div>
 </div></div>
 
 <div class="mask" id="mWipe"><div class="sheet" style="max-width:420px">
@@ -1522,12 +1635,21 @@ const LS_ROOM = "wallet-room-v2";
 const LS_MONTH = "wallet-month-v2";
 const LS_TAB = "wallet-tab-v2";
 
-/* 카테고리: fixed=true 는 고정비 기본값 */
+/* 카테고리: fixed=true 는 고정비 기본값
+   · 식비·교통은 그대로 두고(기존 내역·기존 규칙 호환) 2차 세분화로
+     식자재/외식·배달/카페·간식/술·모임 · 차량유지비/택시·대리/대중교통을 더한다 */
 const CATS = [
   { n: "식비", e: "🍚", fixed: false },
+  { n: "식자재", e: "🥬", fixed: false },
+  { n: "외식·배달", e: "🍽️", fixed: false },
+  { n: "카페·간식", e: "☕", fixed: false },
+  { n: "술·모임", e: "🍻", fixed: false },
   { n: "생활", e: "🧴", fixed: false },
   { n: "아이", e: "🧒", fixed: false },
   { n: "교통", e: "🚌", fixed: false },
+  { n: "차량유지비", e: "🚗", fixed: false },
+  { n: "택시·대리", e: "🚕", fixed: false },
+  { n: "대중교통", e: "🚇", fixed: false },
   { n: "쇼핑", e: "🛍️", fixed: false },
   { n: "의료", e: "💊", fixed: false },
   { n: "문화", e: "🎬", fixed: false },
@@ -1549,6 +1671,17 @@ const CAT_BY = {};
 CATS.forEach(c => { CAT_BY[c.n] = c; });
 function catEmoji(name) { return (CAT_BY[name] && CAT_BY[name].e) || "📌"; }
 function catFixedDefault(name) { return !!(CAT_BY[name] && CAT_BY[name].fixed); }
+
+/* 식비·교통 세부 분류 묶음 (합계·연말정산 집계용) */
+const FOOD_CATS = ["식비", "식자재", "외식·배달", "카페·간식", "술·모임"];
+const TRANSPORT_CATS = ["교통", "차량유지비", "택시·대리", "대중교통"];
+/* 대중교통 — 세부 분류가 붙기 전 '교통'으로 적힌 옛 내역도 함께 본다 */
+const TRANSIT_RE = /버스|지하철|전철|티머니|교통카드|코레일|KTX|SRT|광역|기차|시내버스|공항철도|지하철/;
+function isTransitTxn(t) {
+  if (!t) return false;
+  if (t.cat === "대중교통") return true;
+  return t.cat === "교통" && TRANSIT_RE.test(String(t.memo || ""));
+}
 
 /* 결제수단 — 카드가 아닌 수단은 카드 실적 계산에서 빠짐 */
 const PAY_CASH = "cash";
@@ -1980,6 +2113,8 @@ function blankState() {
     giftUses: [],
     ktChecks: {},
     catRules: {},
+    /* 연말정산 요약 — 총급여(선택 입력)와 마지막으로 보던 연도 */
+    tax: { gross: 0, year: "" },
     security: { pinOn: false, pinHash: "", salt: "" },
     updatedAt: 0
   };
@@ -2081,6 +2216,9 @@ function normalizeState(raw) {
   s.security.pinHash = String(s.security.pinHash || "");
   s.security.salt = String(s.security.salt || "");
   s.ktChecks = s.ktChecks && typeof s.ktChecks === "object" ? s.ktChecks : {};
+  s.tax = s.tax && typeof s.tax === "object" ? s.tax : {};
+  s.tax.gross = num(s.tax.gross);
+  s.tax.year = /^\d{4}$/.test(String(s.tax.year || "")) ? String(s.tax.year) : "";
   s.onnuri = s.onnuri && typeof s.onnuri === "object" ? s.onnuri : {};
   s.onnuri.total = num(s.onnuri.total);
   s.onnuri.updatedAt = num(s.onnuri.updatedAt);
@@ -3080,6 +3218,11 @@ function renderAll() {
   setSync(syncKind);
   if (typeof applyLockState === "function") applyLockState();
   if (typeof renderAuthUi === "function") renderAuthUi();
+  /* 고정비·변동비 상세 모달이 열려 있으면 칸을 고친 뒤 숫자도 같이 맞춰 준다 */
+  if (typeof renderFvDetail === "function") {
+    const fv = document.getElementById("mFvDetail");
+    if (fv && fv.classList.contains("on")) renderFvDetail();
+  }
 }
 
 function syncMonthNav() {
@@ -3303,6 +3446,7 @@ function renderCardUse() {
 }
 
 /* ---------- 가계부 ---------- */
+let fvShowAll = false;   /* 고정비·변동비 목록을 전부 펼쳤는지 */
 function renderLedger() {
   const mk = uiMonth;
   const st = monthStats(mk);
@@ -3330,8 +3474,8 @@ function renderLedger() {
   const dayN = monthOf(todayISO()) === mk ? day.getDate() : lastDayOfMonth(mk);
   $("#varSub").textContent = st.varList.length + "건 · 하루 평균 " + won(st.variable / Math.max(1, dayN));
 
-  $("#fixList").innerHTML = groupRows(st.fixList, st.fix);
-  $("#varList").innerHTML = groupRows(st.varList, st.variable);
+  $("#fixList").innerHTML = groupRows(st.fixList, st.fix, true);
+  $("#varList").innerHTML = groupRows(st.varList, st.variable, false);
 
   const dn = $("#dutchNote");
   if (dn) {
@@ -3403,12 +3547,21 @@ function renderLedger() {
       monthLabel(mk) + " 기록이 아직 없어요<br>위에서 한 줄 적거나 엑셀을 올려 주세요</li>";
 }
 
-function groupRows(list, total) {
+function groupRows(list, total, fixed) {
   if (!list.length) return '<li style="border:0;justify-content:center;color:#B7AC9C;font-size:9.5px;font-weight:600">아직 없어요</li>';
   const map = {};
-  list.forEach(t => { map[t.cat] = (map[t.cat] || 0) + spendAmt(t); });  return Object.keys(map).sort((a, b) => map[b] - map[a]).slice(0, 6).map(cat =>
-    "<li><span>" + catEmoji(cat) + " " + esc(cat) + " <i>" + (total ? Math.round(map[cat] / total * 100) : 0) + "%</i></span><b>" + fmt(map[cat]) + "</b></li>"
-  ).join("");
+  list.forEach(t => { map[t.cat] = (map[t.cat] || 0) + spendAmt(t); });
+  const cats = Object.keys(map).sort((a, b) => map[b] - map[a]);
+  const show = fvShowAll ? cats : cats.slice(0, 6);
+  return show.map(cat =>
+    '<li class="fvcat" data-fvcat="' + esc(cat) + '" data-fvfix="' + (fixed ? "1" : "0") + '" title="눌러서 ' + esc(cat) + ' 건별 상세 보기">' +
+      "<span>" + catEmoji(cat) + " " + esc(cat) + " <i>" + (total ? Math.round(map[cat] / total * 100) : 0) + "%</i></span>" +
+      '<b>' + fmt(map[cat]) + '<em class="fvar">›</em></b></li>'
+  ).join("") +
+    (cats.length > 6
+      ? '<li class="fvmore" data-fvmore="' + (fixed ? "fix" : "var") + '"><span>' +
+        (fvShowAll ? "접기 ▲" : "＋ " + (cats.length - 6) + "개 분류 더 보기 ▼") + "</span></li>"
+      : "");
 }
 
 /* ---------- 기프티콘 ---------- */
@@ -5118,8 +5271,10 @@ function exportCsv() {
 /* ---------- 이벤트 위임 ---------- */
 function bindDelegates() {
   document.addEventListener("click", ev => {
-    const t = ev.target.closest ? ev.target.closest("[data-edit-card],[data-edit-gift],[data-big],[data-use],[data-unuse],[data-gift-bal],[data-kt],[data-txn],[data-open-txn],[data-del],[data-pick-use],[data-pick-unuse],[data-pick-edit],[data-edit-pt]") : null;
+    const t = ev.target.closest ? ev.target.closest("[data-edit-card],[data-edit-gift],[data-big],[data-use],[data-unuse],[data-gift-bal],[data-kt],[data-txn],[data-open-txn],[data-del],[data-pick-use],[data-pick-unuse],[data-pick-edit],[data-edit-pt],[data-fvcat],[data-fvmore]") : null;
     if (!t) return;
+    if (t.hasAttribute("data-fvmore")) { ev.stopPropagation(); fvShowAll = !fvShowAll; renderLedger(); return; }
+    if (t.hasAttribute("data-fvcat")) { ev.stopPropagation(); openFvDetail(t.getAttribute("data-fvcat"), t.getAttribute("data-fvfix") === "1"); return; }
     if (t.hasAttribute("data-edit-pt")) { ev.stopPropagation(); openPointModal(t.getAttribute("data-edit-pt")); return; }
     if (t.hasAttribute("data-pick-use")) { askUsePick(t.getAttribute("data-pick-use")); return; }
     if (t.hasAttribute("data-pick-unuse")) { unusePick(t.getAttribute("data-pick-unuse")); return; }
@@ -6949,12 +7104,18 @@ async function openEncryptedWorkbook(bytes) {
 }
 
 /* ---------- 표 해석 ---------- */
+/* 대분류·소분류 이름 → 앱 카테고리. 식비·교통은 세분류가 생겼지만
+   기존 이름 그대로 들어오는 표도 있어 '식분'·'교통' 키는 그대로 둔다 */
 const SUPPLIER_CAT = {
-  "식비": "식비", "카페": "식비", "카페/간식": "식비", "카페·간식": "식비", "간식": "식비", "외식": "식비", "배달": "식비", "음식": "식비",
-  "주류": "문화", "유흥": "문화", "주류·유흥": "문화",
-  "마트": "생활", "편의점": "생활", "생활": "생활", "생필품": "생활", "세탁": "생활",
-  "마트·편의점": "생활",
-  "교통": "교통", "주유": "교통", "대중교통": "교통", "택시": "교통", "주차": "교통", "자동차": "교통",
+  "식비": "식비",
+  "카페": "카페·간식", "카페/간식": "카페·간식", "카페·간식": "카페·간식", "간식": "카페·간식", "디저트": "카페·간식", "베이커리": "카페·간식",
+  "외식": "외식·배달", "배달": "외식·배달", "음식": "외식·배달", "외식·배달": "외식·배달", "배달음식": "외식·배달",
+  "식자재": "식자재", "장보기": "식자재", "마트": "식자재", "식료품": "식자재",
+  "주류": "술·모임", "술": "술·모임", "주류·유흥": "술·모임", "유흥": "문화",
+  "편의점": "생활", "생활": "생활", "생필품": "생활", "세탁": "생활",
+  "교통": "교통", "주유": "차량유지비", "주유소": "차량유지비", "주차": "차량유지비", "자동차": "차량유지비", "차량": "차량유지비", "장비": "차량유지비", "정비": "차량유지비",
+  "대중교통": "대중교통", "버스": "대중교통", "지하철": "대중교통",
+  "택시": "택시·대리", "대리": "택시·대리", "택시·대리": "택시·대리",
   "쇼핑": "쇼핑", "온라인쇼핑": "쇼핑", "뷰티": "쇼핑", "의류": "쇼핑", "패션": "쇼핑", "뷰티·미용": "쇼핑", "미용": "쇼핑",
   "의료": "의료", "병원": "의료", "약국": "의료", "건강": "의료", "의료·건강": "의료",
   "문화": "문화", "여가": "문화", "취미": "문화", "도서": "문화", "영화": "문화", "문화·여가": "문화",
@@ -6970,10 +7131,14 @@ const SUPPLIER_CAT = {
   "고향사랑": "기부금", "고향사랑기부": "기부금", "유니세프": "기부금", "세이브더칠드런": "기부금", "월드비전": "기부금", "초록우산": "기부금", "굿네이버스": "기부금",
   "이체": "기타", "수입": "기타", "급여": "기타", "수수료": "기타", "기타": "기타"
 };
+/* 표의 분류가 '마트/편의점'처럼 뭉둘그려져 있으면 내역 키워드로 다시 본다
+   — 이마트는 식자재, GS25는 생활 (예전엔 둘 다 생활) */
+const CAT_DEFER = { "마트/편의점": 1, "마트·편의점": 1, "마트 / 편의점": 1 };
 /* 표의 분류 열 → 앱 고정/변동 카테고리 (정확 → 조각 → 포함 순) */
 function supplierCat(given) {
   const g = String(given || "").trim();
   if (!g) return "";
+  if (CAT_DEFER[g]) return "";
   if (SUPPLIER_CAT[g]) return SUPPLIER_CAT[g];
   if (CAT_BY[g]) return g;
   const parts = g.split(/[\/·>,\s]+/).filter(Boolean);
@@ -6990,15 +7155,21 @@ const CAT_GUESS = [
   [/용돈/, "용돈"],
   [/기부|고향사랑|후원|유니세프|세이브더칠드런|월드비전|초록우산|굿네이버스|자선|성금|모금/, "기부금"],
   [/관리비|공과금|월세|임대료|전기요금|가스요금|수도요금|도시가스|한전|아파트/, "관리비"],
-  [/대출|원리금|이자|상환|카드대금|할부금|중도금/, "대출"],
+  [/대출|원리금|이자(?!카야)|상환|카드대금|할부금|중도금/, "대출"],
   [/\bKT\b|\bSKT\b|SK텔레콤|LG\s?U\+|LGU|통신|인터넷|휴대폰|요금제|알뜰폰/, "통신"],
   [/보험/, "보험"],
   [/유치원|어린이집/, "유치원비"],
   [/에오스|교육|학원|교재|학습지|소마|팩토|슐레|논술|과외|문제집/, "교육"],
-  [/식비|카페|커피|간식|외식|배달|음식|식당|베이커리|치킨|피자|스타벅스|메가|투썸|이디야|컴포즈|빽다방|배스킨|던킨|맥도날드|버거|김밥|분식|쿠팡이츠|배민|요기요|떡볶이/, "식비"],
-  [/이마트|홈플러스|롯데마트|코스트코|마트|편의점|GS25|CU|세븐|생필품|다이소|세탁|청소|쿠팡|컬리|무인양품/, "생활"],
+  [/호프|포차|이자카야|주점|와인|맥주|술집|주류|소주|막걸리|하이볼|칵테일|비어/, "술·모임"],
+  [/스타벅스|메가MGC|메가커피|메가|컴포즈|투썸|이디야|빽다방|파리바게뜨|뚜레쥬르|배스킨|베스킨|던킨|할리스|폴바셋|공차|설빙|카페|커피|디저트|베이커리|빵집|도넛|아이스크림|주스|쥬스/, "카페·간식"],
+  [/배민|배달의민족|쿠팡이츠|요기요|땡겨요|식당|김밥|분식|치킨|피자|버거|맥도날드|롯데리아|서브웨이|토스트|떡볶이|국밥|칼국수|초밥|스시|돈까스|찜닭|족발|보쌈|냉면|쌀국수|마라탕|고깃집|회식|음식|외식|배달/, "외식·배달"],
+  [/이마트|롯데마트|홈플러스|트레이더스|코스트코|쿠팡프레시|마켓컬리|오아시스|하나로마트|농협하나로|노브랜드|정육|반찬|과일|청과|야채|채소|수산|생선|식자재|장보기|마트(?!폰|워치|밴드|홈|TV|tv)/, "식자재"],
+  [/편의점|GS25|CU|세븐일레븐|세븐|생필품|다이소|세탁|청소|쿠팡|무인양품/, "생활"],
   [/육아|아이|키즈|유아|장난감|아동|어린이|서한|기저귀|분유/, "아이"],
-  [/주유|주차|택시|버스|지하철|교통|KTX|카카오T|티머니|하이패스/, "교통"],
+  [/카카오T|카카오택시|카카오t|택시|우버|타다|대리운전|대리기사/, "택시·대리"],
+  [/티머니|교통카드|지하철|버스|코레일|KTX|SRT|광역|기차|전철|공항철도/, "대중교통"],
+  [/주유소|주유|SK에너지|GS칼텍스|S-OIL|에스오일|오일뱅크|세차|정비|카센터|하이패스|톨게이트|주차|엔진오일|타이어/, "차량유지비"],
+  [/교통/, "교통"],
   [/올리브영|무신사|쇼핑|의류|패션|뷰티|화장품/, "쇼핑"],
   [/병원|약국|의료|치과|한의원/, "의료"],
   [/영화|도서|공연|문화|넷플릭스|유튜브|티빙|웨이브|밀리|구독/, "문화"],
@@ -7314,6 +7485,250 @@ function confirmImport() {
   toast(added + "건을 가계부에 담았어요" + (sel.length - added ? " (중복 " + (sel.length - added) + "건 제외)" : ""));
 }
 
+/* ==== 52-tax.js ==== */
+/* ============================================================
+   📊 연말정산 요약 — 한 해 내역을 공제 항목별로 모아 보여 준다
+   (계산은 이 브라우저 안에서만 · 서버로 나가지 않음)
+   ============================================================ */
+const TAX_RATE = { credit: 0.15, check: 0.30, onnuri: 0.40, transit: 0.40, edu: 0.15, med: 0.15, don: 0.15 };
+const EDU_CAP = 3000000;   /* 취학전 아동 교육비 세액공제 한도 (연 300만) */
+const DON_HOMELOVE = 100000; /* 고향사랑기부금 10만 원 전액 공제 참고값 */
+
+function taxYears() {
+  const set = {};
+  state.txns.forEach(t => {
+    const y = String(t.date || "").slice(0, 4);
+    if (/^\d{4}$/.test(y)) set[y] = 1;
+  });
+  set[String(new Date().getFullYear())] = 1;
+  if (uiMonth) set[String(uiMonth).slice(0, 4)] = 1;
+  return Object.keys(set).sort().reverse();
+}
+function taxYearNow() {
+  const years = taxYears();
+  const saved = state.tax && String(state.tax.year || "");
+  if (saved && years.indexOf(saved) >= 0) return saved;
+  return years[0] || String(new Date().getFullYear());
+}
+function taxGross() {
+  return state.tax && typeof state.tax.gross === "number" ? state.tax.gross : 0;
+}
+
+/* 한 해 집계 — 공제는 '결제한 날' 기준, 금액은 결제 전액(더치·기간나누기와 무관) */
+function taxSummary(year) {
+  const y = String(year || taxYearNow());
+  const list = state.txns.filter(t => t.type !== "income" && String(t.date || "").slice(0, 4) === y && num(t.amount) > 0);
+  const s = { year: y, count: list.length, total: 0, credit: 0, check: 0, onnuri: 0, transit: 0, edu: 0, med: 0, don: 0, account: 0, etc: 0 };
+  list.forEach(t => {
+    const amt = num(t.amount);
+    s.total += amt;
+    if (t.cardId === PAY_ACCOUNT) { s.account += amt; return; }
+    if (t.cardId === PAY_ONNURI) { s.onnuri += amt; return; }
+    if (isTransitTxn(t)) { s.transit += amt; return; }
+    const c = cardById(t.cardId);
+    if (c && c.type === "check") { s.check += amt; return; }
+    if (c) { s.credit += amt; return; }
+    if (t.cardId === PAY_CASH) { s.check += amt; return; }
+    s.etc += amt;   /* 기프티콘·포인트 결제 — 카드 공제 대상 아님 */
+  });
+  /* 세액공제 항목 — 결제수단과 상관없이 분류로 모은다 */
+  list.forEach(t => {
+    if (t.cat === "유치원비" || t.cat === "교육") s.edu += num(t.amount);
+    else if (t.cat === "의료") s.med += num(t.amount);
+    else if (t.cat === "기부금") s.don += num(t.amount);
+  });
+  /* 25% 문턱에 들어가는 사용액 (카드·현금·전통시장·대중교통) */
+  s.thresholdUse = s.credit + s.check + s.onnuri + s.transit;
+  s.deduct = Math.round(
+    s.credit * TAX_RATE.credit + s.check * TAX_RATE.check + s.onnuri * TAX_RATE.onnuri + s.transit * TAX_RATE.transit
+  );
+  s.taxCredit = Math.round(
+    Math.min(s.edu, EDU_CAP) * TAX_RATE.edu + s.med * TAX_RATE.med + s.don * TAX_RATE.don
+  );
+  return s;
+}
+
+function openTax(year) {
+  const years = taxYears();
+  const sel = $("#taxYear");
+  if (sel) {
+    sel.innerHTML = years.map(y => '<option value="' + esc(y) + '">' + esc(y) + "년</option>").join("");
+    sel.value = String(year || taxYearNow());
+  }
+  if (!state.tax || typeof state.tax !== "object") state.tax = { gross: 0, year: "" };
+  $("#taxGross").value = taxGross() ? fmt(taxGross()) : "";
+  renderTax();
+  openModal("mTax");
+}
+
+function renderTax() {
+  const sel = $("#taxYear");
+  const year = sel ? sel.value || taxYearNow() : taxYearNow();
+  if (state.tax && state.tax.year !== year) {
+    state.tax = Object.assign({ gross: taxGross() }, state.tax, { year: year });
+  }
+  const s = taxSummary(year);
+  const chip = $("#taxChip");
+  if (chip) chip.textContent = s.count + "건 · 지출 " + fmt(s.total) + "원";
+
+  /* 총급여 25% 문턱 게이지 */
+  const gross = taxGross();
+  const wrap = $("#taxBarWrap");
+  if (wrap) {
+    if (!gross) {
+      wrap.innerHTML = '<div class="taxbar-note">총급여를 넣으면 <b>총급여 25% 문턱</b> 대비 카드 등 사용액 달성률과 남은 금액을 보여 드려요</div>';
+    } else {
+      const need = Math.round(gross * 0.25);
+      const pct = need > 0 ? Math.min(100, Math.round(s.thresholdUse / need * 100)) : 0;
+      const over = s.thresholdUse - need;
+      wrap.innerHTML =
+        '<div class="taxbar-h"><span>카드 등 사용액 <b>' + fmt(s.thresholdUse) + '</b>원</span><span class="' + (over >= 0 ? "ok" : "") + '">' + pct + "%</span></div>" +
+        '<div class="taxbar"><i class="' + (over >= 0 ? "" : "low") + '" style="width:' + pct + '%"></i></div>' +
+        '<div class="taxbar-note">총급여 25% 문턱 <b>' + won(need) + '</b> · ' +
+          (over >= 0
+            ? "문턱을 <b>" + won(over) + "</b> 넘었어요 ✓ 넘은 금액부터 공제 대상이에요"
+            : "<b>" + won(-over) + "</b> 남았어요") +
+        " <span class=\"txdim\">(총급여 " + won(gross) + ")</span></div>";
+    }
+  }
+
+  const rows = [
+    { e: "💳", t: "신용카드", sub: "공제율 15%", amt: s.credit, rate: TAX_RATE.credit },
+    { e: "🏧", t: "체크카드·현금", sub: "공제율 30%", amt: s.check, rate: TAX_RATE.check },
+    { e: "🎟️", t: "온누리상품권", sub: "전통시장 40%", amt: s.onnuri, rate: TAX_RATE.onnuri },
+    { e: "🚇", t: "대중교통", sub: "40% · 신용·체크 합계에서 빼 중복 없음", amt: s.transit, rate: TAX_RATE.transit },
+    { e: "🏫", t: "교육·유치원비", sub: "세액공제 15% · 취학전 아동 연 300만 한도", amt: s.edu, rate: TAX_RATE.edu, cap: EDU_CAP },
+    { e: "💊", t: "의료비", sub: "세액공제 15%", amt: s.med, rate: TAX_RATE.med },
+    { e: "💝", t: "기부금", sub: "세액공제 15% · 고향사랑 10만 원 전액 공제", amt: s.don, rate: TAX_RATE.don, note: s.don > 0 ? "고향사랑기부 " + won(Math.min(s.don, DON_HOMELOVE)) + "는 전액 공제 대상" : "" }
+  ];
+  const listBox = $("#taxList");
+  if (!listBox) return;
+  listBox.innerHTML = rows.map(r => {
+    const base = r.cap ? Math.min(r.amt, r.cap) : r.amt;
+    const est = Math.round(base * r.rate);
+    const zero = !r.amt;
+    return '<div class="taxrow' + (zero ? " zero" : "") + '">' +
+      '<span class="te">' + r.e + "</span>" +
+      '<div class="tn"><b>' + esc(r.t) + "</b><small>" + esc(r.sub) + "</small>" +
+        (r.note ? '<small class="txnote">' + esc(r.note) + "</small>" : "") +
+        (r.cap && r.amt > r.cap ? '<small class="txnote">한도 초과 ' + won(r.amt - r.cap) + "은 공제 제외</small>" : "") + "</div>" +
+      '<div class="ta"><b>' + fmt(r.amt) + "<i>원</i></b><small>" +
+        (r.amt ? "공제 " + fmt(est) + "원" : "기록 없음") + "</small></div>" +
+      "</div>";
+  }).join("") +
+    '<div class="taxsum">' +
+      '<div><span>예상 소득공제 (카드·전통시장·대중교통)</span><b>' + won(s.deduct) + "</b></div>" +
+      '<div><span>예상 세액공제 (교육·의료·기부)</span><b>' + won(s.taxCredit) + "</b></div>" +
+    "</div>" +
+    (s.account ? '<div class="hint">🏦 계좌이체 ' + won(s.account) + "은 카드 공제 대상이 아니에요</div>" : "") +
+    (s.etc ? '<div class="hint">🎁 기프티콘·포인트 결제 ' + won(s.etc) + "도 카드 공제 대상이 아니에요</div>" : "") +
+    (s.count ? "" : '<div class="pickempty">' + esc(year) + "년 지출 내역이 아직 없어요</div>");
+}
+
+function saveTaxGross() {
+  const v = Math.abs(num($("#taxGross").value));
+  state.tax = Object.assign({ gross: 0, year: taxYearNow() }, state.tax, { gross: v });
+  touch();
+  renderTax();
+  toast(v ? "총급여 " + won(v) + " 저장 · 25% 문턱을 계산했어요" : "총급여를 비웠어요");
+}
+function exportTaxCsv() {
+  const s = taxSummary(taxYearNow());
+  const head = "연도,항목,금액,공제율,예상공제\n";
+  const rows = [
+    ["신용카드", s.credit, "15%", Math.round(s.credit * TAX_RATE.credit)],
+    ["체크카드·현금", s.check, "30%", Math.round(s.check * TAX_RATE.check)],
+    ["온누리상품권", s.onnuri, "40%", Math.round(s.onnuri * TAX_RATE.onnuri)],
+    ["대중교통", s.transit, "40%", Math.round(s.transit * TAX_RATE.transit)],
+    ["교육·유치원비", s.edu, "15%", Math.round(Math.min(s.edu, EDU_CAP) * TAX_RATE.edu)],
+    ["의료비", s.med, "15%", Math.round(s.med * TAX_RATE.med)],
+    ["기부금", s.don, "15%", Math.round(s.don * TAX_RATE.don)]
+  ];
+  const body = rows.map(r => '"' + s.year + '","' + r[0] + '",' + r[1] + ',"' + r[2] + '",' + r[3]).join("\n");
+  downloadBlob("yeonmal-" + s.year + ".csv", "\ufeff" + head + body, "text/csv;charset=utf-8");
+  toast(s.year + "년 연말정산 요약을 CSV로 내보냈어요");
+}
+
+function bindTax() {
+  const btn = $("#btnTax");
+  if (btn) btn.addEventListener("click", () => openTax());
+  const sel = $("#taxYear");
+  if (sel) sel.addEventListener("change", () => { renderTax(); });
+  const gs = $("#taxGrossSave");
+  if (gs) gs.addEventListener("click", saveTaxGross);
+  const gi = $("#taxGross");
+  if (gi) {
+    gi.addEventListener("input", () => {
+      const raw = gi.value.replace(/[^\d]/g, "").slice(0, 12);
+      gi.value = raw ? fmt(raw) : "";
+    });
+    gi.addEventListener("keydown", ev => { if (ev.key === "Enter") { ev.preventDefault(); saveTaxGross(); } });
+  }
+  const csv = $("#taxCsv");
+  if (csv) csv.addEventListener("click", exportTaxCsv);
+}
+
+/* ==== 54-fv-detail.js ==== */
+/* ============================================================
+   🔒 고정비 · 🔁 변동비 분류를 누르면 그 달 건별 상세
+   ============================================================ */
+let fvCat = "";
+let fvFixed = false;
+
+function fvDetailList() {
+  const st = monthStats(uiMonth);
+  const base = fvFixed ? st.fixList : st.varList;
+  return sortTxDesc(base.filter(t => t.cat === fvCat));
+}
+function openFvDetail(cat, fixed) {
+  fvCat = cat || "";
+  fvFixed = !!fixed;
+  renderFvDetail();
+  openModal("mFvDetail");
+}
+function renderFvDetail() {
+  const box = $("#fvBody");
+  const title = $("#fvTitle");
+  if (!box) return;
+  const list = fvDetailList();
+  const sum = list.reduce((s, t) => s + spendAmtIn(t, uiMonth), 0);
+  const full = list.reduce((s, t) => s + num(t.amount), 0);
+  if (title) title.textContent = (fvFixed ? "🔒 고정비" : "🔁 변동비") + " · " + fvCat;
+  const head =
+    '<div class="fvsum">' +
+      '<div class="fvsum-h"><span>' + monthTitle(uiMonth) + " · " + list.length + "건</span><b>" + won(sum) + "</b></div>" +
+      (full !== sum ? '<div class="fvsum-s">결제 전액 ' + won(full) + " · 🤝 더치·🎁 페이백 반영한 금액이 위 금액이에요</div>" : "") +
+    "</div>";
+  const rows = list.map(t => {
+    const shown = spendAmtIn(t, uiMonth);
+    const tags = [];
+    if (dutchOn(t)) tags.push("🤝 내 몫");
+    if (trialOn(t)) tags.push(t.paybackDone ? "🎁 페이백 완료" : "🎁 페이백 대기");
+    if (splitOn(t)) tags.push("📆 " + splitIdx(t, uiMonth) + "/" + splitMonths(t) + "개월");
+    if (t.installment) tags.push("무이자 할부");
+    return '<button class="fvrow" data-open-txn="' + esc(t.id) + '" title="눌러서 이 내역 수정">' +
+      '<span class="fvd">' + esc(String(t.date || "").slice(5).replace("-", "/")) + "</span>" +
+      '<span class="fvm"><b>' + esc(t.memo || t.cat) + "</b><small>" + esc(cardLabel(t.cardId)) +
+        (tags.length ? " · " + tags.join(" · ") : "") + "</small></span>" +
+      '<span class="fva">' + fmt(shown) + "<i>원</i></span>" +
+      '<span class="fve">✎</span>' +
+      "</button>";
+  }).join("");
+  box.innerHTML = head + (rows
+    ? '<div class="fvrows">' + rows + "</div>"
+    : '<div class="pickempty">' + monthLabel(uiMonth) + "에 " + esc(fvCat) + "로 잡힌 내역이 없어요</div>") +
+    '<div class="hint" style="margin-top:9px">줄을 누르면 그 내역을 바로 고칠 수 있어요 (분류·금액·더치페이·기간 나누기)</div>';
+}
+function bindFvDetail() {
+  const all = $("#fvAllBtn");
+  if (all) all.addEventListener("click", () => {
+    closeModal("mFvDetail");
+    openAll();
+    const f = $("#allFilter");
+    if (f) { f.value = fvFixed ? "fix" : "var"; renderAllTx(); }
+  });
+}
+
 /* ==== 55-xlsx-crypt.js ==== */
 /* ============================================================
    암호 걸린 XLSX (ECMA-376 Agile) — 브라우저 안에서만 복호화
@@ -7558,9 +7973,13 @@ async function decryptXlsx(bytes, password) {
 /* ==== 60-ocr.js ==== */
 /* ============================================================
    무료 OCR (Tesseract.js, 브라우저 안에서만)
+   + 🛒 쿠팡 주문서 품목별 쪼개기 모드
    ============================================================ */
 let ocrRows = [];
 let ocrBusy = false;
+let ocrLines = [];          /* 마지막으로 읽은 OCR 줄 — 모드를 바꿔도 다시 읽지 않고 다시 나눈다 */
+let ocrMode = "txn";        /* txn = 결제 내역 / coupang = 쿠팡 품목 쪼개기 */
+let cpTotal = 0;            /* 쿠팡 캡처에서 읽은 총 결제금액 (있으면 품목 합계와 비교) */
 
 function loadScript(src) {
   return new Promise((resolve, reject) => {
@@ -7580,16 +7999,125 @@ async function ensureTesseract() {
   }
 }
 
-function bindOcr() {
-  $("#btnOcr").addEventListener("click", () => {
-    imgMode = "txn";
-    $("#fileImg").value = "";
-    $("#fileImg").click();
+/* ---------- 캡처 모드 (결제 내역 ↔ 쿠팡 쪼개기) ---------- */
+function pickOcrFile(mode) {
+  imgMode = mode === "coupang" ? "coupang" : "txn";
+  ocrMode = imgMode;
+  const inp = $("#fileImg");
+  if (!inp) return;
+  inp.value = "";
+  inp.click();
+}
+function cpDateValue() {
+  const el = $("#cpDate");
+  return (el && el.value) || dateForMonth(uiMonth);
+}
+function cpCardValue() {
+  const el = $("#cpCard");
+  if (el && el.value) return el.value;
+  return state.cards.length ? state.cards[0].id : PAY_CASH;
+}
+function fillCpCard() {
+  const el = $("#cpCard");
+  if (!el) return;
+  const cur = el.value || (state.cards[0] ? state.cards[0].id : PAY_CASH);
+  el.innerHTML = cardOptionsHTML(cur);
+  if (cur) el.value = cur;
+}
+function syncOcrModeUI() {
+  $$("#ocrMode button").forEach(b => b.classList.toggle("on", b.getAttribute("data-m") === ocrMode));
+  const bar = $("#cpBar");
+  if (bar) bar.classList.toggle("hidden", ocrMode !== "coupang");
+  const hint = $("#ocrHint");
+  if (hint) hint.innerHTML = ocrMode === "coupang"
+    ? "쿠팡 주문내역·영수증을 올리면 <b>상품명 + 가격</b>을 품목별로 나눠 담아요 · 배송비·할인·총 결제금액은 빼고, 품목 이름으로 <b>식자재 · 생활 · 아이 · 쇼핑</b>을 자동 분류합니다"
+    : "잘못 읽힌 숫자만 고쳐 주세요 · 내 계좌 이체로 보이는 줄은 미리 꺼 두었어요";
+}
+
+/* ---------- 🛒 쿠팡 주문서 파싱 ----------
+   '상품명 + 가격' 줄을 품목 하나로 보고, 가격이 다음 줄에 오는 주문서도 붙여 읽는다.
+   배송비·할인·쿠폰·포인트·총 결제금액 같은 줄은 품목이 아니므로 건너뛴다. */
+const CP_NOT_ITEM = /배송비|배송료|할인|쿠폰|적립|포인트|결제금액|결제 금액|총액|합계|소계|상품금액|주문금액|무료배송|반품|교환|취소|주문번호|주문일|결제수단|영수증|부가세|과세|면세|와우|멤버십|즉시할인|카드할인|상품쿠폰|할인금액|배송지|받는사람|주소|네이버페이|카카오페이|토스페이/;
+const CP_HEAD = /^(주문\s*상품|상품\s*정보|주문\s*정보|배송\s*정보|결제\s*정보|주문\s*내역|쿠팡\s*주문|영수증|옵션|수량|주문상태|구매\s*목록|장바구니)/;
+const CP_AMT = /([0-9][0-9,]{2,})\s*원/;
+const CP_CATS = [
+  [/기저귀|분유|물티슈|아동|어린이|키즈|유아|장난감|레고|블록|색연필|크레파스|학습지|동화|그림책|서한|아기|젖병|이유식|유치원|어린이집/, "아이"],
+  [/세제|섬유유연제|샴푸|린스|컨디셔너|치약|칫솔|휴지|키친타월|행주|수세미|락스|비누|건전지|전구|쓰레기봉투|청소|수납|정리함|빨래|다이소|방충|탈취|제습|세탁|욕실|주방세제|호일|랩|지퍼백|면봉|손소독|빨랫|걸레|밀대/, "생활"],
+  [/우유|계란|달걀|쌀|잡곡|과일|사과|바나나|귤|오렌지|포도|딸기|수박|채소|야채|양파|감자|고구마|대파|마늘|당근|버섯|고기|삼겹살|목살|닭|소고기|돼지|생선|새우|오징어|미역|다시마|라면|과자|초콜릿|음료|주스|커피|원두|소스|참기름|간장|소금|설탕|밀가루|빵|치즈|요거트|요구르트|두부|콩나물|김치|만두|햇반|통조림|식용유|올리브유|생수|견과|떡|어묵|맛살|참치|스팸|시리얼|탄산|맥주|와인|전분|카레|고추장|된장|쌈장|마요네즈|케첩/, "식자재"],
+  [/옷|의류|티셔츠|맨투맨|셔츠|바지|청바지|원피스|코트|패딩|신발|운동화|슬리퍼|가방|지갑|화장품|뷰티|향수|세럼|크림|로션|마스크팩|액세서리|이불|베개|쿠션|매트|커튼|가전|충전기|케이블|이어폰|드라이기|고데기|문구|필통|노트|텀블러|프라이팬|냄비|수건|양말|속옷|모자|장갑|목도리/, "쇼핑"]
+];
+function coupangCatOf(name) {
+  const s = String(name || "");
+  for (const pair of CP_CATS) if (pair[0].test(s)) return pair[1];
+  return "쇼핑";
+}
+function cpCleanName(s) {
+  return String(s || "")
+    .replace(/^\s*\d{1,2}\s*[.)]\s*/, "")          /* 줄 번호 1. 2) */
+    .replace(/^[•·▪\-–—]+\s*/, "")
+    .replace(/\s*[xX×*]\s*\d+\s*$/, "")            /* 수량 ×2 */
+    .replace(/\s*\d+\s*개\s*$/, "")                /* 수량 2개 */
+    .replace(/\s{2,}/g, " ")
+    .trim()
+    .slice(0, 60);
+}
+function parseCoupangLines(lines, opts) {
+  const date = (opts && opts.date) || dateForMonth(uiMonth);
+  const cardId = (opts && opts.cardId) || (state.cards[0] ? state.cards[0].id : PAY_CASH);
+  const rows = [];
+  let total = 0;
+  let pending = "";
+  const push = (name, amount) => {
+    name = cpCleanName(name);
+    if (!name || !(amount > 0)) return;
+    if (CP_NOT_ITEM.test(name)) return;
+    rows.push({
+      on: true, date: date, memo: name, amount: amount, cat: coupangCatOf(name),
+      fixed: false, cardId: cardId, transfer: false, hint: ""
+    });
+  };
+  (lines || []).forEach(raw => {
+    const line = String(raw || "").replace(/\s+/g, " ").trim();
+    if (!line || line.length < 2) return;
+    const m = line.match(CP_AMT);
+    if (!m) {
+      if (CP_NOT_ITEM.test(line) || CP_HEAD.test(line)) { pending = ""; return; }
+      pending = line;   /* 가격이 다음 줄에 오는 주문서 */
+      return;
+    }
+    const amount = num(m[1]);
+    if (/결제금액|결제 금액|총액|합계|소계|상품금액|주문금액/.test(line)) { total = amount; pending = ""; return; }
+    if (CP_NOT_ITEM.test(line)) { pending = ""; return; }
+    const before = line.slice(0, m.index).trim();
+    if (before) push(before, amount);
+    else if (pending) push(pending, amount);
+    pending = "";
   });
+  return { rows: rows.slice(0, 60), total: total };
+}
+
+function bindOcr() {
+  $("#btnOcr").addEventListener("click", () => { ocrMode = "txn"; pickOcrFile("txn"); });
+  const bc = $("#btnCoupang");
+  if (bc) bc.addEventListener("click", () => { ocrMode = "coupang"; pickOcrFile("coupang"); });
   $("#fileImg").addEventListener("change", ev => {
     const files = Array.prototype.slice.call(ev.target.files || []);
     if (files.length) runOcrFiles(files, imgMode);
   });
+  const modeBox = $("#ocrMode");
+  if (modeBox) modeBox.addEventListener("click", ev => {
+    const b = ev.target.closest("[data-m]");
+    if (!b) return;
+    const m = b.getAttribute("data-m") === "coupang" ? "coupang" : "txn";
+    if (m === ocrMode && ocrLines.length) { syncOcrModeUI(); return; }
+    ocrMode = m;
+    if (ocrLines.length) applyOcrLines();
+    else { syncOcrModeUI(); pickOcrFile(m); }
+  });
+  const cpDate = $("#cpDate");
+  if (cpDate) cpDate.addEventListener("change", applyCpBarToRows);
+  const cpCard = $("#cpCard");
+  if (cpCard) cpCard.addEventListener("change", applyCpBarToRows);
   $("#ocrTable").addEventListener("change", ev => {
     const i = Number(ev.target.getAttribute("data-i"));
     const f = ev.target.getAttribute("data-f");
@@ -7598,7 +8126,7 @@ function bindOcr() {
     else if (f === "amount") ocrRows[i].amount = num(ev.target.value);
     else ocrRows[i][f] = ev.target.value;
     const cnt = $("#ocrCount");
-  if (cnt) cnt.textContent = ocrRows.filter(r => r.on).length;
+    if (cnt) cnt.textContent = ocrRows.filter(r => r.on).length;
   });
   $("#ocrConfirm").addEventListener("click", () => {
     const sel = ocrRows.filter(r => r.on && r.amount > 0);
@@ -7615,13 +8143,59 @@ function bindOcr() {
   });
 }
 
+/* 모드에 맞게 읽은 줄을 다시 나눈다 (OCR은 한 번만 돌린다) */
+function applyOcrLines() {
+  fillCpCard();
+  syncOcrModeUI();
+  if (ocrMode === "coupang") {
+    const parsed = parseCoupangLines(ocrLines, { date: cpDateValue(), cardId: cpCardValue() });
+    ocrRows = parsed.rows;
+    cpTotal = parsed.total;
+    const sum = ocrRows.reduce((s, r) => s + num(r.amount), 0);
+    const diff = cpTotal ? cpTotal - sum : 0;
+    $("#ocrMsg").innerHTML = ocrRows.length
+      ? "🛒 쿠팡 <b>" + ocrRows.length + "개 품목</b>으로 나눴어요 · 합계 <b>" + fmt(sum) + "원</b>" +
+        (cpTotal ? (diff === 0
+          ? ' · 총 결제금액 <b>' + fmt(cpTotal) + '원</b>과 일치 ✓'
+          : ' · 총 결제금액 <b>' + fmt(cpTotal) + '원</b>과 <b class="cpmis">' + fmt(Math.abs(diff)) + "원 " + (diff > 0 ? "차이" : "많음") + "</b> — 빠진 품목이 있는지 확인해 주세요")
+          : "") + "<br><small>품목 이름으로 분류를 자동으로 골랐어요 · 틀린 분류·금액만 고쳐 주세요</small>"
+      : "🛒 쿠팡 품목을 찾지 못했어요 · 상품명과 금액이 함께 보이는 주문내역 캡처로 다시 시도해 주세요";
+    renderOcr();
+    return;
+  }
+  ocrRows = parseOcrLines(ocrLines);
+  $("#ocrMsg").innerHTML = ocrRows.length
+    ? "📷 <b>" + ocrRows.length + "건</b>을 읽었어요 · 잘못 읽힌 숫자만 고쳐 주세요"
+    : "읽어낸 결제 내역이 없어요 · 결제 목록이 크게 보이는 캡처로 다시 시도해 주세요";
+  renderOcr();
+}
+
+/* 쿠팡 모드의 날짜·결제수단을 표 전체에 한 번에 적용 */
+function applyCpBarToRows() {
+  if (ocrMode !== "coupang" || !ocrRows.length) return;
+  const d = cpDateValue(), c = cpCardValue();
+  ocrRows.forEach(r => { r.date = d; r.cardId = c; });
+  renderOcr();
+}
+
 async function runOcrFiles(files, mode) {
   if (ocrBusy) { toast("아직 읽는 중이에요"); return; }
   ocrBusy = true;
   const msgBox = mode === "pick" ? $("#pocrMsg") : mode === "trial" ? $("#tOcrMsg") : $("#ocrMsg");
   if (mode === "pick") openPickOcr([], "글자 인식 도구를 준비하는 중…");
   else if (mode === "trial") { if (msgBox) msgBox.textContent = "📷 글자 인식 도구를 준비하는 중…"; }
-  else { ocrRows = []; $("#ocrMsg").textContent = "글자 인식 도구를 준비하는 중…"; renderOcr(); openModal("mOcr"); }
+  else {
+    ocrRows = [];
+    ocrLines = [];
+    ocrMode = mode === "coupang" ? "coupang" : "txn";
+    fillCpCard();
+    const dp = $("#cpDate");
+    if (dp && !dp.value) dp.value = dateForMonth(uiMonth);
+    syncOcrModeUI();
+    $("#ocrMsg").textContent = "글자 인식 도구를 준비하는 중…";
+    renderOcr();
+    openModal("mOcr");
+  }
   let worker = null;
   try {
     await ensureTesseract();
@@ -7653,11 +8227,9 @@ async function runOcrFiles(files, mode) {
         ? "📷 캡처에서 <b>" + found.join("·") + "</b>을(를) 읽어 채웠어요 · 틀린 칸만 고쳐 주세요"
         : "📷 글자는 읽었지만 체험단 내용을 찾지 못했어요 · 더 선명한 캡처나 공지 복붙을 써 주세요";
     } else {
-      ocrRows = parseOcrLines(lines);
-      $("#ocrMsg").innerHTML = ocrRows.length
-        ? "📷 <b>" + ocrRows.length + "건</b>을 읽었어요 · 잘못 읽힌 숫자만 고쳐 주세요"
-        : "읽어낸 결제 내역이 없어요 · 결제 목록이 크게 보이는 캡처로 다시 시도해 주세요";
-      renderOcr();
+      ocrLines = lines;   /* 모드를 바꿔도 다시 읽지 않도록 보관 */
+      ocrMode = mode === "coupang" ? "coupang" : "txn";
+      applyOcrLines();
     }
   } catch (e) {
     console.warn("ocr failed", e);
@@ -7727,15 +8299,17 @@ function renderOcr() {
   const head = "<thead><tr><th>담기</th><th>날짜</th><th>내용</th><th>분류</th><th>결제</th><th>금액</th></tr></thead>";
   const body = ocrRows.map((r, i) =>
     '<tr class="' + (r.transfer ? "off" : "") + '" data-i="' + i + '">' +
-      '<td style="text-align:center"><input type="checkbox" data-f="on" data-i="' + i + '"' + (r.on ? " checked" : "") + ' style="width:16px;height:16px;accent-color:#5C7F68;border:0;padding:0"></td>' +
-      '<td><input type="date" class="w90" data-f="date" data-i="' + i + '" value="' + esc(r.date) + '"></td>' +
-      '<td><input data-f="memo" data-i="' + i + '" value="' + esc(r.memo) + '" style="min-width:110px">' +
+      '<td class="c-on" style="text-align:center"><input type="checkbox" data-f="on" data-i="' + i + '"' + (r.on ? " checked" : "") + ' style="width:16px;height:16px;accent-color:#5C7F68;border:0;padding:0"></td>' +
+      '<td class="c-date"><input type="date" class="w90" data-f="date" data-i="' + i + '" value="' + esc(r.date) + '"></td>' +
+      '<td class="c-memo" data-label="내용"><input data-f="memo" data-i="' + i + '" value="' + esc(r.memo) + '" style="min-width:110px">' +
         (r.hint ? '<div class="imphint">🟠 ' + esc(r.hint) + "</div>" : "") + "</td>" +
-      '<td><select data-f="cat" data-i="' + i + '">' + CATS.map(c => '<option value="' + esc(c.n) + '"' + (c.n === r.cat ? " selected" : "") + ">" + esc(c.n) + "</option>").join("") + "</select></td>" +
-      '<td><select data-f="cardId" data-i="' + i + '">' + cardOptionsHTML(r.cardId) + "</select></td>" +
-      '<td class="num"><input class="w90" data-f="amount" data-i="' + i + '" inputmode="numeric" value="' + fmt(r.amount) + '"></td>' +
+      '<td class="c-cat" data-label="분류"><select data-f="cat" data-i="' + i + '">' + CATS.map(c => '<option value="' + esc(c.n) + '"' + (c.n === r.cat ? " selected" : "") + ">" + esc(c.n) + "</option>").join("") + "</select></td>" +
+      '<td class="c-card" data-label="결제"><select data-f="cardId" data-i="' + i + '">' + cardOptionsHTML(r.cardId) + "</select></td>" +
+      '<td class="num c-amt" data-label="금액"><input class="w90" data-f="amount" data-i="' + i + '" inputmode="numeric" value="' + fmt(r.amount) + '"></td>' +
     "</tr>").join("");
-  tbl.innerHTML = head + "<tbody>" + (body || '<tr><td colspan="6" style="text-align:center;color:#B7AC9C;padding:18px">읽어낸 내역이 없어요</td></tr>') + "</tbody>";
+  tbl.innerHTML = head + "<tbody>" + (body || '<tr><td colspan="6" style="text-align:center;color:#B7AC9C;padding:18px">' +
+    (ocrMode === "coupang" ? "읽어낸 쿠팡 품목이 없어요" : "읽어낸 내역이 없어요") + "</td></tr>") + "</tbody>";
+  tbl.classList.add("cards");
   const cnt = $("#ocrCount");
   if (cnt) cnt.textContent = ocrRows.filter(r => r.on).length;
 }
@@ -7883,6 +8457,8 @@ function boot() {
   bindPass();
   bindLock();
   bindOcr();
+  bindTax();
+  bindFvDetail();
   bindPicks();
   bindPickOcr();
   bindGiftScan();
@@ -7983,6 +8559,15 @@ function boot() {
     lockInfo: lockInfo,
     dropLock: function () { state.security = { pinOn: false, pinHash: "", salt: "" }; dropLocalLock(); touch(); applyLockState(); },
     parseOcrLines: parseOcrLines,
+    parseCoupangLines: parseCoupangLines,
+    coupangCatOf: coupangCatOf,
+    openTax: openTax,
+    renderTax: renderTax,
+    taxSummary: taxSummary,
+    saveTaxGross: saveTaxGross,
+    openFvDetail: openFvDetail,
+    renderFvDetail: renderFvDetail,
+    isTransitTxn: isTransitTxn,
     parseWorkbook: parseWorkbook,
     mergePgPairs: mergePgPairs,
     mergePgDuplicates: mergePgDuplicates,
