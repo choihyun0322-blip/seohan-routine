@@ -672,6 +672,13 @@ body.locked .app,body.locked .toast{visibility:hidden}
 .tbox .tprev b{font-weight:800}
 .tmin{margin-top:4px;font-size:9px;font-weight:800;color:var(--amber-d);background:var(--amber-soft);border-radius:6px;padding:2px 5px;display:inline-block;letter-spacing:-.2px}
 .tmin.done{background:var(--sage-soft);color:var(--sage-d)}
+/* ---------- 결제 취소 (지출 마이너스 차감) ---------- */
+.cchip{font-size:8.5px;font-weight:800;background:#FBEDE7;color:#A8472C;border-radius:5px;padding:1px 4px;margin-right:2px;font-style:normal;display:inline-block}
+.rec .a.cx{color:#A8472C}
+.cmin{margin-top:4px;font-size:9px;font-weight:800;color:#A8472C;background:#FBEDE7;border-radius:6px;padding:2px 5px;display:inline-block;letter-spacing:-.2px;white-space:nowrap}
+.imphint.cx{color:#A8472C;background:#FBEDE7}
+table.tbl tr.cx td{background:#FFFBF9}
+#tCancelWrap .dprev{background:#FBEDE7;color:#A8472C}
 .mini.ok{color:var(--sage-d);background:var(--sage-soft)}
 @media(max-width:420px){
   .trialbanner{padding:9px 10px;gap:7px}
@@ -750,6 +757,9 @@ body.locked .app,body.locked .toast{visibility:hidden}
 .cpbar .qf{height:36px}
 .cpbar .qf input,.cpbar .qf select{font-size:12px}
 .cpnote{grid-column:1/-1;font-size:9.5px;font-weight:700;color:#A79C8D;line-height:1.5}
+.cpbar .cpreplace{grid-column:1/-1;display:flex;align-items:flex-start;gap:6px;white-space:normal;line-height:1.45;text-align:left;background:#FFF8EC;border-color:var(--amber-line);color:var(--amber-d)}
+.cpbar .cpreplace small{color:#B08A57;font-weight:700}
+.cpbar .cpreplace.hidden{display:none}
 .cpmis{color:var(--coral-d)}
 
 /* 연말정산 요약 */
@@ -1210,6 +1220,10 @@ body.locked .app,body.locked .toast{visibility:hidden}
     <div class="fld"><label>지출 / 수입</label>
       <div class="seg2" id="tType"><button type="button" data-v="expense" class="on">－ 지출</button><button type="button" data-v="income">＋ 수입</button></div>
     </div>
+    <div class="fld hidden" id="tCancelWrap">
+      <label class="qchk" style="border-radius:10px"><input type="checkbox" id="tCancel"> ↩️ 결제 취소 <small>지출을 마이너스로 차감</small></label>
+      <div class="dprev tprev" id="tCancelPreview"></div>
+    </div>
     <div class="fld"><label>내용</label><input id="tMemo"></div>
     <div class="fld"><div class="row2">
       <div><label>금액</label><input id="tAmount" inputmode="numeric"></div>
@@ -1481,6 +1495,7 @@ body.locked .app,body.locked .toast{visibility:hidden}
       <div class="qf"><span class="w">📅</span><input type="date" id="cpDate" aria-label="쿠팡 결제 날짜"></div>
       <div class="qf"><select id="cpCard" aria-label="쿠팡 결제수단"></select></div>
       <div class="cpnote" id="cpNote">품목마다 한 줄로 담깁니다 · 날짜·결제수단은 바꾸면 전체에 바로 적용돼요</div>
+      <label class="qchk hidden cpreplace" id="cpReplaceWrap" style="border-radius:10px"><input type="checkbox" id="cpReplace"> <span id="cpReplaceTxt"></span></label>
     </div>
     <div class="tblwrap cards-wrap"><table class="tbl" id="ocrTable"></table></div>
     <div class="hint" style="margin-top:8px" id="ocrHint">잘못 읽힌 숫자만 고쳐 주세요 · 내 계좌 이체로 보이는 줄은 미리 꺼 두었어요</div>
@@ -1869,6 +1884,8 @@ function ledgerBase(t) {
   if (!t) return 0;
   const full = num(t.amount);
   if (t.type === "income") return full;
+  /* 결제 취소 — 더치·페이백과 상관없이 마이너스 그대로 차감 */
+  if (full < 0) return full;
   let base = dutchOn(t) ? Math.max(0, Math.min(Math.round(t.myShare), full)) : full;
   if (trialOn(t)) base = Math.max(0, Math.round(base - trialPayback(t)));
   return base;
@@ -2143,16 +2160,25 @@ function migrateState(s, rawSeedVersion) {
 
 function normalizeTxn(t) {
   t.id = t.id || uid("t");
-  t.amount = Math.abs(num(t.amount));
   t.date = /^\d{4}-\d{2}-\d{2}$/.test(t.date || "") ? t.date : todayISO();
   t.type = t.type === "income" ? "income" : "expense";
+  /* 결제 취소는 지출을 마이너스로 차감한다 — expense + 음수 금액(isCancel)만 허용 */
+  const rawAmt = num(t.amount);
+  if (t.type === "income") {
+    t.amount = Math.abs(rawAmt);
+    t.isCancel = false;
+  } else {
+    const cancel = rawAmt < 0 || t.isCancel === true;
+    t.amount = cancel ? -Math.abs(rawAmt) : Math.abs(rawAmt);
+    t.isCancel = cancel;
+  }
   t.cat = CAT_BY[t.cat] ? t.cat : "기타";
   t.fixed = t.type === "income" ? false : (typeof t.fixed === "boolean" ? t.fixed : catFixedDefault(t.cat));
   t.cardId = t.cardId || PAY_CASH;
   t.memo = String(t.memo || "").slice(0, 80);
-  t.installment = t.type === "income" ? false : !!t.installment;
+  t.installment = (t.type === "income" || t.isCancel) ? false : !!t.installment;
   /* 더치페이: amount(결제 전액)는 그대로 두고 myShare(내 몫)만 따로 저장 */
-  t.isDutch = t.type === "income" ? false : !!t.isDutch;
+  t.isDutch = (t.type === "income" || t.isCancel) ? false : !!t.isDutch;
   if (t.isDutch) {
     const raw = t.myShare;
     const ms = (typeof raw === "number" ? raw : (typeof raw === "string" && raw.trim() !== "" ? num(raw) : NaN));
@@ -2165,7 +2191,7 @@ function normalizeTxn(t) {
   }
   /* 체험단 페이백: amount(결제 전액)는 그대로 두고 payback(예상 입금액)을 따로 저장
      — 카드 실적은 전액, 가계부 지출은 amount − payback */
-  t.isTrial = t.type === "income" ? false : !!t.isTrial;
+  t.isTrial = (t.type === "income" || t.isCancel) ? false : !!t.isTrial;
   if (t.isTrial) {
     const raw = t.payback;
     const p = (typeof raw === "number" ? raw : (typeof raw === "string" && raw.trim() !== "" ? num(raw) : NaN));
@@ -2181,7 +2207,7 @@ function normalizeTxn(t) {
   }
   /* 기간 나누기(안분): amount는 결제 전액 그대로, splitN·splitStart만 따로 저장 */
   const sn = Math.round(num(t.splitN));
-  if (t.type === "income" || !(sn >= 2)) {
+  if (t.type === "income" || t.isCancel || !(sn >= 2)) {
     t.splitN = null; t.splitStart = null;
   } else {
     t.splitN = Math.min(SPLIT_MAX, sn);
@@ -2336,18 +2362,19 @@ function cardLabel(id) {
 }
 function cardStats(card, mk) {
   const list = monthPaidTxns(mk).filter(t => t.cardId === card.id && !isIncomeT(t));
-  let used = 0, perf = 0, inst = 0;
+  let used = 0, perf = 0, inst = 0, cancel = 0;
   list.forEach(t => {
     used += t.amount;
+    if (t.amount < 0) cancel += -t.amount;
     if (t.installment) inst += t.amount; else perf += t.amount;
   });
-  return { used: used, perf: perf, inst: inst, count: list.length };
+  return { used: used, perf: perf, inst: inst, count: list.length, cancel: cancel };
 }
 
 /* 카드 혜택 추정: 규칙(가맹점 키워드/카테고리/전체) + 월 한도 */
 function cardSaving(card, mk) {
   if (!card.rules || !card.rules.length) return 0;
-  const list = monthPaidTxns(mk).filter(t => t.cardId === card.id && t.amount > 0 && !isIncomeT(t));
+  const list = monthPaidTxns(mk).filter(t => t.cardId === card.id && num(t.amount) !== 0 && !isIncomeT(t));
   let total = 0;
   card.rules.forEach((rule, i) => {
     let sub = 0;
@@ -2455,6 +2482,9 @@ function addTxn(t, opts) {
   item.id = t.id || uid("t");
   item.ts = t.ts || Date.now();
   applyRule(item);
+  /* 규칙으로 수입/지출이 바뀌면 부호도 맞춘다 (취소 줄이 규칙 때문에 뒤집히지 않게) */
+  if (item.type === "income") { item.amount = Math.abs(item.amount); item.isCancel = false; }
+  else if (item.isCancel) item.amount = -Math.abs(item.amount);
   if (!opts || opts.noDedup !== true) {
     const dup = state.txns.some(x => x.date === item.date && x.amount === item.amount && normKey(x.memo) === normKey(item.memo) && (x.type || "expense") === item.type);
     if (dup) return null;
@@ -3238,7 +3268,7 @@ function renderKpis() {
   const mk = uiMonth;
   const st = monthStats(mk);
   const prev = monthStats(shiftMonth(mk, -1));
-  const diff = prev.expense > 0 ? Math.round((st.expense - prev.expense) / prev.expense * 100) : null;
+  const diff = (prev.expense > 0 && st.expense >= 0) ? Math.round((st.expense - prev.expense) / prev.expense * 100) : null;
   const cs = cardSavings(mk), gs = giftSaving(mk), ps = pickSaving(mk), pb = pointPayback(mk);
   const save = cs + gs + ps + pb;
   const net = st.net;
@@ -3395,7 +3425,7 @@ function renderCardUse() {
   state.cards.forEach(c => {
     const s = cardStats(c, mk);
     if (!s.used) return;
-    rows.push({ kind: "card", card: c, used: s.used, count: s.count, perf: s.perf, inst: s.inst,
+    rows.push({ kind: "card", card: c, used: s.used, count: s.count, perf: s.perf, inst: s.inst, cancel: s.cancel,
       dutch: monthPaidTxns(mk).some(t => t.cardId === c.id && !isIncomeT(t) && dutchOn(t)),
       split: monthPaidTxns(mk).some(t => t.cardId === c.id && !isIncomeT(t) && splitOn(t)),
       trial: monthPaidTxns(mk).some(t => t.cardId === c.id && trialOn(t)) });
@@ -3410,7 +3440,8 @@ function renderCardUse() {
   others.forEach(o => {
     const list = st.expList.filter(t => t.cardId === o.id);
     if (!list.length) return;
-    rows.push({ kind: "other", id: o.id, label: o.label, emoji: o.emoji, used: list.reduce((s, t) => s + spendAmtIn(t, mk), 0), count: list.length, dutch: list.some(dutchOn) });
+    rows.push({ kind: "other", id: o.id, label: o.label, emoji: o.emoji, used: list.reduce((s, t) => s + spendAmtIn(t, mk), 0), count: list.length, dutch: list.some(dutchOn),
+      cancel: list.reduce((s, t) => s + (num(t.amount) < 0 ? -num(t.amount) : 0), 0) });
   });
   rows.sort((a, b) => b.used - a.used);
   const sum = rows.reduce((s, r) => s + r.used, 0);
@@ -3426,6 +3457,7 @@ function renderCardUse() {
       return '<div class="userow">' +
         '<span class="clogo cs">' + r.emoji + "</span>" +
         '<div class="un"><b>' + esc(r.label) + "</b><small>" + (r.dutch ? "🤝 더치페이는 내 몫만 · " : "") +
+          (r.cancel ? "↩️ 취소 " + man(r.cancel) + "원 차감 · " : "") +
           (r.id === PAY_ONNURI ? "🎟️ 잔액 " + won(onnuriBalance()) + " 남음 · 카드 실적 제외" : "카드 실적에 들어가지 않아요") + "</small></div>" +
         '<div class="ua"><b>' + fmt(r.used) + "<i>원</i></b><small>" + r.count + "건</small></div>" +
       "</div>";
@@ -3438,7 +3470,7 @@ function renderCardUse() {
       : "실적 조건 없음";
     return '<div class="userow card">' +
       '<span class="clogo ' + esc(c.color || "cs") + '">' + esc(logoText(c)) + "</span>" +
-      '<div class="un"><b>' + esc(c.name) + "</b><small>" + esc(sub) + (r.inst ? " · 무이자할부 " + man(r.inst) + " 제외" : "") + (r.dutch ? " · 🤝 더치 전액 실적" : "") + (r.split ? " · 📆 기간 나누기 전액 실적" : "") + (r.trial ? " · 🎁 체험단 전액 실적" : "") + "</small>" +
+      '<div class="un"><b>' + esc(c.name) + "</b><small>" + esc(sub) + (r.inst ? " · 무이자할부 " + man(r.inst) + " 제외" : "") + (r.dutch ? " · 🤝 더치 전액 실적" : "") + (r.split ? " · 📆 기간 나누기 전액 실적" : "") + (r.trial ? " · 🎁 체험단 전액 실적" : "") + (r.cancel ? " · ↩️ 취소 " + man(r.cancel) + " 차감" : "") + "</small>" +
         (c.target > 0 ? '<div class="gbar mini"><i class="' + (pct >= 100 ? "" : pct >= 60 ? "" : "low") + '" style="width:' + pct + '%"></i></div>' : "") +
       "</div>" +
       '<div class="ua"><b>' + fmt(r.used) + "<i>원</i></b><small>" + r.count + "건</small></div>" +
@@ -3451,7 +3483,7 @@ let fvShowAll = false;   /* 고정비·변동비 목록을 전부 펼쳤는지 *
 function renderLedger() {
   const mk = uiMonth;
   const st = monthStats(mk);
-  const pctF = st.expense ? Math.round(st.fix / st.expense * 100) : 0;
+  const pctF = st.expense > 0 ? Math.round(st.fix / st.expense * 100) : 0;
   const pctV = st.expense ? 100 - pctF : 0;
 
   const chip = $("#ledgerChip");
@@ -3517,9 +3549,11 @@ function renderLedger() {
       const dt = dutchOn(t);
       const sp = splitOn(t);
       const tr = trialOn(t);
+      const cxl = num(t.amount) < 0;
       const si = sp ? splitIdx(t, mk) : 0;
       const sn = sp ? splitMonths(t) : 1;
       const shown = spendAmtIn(t, mk);
+      const cancelChip = cxl ? '<span class="cchip">↩️ 취소</span> · ' : "";
       const trialChip = tr
         ? (t.paybackDone
           ? '<span class="tchip done">✅ 페이백 완료</span> · '
@@ -3528,9 +3562,11 @@ function renderLedger() {
       const splitChip = si
         ? '<span class="schip">📆 ' + si + "/" + sn + " (원금 " + fmt(t.amount) + '원 ÷ ' + sn + '개월)</span> · '
         : "";
-      const small = trialChip + splitChip + (dt ? '<span class="dchip">🤝 더치 (결제 ' + fmt(t.amount) + '원)</span> · ' + (inc ? "수입" : esc(t.cat)) : (inc ? "수입" : esc(t.cat))) +
+      const small = cancelChip + trialChip + splitChip + (dt ? '<span class="dchip">🤝 더치 (결제 ' + fmt(t.amount) + '원)</span> · ' + (inc ? "수입" : esc(t.cat)) : (inc ? "수입" : esc(t.cat))) +
         " · " + esc(cardLabel(t.cardId)) + (t.myShare != null && dt && t.dutchN ? " · " + t.dutchN + "명" : "") + (t.installment ? " · 할부" : "") + " · " + esc(t.date.slice(5).replace("-", "/"));
-      const tip = tr
+      const tip = cxl
+          ? "↩️ 결제 취소 · 이번 달 지출에서 " + won(Math.abs(shown)) + " 차감 — 누르면 고정↔변동"
+          : tr
           ? "🎁 체험단 페이백 · 결제 " + won(t.amount) + "은 카드 실적 전액 · 페이백 " + won(trialPayback(t)) + (t.paybackDone ? " 입금 완료" : " 입금 대기") + " · 실질 부담 " + won(shown) + (trialProfit(t) ? " (페이백이 " + won(trialProfit(t)) + " 더 커서 지출 0원)" : "") + " — 누르면 고정↔변동"
           : dt && sp
           ? "🤝 더치페이 " + t.dutchN + "명 · 📆 " + sn + "개월 나눠 담기 · 결제 " + won(t.amount) + " · 이번 달 " + won(shown) + " — 누르면 고정↔변동"
@@ -3540,7 +3576,7 @@ function renderLedger() {
       return '<li data-txn="' + esc(t.id) + '" title="' + tip + '">' +
         '<span class="e">' + (inc ? "💰" : catEmoji(t.cat)) + "</span>" +
         '<span class="n"><b>' + esc(t.memo || t.cat) + "</b><small>" + small + "</small></span>" +
-        '<span class="a' + (inc ? " inc" : shown ? "" : " zero") + (dt ? " dt" : "") + '"' + (dt ? ' title="가계부에는 내 몫만 · 카드 실적은 결제 전액"' : "") + '>' + (inc ? "+" : "") + fmt(shown) + "<i>원</i>" + (t.fixed ? '<span class="fx">🔒</span>' : "") + "</span>" +
+        '<span class="a' + (inc ? " inc" : shown ? "" : " zero") + (dt ? " dt" : "") + (cxl ? " cx" : "") + '"' + (dt ? ' title="가계부에는 내 몫만 · 카드 실적은 결제 전액"' : cxl ? ' title="결제 취소 — 지출에서 마이너스로 차감"' : "") + '>' + (inc ? "+" : "") + fmt(shown) + "<i>원</i>" + (t.fixed ? '<span class="fx">🔒</span>' : "") + "</span>" +
         '<button class="mini" data-open-txn="' + esc(t.id) + '" aria-label="수정">✎</button>' +
         "</li>";
     }).join("")
@@ -3556,7 +3592,7 @@ function groupRows(list, total, fixed) {
   const show = fvShowAll ? cats : cats.slice(0, 6);
   return show.map(cat =>
     '<li class="fvcat" data-fvcat="' + esc(cat) + '" data-fvfix="' + (fixed ? "1" : "0") + '" title="눌러서 ' + esc(cat) + ' 건별 상세 보기">' +
-      "<span>" + catEmoji(cat) + " " + esc(cat) + " <i>" + (total ? Math.round(map[cat] / total * 100) : 0) + "%</i></span>" +
+      "<span>" + catEmoji(cat) + " " + esc(cat) + " <i>" + (total > 0 ? Math.round(map[cat] / total * 100) : 0) + "%</i></span>" +
       '<b>' + fmt(map[cat]) + '<em class="fvar">›</em></b></li>'
   ).join("") +
     (cats.length > 6
@@ -4400,6 +4436,7 @@ function renderAllTx() {
       '<td class="c-fixed" data-label="고정/변동"><button class="chip ' + (t.fixed ? "plum" : "sage") + '" data-f="fixed">' + (t.fixed ? "🔒 고정" : "🔁 변동") + "</button></td>" +
       '<td class="c-card" data-label="결제"><select data-f="cardId">' + cardOpts + "</select></td>" +
       '<td class="num c-amt" data-label="금액"><input class="w90" data-f="amount" inputmode="numeric" value="' + fmt(t.amount) + '">' +
+        (num(t.amount) < 0 ? '<div class="cmin">↩️ 결제 취소 ' + fmt(Math.abs(t.amount)) + " 차감</div>" : "") +
         (trialOn(t) ? '<div class="tmin' + (t.paybackDone ? " done" : "") + '">' + (t.paybackDone ? "✅ 페이백 완료 " : "🎁 입금대기 ") + fmt(trialPayback(t)) + " · 실질 " + fmt(spendAmtIn(t, uiMonth)) + "</div>" : "") +
         (dutchOn(t) ? '<div class="dmin">🤝 내 몫 ' + fmt(dutchShareOfTxn(t)) + (t.dutchN ? " · " + t.dutchN + "명" : "") + "</div>" : "") +
         (splitOn(t) ? '<div class="smin">📆 ' + splitIdx(t, uiMonth) + "/" + splitMonths(t) + " · 이번 달 " + fmt(spendAmtIn(t, uiMonth)) + "</div>" : "") + "</td>" +
@@ -4418,8 +4455,15 @@ function updateTxn(id, field, value) {
   if (!t) return;
   if (field === "amount") {
     const old = t.amount;
-    t.amount = Math.abs(num(value));
-    if (t.isDutch) {
+    const v = num(value);
+    if (t.type === "income") t.amount = Math.abs(v);
+    else {
+      /* 취소 건은 부호를 유지하고, 음수로 고치면 취소로 본다 */
+      const cancel = t.isCancel || v < 0;
+      t.amount = cancel ? -Math.abs(v) : Math.abs(v);
+      t.isCancel = cancel;
+    }
+    if (t.isDutch && t.amount > 0) {
       /* 인원수로 나눈 건이면 새 금액에 맞춰 내 몫도 다시 계산 */
       t.myShare = t.dutchN ? Math.min(t.amount, Math.round(t.amount / t.dutchN)) : Math.min(num(t.myShare), t.amount);
     }
@@ -4427,7 +4471,10 @@ function updateTxn(id, field, value) {
     if (t.isTrial && t.payback === trialPaybackDefault(old)) t.payback = trialPaybackDefault(t.amount);
   } else if (field === "type") {
     t.type = isIncomeT(t) ? "expense" : "income";
-    if (t.type === "income") { t.fixed = false; t.installment = false; t.isDutch = false; t.myShare = null; t.dutchN = null; t.splitN = null; t.splitStart = null; t.isTrial = false; t.payback = null; t.paybackDone = false; t.paybackAt = null; }
+    if (t.type === "income") {
+      t.amount = Math.abs(t.amount); t.isCancel = false;
+      t.fixed = false; t.installment = false; t.isDutch = false; t.myShare = null; t.dutchN = null; t.splitN = null; t.splitStart = null; t.isTrial = false; t.payback = null; t.paybackDone = false; t.paybackAt = null;
+    }
     else if (!state.catRules[normKey(t.memo)]) t.fixed = catFixedDefault(t.cat);
   }
   else if (field === "fixed") {
@@ -4487,6 +4534,7 @@ function openAllTrial() {
 /* ---------- 내역 상세 편집 ---------- */
 let editingTxnId = "";
 let txnType = "expense";
+let txnCancel = false;   /* 결제 취소 — 지출을 마이너스로 차감 */
 let txnDutchN = null;   /* 더치페이 인원 수 (직접 입력하면 null) */
 let dutchBackup = null; /* 수입으로 잠시 바꿀 때 더치 설정을 기억했다 복구 */
 let txnSplitN = 1;      /* 기간 나누기 개월 수 (1 = 나누지 않음) */
@@ -4496,6 +4544,18 @@ const DUTCH_MIN = 2, DUTCH_MAX = 99;   /* 더치페이 인원 범위 */
 function dutchFieldVisible() {
   const wrap = $("#tDutchWrap");
   if (wrap) wrap.classList.toggle("hidden", txnType === "income");
+}
+/* 결제 취소 — 지출을 마이너스로 차감하는 줄 */
+function renderCancelBox() {
+  const wrap = $("#tCancelWrap");
+  if (wrap) wrap.classList.toggle("hidden", txnType === "income");
+  const on = txnType !== "income" && !!($("#tCancel") && $("#tCancel").checked);
+  txnCancel = on;
+  const pv = $("#tCancelPreview");
+  if (!pv) return;
+  pv.innerHTML = on
+    ? "↩️ <b>지출 −" + fmt(Math.abs(num($("#tAmount").value))) + "원</b>으로 담아요 · 지출 합계·카테고리·카드 실적·연말정산에서 함께 빠져요"
+    : "";
 }
 /* 인원 수 2~99로 정리 (직접 입력·−/+ 공통) */
 function dutchClampN(v) {
@@ -4791,7 +4851,11 @@ function openTxn(id) {
   txnType = isIncomeT(t) ? "income" : "expense";
   $$("#tType button").forEach(b => b.classList.toggle("on", b.getAttribute("data-v") === txnType));
   $("#tMemo").value = t.memo;
-  $("#tAmount").value = fmt(t.amount);
+  /* 금액은 절댓값으로 보이고, 결제 취소는 체크로 부호를 정한다 */
+  txnCancel = num(t.amount) < 0;
+  $("#tAmount").value = fmt(Math.abs(t.amount));
+  if ($("#tCancel")) $("#tCancel").checked = txnCancel;
+  renderCancelBox();
   $("#tDate").value = t.date;
   $("#tCat").innerHTML = CATS.map(c => '<option value="' + esc(c.n) + '"' + (c.n === t.cat ? " selected" : "") + ">" + esc(c.n) + "</option>").join("");
   $("#tCard").innerHTML = cardOptionsHTML(t.cardId);
@@ -4834,17 +4898,19 @@ function saveTxn(opts) {
   const t = state.txns.find(x => x.id === editingTxnId);
   if (!t) return;
   t.memo = ($("#tMemo").value || "").trim() || t.memo;
-  t.amount = Math.abs(num($("#tAmount").value));
+  txnCancel = txnType !== "income" && !!($("#tCancel") && $("#tCancel").checked);
+  t.amount = txnCancel ? -Math.abs(num($("#tAmount").value)) : Math.abs(num($("#tAmount").value));
+  t.isCancel = txnCancel;
   t.date = $("#tDate").value || t.date;
   t.type = txnType;
   const oldCat = t.cat;
   t.cat = $("#tCat").value;
   if (oldCat !== t.cat && !state.catRules[normKey(t.memo)] && txnType !== "income") t.fixed = catFixedDefault(t.cat);
   t.cardId = $("#tCard").value;
-  t.installment = txnType === "income" ? false : $("#tInstall").checked;
+  t.installment = (txnType === "income" || txnCancel) ? false : $("#tInstall").checked;
   if (txnType === "income") t.fixed = false;
   /* 더치페이: amount는 결제 전액 그대로, myShare만 따로 */
-  const dutchChecked = txnType !== "income" && !!($("#tDutch") && $("#tDutch").checked);
+  const dutchChecked = txnType !== "income" && !txnCancel && !!($("#tDutch") && $("#tDutch").checked);
   if (dutchChecked) {
     const share = Math.abs(num($("#tMyShare").value));
     t.isDutch = true;
@@ -4854,14 +4920,14 @@ function saveTxn(opts) {
     t.isDutch = false; t.myShare = null; t.dutchN = null;
   }
   /* 기간 나누기: 결제 금액(amount)은 그대로, 지출만 N개월에 나눠 담기 */
-  if (txnType === "income" || txnSplitN < 2) {
+  if (txnType === "income" || txnCancel || txnSplitN < 2) {
     t.splitN = null; t.splitStart = null;
   } else {
     t.splitN = txnSplitN;
     t.splitStart = txnSplitStart || monthOf(t.date);
   }
   /* 체험단 페이백: amount는 결제 전액 그대로, payback만 따로 */
-  const trialChecked = txnType !== "income" && !!($("#tTrial") && $("#tTrial").checked);
+  const trialChecked = txnType !== "income" && !txnCancel && !!($("#tTrial") && $("#tTrial").checked);
   if (trialChecked) {
     t.isTrial = true;
     t.payback = paybackUI();
@@ -5215,6 +5281,10 @@ function bindModals() {
   bindDutch();
   bindSplit();
   bindTrial();
+  const cxl = $("#tCancel");
+  if (cxl) cxl.addEventListener("change", () => { txnCancel = txnType !== "income" && !!cxl.checked; renderCancelBox(); });
+  const cxlAmt = $("#tAmount");
+  if (cxlAmt) cxlAmt.addEventListener("input", renderCancelBox);
   $("#tBulk").addEventListener("click", () => saveTxn({ bulk: true }));
   $("#tDelete").addEventListener("click", () => { if (editingTxnId) { deleteTxn(editingTxnId); closeModal("mTxn"); toast("지웠어요"); } });
   $("#tType").addEventListener("click", ev => {
@@ -5223,6 +5293,9 @@ function bindModals() {
     txnType = b.getAttribute("data-v") === "income" ? "income" : "expense";
     $$("#tType button").forEach(x => x.classList.toggle("on", x === b));
     if (txnType === "income") {
+      const cxl = $("#tCancel");
+      if (cxl) cxl.checked = false;
+      txnCancel = false;
       const cb = $("#tDutch");
       if (cb && cb.checked) dutchBackup = { share: $("#tMyShare").value, n: txnDutchN };
       if (cb) cb.checked = false;
@@ -5245,7 +5318,7 @@ function bindModals() {
         trialBackup = null;
       }
     }
-    dutchFieldVisible(); renderDutchBox(); renderSplitBox(); renderTrialBox();
+    dutchFieldVisible(); renderDutchBox(); renderSplitBox(); renderTrialBox(); renderCancelBox();
   });
   $("#tFixed").addEventListener("click", () => {
     const t = state.txns.find(x => x.id === editingTxnId);
@@ -6748,8 +6821,10 @@ function bindTrials() {
      · 내용·분류는 가맹점 줄 기준 (가맹점 분류가 미분류/기타면 카드 줄 분류 유지)
      · 고정/변동은 합친 분류의 기본 규칙 (네이버페이가 고정비로 새지 않게)
    ============================================================ */
-const PG_PAY_RE = /네이버\s?페이|카카오\s?페이|토스\s?페이|삼성\s?페이|애플\s?페이|페이코|SSG\s?페이|신세계\s?페이|쿠페이|엘\s?페이|L\.?\s?pay|핵토리|스마일\s?페이/i;
-const PG_PAY_STRIP_RE = /네이버\s?페이|카카오\s?페이|토스\s?페이|삼성\s?페이|애플\s?페이|페이코|SSG\s?페이|신세계\s?페이|쿠페이|엘\s?페이|핵토리|스마일\s?페이/gi;
+/* 간편결제 이름 — 토스는 '토스페이'뿐 아니라 '토스', '(주)비바리퍼블리카', '토스 간편결제'로도 찍힌다.
+   토스뱅크(계좌·카드)는 간편결제가 아니므로 뺀다. */
+const PG_PAY_RE = /네이버\s?페이|카카오\s?페이|토스\s?페이|토스\s?간편결제|(?:\(\s*주\s*\)\s*)?비바리퍼블리카|토스(?!\s*뱅크)|삼성\s?페이|애플\s?페이|페이코|SSG\s?페이|신세계\s?페이|쿠페이|엘\s?페이|L\.?\s?pay|핵토리|스마일\s?페이/i;
+const PG_PAY_STRIP_RE = /네이버\s?페이|카카오\s?페이|토스\s?페이|토스\s?간편결제|(?:\(\s*주\s*\)\s*)?비바리퍼블리카|토스(?!\s*뱅크)|삼성\s?페이|애플\s?페이|페이코|SSG\s?페이|신세계\s?페이|쿠페이|엘\s?페이|핵토리|스마일\s?페이/gi;
 const PG_TAIL_NOISE_RE = /간편결제|온라인|오프라인|결제|승인|정상|매출|포인트|적립|페이백|캐시백|충전|취소|환불|자동|정기/g;
 
 function isPgPayMemo(memo) { return PG_PAY_RE.test(String(memo || "")); }
@@ -6953,7 +7028,10 @@ function bindImport() {
     if (isNaN(i) || !f || !importRows[i]) return;
     if (f === "on") importRows[i].on = ev.target.checked;
     else if (f === "fixed") importRows[i].fixed = ev.target.value === "fix";
-    else if (f === "amount") importRows[i].amount = num(ev.target.value);
+    else if (f === "amount") {
+      const v = num(ev.target.value);
+      importRows[i].amount = importRows[i].isCancel ? -Math.abs(v) : Math.abs(v);
+    }
     else importRows[i][f] = ev.target.value;
     updateImpCount();
   });
@@ -6964,7 +7042,11 @@ function bindImport() {
     if (!importRows[i]) return;
     if (b.getAttribute("data-f") === "typebtn") {
       importRows[i].type = importRows[i].type === "income" ? "expense" : "income";
+      /* 취소(마이너스) 줄을 수입/지출로 바꾸면 부호도 같이 맞춘다 */
       if (importRows[i].type === "income") {
+        importRows[i].amount = Math.abs(num(importRows[i].amount));
+        importRows[i].isCancel = false;
+        if (importRows[i].hint === CANCEL_HINT || importRows[i].hint === OFFSET_HINT) importRows[i].hint = "";
         importRows[i].fixed = false;
         importRows[i].installment = false;
         importRows[i].cat = "기타";
@@ -7239,6 +7321,57 @@ function isOnnuriCharge(memo, catVal, typeVal) {
 }
 function onnuriChargeHint() { return "충전 · 이중지출 방지"; }
 
+/* ---------- 카드 결제 취소 (뱅크샐러드) ----------
+   일반 지출은 금액이 -55,000처럼 음수로 오고,
+   카드 결제 취소는 '지출' 줄에 +55,000(양수)로 오거나 구분·내역에
+   승인취소·결제취소·카드취소·매출취소가 붙는다. 취소는 지출에서 마이너스로 차감해야 하므로
+   expense · 음수 금액 · isCancel 로 담는다. */
+const CANCEL_RE = /승인\s*취소|결제\s*취소|카드\s*취소|매출\s*취소|취소\s*승인/;
+const INCOME_ROW_RE = /환불|캐시백|페이백|리워드|지원금|보험금|수입|입금/;
+const CANCEL_HINT = "↩️ 결제 취소";
+const OFFSET_HINT = "↩️ 결제 취소 상쇄";
+function isCancelRow(typeVal, amount, memo, catVal, mixedSign) {
+  const rowText = [typeVal, memo, catVal].join(" ");
+  /* 환불·캐시백·페이백 같은 실제 수입 행은 취소가 아니다 */
+  if (INCOME_ROW_RE.test(rowText)) return false;
+  if (CANCEL_RE.test(rowText)) return true;
+  /* 부호가 섞인 표에서 '지출' 줄이 양수면 취소 — 지출은 원래 음수로 온다 */
+  return !!mixedSign && num(amount) > 0 && /지출|결제|승인|사용/.test(String(typeVal || ""));
+}
+
+/* ---------- 같은 파일 안 원결제 + 취소 1:1 자동 상쇄 ----------
+   같은 가맹점(merchantMatch)·같은 절댓값·같은(또는 짝이 맞는) 카드의 원결제와 취소를 짝지어
+   둘 다 체크를 풀어 둔다(사용자가 원하면 다시 체크할 수 있다).
+   · 둘 다 새로 담기는 줄(on)일 때만 짝짓는다 — 원결제가 이미 장부에 있으면 취소는 남겨서 차감해야 한다. */
+function offsetCancelPairs(list) {
+  const used = new Set();
+  let pairs = 0;
+  for (let i = 0; i < list.length; i++) {
+    const c = list[i];
+    if (!c || !c.isCancel || !c.on || used.has(i)) continue;
+    const target = Math.abs(num(c.amount));
+    let best = -1, bestScore = -1;
+    for (let j = 0; j < list.length; j++) {
+      const r = list[j];
+      if (i === j || used.has(j) || !r || r.isCancel || r.type !== "expense" || !r.on) continue;
+      if (Math.abs(num(r.amount)) !== target) continue;
+      if (normKey(c.memo) !== normKey(r.memo) && !merchantMatch(c.memo, r.memo)) continue;
+      const bothCard = !!cardById(c.cardId) && !!cardById(r.cardId);
+      const sameCard = String(c.cardId || "") === String(r.cardId || "");
+      if (bothCard && !sameCard) continue;          /* 카드가 다르면 다른 결제 */
+      let score = sameCard ? 2 : 1;
+      if (r.date === c.date) score += 2;
+      if (score > bestScore) { bestScore = score; best = j; }
+    }
+    if (best < 0) continue;
+    used.add(i); used.add(best);
+    c.on = false; c.hint = OFFSET_HINT;
+    list[best].on = false; list[best].hint = OFFSET_HINT;
+    pairs++;
+  }
+  return pairs;
+}
+
 function guessCategory(text, given) {
   const mapped = supplierCat(given);
   if (mapped) return mapped;
@@ -7394,12 +7527,16 @@ function parseWorkbook(wb) {
     if (isTransferRow(typeVal, memo, catVal)) { excluded++; continue; }
     const date = parseDateCell(rawDate) || parseDateCell(row[0]) || "";
     if (!date) { excluded++; continue; }
-    const amount = Math.abs(plainAmount);
-    if (!amount) continue;
+    const absAmount = Math.abs(plainAmount);
+    if (!absAmount) continue;
     const type = forcedIncome ? "income"
       : (/수입|지출|입금|출금|결제|승인|충전|급여|이자|환불|캐시백/.test(String(typeVal || ""))
         ? rowTypeOf(typeVal, rawAmount, memo, catVal)
         : (mixedSign ? (plainAmount < 0 ? "expense" : "income") : rowTypeOf(typeVal, rawAmount, memo, catVal)));
+    /* 카드 결제 취소 → 지출은 그대로 두고 금액만 마이너스 차감 */
+    const cancel = type === "expense" && isCancelRow(typeVal, plainAmount, memo, catVal, mixedSign);
+    const amount = cancel ? -absAmount : absAmount;
+    /* 중복 키에 부호를 그대로 넣는다 — 원결제(55000)가 있어도 취소(-55000)는 새 내역 */
     const key = date + "|" + amount + "|" + normKey(memo);
     const cat = type === "income" ? incomeCat(memo, catVal) : guessCategory(memo, catVal);
     const cardRaw = idx.card != null ? row[idx.card] : "";
@@ -7410,14 +7547,15 @@ function parseWorkbook(wb) {
       else cardId = /카드|체크/.test(cs) ? (matchCardId(cs) || PAY_ACCOUNT) : PAY_ACCOUNT;
     } else cardId = matchCardId(cardRaw, memo);
     if (!cardId) cardId = /계좌|은행|이체/.test(String(cardRaw)) ? PAY_ACCOUNT : PAY_CASH;
-    const chargeRow = type !== "income" && isOnnuriCharge(memo, catVal, typeVal);
+    const chargeRow = !cancel && type !== "income" && isOnnuriCharge(memo, catVal, typeVal);
     const item = {
       on: chargeRow ? false : !existing[key],
       date: date, memo: memo || (type === "income" ? "수입" : cat), amount: amount, type: type, cat: cat,
+      isCancel: cancel,
       fixed: type === "income" ? false : catFixedDefault(cat),
       cardId: cardId,
-      installment: type === "income" ? false : (idx.inst != null ? /무이자|할부/.test(String(row[idx.inst])) && !/일시불/.test(String(row[idx.inst])) : false),
-      hint: chargeRow ? onnuriChargeHint() : "",
+      installment: cancel ? false : (type === "income" ? false : (idx.inst != null ? /무이자|할부/.test(String(row[idx.inst])) && !/일시불/.test(String(row[idx.inst])) : false)),
+      hint: cancel ? CANCEL_HINT : (chargeRow ? onnuriChargeHint() : ""),
       dup: !!existing[key]
     };
     if (type === "income") income++;
@@ -7426,7 +7564,13 @@ function parseWorkbook(wb) {
   }
   /* 간편결제(네이버페이·카카오페이…) 중복 자동 합치기 — 카드 승인 줄 + 가맹점 줄을 한 줄로 */
   const pg = mergePgDuplicates(out, existing);
-  return { rows: pg.rows, excluded: excluded, dup: pg.dup, income: income, sheet: best.name, pgMerged: pg.count };
+  /* 같은 파일 안 원결제 + 취소는 둘 다 체크를 풀어 자동 상쇄 */
+  const offsetPairs = offsetCancelPairs(pg.rows);
+  return {
+    rows: pg.rows, excluded: excluded, dup: pg.dup, income: income, sheet: best.name,
+    pgMerged: pg.count, offsetPairs: offsetPairs,
+    cancels: pg.rows.filter(r => r && r.isCancel).length
+  };
 }
 
 /* ---------- 미리보기 ---------- */
@@ -7435,11 +7579,15 @@ function openImport(parsed) {
   const inc = parsed.rows.filter(r => r.type === "income").length;
   $("#impTitle").textContent = "가져온 내역 확인 (" + parsed.rows.length + "건)";
   const fresh = parsed.rows.filter(r => r.on).length;
-  const chargeN = parsed.rows.filter(r => r.hint).length;
+  const chargeN = parsed.rows.filter(r => r.hint && r.hint.indexOf("↩️") !== 0).length;
+  const cancelN = parsed.cancels || 0;
+  const offsetN = parsed.offsetPairs || 0;
   $("#impSummary").innerHTML = "📄 <b>" + esc(parsed.sheet || "표") + "</b>에서 " + parsed.rows.length + "건을 읽었어요 · " +
     "새 내역 <b>" + fresh + "건</b>" +
     (inc ? " (수입 " + inc + "건 포함)" : "") +
     (parsed.pgMerged ? " · <b>🔗 간편결제 중복 " + parsed.pgMerged + "건 자동 합침</b>" : "") +
+    (cancelN ? " · <b>↩️ 결제 취소 " + cancelN + "건은 마이너스로 차감</b>" : "") +
+    (offsetN ? " · <b>↩️ 원결제와 상쇄된 " + offsetN + "쌍은 체크를 풀어 뒀어요</b>" : "") +
     (parsed.dup ? " · 이미 있는 " + parsed.dup + "건은 체크를 풀어 뒀어요" : "") +
     (chargeN ? " · <b>🎟️ 온누리 충전 " + chargeN + "건은 이중지출 방지로 체크를 풀어 뒀어요</b>" : "") +
     (parsed.excluded ? " · <b>본인 계좌 이체</b> " + parsed.excluded + "건만 제외" : "");
@@ -7454,12 +7602,12 @@ function renderImport() {
   const head = "<thead><tr><th>담기</th><th>지출/수입</th><th>날짜</th><th>내용</th><th>분류</th><th>고정/변동</th><th>결제</th><th>금액</th></tr></thead>";
   const body = importRows.map((r, i) => {
     const inc = r.type === "income";
-    return '<tr class="' + (r.dup ? "dup" : "") + '" data-i="' + i + '"' + (r.pgMerged ? ' title="간편결제 중복 자동 합침 — 카드 승인 줄 기준 + 가맹점 내용·분류"' : '') + '>' +
+    return '<tr class="' + (r.dup ? "dup" : "") + (r.amount < 0 ? " cx" : "") + '" data-i="' + i + '"' + (r.pgMerged ? ' title="간편결제 중복 자동 합침 — 카드 승인 줄 기준 + 가맹점 내용·분류"' : '') + '>' +
       '<td class="c-on" style="text-align:center"><input type="checkbox" data-f="on" data-i="' + i + '"' + (r.on ? " checked" : "") + ' style="accent-color:#5C7F68;border:0;padding:0"></td>' +
       '<td class="c-type"><button class="chip ' + (inc ? "sage" : "line") + '" data-f="typebtn" data-i="' + i + '">' + (inc ? "＋ 수입" : "－ 지출") + "</button></td>" +
       '<td class="c-date"><input type="date" class="w90" data-f="date" data-i="' + i + '" value="' + esc(r.date) + '"></td>' +
       '<td class="c-memo" data-label="내용"><input data-f="memo" data-i="' + i + '" value="' + esc(r.memo) + '" style="min-width:110px">' +
-        (r.hint ? '<div class="imphint">🟠 ' + esc(r.hint) + "</div>" : "") + "</td>" +
+        (r.hint ? '<div class="imphint' + (r.hint.indexOf("↩️") === 0 ? " cx" : "") + '">' + (r.hint.indexOf("↩️") === 0 ? "" : "🟠 ") + esc(r.hint) + "</div>" : "") + "</td>" +
       '<td class="c-cat" data-label="분류"><select data-f="cat" data-i="' + i + '">' + CATS.map(c => '<option value="' + esc(c.n) + '"' + (c.n === r.cat ? " selected" : "") + ">" + esc(c.n) + "</option>").join("") + "</select></td>" +
       '<td class="c-fixed" data-label="고정/변동">' + (inc
         ? '<span class="chip line">수입</span>'
@@ -7518,7 +7666,8 @@ function taxGross() {
 /* 한 해 집계 — 공제는 '결제한 날' 기준, 금액은 결제 전액(더치·기간나누기와 무관) */
 function taxSummary(year) {
   const y = String(year || taxYearNow());
-  const list = state.txns.filter(t => t.type !== "income" && String(t.date || "").slice(0, 4) === y && num(t.amount) > 0);
+  /* 결제 취소(마이너스)도 넣어서 연간 합계에서 차감한다 */
+  const list = state.txns.filter(t => t.type !== "income" && String(t.date || "").slice(0, 4) === y && num(t.amount) !== 0);
   const s = { year: y, count: list.length, total: 0, credit: 0, check: 0, onnuri: 0, transit: 0, edu: 0, med: 0, don: 0, account: 0, etc: 0 };
   list.forEach(t => {
     const amt = num(t.amount);
@@ -7698,11 +7847,12 @@ function renderFvDetail() {
   const head =
     '<div class="fvsum">' +
       '<div class="fvsum-h"><span>' + monthTitle(uiMonth) + " · " + list.length + "건</span><b>" + won(sum) + "</b></div>" +
-      (full !== sum ? '<div class="fvsum-s">결제 전액 ' + won(full) + " · 🤝 더치·🎁 페이백 반영한 금액이 위 금액이에요</div>" : "") +
+      (full !== sum ? '<div class="fvsum-s">결제 전액 ' + won(full) + " · 🤝 더치·🎁 페이백·↩️ 취소 반영한 금액이 위 금액이에요</div>" : "") +
     "</div>";
   const rows = list.map(t => {
     const shown = spendAmtIn(t, uiMonth);
     const tags = [];
+    if (num(t.amount) < 0) tags.push("↩️ 취소");
     if (dutchOn(t)) tags.push("🤝 내 몫");
     if (trialOn(t)) tags.push(t.paybackDone ? "🎁 페이백 완료" : "🎁 페이백 대기");
     if (splitOn(t)) tags.push("📆 " + splitIdx(t, uiMonth) + "/" + splitMonths(t) + "개월");
@@ -7981,6 +8131,9 @@ let ocrBusy = false;
 let ocrLines = [];          /* 마지막으로 읽은 OCR 줄 — 모드를 바꿔도 다시 읽지 않고 다시 나눈다 */
 let ocrMode = "txn";        /* txn = 결제 내역 / coupang = 쿠팡 품목 쪼개기 */
 let cpTotal = 0;            /* 쿠팡 캡처에서 읽은 총 결제금액 (있으면 품목 합계와 비교) */
+let cpDateAuto = false;     /* 캡처에서 읽은 날짜를 자동으로 넣었는지 (사용자가 고치면 false) */
+let cpReplaceId = "";       /* 교체할 기존 쿠팡 결제 txn id */
+let cpAutoSwitchOff = false; /* 사용자가 직접 '결제 내역'을 골랐을 때는 자동 전환하지 않는다 */
 
 function loadScript(src) {
   return new Promise((resolve, reject) => {
@@ -8039,29 +8192,88 @@ function syncOcrModeUI() {
 /* ---------- 🛒 쿠팡 주문서 파싱 ----------
    '상품명 + 가격' 줄을 품목 하나로 보고, 가격이 다음 줄에 오는 주문서도 붙여 읽는다.
    배송비·할인·쿠폰·포인트·총 결제금액 같은 줄은 품목이 아니므로 건너뛴다. */
-const CP_NOT_ITEM = /배송비|배송료|할인|쿠폰|적립|포인트|결제금액|결제 금액|총액|합계|소계|상품금액|주문금액|무료배송|반품|교환|취소|주문번호|주문일|결제수단|영수증|부가세|과세|면세|와우|멤버십|즉시할인|카드할인|상품쿠폰|할인금액|배송지|받는사람|주소|네이버페이|카카오페이|토스페이/;
-const CP_HEAD = /^(주문\s*상품|상품\s*정보|주문\s*정보|배송\s*정보|결제\s*정보|주문\s*내역|쿠팡\s*주문|영수증|옵션|수량|주문상태|구매\s*목록|장바구니)/;
+/* 버튼·상태 줄은 품목 후보에서 뺀다 (쿠팡 주문내역 화면) */
+const CP_NOT_ITEM = /배송비|배송료|할인|쿠폰|적립|포인트|결제금액|결제 금액|총액|합계|소계|상품금액|주문금액|무료배송|반품|교환|취소|주문번호|주문일|결제수단|영수증|부가세|과세|면세|와우|멤버십|즉시할인|카드할인|상품쿠폰|할인금액|배송지|받는사람|주소|네이버페이|카카오페이|토스페이|배송\s*[·•ㆍ]?\s*주문\s*관리|바로\s*구매|전체\s*상품\s*장바구니|장바구니\s*담기|주문한\s*상품을\s*검색|배송완료|배송중|배송준비|배송출발|로켓프레시|로켓배송|도착\s*보장|\d{1,2}\s*\/\s*\d{1,2}\s*\([월화수목금토일]\)/;
+const CP_HEAD = /^(주문\s*상품|상품\s*정보|주문\s*정보|배송\s*정보|결제\s*정보|주문\s*내역|쿠팡\s*주문|영수증|옵션|수량|주문상태|구매\s*목록|장바구니|배송\s*[·•ㆍ]|바로\s*구매|접기|전체\s*상품|주문한\s*상품)/;
 const CP_AMT = /([0-9][0-9,]{2,})\s*원/;
+/* OCR이 '원'을 빼먹고 '2,480  17H'처럼 찍은 줄 — 날짜(2026. 11.7)·수량(110g)은 걸러낸다 */
+const CP_AMT_LOOSE = /(?<![\d.,\/:%-])([0-9]{1,3}(?:,[0-9]{3})+|[0-9]{3,})(?![\d.,\/:%A-Za-z가-힣-])/;
 const CP_CATS = [
   [/기저귀|분유|물티슈|아동|어린이|키즈|유아|장난감|레고|블록|색연필|크레파스|학습지|동화|그림책|서한|아기|젖병|이유식|유치원|어린이집/, "아이"],
   [/세제|섬유유연제|샴푸|린스|컨디셔너|치약|칫솔|휴지|키친타월|행주|수세미|락스|비누|건전지|전구|쓰레기봉투|청소|수납|정리함|빨래|다이소|방충|탈취|제습|세탁|욕실|주방세제|호일|랩|지퍼백|면봉|손소독|빨랫|걸레|밀대/, "생활"],
-  [/우유|계란|달걀|쌀|잡곡|과일|사과|바나나|귤|오렌지|포도|딸기|수박|채소|야채|양파|감자|고구마|대파|마늘|당근|버섯|고기|삼겹살|목살|닭|소고기|돼지|생선|새우|오징어|미역|다시마|라면|과자|초콜릿|음료|주스|커피|원두|소스|참기름|간장|소금|설탕|밀가루|빵|치즈|요거트|요구르트|두부|콩나물|김치|만두|햇반|통조림|식용유|올리브유|생수|견과|떡|어묵|맛살|참치|스팸|시리얼|탄산|맥주|와인|전분|카레|고추장|된장|쌈장|마요네즈|케첩/, "식자재"],
+  [/우유|계란|달걀|쌀|잡곡|과일|사과|바나나|귤|오렌지|포도|딸기|수박|채소|야채|양파|감자|고구마|대파|마늘|당근|버섯|고기|삼겹살|목살|닭|소고기|돼지|생선|새우|오징어|미역|다시마|라면|과자|초콜릿|음료|주스|커피|원두|소스|참기름|간장|소금|설탕|밀가루|빵|치즈|요거트|요구르트|두부|콩나물|김치|만두|햇반|통조림|식용유|올리브유|생수|견과|떡|어묵|맛살|참치|스팸|시리얼|탄산|맥주|와인|전분|카레|고추장|된장|쌈장|마요네즈|케첩|삼립|쑥|약과|한과|카스텔라|쿠키|스낵|뿌셔|청정원|올가|돈카츠|돈가스|우리밀|소시지|베이컨|햄|식품|냉동|간식/, "식자재"],
   [/옷|의류|티셔츠|맨투맨|셔츠|바지|청바지|원피스|코트|패딩|신발|운동화|슬리퍼|가방|지갑|화장품|뷰티|향수|세럼|크림|로션|마스크팩|액세서리|이불|베개|쿠션|매트|커튼|가전|충전기|케이블|이어폰|드라이기|고데기|문구|필통|노트|텀블러|프라이팬|냄비|수건|양말|속옷|모자|장갑|목도리/, "쇼핑"]
 ];
+/* ---------- 쿠팡 주문내역 화면 감지 ----------
+   '📷 캡처 인식'으로 올렸어도 쿠팡 화면 특징이 2가지 이상 보이면 품목 쪼개기로 읽는다. */
+const CP_SIGNAL_RE = /배송\s*[·•]?\s*주문\s*관리|바로\s*구매|로켓프레시|로켓배송|전체\s*상품\s*장바구니|주문한\s*상품을\s*검색/g;
+function coupangSignals(lines) {
+  const seen = {};
+  let n = 0;
+  (lines || []).forEach(raw => {
+    const s = String(raw || "");
+    const hits = s.match(CP_SIGNAL_RE) || [];
+    hits.forEach(h => { const k = String(h).replace(/\s+/g, ""); if (!seen[k]) { seen[k] = 1; n++; } });
+  });
+  return n;
+}
+/* 쿠팡 주문 날짜 (2026. 11. 7) — 상태바 시각(3:03)·배터리(58) 같은 숫자는 날짜가 아니다 */
+const CP_DATE_RE = /(20\d{2})\s*[.\-/]\s*(\d{1,2})\s*[.\-/]\s*(\d{1,2})/;
+function findCoupangDate(lines) {
+  for (const raw of (lines || [])) {
+    const m = String(raw || "").match(CP_DATE_RE);
+    if (!m) continue;
+    const y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]);
+    if (!(mo >= 1 && mo <= 12 && d >= 1 && d <= 31)) continue;
+    return y + "-" + pad2(mo) + "-" + pad2(d);
+  }
+  return "";
+}
+
+/* OCR이 한 글자 틀린 경우(요구르트→요구드트) 긴 낱말은 1글자 차이까지 같은 것으로 본다 */
+const CP_FOOD_KEYS = ["요구르트", "돈카츠", "돈가스", "뿌셔뿌셔", "카스텔라", "꼬마약과", "우리밀", "간장", "된장", "고추장", "참기름", "식용유", "밀가루", "소시지", "베이컨", "통조림", "시리얼", "견과", "원두", "콩나물", "고구마", "어묵", "맛살", "참치", "스팸", "만두", "햇반", "김치", "양파", "감자", "대파", "마늘", "당근", "버섯", "사과", "바나나", "딸기", "수박"];
+function cpNear(name, key) {
+  if (name.indexOf(key) >= 0) return true;
+  if (key.length < 3) return false;
+  for (let i = 0; i + key.length <= name.length; i++) {
+    let diff = 0;
+    for (let j = 0; j < key.length; j++) {
+      if (name[i + j] !== key[j]) { diff++; if (diff > 1) break; }
+    }
+    if (diff <= 1) return true;
+  }
+  return false;
+}
 function coupangCatOf(name) {
-  const s = String(name || "");
+  const s = String(name || "").replace(/\s+/g, " ");
   for (const pair of CP_CATS) if (pair[0].test(s)) return pair[1];
+  if (CP_FOOD_KEYS.some(k => cpNear(s, k))) return "식자재";
   return "쇼핑";
 }
 function cpCleanName(s) {
   return String(s || "")
     .replace(/^\s*\d{1,2}\s*[.)]\s*/, "")          /* 줄 번호 1. 2) */
+    .replace(/^(?=[^가-힣]*[\d\[\]{}()|<>~_,.;:·•#])([^가-힣]{1,12})(?=[가-힣])/, "")   /* OCR 앞머리 잡음 */
     .replace(/^[•·▪\-–—]+\s*/, "")
     .replace(/\s*[xX×*]\s*\d+\s*$/, "")            /* 수량 ×2 */
     .replace(/\s*\d+\s*개\s*$/, "")                /* 수량 2개 */
     .replace(/\s{2,}/g, " ")
+    .replace(/[,\s]+$/, "")
     .trim()
     .slice(0, 60);
+}
+/* 캡처를 여러 장 올리면 같은 품목이 두 번 읽힌다 — 이름이 4자 이상 겹치고 금액이 같으면 같은 품목으로 본다 */
+function cpNameOverlap(a, b) {
+  const ka = String(a || "").replace(/[^가-힣]/g, "");
+  const kb = String(b || "").replace(/[^가-힣]/g, "");
+  if (ka.length < 4 || kb.length < 4) return false;
+  const max = Math.min(6, ka.length, kb.length);
+  for (let len = max; len >= 4; len--) {
+    for (let i = 0; i + len <= ka.length; i++) {
+      if (kb.indexOf(ka.substr(i, len)) >= 0) return true;
+    }
+  }
+  return false;
 }
 function parseCoupangLines(lines, opts) {
   const date = (opts && opts.date) || dateForMonth(uiMonth);
@@ -8073,6 +8285,8 @@ function parseCoupangLines(lines, opts) {
     name = cpCleanName(name);
     if (!name || !(amount > 0)) return;
     if (CP_NOT_ITEM.test(name)) return;
+    /* 캡처를 여러 장 올려 같은 품목이 겹치면 한 번만 */
+    if (rows.some(r => r.memo === name && num(r.amount) === amount)) return;
     rows.push({
       on: true, date: date, memo: name, amount: amount, cat: coupangCatOf(name),
       fixed: false, cardId: cardId, transfer: false, hint: ""
@@ -8081,9 +8295,21 @@ function parseCoupangLines(lines, opts) {
   (lines || []).forEach(raw => {
     const line = String(raw || "").replace(/\s+/g, " ").trim();
     if (!line || line.length < 2) return;
-    const m = line.match(CP_AMT);
+    let m = line.match(CP_AMT);
+    if (!m) {
+      /* '원'을 빼먹은 줄은 앞뒤가 모두 잡음일 때만 금액으로 본다
+         — '398 네 남양유업 ...'·'... 250g' 같은 상품명 줄의 숫자를 금액으로 오해하지 않게 */
+      const lm = line.match(CP_AMT_LOOSE);
+      if (lm) {
+        const pre = line.slice(0, lm.index).trim();
+        const post = line.slice(lm.index + lm[0].length).trim();
+        if (!/[가-힣]{2,}/.test(pre) && !/[가-힣]{2,}/.test(post)) m = lm;
+      }
+    }
     if (!m) {
       if (CP_NOT_ITEM.test(line) || CP_HEAD.test(line)) { pending = ""; return; }
+      /* 날짜·시각·배터리 숫자만 있는 줄은 품목 후보가 아니다 */
+      if (!/[가-힣]{2,}/.test(line) && !/[A-Za-z]{3,}/.test(line)) return;
       pending = line;   /* 가격이 다음 줄에 오는 주문서 */
       return;
     }
@@ -8091,10 +8317,23 @@ function parseCoupangLines(lines, opts) {
     if (/결제금액|결제 금액|총액|합계|소계|상품금액|주문금액/.test(line)) { total = amount; pending = ""; return; }
     if (CP_NOT_ITEM.test(line)) { pending = ""; return; }
     const before = line.slice(0, m.index).trim();
-    if (before) push(before, amount);
-    else if (pending) push(pending, amount);
+    const namePart = cpCleanName(before);
+    /* '7,500 원 · 1개' / OCR 오인식 '· 174'·'주 개'·'· 17H'처럼 가격 앞이 비었거나
+       숫자·기호뿐이면 바로 위 상품명 줄(pending)과 연결한다 */
+    const noiseBefore = !namePart || !/[가-힣]{2,}/.test(namePart);
+    if (noiseBefore && pending) push(pending, amount);
+    else if (namePart) push(namePart, amount);
     pending = "";
   });
+  /* 겹친 캡처로 같은 품목이 두 줄이면 뒤엣것은 체크를 풀어 둔다 (사용자가 다시 켤 수 있다) */
+  for (let i = 0; i < rows.length; i++) {
+    for (let j = i + 1; j < rows.length; j++) {
+      if (!rows[j].on || num(rows[i].amount) !== num(rows[j].amount)) continue;
+      if (!cpNameOverlap(rows[i].memo, rows[j].memo)) continue;
+      rows[j].on = false;
+      rows[j].hint = "🔁 같은 품목이 두 번 읽혀 체크를 풀었어요";
+    }
+  }
   return { rows: rows.slice(0, 60), total: total };
 }
 
@@ -8118,11 +8357,14 @@ function bindOcr() {
     const m = b.getAttribute("data-m") === "coupang" ? "coupang" : "txn";
     if (m === ocrMode && ocrLines.length) { syncOcrModeUI(); return; }
     ocrMode = m;
-    if (ocrLines.length) applyOcrLines();
+    if (ocrLines.length) {
+      cpAutoSwitchOff = true;      /* 직접 고른 모드는 그대로 둔다 */
+      try { applyOcrLines(); } finally { cpAutoSwitchOff = false; }
+    }
     else { syncOcrModeUI(); pickOcrFile(m); }
   });
   const cpDate = $("#cpDate");
-  if (cpDate) cpDate.addEventListener("change", applyCpBarToRows);
+  if (cpDate) cpDate.addEventListener("change", () => { cpDateAuto = false; applyCpBarToRows(); });
   const cpCard = $("#cpCard");
   if (cpCard) cpCard.addEventListener("change", applyCpBarToRows);
   $("#ocrTable").addEventListener("change", ev => {
@@ -8134,9 +8376,19 @@ function bindOcr() {
     else ocrRows[i][f] = ev.target.value;
     const cnt = $("#ocrCount");
     if (cnt) cnt.textContent = ocrRows.filter(r => r.on).length;
+    if (f !== "on" || ocrMode === "coupang") renderCpReplace();
   });
   $("#ocrConfirm").addEventListener("click", () => {
     const sel = ocrRows.filter(r => r.on && r.amount > 0);
+    /* 기존 쿠팡 결제건 교체 — 삭제한 뒤 품목으로 다시 담는다 */
+    const rep = $("#cpReplace");
+    const replaceId = (ocrMode === "coupang" && rep && rep.checked) ? cpReplaceId : "";
+    let replaced = 0, replacedTarget = null;
+    if (replaceId && state.txns.some(t => t.id === replaceId)) {
+      replacedTarget = state.txns.find(t => t.id === replaceId);
+      state.txns = state.txns.filter(t => t.id !== replaceId);
+      replaced = 1;
+    }
     let n = 0;
     sel.forEach(r => {
       const t = addTxn({
@@ -8145,29 +8397,49 @@ function bindOcr() {
       });
       if (t) n++;
     });
+    cpReplaceId = "";
+    const rw = $("#cpReplaceWrap");
+    if (rw) rw.classList.add("hidden");
+    if (rep) rep.checked = false;
     touch(); closeModal("mOcr"); renderAll();
-    toast(n + "건을 가계부에 반영했어요");
+    toast(replaced
+      ? "🔄 기존 쿠팡 결제 " + replaced + "건 교체(" + fmt(num(replacedTarget && replacedTarget.amount)) + "원) · " + n + "건 반영했어요"
+      : n + "건을 가계부에 반영했어요");
   });
 }
 
 /* 모드에 맞게 읽은 줄을 다시 나눈다 (OCR은 한 번만 돌린다) */
 function applyOcrLines() {
   fillCpCard();
+  /* 📷 캡처 인식으로 올려도 쿠팡 주문내역 화면이면 품목 쪼개기로 자동 전환 */
+  let autoSwitch = false;
+  if (!cpAutoSwitchOff && ocrMode !== "coupang" && ocrLines.length && coupangSignals(ocrLines) >= 2) {
+    ocrMode = "coupang";
+    autoSwitch = true;
+  }
+  if (ocrMode === "coupang") syncCpDateFromLines();
   syncOcrModeUI();
   if (ocrMode === "coupang") {
+    cpAutoCardForTarget();
     const parsed = parseCoupangLines(ocrLines, { date: cpDateValue(), cardId: cpCardValue() });
     ocrRows = parsed.rows;
     cpTotal = parsed.total;
-    const sum = ocrRows.reduce((s, r) => s + num(r.amount), 0);
+    const picked = ocrRows.filter(r => r.on);
+    const sum = picked.reduce((s, r) => s + num(r.amount), 0);
+    const skipped = ocrRows.length - picked.length;
     const diff = cpTotal ? cpTotal - sum : 0;
     $("#ocrMsg").innerHTML = ocrRows.length
-      ? "🛒 쿠팡 <b>" + ocrRows.length + "개 품목</b>으로 나눴어요 · 합계 <b>" + fmt(sum) + "원</b>" +
+      ? "🛒 쿠팡 <b>" + ocrRows.length + "개 품목</b>으로 나눴어요" +
+        (skipped ? " (선택 " + picked.length + "건 · 겹친 " + skipped + "건은 체크 해제)" : "") +
+        " · 합계 <b>" + fmt(sum) + "원</b>" +
         (cpTotal ? (diff === 0
           ? ' · 총 결제금액 <b>' + fmt(cpTotal) + '원</b>과 일치 ✓'
           : ' · 총 결제금액 <b>' + fmt(cpTotal) + '원</b>과 <b class="cpmis">' + fmt(Math.abs(diff)) + "원 " + (diff > 0 ? "차이" : "많음") + "</b> — 빠진 품목이 있는지 확인해 주세요")
-          : "") + "<br><small>품목 이름으로 분류를 자동으로 골랐어요 · 틀린 분류·금액만 고쳐 주세요</small>"
+          : "") + "<br><small>품목 이름으로 분류를 자동으로 골랐어요 · 틀린 분류·금액만 고쳐 주세요</small>" +
+        (autoSwitch ? "<br><small>🛒 쿠팡 주문내역으로 보여 <b>품목 쪼개기</b>로 자동 전환했어요</small>" : "")
       : "🛒 쿠팡 품목을 찾지 못했어요 · 상품명과 금액이 함께 보이는 주문내역 캡처로 다시 시도해 주세요";
     renderOcr();
+    renderCpReplace();
     return;
   }
   ocrRows = parseOcrLines(ocrLines);
@@ -8175,6 +8447,74 @@ function applyOcrLines() {
     ? "📷 <b>" + ocrRows.length + "건</b>을 읽었어요 · 잘못 읽힌 숫자만 고쳐 주세요"
     : "읽어낸 결제 내역이 없어요 · 결제 목록이 크게 보이는 캡처로 다시 시도해 주세요";
   renderOcr();
+  renderCpReplace();
+}
+
+/* 캡처에서 읽은 주문 날짜를 #cpDate 에 반영 (사용자가 직접 고른 날짜는 그대로 둔다) */
+function syncCpDateFromLines() {
+  const el = $("#cpDate");
+  if (!el) return false;
+  const d = findCoupangDate(ocrLines);
+  if (!d) return false;
+  if (el.value && !cpDateAuto && el.value !== d) return false;
+  cpDateAuto = true;
+  if (el.value === d) return false;
+  el.value = d;
+  return true;
+}
+
+/* ---------- 기존 쿠팡 결제건 찾기 → 교체 ----------
+   같은 날(±2일)의 '쿠팡' 지출 중 품목 합계와 금액이 같거나 가장 가까운 건을 고른다.
+   쿠팡이츠는 다른 주문이므로 일반 쿠팡 건이 있으면 뒤로 미룬다. */
+function cpDayGap(a, b) {
+  if (!a || !b) return 99;
+  return Math.round((new Date(a + "T00:00:00") - new Date(b + "T00:00:00")) / 86400000);
+}
+function cpHay(t) {
+  return String((t && t.memo) || "") + " " + (t && t.pgFrom ? String(t.pgFrom.card || "") + " " + String(t.pgFrom.merchant || "") : "");
+}
+function cpSelSum() {
+  return ocrRows.filter(r => r.on && num(r.amount) > 0).reduce((s, r) => s + num(r.amount), 0);
+}
+function cpReplaceCandidates(sum) {
+  const d = cpDateValue();
+  const list = state.txns
+    .filter(t => t && t.type !== "income" && num(t.amount) > 0 && /쿠팡/.test(cpHay(t)))
+    .map(t => ({ t: t, gap: Math.abs(cpDayGap(t.date, d)), diff: Math.abs(num(t.amount) - num(sum)), eat: /쿠팡이츠/.test(String(t.memo || "")) }))
+    .filter(x => x.gap <= 2)
+    .sort((a, b) => (a.diff - b.diff) || (a.gap - b.gap));
+  const plain = list.filter(x => !x.eat);
+  return plain.length ? plain : list;
+}
+function cpBestTarget() { return cpReplaceCandidates(cpSelSum())[0] || null; }
+/* 기존 쿠팡 결제가 실제 카드면 그 카드를 기본 결제수단으로 맞춘다 (금액이 딱 맞을 때만) */
+function cpAutoCardForTarget() {
+  const best = cpBestTarget();
+  const sel = $("#cpCard");
+  if (!best || !sel || !cardById(best.t.cardId)) return;
+  if (num(best.t.amount) !== cpSelSum()) return;
+  if (sel.value === best.t.cardId) return;
+  sel.value = best.t.cardId;
+  ocrRows.forEach(r => { r.cardId = best.t.cardId; });
+}
+function renderCpReplace() {
+  const wrap = $("#cpReplaceWrap"), cb = $("#cpReplace"), txt = $("#cpReplaceTxt");
+  if (!wrap || !cb) return;
+  if (ocrMode !== "coupang" || !ocrRows.length) {
+    wrap.classList.add("hidden"); cpReplaceId = ""; cb.checked = false; return;
+  }
+  const sum = cpSelSum();
+  const list = cpReplaceCandidates(sum);
+  const best = list[0];
+  if (!best) {
+    wrap.classList.add("hidden"); cpReplaceId = ""; cb.checked = false; return;
+  }
+  cpReplaceId = best.t.id;
+  wrap.classList.remove("hidden");
+  if (txt) txt.innerHTML = "🔄 기존 <b>" + esc(best.t.date) + " 쿠팡 " + fmt(num(best.t.amount)) + "원</b> 결제건 교체 " +
+    '<small>(삭제 후 품목 ' + ocrRows.filter(r => r.on).length + "건으로 반영 · 합계 " + fmt(sum) + "원)</small>";
+  /* 금액이 정확히 맞거나 후보가 1건뿐이면 기본으로 체크 */
+  cb.checked = best.diff === 0 || list.length === 1;
 }
 
 /* 쿠팡 모드의 날짜·결제수단을 표 전체에 한 번에 적용 */
@@ -8183,6 +8523,7 @@ function applyCpBarToRows() {
   const d = cpDateValue(), c = cpCardValue();
   ocrRows.forEach(r => { r.date = d; r.cardId = c; });
   renderOcr();
+  renderCpReplace();
 }
 
 async function runOcrFiles(files, mode) {
@@ -8194,10 +8535,16 @@ async function runOcrFiles(files, mode) {
   else {
     ocrRows = [];
     ocrLines = [];
+    cpReplaceId = "";
+    cpDateAuto = false;
+    const rw0 = $("#cpReplaceWrap");
+    if (rw0) rw0.classList.add("hidden");
+    const rc0 = $("#cpReplace");
+    if (rc0) rc0.checked = false;
     ocrMode = mode === "coupang" ? "coupang" : "txn";
     fillCpCard();
     const dp = $("#cpDate");
-    if (dp && !dp.value) dp.value = dateForMonth(uiMonth);
+    if (dp && !dp.value) { dp.value = dateForMonth(uiMonth); cpDateAuto = true; }
     syncOcrModeUI();
     $("#ocrMsg").textContent = "글자 인식 도구를 준비하는 중…";
     renderOcr();
