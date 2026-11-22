@@ -1884,7 +1884,7 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
       <button class="refresh-btn" id="btnRefreshApp" type="button" aria-label="최신 버전으로 새로고침" title="최신 버전으로 새로고침">
         <span class="refresh-ico" aria-hidden="true">🔄</span>
       </button>
-      <span class="app-ver" id="appVer" title="앱 버전">v5.6.1</span>
+      <span class="app-ver" id="appVer" title="앱 버전">v5.6.2</span>
       <button class="wake-btn" id="btnWakeQuick" type="button" aria-pressed="false" aria-label="화면 켜짐 유지" title="화면 켜짐 유지">
         <span class="wake-ico" id="wakeQuickIcon" aria-hidden="true">🌙</span><span class="wake-txt" id="wakeQuickText">꺼짐</span>
       </button>
@@ -12997,6 +12997,7 @@ window.SIGHT_DATA = {
     },
     {
       w: 'put', ko: '놓다', st: 'known', note: '11/08',
+      qr: 'https://drive.google.com/file/d/1KQJEK1hjPKKZbuy-Wzx9-2m490sLTkft/view?usp=drive_link',
       pics: [['bun', '🍞'], ['shelf', '🗄️'], ['lid', '🥫'], ['water', '💧'], ['jam', '🍓']],
       ex: [
         ['I put the cap on.', 'cap', '🧢'],
@@ -13026,6 +13027,7 @@ window.SIGHT_DATA = {
     },
     {
       w: 'yellow', ko: '노란', st: 'weak', note: '11/12',
+      qr: 'https://drive.google.com/file/d/1q5_sRfif79Ni0RO9qt7GtOT-u1OCk26f/view?usp=drive_link',
       pics: [['ribbon', '🎀'], ['dress', '👗'], ['duck', '🦆'], ['fruit', '🍎'], ['coat', '🧥']],
       ex: [
         ['I see a yellow ribbon.', 'ribbon', '🎀'],
@@ -13115,6 +13117,7 @@ window.SIGHT_DATA = {
     },
     {
       w: 'into', ko: '~안으로', st: 'weak', note: '',
+      qr: 'https://drive.google.com/file/d/1l_UQHheGFcuxJlf4Cak1qUkxePo_a_pz/view?usp=drive_link',
       pics: [['wall', '🧱'], ['pit', '🕳️'], ['hall', '🚪'], ['crawl', '👶'], ['room', '🛋️']],
       ex: [
         ['He went into the car.', 'car', '🚗'],
@@ -13144,6 +13147,7 @@ window.SIGHT_DATA = {
     },
     {
       w: 'year', ko: '해 · 년', st: 'weak', note: '',
+      qr: 'https://drive.google.com/file/d/1zDxVYYc-wAcCsjYqFviwwpXCbSZAyAvE/view?usp=drive_link',
       pics: [['year', '📅'], ['end', '🏁'], ['twelve', '1️⃣2️⃣'], ['born', '🐣'], ['season', '🍂']],
       ex: [
         ['The year will end soon.', 'end', '🏁'],
@@ -13173,6 +13177,7 @@ window.SIGHT_DATA = {
     },
     {
       w: 'goes', ko: '간다', st: 'weak', note: '',
+      qr: 'https://drive.google.com/file/d/1JkJqmwVoPhU_4MjLPmqPPfSqcYciKYkB/view?usp=drive_link',
       pics: [['theater', '🎭'], ['library', '📚'], ['tower', '🏙️'], ['shed', '🏚️'], ['car', '🚗']],
       ex: [
         ['Tim goes to the theater.', 'theater', '🎭'],
@@ -14072,7 +14077,7 @@ function iconSVG(key) {
   ============================================================ */
   var STORAGE_KEY = 'seohan-numberblocks-routine-v1';
   var STORAGE_VERSION = 6;            /* v6: 🏖️ 주말·공휴일 모드 · 물통·수저통 · 내일 준비물 삭제 */
-  var APP_VERSION = '5.6.1';          /* v5.6.1: 주말 Study 아래 Sight Words 이어 보기 · 3열 정렬 고정 · 새 단어 카드에 사진 QR 바로가기 */
+  var APP_VERSION = '5.6.2';          /* v5.6.2: 11월 Sight Words put·goes·year·into·yellow 교재 QR 링크 연동 · 저장 목록 qr 비어 있어도 기본 qr 따라가기 */
   var APP_BUILT = '2026-11-22';
   var CELEBRATE_UNDO_MS = 10000;      /* 전체 완료 후 10초 안에 취소하면 축하·도감 해금을 되돌려요 */
   var UNDO_TTL = 90 * 1000;           /* 방금 취소한 체크는 90초 동안 원격 상태보다 우선해요 */
@@ -18528,6 +18533,15 @@ function iconSVG(key) {
   var sightLastKey = '';
   var sightTimer = null;
 
+  /* 기본 단어 카드에 실린 교재 QR — 저장된 목록의 qr이 비어 있어도 이 값을 따라가요 */
+  function sightDefQr(key) {
+    var k = String(key == null ? '' : key).toLowerCase();
+    for (var i = 0; i < SIGHT_DEF.length; i++) {
+      var d = SIGHT_DEF[i];
+      if (String(d.w == null ? '' : d.w).toLowerCase() === k) return sightQrValid(d.qr);
+    }
+    return '';
+  }
   function sightAll() {
     var out = [], i;
     for (i = 0; i < SIGHT_DEF.length; i++) {
@@ -18545,7 +18559,7 @@ function iconSVG(key) {
       out.push({
         w: e.w, ko: e.ko || '', note: '',
         pics: e.pics || [], ex: e.ex || [],
-        qr: sightQrOf(e.w, e.qr),
+        qr: sightQrOf(e.w, e.qr || sightDefQr(e.w)),
         base: e.st === 'known' ? 'known' : 'weak', extra: true, key: e.w
       });
     }
