@@ -4551,6 +4551,11 @@ function renderCancelBox() {
   if (wrap) wrap.classList.toggle("hidden", txnType === "income");
   const on = txnType !== "income" && !!($("#tCancel") && $("#tCancel").checked);
   txnCancel = on;
+  /* 취소 건은 더치페이·체험단·기간 나누기를 쓰지 않는다 */
+  ["#tDutchWrap", "#tTrialWrap", "#tSplitWrap"].forEach(sel => {
+    const el = $(sel);
+    if (el) el.classList.toggle("hidden", txnType === "income" || on);
+  });
   const pv = $("#tCancelPreview");
   if (!pv) return;
   pv.innerHTML = on
@@ -4855,7 +4860,6 @@ function openTxn(id) {
   txnCancel = num(t.amount) < 0;
   $("#tAmount").value = fmt(Math.abs(t.amount));
   if ($("#tCancel")) $("#tCancel").checked = txnCancel;
-  renderCancelBox();
   $("#tDate").value = t.date;
   $("#tCat").innerHTML = CATS.map(c => '<option value="' + esc(c.n) + '"' + (c.n === t.cat ? " selected" : "") + ">" + esc(c.n) + "</option>").join("");
   $("#tCard").innerHTML = cardOptionsHTML(t.cardId);
@@ -4885,6 +4889,7 @@ function openTxn(id) {
   renderDutchBox();
   renderSplitBox();
   renderTrialBox();
+  renderCancelBox();
   const same = state.txns.filter(x => x.id !== t.id && merchantMatch(x.memo, t.memo)).length;
   const bulk = $("#tBulk");
   if (bulk) bulk.innerHTML = "🔁 같은 내역 모두 바꾸기" + (same ? " <b>(" + same + "건 더)</b>" : "");
