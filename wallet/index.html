@@ -6161,7 +6161,12 @@ function renderTrials() {
     const inc = trialIncomeTxn(t);
     const fee = trialFeeOf(t);
     const meta = [];
-    if (t.start || t.end) meta.push("📅 " + (t.start ? t.start.slice(5).replace("-", "/") : "?") + "~" + (t.end ? t.end.slice(5).replace("-", "/") : "?"));
+    if (t.start || t.end) {
+      /* 한쪽 날짜만 적힌 건은 물음표 대신 있는 날짜만 보여 준다 */
+      const sd = t.start ? t.start.slice(5).replace("-", "/") : "";
+      const ed = t.end ? t.end.slice(5).replace("-", "/") : "";
+      meta.push("📅 " + (sd && ed ? sd + "~" + ed : sd ? sd + "~" : "~" + ed));
+    }
     if (t.amount) meta.push("💸 선결제 " + won(t.amount));
     if (t.method) meta.push("🚚 " + t.method);
     if (t.fee) meta.push("✍️ 원고료 " + won(t.fee));
