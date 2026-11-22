@@ -760,6 +760,12 @@ table.tbl tr.cx td{background:#FFFBF9}
 .cpbar .cpreplace{grid-column:1/-1;display:flex;align-items:flex-start;gap:6px;white-space:normal;line-height:1.45;text-align:left;background:#FFF8EC;border-color:var(--amber-line);color:var(--amber-d)}
 .cpbar .cpreplace small{color:#B08A57;font-weight:700}
 .cpbar .cpreplace.hidden{display:none}
+.cpbar .cppastebtn{grid-column:1/-1;justify-self:start;font-size:10.5px;padding:5px 9px;height:auto}
+.cpbar .cppaste{grid-column:1/-1;display:flex;flex-direction:column;gap:6px;background:#fff;border:1px solid var(--sage-line);border-radius:10px;padding:8px}
+.cpbar .cppaste.hidden{display:none}
+.cpbar .cppaste textarea{min-height:104px;font:600 11.5px/1.55 inherit;padding:8px;resize:vertical;white-space:pre-wrap}
+.cpbar .cppastef{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.cpbar .cppastef small{font-size:9.5px;font-weight:700;color:var(--mute)}
 .cpmis{color:var(--coral-d)}
 
 /* 연말정산 요약 */
@@ -867,6 +873,11 @@ table.tbl tr.cx td{background:#FFFBF9}
           <span class="tic">🛒</span>
           <span class="ttx"><b>쿠팡 품목별 쪼개기</b><small>주문서 캡처 하나를 품목마다 한 줄로</small></span>
           <span class="zero">한도 0%</span>
+        </button>
+        <button class="tool" id="btnCpPaste">
+          <span class="tic">📋</span>
+          <span class="ttx"><b>쿠팡 텍스트로 붙여넣기</b><small>주문내역 글자를 그대로 나누기 (사진 인식 없이)</small></span>
+          <span class="zero">정확 100%</span>
         </button>
         <button class="tool" id="btnShortcut2">
           <span class="tic">📱</span>
@@ -1495,6 +1506,11 @@ table.tbl tr.cx td{background:#FFFBF9}
       <div class="qf"><span class="w">📅</span><input type="date" id="cpDate" aria-label="쿠팡 결제 날짜"></div>
       <div class="qf"><select id="cpCard" aria-label="쿠팡 결제수단"></select></div>
       <div class="cpnote" id="cpNote">품목마다 한 줄로 담깁니다 · 날짜·결제수단은 바꾸면 전체에 바로 적용돼요</div>
+      <button type="button" class="btn ghost sm cppastebtn" id="cpPasteBtn">📋 텍스트로 붙여넣기</button>
+      <div class="cppaste hidden" id="cpPasteWrap">
+        <textarea id="cpPasteText" rows="5" placeholder="쿠팡 주문내역 글자를 그대로 붙여넣으세요&#10;2026. 11. 6&#10;메르시 파이니스트 셀렉션 레드 9,630원&#10;2026. 11. 9&#10;삼겹살 1kg 15,900원" aria-label="쿠팡 주문내역 텍스트"></textarea>
+        <div class="cppastef"><small>날짜 줄(2026. 11. 6)이 있으면 그 뒤 품목은 그 날짜로 담겨요</small><button type="button" class="btn pri sm" id="cpPasteGo">나누기</button></div>
+      </div>
       <label class="qchk hidden cpreplace" id="cpReplaceWrap" style="border-radius:10px"><input type="checkbox" id="cpReplace"> <span id="cpReplaceTxt"></span></label>
     </div>
     <div class="tblwrap cards-wrap"><table class="tbl" id="ocrTable"></table></div>
@@ -2593,6 +2609,7 @@ async function logoutGoogle() {
   if (authState === "noncrypto" || authState === "off") return;
   if (!confirm("구글 로그인을 풀까요?\n\n로그인을 풀면 이 기기에는 계속 저장되지만 서버 동기화는 멈춥니다. 암호 열쇠는 이 기기에 남습니다.")) return;
   await firebase.auth().signOut();
+  rememberPinUnlock(false);   /* 로그아웃하면 이 탭의 잠금 해제도 함께 지운다 */
   toast("로그인을 풀었어요 — 이 기기에만 저장합니다");
 }
 
@@ -5092,6 +5109,20 @@ let unlockedNow = false;
 let pinInput = "";
 let lockBusy = false;
 const LS_LOCK = "wallet-lock-v1:";
+const SS_PIN_KEY = "wallet_pin_unlocked_" + Room;   /* 같은 탭 안에서 새로고침해도 잠금이 풀린 채로 */
+
+/* 🔄 새로고침(location.reload)은 sessionStorage를 지우지 않는다 — 이 탭에서 이미 풀었다면 그대로 둔다.
+   탭·앱을 완전히 닫으면 sessionStorage가 비워져 다시 PIN을 묻는다. */
+function ssPinUnlocked() {
+  try { return sessionStorage.getItem(SS_PIN_KEY) === "1"; } catch (e) { return false; }
+}
+function rememberPinUnlock(on) {
+  try {
+    if (on) sessionStorage.setItem(SS_PIN_KEY, "1");
+    else sessionStorage.removeItem(SS_PIN_KEY);
+  } catch (e) {}
+}
+if (ssPinUnlocked()) unlockedNow = true;
 
 /* 잠금은 이 기기에도 따로 남긴다 — 서버 상태가 늦게 도착해도 풀리지 않게 */
 function localLock() {
@@ -5147,6 +5178,7 @@ async function submitPin() {
   lockBusy = false;
   if (ok) {
     unlockedNow = true;
+    rememberPinUnlock(true);
     pinInput = "";
     applyLockState();
     toast("잠금을 풀었어요");
@@ -5185,6 +5217,7 @@ function bindLock() {
     if (!confirm("PIN을 잊으셨나요?\n\n이 기기에서 잠금을 풀고 PIN 설정을 지웁니다. 가계부 내용(내역·카드·기프티콘)은 그대로 남습니다.")) return;
     state.security = { pinOn: false, pinHash: "", salt: "" };
     dropLocalLock();
+    rememberPinUnlock(false);
     unlockedNow = true;
     touch(); applyLockState(); renderSettingsPin();
     toast("잠금을 풀었어요 — 설정에서 다시 켤 수 있어요");
@@ -5219,6 +5252,7 @@ async function savePinSetup() {
   state.security = { pinOn: true, pinHash: hash, salt: salt };
   saveLocalLock(state.security);
   unlockedNow = true;
+  rememberPinUnlock(true);   /* 방금 정한 PIN으로 이 탭은 바로 열린 상태 */
   touch(); closeModal("mPin"); renderSettingsPin(); applyLockState();
   toast("🔒 잠금을 켰어요 — 다음에 열 때 PIN을 물어봐요");
 }
@@ -5227,6 +5261,7 @@ function togglePin(on) {
   if (!confirm("비밀번호 잠금을 끌까요?\n이 기기와 공유 방에서 PIN 없이 바로 열립니다.")) { renderSettingsPin(); return; }
   state.security = { pinOn: false, pinHash: "", salt: "" };
   dropLocalLock();
+  rememberPinUnlock(false);
   touch(); renderSettingsPin(); applyLockState();
   toast("잠금을 껐어요");
 }
@@ -8139,6 +8174,8 @@ let cpTotal = 0;            /* 쿠팡 캡처에서 읽은 총 결제금액 (있�
 let cpDateAuto = false;     /* 캡처에서 읽은 날짜를 자동으로 넣었는지 (사용자가 고치면 false) */
 let cpReplaceId = "";       /* 교체할 기존 쿠팡 결제 txn id */
 let cpAutoSwitchOff = false; /* 사용자가 직접 '결제 내역'을 골랐을 때는 자동 전환하지 않는다 */
+let cpMultiDate = false;    /* 붙여넣은 글에 날짜가 여러 개 — 상단 날짜로 덮어쓰지 않는다 */
+let cpPasteMode = false;    /* 📋 텍스트로 붙여넣기로 연 상태 */
 
 function loadScript(src) {
   return new Promise((resolve, reject) => {
@@ -8203,6 +8240,57 @@ const CP_HEAD = /^(주문\s*상품|상품\s*정보|주문\s*정보|배송\s*정�
 const CP_AMT = /([0-9][0-9,]{2,})\s*원/;
 /* OCR이 '원'을 빼먹고 '2,480  17H'처럼 찍은 줄 — 날짜(2026. 11.7)·수량(110g)은 걸러낸다 */
 const CP_AMT_LOOSE = /(?<![\d.,\/:%-])([0-9]{1,3}(?:,[0-9]{3})+|[0-9]{3,})(?![\d.,\/:%A-Za-z가-힣-])/;
+
+/* ---------- 금액 검증 (썸네일 사진이 만든 비정상 숫자) ----------
+   '2.022,222,222,222,22' 처럼 소수점·쉼표가 기형으로 섞인 열과 천만 원 초과 금액은 금액이 아니다. */
+function cpAmountNum(str) {
+  let t = String(str == null ? "" : str).replace(/\s+/g, "").replace(/[.,]+$/, "");
+  if (!t) return 0;
+  if (t.indexOf(".") >= 0) {
+    if (!/^\d{1,3}(\.\d{3})+$/.test(t)) return 0;   /* 9.630 → 9630 · 2.022,222,222,222,22 → 버림 */
+    t = t.replace(/\./g, "");
+  }
+  if (t.indexOf(",") >= 0) {
+    if (!/^\d{1,3}(,\d{3})+$/.test(t)) return 0;     /* 222,22 / 1,23,456 → 버림 */
+    t = t.replace(/,/g, "");
+  }
+  const n = Number(t);
+  if (!isFinite(n) || n <= 0 || n > 10000000) return 0;
+  return n;
+}
+
+/* ---------- 외계어·썸네일 노이즈 필터 ----------
+   쿠팡 주문내역 왼쪽 상품 사진 속 영문·무늬를 Tesseract가 글자로 읽으면
+   'TE / Oo > oS aA \\ of 고누 기'·'C1 SAR'·'봉었 4 EEE' 같은 줄이 품목으로 잡힌다. */
+const CP_SYM_ANY = /[/><\\|[\]{}£^~]/g;      /* 한글이 0자인 줄 */
+const CP_SYM_MIX = /[/><\\|[\]£]/g;          /* 한글에 섞여 깨진 줄 (2개 이상이면 버림) */
+function cpSymCount(s, re) { const m = String(s || "").match(re); return m ? m.length : 0; }
+/* 대문자·공백 파편 (C1 SAR · LITIN I) — 진짜 영문 상품명(SAMSUNG GALAXY S24·PAMPERS)은 남긴다 */
+function cpUpperFragment(s) {
+  if (/[a-z가-힣]/.test(s)) return false;
+  const toks = s.split(/\s+/).filter(Boolean);
+  if (toks.length < 2 || toks.length > 4) return false;
+  if (toks.some(t => !/[A-Z]/.test(t))) return false;
+  if (toks.some(t => t.length > 7)) return false;
+  return (s.match(/[A-Z]/g) || []).length <= 8;   /* 짧은 대문자 토막 몇 개뿐이면 썸네일 파편 */
+}
+function isGarbageCoupangName(name) {
+  const s = String(name || "").replace(/\s+/g, " ").trim();
+  if (!s) return true;
+  if (/^-?[\d.,\/:%~\s]+$/.test(s)) return true;              /* 숫자·기호만 있는 줄 */
+  const han = (s.match(/[가-힣]/g) || []).length;
+  if (han === 0) {
+    if (cpSymCount(s, CP_SYM_ANY) >= 1) return true;            /* C1 SAR - | | "3 [WI | Ld */
+    return cpUpperFragment(s);                                  /* C1 SAR · LITIN I */
+  }
+  if (cpSymCount(s, CP_SYM_MIX) >= 2) return true;              /* TE / Oo > oS aA \\ of 고누 기 */
+  if (han <= 2) {                                              /* 봉었 4 EEE */
+    const runs = s.match(/[A-Z]{2,}/g) || [];
+    const total = runs.join("").length;
+    if (runs.some(r => r.length >= 3) || (runs.length >= 2 && total >= 3)) return true;
+  }
+  return false;
+}
 const CP_CATS = [
   [/기저귀|분유|물티슈|아동|어린이|키즈|유아|장난감|레고|블록|색연필|크레파스|학습지|동화|그림책|서한|아기|젖병|이유식|유치원|어린이집/, "아이"],
   [/세제|섬유유연제|샴푸|린스|컨디셔너|치약|칫솔|휴지|키친타월|행주|수세미|락스|비누|건전지|전구|쓰레기봉투|청소|수납|정리함|빨래|다이소|방충|탈취|제습|세탁|욕실|주방세제|호일|랩|지퍼백|면봉|손소독|빨랫|걸레|밀대/, "생활"],
@@ -8280,26 +8368,44 @@ function cpNameOverlap(a, b) {
   }
   return false;
 }
+/* 날짜 헤더 단독 줄 (2026-11-06 · 2026. 11. 6 · 2026. 11. 6 (금)) —
+   여러 날 주문내역을 한꺼번에 붙여넣어도 이 뒤 품목은 그 날짜로 들어간다 */
+const CP_DATE_HEAD = /^(20\d{2})\s*[.\-/]\s*(\d{1,2})\s*[.\-/]\s*(\d{1,2})\s*(?:\([월화수목금토일]\))?\s*(?:주문|결제|주문일|결제일)?$/;
+function cpDateHeader(line) {
+  const m = String(line || "").replace(/\s+/g, " ").trim().match(CP_DATE_HEAD);
+  if (!m) return "";
+  const y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]);
+  if (!(mo >= 1 && mo <= 12 && d >= 1 && d <= 31)) return "";
+  return y + "-" + pad2(mo) + "-" + pad2(d);
+}
 function parseCoupangLines(lines, opts) {
   const date = (opts && opts.date) || dateForMonth(uiMonth);
   const cardId = (opts && opts.cardId) || (state.cards[0] ? state.cards[0].id : PAY_CASH);
   const rows = [];
   let total = 0;
   let pending = "";
+  let dropped = 0;          /* 썸네일 사진 글자·비정상 숫자로 뺌 줄 수 */
+  let curDate = date;       /* 날짜 헤더 줄이 나오면 바뀐다 */
+  const datesSeen = {};
   const push = (name, amount) => {
     name = cpCleanName(name);
     if (!name || !(amount > 0)) return;
     if (CP_NOT_ITEM.test(name)) return;
+    if (isGarbageCoupangName(name)) { dropped++; return; }
     /* 캡처를 여러 장 올려 같은 품목이 겹치면 한 번만 */
     if (rows.some(r => r.memo === name && num(r.amount) === amount)) return;
     rows.push({
-      on: true, date: date, memo: name, amount: amount, cat: coupangCatOf(name),
+      on: true, date: curDate, memo: name, amount: amount, cat: coupangCatOf(name),
       fixed: false, cardId: cardId, transfer: false, hint: ""
     });
+    datesSeen[curDate] = 1;
   };
   (lines || []).forEach(raw => {
     const line = String(raw || "").replace(/\s+/g, " ").trim();
     if (!line || line.length < 2) return;
+    /* 📅 날짜 헤더 단독 줄 — 이후 품목의 날짜가 된다 (여러 날 붙여넣기) */
+    const dh = cpDateHeader(line);
+    if (dh) { curDate = dh; pending = ""; return; }
     let m = line.match(CP_AMT);
     if (!m) {
       /* '원'을 빼먹은 줄은 앞뒤가 모두 잡음일 때만 금액으로 본다
@@ -8315,10 +8421,13 @@ function parseCoupangLines(lines, opts) {
       if (CP_NOT_ITEM.test(line) || CP_HEAD.test(line)) { pending = ""; return; }
       /* 날짜·시각·배터리 숫자만 있는 줄은 품목 후보가 아니다 */
       if (!/[가-힣]{2,}/.test(line) && !/[A-Za-z]{3,}/.test(line)) return;
+      /* 썸네일 사진 속 글자·무늬를 읽은 외계어 줄은 품목 후보로 삼지 않는다 */
+      if (isGarbageCoupangName(line)) { dropped++; pending = ""; return; }
       pending = line;   /* 가격이 다음 줄에 오는 주문서 */
       return;
     }
-    const amount = num(m[1]);
+    const amount = cpAmountNum(m[1]);
+    if (!amount) { pending = ""; dropped++; return; }   /* 천만 원 초과·기형 쉼표·소수점 */
     if (/결제금액|결제 금액|총액|합계|소계|상품금액|주문금액/.test(line)) { total = amount; pending = ""; return; }
     if (CP_NOT_ITEM.test(line)) { pending = ""; return; }
     const before = line.slice(0, m.index).trim();
@@ -8339,13 +8448,19 @@ function parseCoupangLines(lines, opts) {
       rows[j].hint = "🔁 같은 품목이 두 번 읽혀 체크를 풀었어요";
     }
   }
-  return { rows: rows.slice(0, 60), total: total };
+  return { rows: rows.slice(0, 60), total: total, dropped: dropped, dates: Object.keys(datesSeen) };
 }
 
 function bindOcr() {
   $("#btnOcr").addEventListener("click", () => { ocrMode = "txn"; pickOcrFile("txn"); });
   const bc = $("#btnCoupang");
   if (bc) bc.addEventListener("click", () => { ocrMode = "coupang"; pickOcrFile("coupang"); });
+  const bp = $("#btnCpPaste");
+  if (bp) bp.addEventListener("click", openCpPaste);
+  const pb = $("#cpPasteBtn");
+  if (pb) pb.addEventListener("click", toggleCpPaste);
+  const pgo = $("#cpPasteGo");
+  if (pgo) pgo.addEventListener("click", runCpPaste);
   $("#fileImg").addEventListener("change", ev => {
     const files = Array.prototype.slice.call(ev.target.files || []);
     if (files.length) runOcrFiles(files, imgMode);
@@ -8362,6 +8477,7 @@ function bindOcr() {
     const m = b.getAttribute("data-m") === "coupang" ? "coupang" : "txn";
     if (m === ocrMode && ocrLines.length) { syncOcrModeUI(); return; }
     ocrMode = m;
+    if (m !== "coupang") { const pw = $("#cpPasteWrap"); if (pw) pw.classList.add("hidden"); }
     if (ocrLines.length) {
       cpAutoSwitchOff = true;      /* 직접 고른 모드는 그대로 둔다 */
       try { applyOcrLines(); } finally { cpAutoSwitchOff = false; }
@@ -8414,6 +8530,54 @@ function bindOcr() {
 }
 
 /* 모드에 맞게 읽은 줄을 다시 나눈다 (OCR은 한 번만 돌린다) */
+/* ---------- 📋 주문내역 텍스트 붙여넣기 (사진 인식 없이 100% 정확) ---------- */
+function openCpPaste() {
+  ocrMode = "coupang";
+  cpPasteMode = true;
+  ocrLines = [];
+  ocrRows = [];
+  cpTotal = 0;
+  cpMultiDate = false;
+  cpReplaceId = "";
+  cpDateAuto = false;
+  fillCpCard();
+  syncOcrModeUI();
+  const dp = $("#cpDate");
+  if (dp && !dp.value) { dp.value = dateForMonth(uiMonth); cpDateAuto = true; }
+  const rw = $("#cpReplaceWrap"); if (rw) rw.classList.add("hidden");
+  const rc = $("#cpReplace"); if (rc) rc.checked = false;
+  const msg = $("#ocrMsg");
+  if (msg) msg.innerHTML = "📋 쿠팡 주문내역 글자를 붙여넣고 <b>나누기</b>를 누르면 사진 인식 없이 그대로 나눠요 · <b>2026. 11. 6</b> 같은 날짜 줄 뒤 품목은 그 날짜로 담겨요";
+  const note = $("#cpNote");
+  if (note) note.textContent = "품목마다 한 줄로 담깁니다 · 날짜·결제수단은 바꾸면 전체에 바로 적용돼요";
+  renderOcr();
+  openModal("mOcr");
+  const wrap = $("#cpPasteWrap"); if (wrap) wrap.classList.remove("hidden");
+  const ta = $("#cpPasteText");
+  if (ta) { ta.value = ""; setTimeout(() => { try { ta.focus(); } catch (e) {} }, 140); }
+}
+function toggleCpPaste() {
+  const wrap = $("#cpPasteWrap");
+  if (!wrap) return;
+  const show = wrap.classList.contains("hidden");
+  wrap.classList.toggle("hidden", !show);
+  if (show) {
+    const ta = $("#cpPasteText");
+    if (ta) { if (!ta.value && ocrLines.length) ta.value = ocrLines.join("\n"); try { ta.focus(); } catch (e) {} }
+  }
+}
+function runCpPaste() {
+  const ta = $("#cpPasteText");
+  const lines = String((ta && ta.value) || "").split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  if (!lines.length) { toast("붙여넣은 글이 없어요"); return; }
+  ocrMode = "coupang";
+  cpPasteMode = true;
+  ocrLines = lines;
+  const wrap = $("#cpPasteWrap"); if (wrap) wrap.classList.add("hidden");
+  applyOcrLines();
+  const n = ocrRows.length;
+  toast(n ? "📋 " + n + "개 품목으로 나눴어요" : "품목을 찾지 못했어요 — 상품명과 금액이 함께 있는 글을 붙여넣어 주세요");
+}
 function applyOcrLines() {
   fillCpCard();
   /* 📷 캡처 인식으로 올려도 쿠팡 주문내역 화면이면 품목 쪼개기로 자동 전환 */
@@ -8429,20 +8593,27 @@ function applyOcrLines() {
     const parsed = parseCoupangLines(ocrLines, { date: cpDateValue(), cardId: cpCardValue() });
     ocrRows = parsed.rows;
     cpTotal = parsed.total;
+    cpMultiDate = !!(parsed.dates && parsed.dates.length > 1);
     const picked = ocrRows.filter(r => r.on);
     const sum = picked.reduce((s, r) => s + num(r.amount), 0);
     const skipped = ocrRows.length - picked.length;
     const diff = cpTotal ? cpTotal - sum : 0;
+    const garbage = parsed.dropped ? " · 썸네일 글자·비정상 숫자로 읽힌 <b>" + parsed.dropped + "줄</b>은 뺐어요" : "";
     $("#ocrMsg").innerHTML = ocrRows.length
       ? "🛒 쿠팡 <b>" + ocrRows.length + "개 품목</b>으로 나눴어요" +
+        (cpMultiDate ? " · 날짜 <b>" + parsed.dates.length + "개</b>" : "") +
         (skipped ? " (선택 " + picked.length + "건 · 겹친 " + skipped + "건은 체크 해제)" : "") +
         " · 합계 <b>" + fmt(sum) + "원</b>" +
         (cpTotal ? (diff === 0
           ? ' · 총 결제금액 <b>' + fmt(cpTotal) + '원</b>과 일치 ✓'
           : ' · 총 결제금액 <b>' + fmt(cpTotal) + '원</b>과 <b class="cpmis">' + fmt(Math.abs(diff)) + "원 " + (diff > 0 ? "차이" : "많음") + "</b> — 빠진 품목이 있는지 확인해 주세요")
-          : "") + "<br><small>품목 이름으로 분류를 자동으로 골랐어요 · 틀린 분류·금액만 고쳐 주세요</small>" +
+          : "") + garbage + "<br><small>품목 이름으로 분류를 자동으로 골랐어요 · 틀린 분류·금액만 고쳐 주세요</small>" +
         (autoSwitch ? "<br><small>🛒 쿠팡 주문내역으로 보여 <b>품목 쪼개기</b>로 자동 전환했어요</small>" : "")
-      : "🛒 쿠팡 품목을 찾지 못했어요 · 상품명과 금액이 함께 보이는 주문내역 캡처로 다시 시도해 주세요";
+      : "🛒 쿠팡 품목을 찾지 못했어요 · 상품명과 금액이 함께 보이는 주문내역 캡처로 다시 시도해 주세요" + (garbage ? garbage : "");
+    const note = $("#cpNote");
+    if (note) note.textContent = cpMultiDate
+      ? "📅 날짜가 여러 개라 품목마다 그 날짜로 담았어요 · 결제수단을 바꾸면 전체에 적용돼요"
+      : "품목마다 한 줄로 담깁니다 · 날짜·결제수단은 바꾸면 전체에 바로 적용돼요";
     renderOcr();
     renderCpReplace();
     return;
@@ -8522,11 +8693,11 @@ function renderCpReplace() {
   cb.checked = best.diff === 0 || list.length === 1;
 }
 
-/* 쿠팡 모드의 날짜·결제수단을 표 전체에 한 번에 적용 */
+/* 쿠팡 모드의 날짜·결제수단을 표 전체에 한 번에 적용 (날짜가 여러 개인 붙여넣기는 날짜를 건너뛴다) */
 function applyCpBarToRows() {
   if (ocrMode !== "coupang" || !ocrRows.length) return;
   const d = cpDateValue(), c = cpCardValue();
-  ocrRows.forEach(r => { r.date = d; r.cardId = c; });
+  ocrRows.forEach(r => { if (!cpMultiDate) r.date = d; r.cardId = c; });
   renderOcr();
   renderCpReplace();
 }
@@ -8542,6 +8713,10 @@ async function runOcrFiles(files, mode) {
     ocrLines = [];
     cpReplaceId = "";
     cpDateAuto = false;
+    cpPasteMode = false;
+    cpMultiDate = false;
+    const pw0 = $("#cpPasteWrap");
+    if (pw0) pw0.classList.add("hidden");
     const rw0 = $("#cpReplaceWrap");
     if (rw0) rw0.classList.add("hidden");
     const rc0 = $("#cpReplace");
@@ -8614,7 +8789,7 @@ function parseOcrLines(lines) {
     if (line.length < 4) return;
     const amountM = line.match(/([0-9][0-9,]{2,})\s*원/);
     if (!amountM) return;
-    let amount = num(amountM[1]);
+    let amount = cpAmountNum(amountM[1]);
     if (!amount) return;
     if (/잔액|누적|포인트|한도/.test(line.slice(0, amountM.index))) return;
     const isTransfer = isTransferRow("", line, "");
@@ -8912,6 +9087,7 @@ function boot() {
         const hash = await pinDigest(pin, salt);
         state.security = { pinOn: true, pinHash: hash, salt: salt };
         saveLocalLock(state.security);
+        rememberPinUnlock(false);
         unlockedNow = false;
         touch(); applyLockState();
         return state.security;
@@ -8922,6 +9098,12 @@ function boot() {
     parseOcrLines: parseOcrLines,
     parseCoupangLines: parseCoupangLines,
     coupangCatOf: coupangCatOf,
+    isGarbageCoupangName: isGarbageCoupangName,
+    cpAmountNum: cpAmountNum,
+    cpDateHeader: cpDateHeader,
+    openCpPaste: openCpPaste,
+    runCpPaste: runCpPaste,
+    ssPinUnlocked: ssPinUnlocked,
     openTax: openTax,
     renderTax: renderTax,
     taxSummary: taxSummary,
