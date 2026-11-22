@@ -5243,16 +5243,18 @@ function openPinSetup() {
   setTimeout(() => { const el = $("#pinNew"); if (el) el.focus(); }, 120);
 }
 async function savePinSetup() {
-  const a = ($("#pinNew").value || "").replace(/\D/g, "");
-  const b = ($("#pinNew2").value || "").replace(/\D/g, "");
+  const a = (($("#pinNew") && $("#pinNew").value) || "").replace(/\D/g, "");
+  const b = (($("#pinNew2") && $("#pinNew2").value) || "").replace(/\D/g, "");
   if (!/^\d{4}$/.test(a)) { toast("숫자 4자리로 정해 주세요"); return; }
   if (a !== b) { toast("두 번 넣은 PIN이 달라요"); return; }
+  const had = pinIsOn();   /* 새로 정하는 것과 바꾸는 것을 나눈다 */
   const salt = pinSalt();
   const hash = await pinDigest(a, salt);
   state.security = { pinOn: true, pinHash: hash, salt: salt };
   saveLocalLock(state.security);
-  unlockedNow = true;
-  rememberPinUnlock(true);   /* 방금 정한 PIN으로 이 탭은 바로 열린 상태 */
+  unlockedNow = true;      /* 방금 이 기기에서 PIN을 넣었으니 지금 화면은 열린 상태 */
+  /* 방금 정한 PIN이면 이 탭도 풀린 채로, PIN을 바꾼 것이면 이 탭의 해제 표시는 지운다 */
+  rememberPinUnlock(!had);
   touch(); closeModal("mPin"); renderSettingsPin(); applyLockState();
   toast("🔒 잠금을 켰어요 — 다음에 열 때 PIN을 물어봐요");
 }
