@@ -365,6 +365,9 @@ table.tbl input.w90{width:92px}
 table.tbl input[type="date"]{padding:5px 4px}
 table.tbl td input[type="checkbox"]{width:16px;height:16px;padding:0;border:0;accent-color:#5C7F68}
 table.tbl td.acts{white-space:nowrap;text-align:right}
+table.tbl td.acts .mini + .mini{margin-left:4px}
+/* 전체 내역 위로 수정 모달을 띄운다 (내역 창은 뒤에 두고 고친 뒤 그대로 돌아옴) */
+#mTxn{z-index:90}
 
 /* ============ 모바일(≤640px): 내역 표 → 카드형 행 ============
    아이폰 390px에서 9개 열 표가 반 글자로 찌그러지는 문제 대응.
@@ -467,13 +470,15 @@ table.tbl td.acts{white-space:nowrap;text-align:right}
 .pickempty{text-align:center;font-size:10.5px;font-weight:600;color:#B7AC9C;line-height:1.7;padding:16px 8px}
 
 /* ============ 3 tabs ============ */
-.tabs{position:sticky;top:0;z-index:30;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:rgba(250,246,239,.95);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:14px;padding:4px;margin-bottom:12px;box-shadow:var(--shadow)}
-.tabs button{font-size:11.5px;font-weight:800;letter-spacing:-.35px;color:#9C9285;padding:9px 3px;border-radius:10px;white-space:nowrap;transition:background .15s,color .15s}
+.tabs{position:sticky;top:0;z-index:30;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;background:rgba(250,246,239,.95);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:14px;padding:4px;margin-bottom:12px;box-shadow:var(--shadow)}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:1 0 auto;min-width:0;font-size:11.5px;font-weight:800;letter-spacing:-.35px;color:#9C9285;padding:9px 7px;border-radius:10px;white-space:nowrap;transition:background .15s,color .15s}
 .tabs button.on{background:#fff;color:var(--sage-d);box-shadow:0 1px 4px rgba(120,96,66,.14)}
 .tabpanel{display:none}
 .tabpanel.on{display:block;animation:fadein .16s ease-out}
 @keyframes fadein{from{opacity:.35;transform:translateY(3px)}to{opacity:1;transform:none}}
-@media(min-width:900px){.tabs{max-width:560px}.tabs button{font-size:13px;padding:10px 8px}}
+@media(min-width:900px){.tabs{max-width:700px}.tabs button{font-size:13px;padding:10px 8px}}
+@media(max-width:420px){.tabs button{font-size:10.5px;padding:9px 5px}}
 
 /* ============ KPI: 수입 / 지출 / 잔여 ============ */
 .kpi.in{border-color:#D9E7EE;background:linear-gradient(180deg,#F3F9FC,#fff)}
@@ -645,6 +650,74 @@ body.locked .app,body.locked .toast{visibility:hidden}
 @media(max-width:420px){.onbal .ov b{font-size:21px}.onbal .om{text-align:left}}
 @media(min-width:760px){.onbal-btns{max-width:460px}}
 
+/* ============ 체험단 페이백 (3.3% 공제) ============ */
+.trialbanner{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:linear-gradient(180deg,#FFF8EC,#FFFDFA);border:1px solid var(--amber-line);border-radius:15px;padding:10px 12px;margin-bottom:11px;box-shadow:var(--shadow)}
+.trialbanner .tb-txt{flex:1 1 140px;min-width:0;cursor:pointer}
+.trialbanner .tb-txt b{display:block;font-size:11.5px;font-weight:800;letter-spacing:-.4px;color:var(--amber-d);line-height:1.35}
+.trialbanner .tb-txt small{display:block;margin-top:2px;font-size:9px;font-weight:700;color:#A9947A;letter-spacing:-.2px;line-height:1.45}
+.trialbanner .tb-btns{display:flex;gap:6px;flex:0 0 auto;margin-left:auto}
+.trialbanner .tb-btns .btn{padding:8px 10px;font-size:10.5px;border-radius:9px;white-space:nowrap}
+.trialnote{margin-top:8px;font-size:9.5px;font-weight:700;color:var(--amber-d);background:var(--amber-soft);border:1px solid var(--amber-line);border-radius:10px;padding:7px 9px;line-height:1.6}
+.trialnote b{font-weight:800}
+.rec .tchip{font-size:8.5px;font-weight:800;background:var(--amber-soft);color:var(--amber-d);border-radius:5px;padding:1px 4px;margin-right:2px;font-style:normal}
+.rec .tchip.done{background:var(--sage-soft);color:var(--sage-d)}
+.tbox{margin-top:8px;background:#FBF8F1;border:1px solid var(--amber-line);border-radius:12px;padding:9px}
+.tbox .tquick{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.tbox .tquick button{flex:1 1 0;min-width:80px;font-size:11px;font-weight:800;color:var(--amber-d);background:#fff;border:1px solid var(--amber-line);border-radius:9px;padding:8px 4px;letter-spacing:-.3px}
+.tbox .tquick button.on{background:var(--amber);border-color:var(--amber);color:#fff}
+.tbox .tpayseg{flex:1 1 0;min-width:0;padding:2px;background:#F1E9DD}
+.tbox .tpayseg button{font-size:10.5px;padding:7px 4px}
+.tbox .tpayseg button.on{background:#fff;color:var(--amber-d)}
+.tbox .tprev{background:var(--amber-soft);color:var(--amber-d);margin-top:8px;font-size:10px;font-weight:700;border-radius:9px;padding:7px 9px;line-height:1.55;letter-spacing:-.2px}
+.tbox .tprev b{font-weight:800}
+.tmin{margin-top:4px;font-size:9px;font-weight:800;color:var(--amber-d);background:var(--amber-soft);border-radius:6px;padding:2px 5px;display:inline-block;letter-spacing:-.2px}
+.tmin.done{background:var(--sage-soft);color:var(--sage-d)}
+.mini.ok{color:var(--sage-d);background:var(--sage-soft)}
+@media(max-width:420px){
+  .trialbanner{padding:9px 10px;gap:7px}
+  .trialbanner .tb-btns{flex:1 1 100%;margin-left:0}
+  .trialbanner .tb-btns .btn{flex:1 1 0;min-width:0}
+}
+
+/* 내역 수정 모달: 머리말·저장 버튼 고정, 본문만 스크롤 (아이폰 390px에서 저장 버튼이 가려지지 않게) */
+#mTxn .sheet,#mTrial .sheet{display:flex;flex-direction:column;max-height:92dvh;max-height:92svh}
+#mTxn .sheet .sheet-h,#mTrial .sheet .sheet-h{flex:0 0 auto;position:static}
+#mTxn .sheet .sheet-b,#mTrial .sheet .sheet-b{flex:1 1 auto;min-height:0;max-height:none;overflow-y:auto;-webkit-overflow-scrolling:touch}
+#mTxn .sheet .bulkrow{flex:0 0 auto}
+#mTxn .sheet .sheet-f,#mTrial .sheet .sheet-f{flex:0 0 auto;position:static;padding-bottom:calc(12px + env(safe-area-inset-bottom))}
+
+/* ============ 📋 체험단 탭 ============ */
+.trsum{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:11px}
+.trs{background:#fff;border:1px solid var(--line);border-radius:14px;padding:9px 10px;box-shadow:var(--shadow);min-width:0}
+.trs small{display:block;font-size:9.5px;font-weight:800;color:var(--mute);letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trs b{display:block;margin-top:3px;font-size:15px;font-weight:800;letter-spacing:-.6px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.trs i{display:block;font-style:normal;font-size:9px;font-weight:800;color:var(--amber-d);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trs.hot{border-color:var(--coral-line);background:linear-gradient(180deg,#FEF6F3,#fff)}
+.trs.hot b{color:var(--coral-d)}
+.trs.amber{border-color:var(--amber-line);background:linear-gradient(180deg,#FFF8EC,#fff)}
+.trs.amber b{color:var(--amber-d)}
+.trfilters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px}
+.trfilters button{font-size:10.5px;font-weight:800;padding:6px 10px;border-radius:9px;background:#F6F1E8;color:#9C9285;letter-spacing:-.2px;white-space:nowrap}
+.trfilters button.on{background:var(--sage);color:#fff}
+.trlist{display:flex;flex-direction:column;gap:8px}
+.tr{border:1px solid var(--line);border-radius:15px;padding:10px 11px;background:#FFFDFA;min-width:0}
+.tr-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tr-top .trsite{font-size:9.5px;font-weight:800;color:var(--sage-d);background:var(--sage-soft);border-radius:6px;padding:2px 6px;letter-spacing:-.2px;white-space:nowrap}
+.tr-top .trname{flex:1;min-width:110px;font-size:12.5px;font-weight:800;letter-spacing:-.35px;line-height:1.3;word-break:keep-all}
+.tr-days{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.tr-days:empty{display:none}
+.tr-meta{display:flex;gap:4px 9px;flex-wrap:wrap;margin-top:6px;font-size:9.5px;font-weight:700;color:#A79C8D;letter-spacing:-.2px;line-height:1.5}
+.tr-memo{margin-top:5px;font-size:9.5px;font-weight:700;color:var(--sub);background:#F8F4EB;border-radius:7px;padding:5px 7px;line-height:1.5;word-break:keep-all}
+.tr-acts{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.tr-acts .btn{padding:7px 9px;font-size:10.5px;border-radius:8px;text-decoration:none}
+.tr-acts .mini{width:26px;height:26px;border-radius:8px;margin-left:auto}
+@media(max-width:420px){
+  .trsum{grid-template-columns:repeat(2,1fr);gap:6px}
+  .trs b{font-size:14px}
+  .tr-acts .btn{flex:1 1 auto;min-width:0}
+  .tr-acts .mini{margin-left:0}
+}
+
 </style>
 </head>
 <body>
@@ -675,11 +748,13 @@ body.locked .app,body.locked .toast{visibility:hidden}
     <button data-tab="ledger" class="on">💸 가계부</button>
     <button data-tab="cards">💳 카드·혜택</button>
     <button data-tab="gifts">🎁 기프티콘·포인트</button>
+    <button data-tab="trials">📋 체험단</button>
   </nav>
 
   <!-- ===================== 탭 1. 가계부 ===================== -->
   <div class="tabpanel on" id="panel-ledger">
     <div class="kpis" id="kpis"></div>
+    <div class="trialbanner hidden" id="trialBanner"></div>
 
     <section class="card" id="secLedger">
       <div class="card-h">
@@ -745,6 +820,7 @@ body.locked .app,body.locked .toast{visibility:hidden}
         <div class="lg"><span class="fx" id="lgFix">🔒 고정비 0원 · 0%</span><span class="vr" id="lgVar">🔁 변동비 0원 · 0%</span></div>
         <div class="hint dutchnote hidden" id="dutchNote"></div>
         <div class="hint splitnote hidden" id="splitNote"></div>
+        <div class="hint trialnote hidden" id="trialNote"></div>
       </div>
 
       <div class="fv3">
@@ -866,6 +942,25 @@ body.locked .app,body.locked .toast{visibility:hidden}
       </div>
       <div class="plist" id="pointList"></div>
       <div class="cnote">네이버페이 · 스마일캐시 · 하나머니처럼 쌓이는 포인트를 적어 두세요 · 가계부 결제수단에서 <b>포인트</b>를 고르면 카드 실적 합산에서 빠집니다</div>
+    </section>
+  </div>
+
+  <!-- ===================== 탭 4. 체험단 ===================== -->
+  <div class="tabpanel" id="panel-trials">
+    <div class="trsum" id="trialSum"></div>
+
+    <section class="card" id="secTrials">
+      <div class="card-h">
+        <h2><span class="secnum">1</span>📋 체험단 신청·페이백</h2>
+        <div class="right">
+          <span class="chip line" id="trialChip">0건</span>
+          <button class="btn ghost sm" id="btnTrialSheet">📥 시트 붙여넣기</button>
+          <button class="btn pri sm" id="btnTrialAdd">＋ 체험단</button>
+        </div>
+      </div>
+      <div class="trfilters" id="trialFilters"></div>
+      <div class="trlist" id="trialList"></div>
+      <div class="cnote">구글 시트(<b>체험단</b> · 2026)의 열 구성을 그대로 옮겼어요 · 링크를 넣으면 사이트·제품명을 읽어 오고, 로그인·차단 페이지는 공지 복붙이나 캡처로 채웁니다 · 한도 0%로 이 브라우저 안에서만 돌아가요</div>
     </section>
   </div>
 
@@ -1069,6 +1164,25 @@ body.locked .app,body.locked .toast{visibility:hidden}
         <div class="dprev" id="tDutchPreview"></div>
       </div>
     </div>
+    <div class="fld" id="tTrialWrap">
+      <label class="qchk" style="border-radius:10px"><input type="checkbox" id="tTrial"> 🎁 체험단 페이백 <small>실적은 결제 전액 · 지출은 3.3%만</small></label>
+      <div class="tbox hidden" id="tTrialBox">
+        <div class="dmshare"><label for="tPayback">예상 입금액 · 페이백 (세금 3.3% 제외)</label><input id="tPayback" inputmode="numeric" placeholder="비우면 3.3% 공제로 자동 계산"></div>
+        <div class="dquick tquick" id="tTrialBtns">
+          <button type="button" data-p="default">3.3% 공제 (자동)</button>
+          <button type="button" data-p="full">100% 페이백</button>
+        </div>
+        <div class="dstep">
+          <span class="dstep-cap">입금</span>
+          <div class="seg2 tpayseg" id="tPayState">
+            <button type="button" data-v="wait" class="on">⏳ 입금 대기</button>
+            <button type="button" data-v="done">✅ 입금 완료</button>
+          </div>
+        </div>
+        <div class="dprev tprev" id="tTrialPreview"></div>
+        <div class="dstep-hint">🤝 더치페이와 함께면 내 몫에서 페이백을 뺀 금액이 지출로 잡혀요 · 📆 기간 나누기를 켜면 실질 부담을 N개월로 나눠 담아요</div>
+      </div>
+    </div>
     <div class="fld" id="tSplitWrap">
       <label>기간 나누기 <small style="font-weight:700;color:#B7AC9C">실적은 결제한 달 전액 · 지출만 N개월로</small></label>
       <div class="sbox">
@@ -1202,7 +1316,7 @@ body.locked .app,body.locked .toast{visibility:hidden}
   <div class="sheet-b">
     <div class="tools" style="grid-template-columns:1fr 1fr;margin-bottom:9px">
       <div class="qf"><select id="allFilter" aria-label="필터">
-        <option value="all">전체</option><option value="expense">지출</option><option value="income">수입</option><option value="fix">고정비</option><option value="var">변동비</option>
+        <option value="all">전체</option><option value="expense">지출</option><option value="income">수입</option><option value="fix">고정비</option><option value="var">변동비</option><option value="trial">🎁 페이백 대기</option>
       </select></div>
       <div class="qf"><select id="allCard" aria-label="카드"></select></div>
     </div>
@@ -1210,6 +1324,71 @@ body.locked .app,body.locked .toast{visibility:hidden}
     <div class="hint" style="margin-top:8px">날짜·내용·금액을 눌러 고치고, －/＋ 버튼으로 지출↔수입, 🔒/🔁 버튼으로 고정↔변동을 옮길 수 있어요.</div>
   </div>
   <div class="sheet-f"><button class="btn ghost" id="btnCsv">CSV 내보내기</button><button class="btn ghost" data-close>닫기</button></div>
+</div></div>
+
+<div class="mask" id="mTrial"><div class="sheet" style="max-width:560px">
+  <div class="sheet-h"><b id="trialModalTitle">체험단 추가</b><button class="x" data-close>✕</button></div>
+  <div class="sheet-b">
+    <div class="fld">
+      <label>🔗 체험단 링크</label>
+      <div style="display:flex;gap:6px">
+        <input id="trLink" placeholder="https://cloudreview.co.kr/..." autocomplete="off">
+        <button class="btn pri sm" id="btnTrialFetch" style="flex:0 0 auto">🔗 링크로 채우기</button>
+      </div>
+      <div class="hint" id="tLinkMsg"></div>
+      <div style="display:flex;gap:6px;margin-top:7px;flex-wrap:wrap">
+        <button class="btn ghost sm" id="btnTrialPaste" type="button">📋 공지/톡 복붙</button>
+        <button class="btn ghost sm" id="btnTrialShot" type="button">📷 캡처</button>
+        <input id="trialOcrFile" type="file" accept="image/*" capture="environment" hidden>
+      </div>
+      <div class="hint" id="tOcrMsg"></div>
+    </div>
+    <div class="fld"><div class="row2">
+      <div><label>사이트</label><input id="trSite" list="siteList" placeholder="클라우드리뷰"><datalist id="siteList"></datalist></div>
+      <div><label>상태</label><select id="trStatus"></select></div>
+    </div></div>
+    <div class="fld"><label>제품 / 업체명</label><input id="trProduct" placeholder="예: 발가락티슈"></div>
+    <div class="fld"><div class="row2">
+      <div><label>시작</label><input id="trStart" type="date"></div>
+      <div><label>마감</label><input id="trEnd" type="date"></div>
+    </div></div>
+    <div class="fld"><div class="row2">
+      <div><label>선결제 / 제공금액 (원)</label><input id="trAmount" inputmode="numeric" placeholder="17000"></div>
+      <div><label>방식</label><select id="trMethod"></select></div>
+    </div></div>
+    <div class="fld"><div class="row2">
+      <div><label>방문예정일</label><input id="trVisit" type="date"></div>
+      <div><label>원고료 / 페이백 (원)</label><input id="trFee" inputmode="numeric" placeholder="3000"></div>
+    </div></div>
+    <div class="fld"><label>메모</label><input id="trMemo" placeholder="예: 재구매 참여 · 발표 11/24"></div>
+    <div class="banner info">선결제가 있으면 저장 뒤 목록에서 <b>🎁 가계부 등록</b>을 누르세요 — 카드 실적은 전액, 지출은 3.3% 뺀 실질 부담만 잡혀요. 원고료는 <b>＋ 원고료 수입</b>으로 따로 기록됩니다.</div>
+  </div>
+  <div class="sheet-f"><button class="btn ghost hidden" id="trialDelete" style="flex:0 0 auto;color:#A8472C">삭제</button><button class="btn ghost" data-close>취소</button><button class="btn pri" id="trialSave">저장</button></div>
+</div></div>
+
+<div class="mask" id="mTrialPaste"><div class="sheet" style="max-width:560px">
+  <div class="sheet-h"><b>📋 공지·톡 붙여넣기</b><button class="x" data-close>✕</button></div>
+  <div class="sheet-b">
+    <div class="banner info">체험단 공지·카톡·문자 내용을 통째로 붙여넣으면 <b>사이트·제품명·기간·금액·방식·방문일·원고료</b>를 찾아 칸에 채워 넣어요.</div>
+    <div class="fld"><label>붙여넣을 내용</label>
+      <textarea id="trPasteText" rows="7" placeholder="[클라우드리뷰] 발가락티슈 체험단 모집&#10;모집기간: 12/23 ~ 1/1&#10;선결제 금액: 17,000원&#10;방식: 배송"></textarea>
+    </div>
+    <div class="hint">로그인해야 보이는 공지도 이렇게 붙여넣으면 앱이 직접 읽지 않아도 됩니다 · 사진은 이 기기 밖으로 나가지 않아요</div>
+  </div>
+  <div class="sheet-f"><button class="btn ghost" data-close>취소</button><button class="btn pri" id="trPasteGo">📋 채우기</button></div>
+</div></div>
+
+<div class="mask" id="mTrialSheet"><div class="sheet" style="max-width:680px">
+  <div class="sheet-h"><b>📥 구글 시트 붙여넣기</b><button class="x" data-close>✕</button></div>
+  <div class="sheet-b">
+    <div class="banner info">시트에서 값이 있는 줄을 <b>머리줄까지</b> 복사해 붙여넣으세요 · 탭이나 쉼표로 나뉜 줄을 그대로 읽습니다.</div>
+    <div class="fld"><label>시트 내용</label>
+      <textarea id="trSheetText" rows="8" placeholder="상태&#9;사이트&#9;제품명&#9;시작&#9;~&#9;마감&#9;링크&#9;금액&#9;방식&#9;방문예정일&#9;원고료&#10;진행중&#9;클라우드리뷰&#9;발가락티슈&#9;12/23&#9;~&#9;1/1&#9;https://...&#9;17,000&#9;배송"></textarea>
+    </div>
+    <div class="hint" id="trSheetMsg"></div>
+    <div class="hint">이미 있는 체험단(사이트·제품명·마감일이 같은 건)은 건너뜁니다 · 시트는 그대로 두고 앱에서만 관리해도 됩니다</div>
+  </div>
+  <div class="sheet-f"><button class="btn ghost" data-close>취소</button><button class="btn pri" id="trSheetGo">📥 불러오기</button></div>
 </div></div>
 
 <div class="mask" id="mOcr"><div class="sheet" style="max-width:860px">
@@ -1353,6 +1532,8 @@ const CATS = [
   { n: "의료", e: "💊", fixed: false },
   { n: "문화", e: "🎬", fixed: false },
   { n: "포인트·할인", e: "🎟️", fixed: false },
+  { n: "용돈", e: "👛", fixed: false },
+  { n: "기부금", e: "💝", fixed: false },
   { n: "기타", e: "📌", fixed: false },
   { n: "유치원비", e: "🏫", fixed: true },
   { n: "관리비", e: "🏢", fixed: true },
@@ -1526,13 +1707,37 @@ function num(v) {
 function dutchOn(t) {
   return !!(t && t.type !== "income" && t.isDutch && typeof t.myShare === "number" && isFinite(t.myShare));
 }
-/* 지출 계산용 금액 — 모든 합계(고정/변동·카테고리·일별·월간/순지출)는 이걸 쓴다 */
+/* ---------- 체험단 페이백(3.3% 공제): 카드 실적은 결제 전액, 가계부 지출은 실질 부담만 ----------
+   체험단에 선정되면 결제 전액을 카드로 긁고, 나중에 세금 3.3%를 뗀 금액을 페이백 받는다.
+   · 카드 실적 = 결제 전액(amount) → 실적은 그대로 인정
+   · 가계부 지출 = 실질 부담 = amount − 페이백(예상 입금액)
+   · 페이백이 결제액보다 크면(원고료 포함·100% 페이백) 지출은 0원, 차액은 지출에 넣지 않는다 */
+const TRIAL_TAX = 0.033;
+function trialPaybackDefault(amount) { return Math.round(Math.abs(num(amount)) * (1 - TRIAL_TAX)); }
+function trialOn(t) {
+  return !!(t && t.type !== "income" && t.isTrial && typeof t.payback === "number" && isFinite(t.payback));
+}
+function trialPayback(t) { return trialOn(t) ? Math.max(0, Math.round(num(t.payback))) : 0; }
+/* 페이백이 결제액보다 큰 차액 — 지출로 잡지 않고 안내만 한다 */
+function trialProfit(t) { return trialOn(t) ? Math.max(0, trialPayback(t) - num(t.amount)) : 0; }
+/* 아직 입금되지 않은 체험단 페이백 */
+function trialPending(t) { return trialOn(t) && !t.paybackDone; }
+/* 더치페이 '내 몫' — 페이백과 상관없는 결제 기준 몫 */
+function dutchShareOfTxn(t) {
+  if (!t) return 0;
+  const full = num(t.amount);
+  if (dutchOn(t)) return Math.max(0, Math.min(Math.round(t.myShare), full));
+  return full;
+}
+/* 지출 계산용 금액 — 모든 합계(고정/변동·카테고리·일별·월간/순지출)는 이걸 쓴다
+   우선순위: 결제 전액 → (더치페이면) 내 몫 → (체험단이면) 페이백을 뺀 실질 부담 */
 function ledgerBase(t) {
   if (!t) return 0;
   const full = num(t.amount);
   if (t.type === "income") return full;
-  if (dutchOn(t)) return Math.max(0, Math.min(Math.round(t.myShare), full));
-  return full;
+  let base = dutchOn(t) ? Math.max(0, Math.min(Math.round(t.myShare), full)) : full;
+  if (trialOn(t)) base = Math.max(0, Math.round(base - trialPayback(t)));
+  return base;
 }
 /* ---------- 기간 나누기(안분): 결제한 달 실적은 전액, 가계부 지출만 N개월로 ---------- */
 const SPLIT_MAX = 60;
@@ -1744,7 +1949,7 @@ let uiMonth = (function () {
 let uiTab = (function () {
   try {
     const t = localStorage.getItem(LS_TAB);
-    if (t === "ledger" || t === "cards" || t === "gifts") return t;
+    if (t === "ledger" || t === "cards" || t === "gifts" || t === "trials") return t;
   } catch (e) {}
   return "ledger";
 })();
@@ -1771,6 +1976,7 @@ function blankState() {
     /* 온누리상품권: total = 누적 충전(기준)액 — 잔액 = total − onnuri 결제 합계 */
     onnuri: { total: 0, updatedAt: 0, log: [] },
     txns: [],
+    trials: [],
     giftUses: [],
     ktChecks: {},
     catRules: {},
@@ -1820,6 +2026,22 @@ function normalizeTxn(t) {
   } else {
     t.myShare = null;
     t.dutchN = null;
+  }
+  /* 체험단 페이백: amount(결제 전액)는 그대로 두고 payback(예상 입금액)을 따로 저장
+     — 카드 실적은 전액, 가계부 지출은 amount − payback */
+  t.isTrial = t.type === "income" ? false : !!t.isTrial;
+  if (t.isTrial) {
+    const raw = t.payback;
+    const p = (typeof raw === "number" ? raw : (typeof raw === "string" && raw.trim() !== "" ? num(raw) : NaN));
+    /* 페이백을 아직 안 넣었으면 3.3% 공제 기본값으로 채운다 */
+    t.payback = (isFinite(p) && p >= 0) ? Math.round(p) : trialPaybackDefault(t.amount);
+    t.paybackDone = !!t.paybackDone;
+    if (t.paybackDone) t.paybackAt = /^\d{4}-\d{2}-\d{2}$/.test(t.paybackAt || "") ? t.paybackAt : todayISO();
+    else t.paybackAt = null;
+  } else {
+    t.payback = null;
+    t.paybackDone = false;
+    t.paybackAt = null;
   }
   /* 기간 나누기(안분): amount는 결제 전액 그대로, splitN·splitStart만 따로 저장 */
   const sn = Math.round(num(t.splitN));
@@ -1871,6 +2093,7 @@ function normalizeState(raw) {
     p.memo = String(p.memo || "").slice(0, 40);
   });
   s.txns.forEach(normalizeTxn);
+  s.trials = Array.isArray(s.trials) ? s.trials.map(normTrial) : [];
   s.cards.forEach(c => {
     c.id = c.id || uid("c");
     c.target = num(c.target);
@@ -1938,6 +2161,7 @@ function monthStats(mk) {
   const income = sum(incList), expense = sum(expList), fix = sum(fixList), vr = sum(varList);
   const dutchList = expList.filter(dutchOn);
   const splitList = expList.filter(splitOn);
+  const trialList = expList.filter(trialOn);
   return {
     list: list, income: income, expense: expense, fix: fix, variable: vr, net: income - expense,
     incList: incList, expList: expList, fixList: fixList, varList: varList, count: list.length,
@@ -1946,8 +2170,18 @@ function monthStats(mk) {
     dutchMine: dutchList.reduce((s, t) => s + spendAmtIn(t, mk), 0),
     splitList: splitList,
     splitFull: splitList.reduce((s, t) => s + num(t.amount), 0),
-    splitThis: splitList.reduce((s, t) => s + spendAmtIn(t, mk), 0)
+    splitThis: splitList.reduce((s, t) => s + spendAmtIn(t, mk), 0),
+    trialList: trialList,
+    trialFull: trialList.reduce((s, t) => s + num(t.amount), 0),
+    trialMine: trialList.reduce((s, t) => s + spendAmtIn(t, mk), 0),
+    trialPayback: trialList.reduce((s, t) => s + trialPayback(t), 0),
+    trialPendingList: trialList.filter(trialPending),
+    trialPendingSum: trialList.filter(trialPending).reduce((s, t) => s + trialPayback(t), 0)
   };
+}
+/* 입금 대기 중인 체험단 — 달과 상관없이 전체 기간(가계부 요약 배너·필터용) */
+function trialPendingAll() {
+  return state.txns.filter(trialPending);
 }
 function cardById(id) {
   return state.cards.find(c => c.id === id) || null;
@@ -2809,7 +3043,7 @@ function man(n) {
 }
 
 /* ---------- 탭 ---------- */
-const TABS = ["ledger", "cards", "gifts"];
+const TABS = ["ledger", "cards", "gifts", "trials"];
 function setTab(name, quiet) {
   if (TABS.indexOf(name) < 0) name = "ledger";
   uiTab = name;
@@ -2830,12 +3064,14 @@ function renderAll() {
   const rt = $("#roomTag");
   if (rt) { rt.textContent = "공유 방"; rt.title = "방 이름: " + Room + " (눌러서 공유 링크 복사)"; }
   renderKpis();
+  renderTrialBanner();
   renderCards();
   renderKt();
   renderCardUse();
   renderPicks();
   renderLedger();
   renderGifts();
+  renderTrials();
   renderPoints();
   renderOnnuri();
   renderFoot();
@@ -2877,6 +3113,32 @@ function renderKpis() {
     '<div class="kpi save"><div class="lb">💰 ' + monthLabel(mk) + " 아낀 금액</div>" +
       '<div class="vl">' + fmt(save) + "<small>원</small></div>" +
       '<div class="cm">카드 ' + fmt(cs) + " + 기프티콘 " + fmt(gs) + " + Pick " + fmt(ps) + (pb ? " + 포인트·할인 " + fmt(pb) : "") + "</div></div>";
+}
+
+/* ---------- 🎁 체험단 페이백 대기 배너 (달과 상관없이 전체 기간) ---------- */
+function renderTrialBanner() {
+  const box = $("#trialBanner");
+  if (!box) return;
+  const pend = trialPendingAll();
+  if (!pend.length) {
+    box.classList.add("hidden");
+    box.innerHTML = "";
+    return;
+  }
+  const total = pend.reduce((s, t) => s + trialPayback(t), 0);
+  const months = Array.from(new Set(pend.map(t => monthLabel(monthOf(t.date)))));
+  box.classList.remove("hidden");
+  box.innerHTML =
+    '<div class="tb-txt" data-trial="list" title="눌러서 입금 대기 내역 보기">' +
+      '<b>🎁 체험단 페이백 대기 ' + pend.length + "건 · 총 " + won(total) + "</b>" +
+      '<small>' + pend.slice(0, 3).map(t => esc(t.memo || t.cat) + " " + fmt(trialPayback(t))).join(" · ") +
+        (pend.length > 3 ? " 외 " + (pend.length - 3) + "건" : "") +
+        " · " + esc(months.join("·")) + " 결제분 · 카드 실적은 결제 전액으로 이미 잡혔어요</small>" +
+    "</div>" +
+    '<div class="tb-btns">' +
+      '<button class="btn pri sm" data-trial="confirm">입금 확인 ✓</button>' +
+      '<button class="btn ghost sm" data-trial="list">내역 보기</button>' +
+    "</div>";
 }
 
 /* ---------- 카드 ---------- */
@@ -2991,7 +3253,8 @@ function renderCardUse() {
     if (!s.used) return;
     rows.push({ kind: "card", card: c, used: s.used, count: s.count, perf: s.perf, inst: s.inst,
       dutch: monthPaidTxns(mk).some(t => t.cardId === c.id && !isIncomeT(t) && dutchOn(t)),
-      split: monthPaidTxns(mk).some(t => t.cardId === c.id && !isIncomeT(t) && splitOn(t)) });
+      split: monthPaidTxns(mk).some(t => t.cardId === c.id && !isIncomeT(t) && splitOn(t)),
+      trial: monthPaidTxns(mk).some(t => t.cardId === c.id && trialOn(t)) });
   });
   const others = [
     { id: PAY_ONNURI, label: "온누리상품권", emoji: "🎟️" },
@@ -3031,7 +3294,7 @@ function renderCardUse() {
       : "실적 조건 없음";
     return '<div class="userow card">' +
       '<span class="clogo ' + esc(c.color || "cs") + '">' + esc(logoText(c)) + "</span>" +
-      '<div class="un"><b>' + esc(c.name) + "</b><small>" + esc(sub) + (r.inst ? " · 무이자할부 " + man(r.inst) + " 제외" : "") + (r.dutch ? " · 🤝 더치 전액 실적" : "") + (r.split ? " · 📆 기간 나누기 전액 실적" : "") + "</small>" +
+      '<div class="un"><b>' + esc(c.name) + "</b><small>" + esc(sub) + (r.inst ? " · 무이자할부 " + man(r.inst) + " 제외" : "") + (r.dutch ? " · 🤝 더치 전액 실적" : "") + (r.split ? " · 📆 기간 나누기 전액 실적" : "") + (r.trial ? " · 🎁 체험단 전액 실적" : "") + "</small>" +
         (c.target > 0 ? '<div class="gbar mini"><i class="' + (pct >= 100 ? "" : pct >= 60 ? "" : "low") + '" style="width:' + pct + '%"></i></div>' : "") +
       "</div>" +
       '<div class="ua"><b>' + fmt(r.used) + "<i>원</i></b><small>" + r.count + "건</small></div>" +
@@ -3049,7 +3312,8 @@ function renderLedger() {
   const chip = $("#ledgerChip");
   if (chip) chip.textContent = st.count + "건 · 지출 " + st.expList.length + " / 수입 " + st.incList.length +
     (st.dutchList.length ? " · 🤝 " + st.dutchList.length + "건" : "") +
-    (st.splitList.length ? " · 📆 " + st.splitList.length + "건" : "");
+    (st.splitList.length ? " · 📆 " + st.splitList.length + "건" : "") +
+    (st.trialList.length ? " · 🎁 " + st.trialList.length + "건" : "");
 
   $("#splitTotal").textContent = won(st.expense);
   $("#barFix").style.width = pctF + "%";
@@ -3089,6 +3353,17 @@ function renderLedger() {
       sn.innerHTML = "";
     }
   }
+  const tn = $("#trialNote");
+  if (tn) {
+    if (st.trialList.length) {
+      tn.classList.remove("hidden");
+      tn.innerHTML = "🎁 체험단 페이백 " + st.trialList.length + "건 — 결제 전액 <b>" + won(st.trialFull) + "</b>은 카드 실적에 그대로, " + monthLabel(mk) + " 가계부 지출은 실질 부담 <b>" + won(st.trialMine) + "</b>만 잡혔어요" +
+        (st.trialPendingSum ? " · 입금 대기 <b>" + won(st.trialPendingSum) + "</b>" : " · 모두 입금 완료 ✓");
+    } else {
+      tn.classList.add("hidden");
+      tn.innerHTML = "";
+    }
+  }
 
   const recent = sortTxDesc(st.list).slice(0, 10);
   $("#recentList").innerHTML = recent.length
@@ -3096,15 +3371,23 @@ function renderLedger() {
       const inc = isIncomeT(t);
       const dt = dutchOn(t);
       const sp = splitOn(t);
+      const tr = trialOn(t);
       const si = sp ? splitIdx(t, mk) : 0;
       const sn = sp ? splitMonths(t) : 1;
       const shown = spendAmtIn(t, mk);
+      const trialChip = tr
+        ? (t.paybackDone
+          ? '<span class="tchip done">✅ 페이백 완료</span> · '
+          : '<span class="tchip">🎁 체험단 · 입금대기 ' + fmt(trialPayback(t)) + '원</span> · ')
+        : "";
       const splitChip = si
         ? '<span class="schip">📆 ' + si + "/" + sn + " (원금 " + fmt(t.amount) + '원 ÷ ' + sn + '개월)</span> · '
         : "";
-      const small = splitChip + (dt ? '<span class="dchip">🤝 더치 (결제 ' + fmt(t.amount) + '원)</span> · ' + (inc ? "수입" : esc(t.cat)) : (inc ? "수입" : esc(t.cat))) +
+      const small = trialChip + splitChip + (dt ? '<span class="dchip">🤝 더치 (결제 ' + fmt(t.amount) + '원)</span> · ' + (inc ? "수입" : esc(t.cat)) : (inc ? "수입" : esc(t.cat))) +
         " · " + esc(cardLabel(t.cardId)) + (t.myShare != null && dt && t.dutchN ? " · " + t.dutchN + "명" : "") + (t.installment ? " · 할부" : "") + " · " + esc(t.date.slice(5).replace("-", "/"));
-      const tip = dt && sp
+      const tip = tr
+          ? "🎁 체험단 페이백 · 결제 " + won(t.amount) + "은 카드 실적 전액 · 페이백 " + won(trialPayback(t)) + (t.paybackDone ? " 입금 완료" : " 입금 대기") + " · 실질 부담 " + won(shown) + (trialProfit(t) ? " (페이백이 " + won(trialProfit(t)) + " 더 커서 지출 0원)" : "") + " — 누르면 고정↔변동"
+          : dt && sp
           ? "🤝 더치페이 " + t.dutchN + "명 · 📆 " + sn + "개월 나눠 담기 · 결제 " + won(t.amount) + " · 이번 달 " + won(shown) + " — 누르면 고정↔변동"
           : dt ? "🤝 더치페이 · 결제 " + won(t.amount) + " · 내 몫 " + won(shown) + (t.dutchN ? " (" + t.dutchN + "명)" : "") + " — 누르면 고정↔변동"
           : sp ? "📆 " + sn + "개월 나눠 담기 · 결제 " + won(t.amount) + "(실적 전액) · 이번 달 " + si + "/" + sn + " = " + won(shown) + " — 누르면 고정↔변동"
@@ -3936,13 +4219,20 @@ function renderAllTx() {
   const filter = $("#allFilter").value || "all";
   const cf = $("#allCard").value || "all";
   let list = monthTxns(uiMonth);
-  if (filter === "income") list = list.filter(isIncomeT);
-  if (filter === "expense") list = list.filter(t => !isIncomeT(t));
-  if (filter === "fix") list = list.filter(t => !isIncomeT(t) && t.fixed);
-  if (filter === "var") list = list.filter(t => !isIncomeT(t) && !t.fixed);
+  if (filter === "trial") {
+    /* 페이백 대기는 달과 상관없이 — 지난달 결제분이 아직 안 들어온 경우도 보여야 한다 */
+    list = trialPendingAll();
+  } else {
+    if (filter === "income") list = list.filter(isIncomeT);
+    if (filter === "expense") list = list.filter(t => !isIncomeT(t));
+    if (filter === "fix") list = list.filter(t => !isIncomeT(t) && t.fixed);
+    if (filter === "var") list = list.filter(t => !isIncomeT(t) && !t.fixed);
+  }
   if (cf !== "all") list = list.filter(t => t.cardId === cf);
   list = sortTxDesc(list);
-  $("#allTitle").textContent = monthTitle(uiMonth) + " 내역 " + list.length + "건";
+  $("#allTitle").textContent = filter === "trial"
+    ? "🎁 체험단 페이백 대기 " + list.length + "건 · 총 " + won(list.reduce((s, t) => s + trialPayback(t), 0))
+    : monthTitle(uiMonth) + " 내역 " + list.length + "건";
   const head = "<thead><tr><th>구분</th><th>날짜</th><th>내용</th><th>분류</th><th>고정/변동</th><th>결제</th><th>금액</th><th>할부</th><th></th></tr></thead>";
   const rows = list.map(t => {
     const inc = isIncomeT(t);
@@ -3956,26 +4246,34 @@ function renderAllTx() {
       '<td class="c-fixed" data-label="고정/변동"><button class="chip ' + (t.fixed ? "plum" : "sage") + '" data-f="fixed">' + (t.fixed ? "🔒 고정" : "🔁 변동") + "</button></td>" +
       '<td class="c-card" data-label="결제"><select data-f="cardId">' + cardOpts + "</select></td>" +
       '<td class="num c-amt" data-label="금액"><input class="w90" data-f="amount" inputmode="numeric" value="' + fmt(t.amount) + '">' +
-        (dutchOn(t) ? '<div class="dmin">🤝 내 몫 ' + fmt(spendAmtIn(t, uiMonth)) + (t.dutchN ? " · " + t.dutchN + "명" : "") + "</div>" : "") +
+        (trialOn(t) ? '<div class="tmin' + (t.paybackDone ? " done" : "") + '">' + (t.paybackDone ? "✅ 페이백 완료 " : "🎁 입금대기 ") + fmt(trialPayback(t)) + " · 실질 " + fmt(spendAmtIn(t, uiMonth)) + "</div>" : "") +
+        (dutchOn(t) ? '<div class="dmin">🤝 내 몫 ' + fmt(dutchShareOfTxn(t)) + (t.dutchN ? " · " + t.dutchN + "명" : "") + "</div>" : "") +
         (splitOn(t) ? '<div class="smin">📆 ' + splitIdx(t, uiMonth) + "/" + splitMonths(t) + " · 이번 달 " + fmt(spendAmtIn(t, uiMonth)) + "</div>" : "") + "</td>" +
       '<td class="c-inst" data-label="할부" style="text-align:center"><input type="checkbox" data-f="installment" style="accent-color:#5C7F68;padding:0;border:0"' + (t.installment ? " checked" : "") + "></td>" +
-      '<td class="acts c-del"><button class="mini del" data-del="' + esc(t.id) + '" aria-label="삭제">✕</button></td></tr>';
+      '<td class="acts c-del">' +
+        '<button class="mini" data-open-txn="' + esc(t.id) + '" title="수정" aria-label="수정">✎</button>' +
+        (trialOn(t) ? '<button class="mini ok" data-pbtoggle="' + esc(t.id) + '" title="' + (t.paybackDone ? "입금 대기로 되돌리기" : "입금 확인") + '" aria-label="페이백 입금">✓</button>' : "") +
+        '<button class="mini del" data-del="' + esc(t.id) + '" aria-label="삭제">✕</button></td></tr>';
   }).join("");
-  tbl.innerHTML = head + "<tbody>" + (rows || '<tr><td colspan="9" style="text-align:center;color:#B7AC9C;padding:18px">기록이 없어요</td></tr>') + "</tbody>";
+  const empty = filter === "trial" ? "입금 대기 중인 체험단 페이백이 없어요" : "기록이 없어요";
+  tbl.innerHTML = head + "<tbody>" + (rows || '<tr><td colspan="9" style="text-align:center;color:#B7AC9C;padding:18px">' + empty + "</td></tr>") + "</tbody>";
   tbl.classList.add("cards");
 }
 function updateTxn(id, field, value) {
   const t = state.txns.find(x => x.id === id);
   if (!t) return;
   if (field === "amount") {
+    const old = t.amount;
     t.amount = Math.abs(num(value));
     if (t.isDutch) {
       /* 인원수로 나눈 건이면 새 금액에 맞춰 내 몫도 다시 계산 */
       t.myShare = t.dutchN ? Math.min(t.amount, Math.round(t.amount / t.dutchN)) : Math.min(num(t.myShare), t.amount);
     }
+    /* 페이백을 3.3% 기본값으로 둔 건은 금액을 고치면 기본값도 따라간다 (직접 넣은 값은 그대로) */
+    if (t.isTrial && t.payback === trialPaybackDefault(old)) t.payback = trialPaybackDefault(t.amount);
   } else if (field === "type") {
     t.type = isIncomeT(t) ? "expense" : "income";
-    if (t.type === "income") { t.fixed = false; t.installment = false; t.isDutch = false; t.myShare = null; t.dutchN = null; t.splitN = null; t.splitStart = null; }
+    if (t.type === "income") { t.fixed = false; t.installment = false; t.isDutch = false; t.myShare = null; t.dutchN = null; t.splitN = null; t.splitStart = null; t.isTrial = false; t.payback = null; t.paybackDone = false; t.paybackAt = null; }
     else if (!state.catRules[normKey(t.memo)]) t.fixed = catFixedDefault(t.cat);
   }
   else if (field === "fixed") {
@@ -3991,6 +4289,45 @@ function updateTxn(id, field, value) {
 function deleteTxn(id) {
   state.txns = state.txns.filter(t => t.id !== id);
   touch(); renderAll(); renderAllTx();
+}
+
+/* ---------- 체험단 페이백 입금 확인 ---------- */
+function setTrialPaid(id, done) {
+  const t = state.txns.find(x => x.id === id);
+  if (!t || !trialOn(t)) return null;
+  t.paybackDone = !!done;
+  t.paybackAt = done ? todayISO() : null;
+  /* 체험단 탭과 상태를 맞춘다 — 같은 페이백을 두 곳에서 따로 보지 않게 */
+  const tr = (state.trials || []).find(x => x.txnId === t.id);
+  if (tr) {
+    tr.status = done ? "완료" : "입금대기";
+    tr.paidAt = done ? todayISO() : "";
+  }
+  touch(); renderAll();
+  const all = $("#mAll");
+  if (all && all.classList.contains("on")) renderAllTx();
+  toast(done
+    ? "🎁 " + (t.memo || "체험단") + " 페이백 " + won(trialPayback(t)) + " 입금 확인 ✓"
+    : "🎁 " + (t.memo || "체험단") + " 페이백을 입금 대기로 되돌렸어요");
+  return t;
+}
+function toggleTrialPaid(id) {
+  const t = state.txns.find(x => x.id === id);
+  if (!t || !trialOn(t)) return;
+  setTrialPaid(id, !t.paybackDone);
+}
+/* 요약 배너 [입금 확인 ✓] — 1건이면 바로, 여러 건이면 목록에서 ✓로 골라서 */
+function confirmTrialPaid() {
+  const pend = trialPendingAll();
+  if (!pend.length) { toast("입금 대기 중인 체험단 페이백이 없어요"); return; }
+  if (pend.length === 1) { setTrialPaid(pend[0].id, true); return; }
+  openAllTrial();
+  toast("입금된 건의 ✓를 눌러 주세요 · " + pend.length + "건 대기 중");
+}
+function openAllTrial() {
+  openAll();
+  const f = $("#allFilter");
+  if (f) { f.value = "trial"; renderAllTx(); }
 }
 
 /* ---------- 내역 상세 편집 ---------- */
@@ -4133,14 +4470,16 @@ function splitSyncStep() {
   const el = $("#tSplitN");
   if (el) el.value = String(txnSplitN || 1);
 }
-/* 이번 달에 나눠 담길 지출 기준액 (더치페이가 켜져 있으면 내 몫 기준) */
+/* 이번 달에 나눠 담길 지출 기준액 (더치페이가 켜져 있으면 내 몫, 체험단이면 페이백을 뺀 실질 부담 기준) */
 function splitBaseUI() {
   const amt = Math.abs(num($("#tAmount").value));
   const cb = $("#tDutch");
   const msEl = $("#tMyShare");
   const ms = Math.abs(num(msEl ? msEl.value : 0));
-  if (cb && cb.checked && txnType !== "income" && ms > 0) return Math.min(ms, amt);
-  return amt;
+  let base = amt;
+  if (cb && cb.checked && txnType !== "income" && ms > 0) base = Math.min(ms, amt);
+  if (trialBoxOn()) base = Math.max(0, base - paybackUI());
+  return base;
 }
 function renderSplitBox() {
   const wrap = $("#tSplitWrap");
@@ -4169,7 +4508,7 @@ function renderSplitBox() {
   const cardLine = byCard
     ? " · 카드 실적은 " + monthLabel(start) + "에 <b>" + won(fullAmt) + "</b> 전액"
     : " · 실적엔 안 잡힘(결제 " + won(fullAmt) + ")";
-  pv.innerHTML = "📆 " + parts.join(" · ") + " (합계 <b>" + won(base) + "</b>)" + cardLine;
+  pv.innerHTML = "📆 " + parts.join(" · ") + " (합계 " + (trialBoxOn() ? "실질 부담 " : "") + "<b>" + won(base) + "</b>)" + cardLine;
 }
 function splitApplyN(v) {
   txnSplitN = splitClampN(v);
@@ -4204,6 +4543,93 @@ function bindSplit() {
   if (cb) cb.addEventListener("change", renderSplitBox);
 }
 
+/* ------------------------------------------------------------------
+   체험단 페이백: 결제 전액은 카드 실적, 가계부 지출은 3.3% 뺀 실질 부담만
+   예) 100,000원 결제 → 실적 100,000원 / 지출 3,300원 (페이백 96,700원 대기)
+   ------------------------------------------------------------------ */
+let txnPaybackDone = false;   /* ⏳ 입금 대기 / ✅ 입금 완료 */
+let txnPaybackAuto = true;    /* 대금이 바뀌면 3.3% 공제 기본값을 따라가기 */
+let trialBackup = null;       /* 수입으로 잠시 바꿀 때 체험단 설정을 기억 */
+const PAYBACK_MAX = 999999999;
+function trialAmountUI() { return Math.abs(num($("#tAmount") ? $("#tAmount").value : 0)); }
+/* 입력한 페이백 — 비었거나 0이면 3.3% 공제 기본값 */
+function paybackUI() {
+  const el = $("#tPayback");
+  const v = Math.abs(num(el ? el.value : 0));
+  if (v > 0) return Math.min(PAYBACK_MAX, Math.round(v));
+  return trialPaybackDefault(trialAmountUI());
+}
+function trialBoxOn() {
+  const cb = $("#tTrial");
+  return !!(cb && cb.checked && txnType !== "income");
+}
+function trialSetPayback(v, auto) {
+  const el = $("#tPayback");
+  if (el) el.value = String(Math.round(Math.max(0, num(v))));
+  txnPaybackAuto = !!auto;
+  renderTrialBox(); renderSplitBox();
+}
+function renderTrialBox() {
+  const wrap = $("#tTrialWrap");
+  if (wrap) wrap.classList.toggle("hidden", txnType === "income");
+  const on = trialBoxOn();
+  const box = $("#tTrialBox");
+  if (box) box.classList.toggle("hidden", !on);
+  if (!on) return;
+  const amt = trialAmountUI();
+  const pay = paybackUI();
+  const net = Math.max(0, amt - pay);
+  const profit = Math.max(0, pay - amt);
+  const dflt = trialPaybackDefault(amt);
+  $$("#tPayState button").forEach(b =>
+    b.classList.toggle("on", (b.getAttribute("data-v") === "done") === !!txnPaybackDone));
+  $$("#tTrialBtns button").forEach(b => {
+    const wantDefault = b.getAttribute("data-p") === "default";
+    b.classList.toggle("on", wantDefault ? (pay === dflt && txnPaybackAuto) : (pay === amt && amt > 0));
+  });
+  const pv = $("#tTrialPreview");
+  if (!pv) return;
+  pv.innerHTML = "🎁 결제 " + won(amt) + " → 카드 실적 <b>" + won(amt) + "</b> 전액 · 페이백 <b>" + won(pay) + "</b>" +
+    (txnPaybackDone ? " (✅ 입금 완료)" : " (⏳ 입금 대기)") +
+    "<br>가계부 지출은 실질 부담 <b>" + won(net) + "</b>" +
+    (profit ? " · 페이백이 " + won(profit) + " 많아 차액은 지출에 넣지 않아요" : "");
+}
+function bindTrial() {
+  const cb = $("#tTrial");
+  if (cb) cb.addEventListener("change", () => {
+    if (cb.checked) trialSetPayback(trialPaybackDefault(trialAmountUI()), true);
+    renderTrialBox(); renderSplitBox();
+  });
+  const pb = $("#tPayback");
+  if (pb) pb.addEventListener("input", () => {
+    const raw = pb.value.replace(/[^\d]/g, "").slice(0, 9);
+    if (pb.value !== raw) pb.value = raw;
+    txnPaybackAuto = false;
+    renderTrialBox(); renderSplitBox();
+  });
+  $$("#tTrialBtns button").forEach(b => b.addEventListener("click", () => {
+    const amt = trialAmountUI();
+    if (b.getAttribute("data-p") === "default") trialSetPayback(trialPaybackDefault(amt), true);
+    else trialSetPayback(amt, false);
+  }));
+  const st = $("#tPayState");
+  if (st) st.addEventListener("click", ev => {
+    const b = ev.target.closest("[data-v]");
+    if (!b) return;
+    txnPaybackDone = b.getAttribute("data-v") === "done";
+    renderTrialBox();
+  });
+  const amt = $("#tAmount");
+  if (amt) amt.addEventListener("input", () => {
+    /* 금액을 고치면 3.3% 공제 기본값도 따라간다 — 직접 넣은 값은 그대로 둔다 */
+    if (trialBoxOn() && txnPaybackAuto) {
+      const el = $("#tPayback");
+      if (el) el.value = String(trialPaybackDefault(trialAmountUI()));
+    }
+    renderTrialBox();
+  });
+}
+
 function openTxn(id) {
   const t = state.txns.find(x => x.id === id);
   if (!t) return;
@@ -4224,15 +4650,23 @@ function openTxn(id) {
   dutchBackup = null;
   if ($("#tDutch")) $("#tDutch").checked = dt;
   /* 내 몫은 "결제에서 내가 낼 몫" 전체 — 기간 나누기 전 금액으로 보여 준다 */
-  if ($("#tMyShare")) $("#tMyShare").value = dt ? fmt(ledgerBase(t)) : "";
+  if ($("#tMyShare")) $("#tMyShare").value = dt ? fmt(dutchShareOfTxn(t)) : "";
   dutchSyncStep();
   /* 기간 나누기 */
   txnSplitN = splitOn(t) ? splitMonths(t) : 1;
   txnSplitStart = splitOn(t) ? splitStartOf(t) : "";
   splitSyncStep();
+  /* 체험단 페이백 */
+  const tr = trialOn(t);
+  trialBackup = null;
+  if ($("#tTrial")) $("#tTrial").checked = tr;
+  txnPaybackDone = tr ? !!t.paybackDone : false;
+  txnPaybackAuto = tr ? (trialPayback(t) === trialPaybackDefault(t.amount)) : true;
+  if ($("#tPayback")) $("#tPayback").value = tr ? String(trialPayback(t)) : "";
   dutchFieldVisible();
   renderDutchBox();
   renderSplitBox();
+  renderTrialBox();
   const same = state.txns.filter(x => x.id !== t.id && merchantMatch(x.memo, t.memo)).length;
   const bulk = $("#tBulk");
   if (bulk) bulk.innerHTML = "🔁 같은 내역 모두 바꾸기" + (same ? " <b>(" + same + "건 더)</b>" : "");
@@ -4272,6 +4706,16 @@ function saveTxn(opts) {
     t.splitN = txnSplitN;
     t.splitStart = txnSplitStart || monthOf(t.date);
   }
+  /* 체험단 페이백: amount는 결제 전액 그대로, payback만 따로 */
+  const trialChecked = txnType !== "income" && !!($("#tTrial") && $("#tTrial").checked);
+  if (trialChecked) {
+    t.isTrial = true;
+    t.payback = paybackUI();
+    t.paybackDone = !!txnPaybackDone;
+    t.paybackAt = t.paybackDone ? todayISO() : null;
+  } else {
+    t.isTrial = false; t.payback = null; t.paybackDone = false; t.paybackAt = null;
+  }
 
   const bulk = !!(opts && opts.bulk);
   rememberRule(t.memo, t.fixed, t.cat, { type: t.type, cardId: t.cardId });
@@ -4292,7 +4736,7 @@ function saveTxn(opts) {
   touch(); closeModal("mTxn"); renderAll(); if ($("#mAll").classList.contains("on")) renderAllTx();
   toast(bulk
     ? "같은 내역 " + (n + 1) + "건을 " + (t.type === "income" ? "수입" : "지출") + " · " + t.cat + (t.type === "income" ? "" : (t.fixed ? " · 고정비" : " · 변동비")) + "로 바꿨어요 · 다음부터 자동"
-    : "내역을 고쳤어요" + (t.isDutch ? " · 🤝 내 몫 " + won(spendAmt(t)) + "만 지출에 반영" : ""));
+    : "내역을 고쳤어요" + (t.isDutch ? " · 🤝 내 몫 " + won(spendAmt(t)) + "만 지출에 반영" : "") + (t.isTrial ? " · 🎁 실질 부담 " + won(spendAmt(t)) + "만 지출에 반영" : ""));
 }
 
 /* ---------- 최근 내역 토글 ---------- */
@@ -4616,6 +5060,7 @@ function bindModals() {
   $("#tSave").addEventListener("click", () => saveTxn());
   bindDutch();
   bindSplit();
+  bindTrial();
   $("#tBulk").addEventListener("click", () => saveTxn({ bulk: true }));
   $("#tDelete").addEventListener("click", () => { if (editingTxnId) { deleteTxn(editingTxnId); closeModal("mTxn"); toast("지웠어요"); } });
   $("#tType").addEventListener("click", ev => {
@@ -4627,14 +5072,26 @@ function bindModals() {
       const cb = $("#tDutch");
       if (cb && cb.checked) dutchBackup = { share: $("#tMyShare").value, n: txnDutchN };
       if (cb) cb.checked = false;
-    } else if (dutchBackup) {
-      if ($("#tDutch")) $("#tDutch").checked = true;
-      if ($("#tMyShare")) $("#tMyShare").value = dutchBackup.share || "";
-      txnDutchN = dutchBackup.n || null;
-      dutchBackup = null;
-      dutchSyncStep();
+      const tc = $("#tTrial");
+      if (tc && tc.checked) trialBackup = { pay: $("#tPayback").value, done: txnPaybackDone, auto: txnPaybackAuto };
+      if (tc) tc.checked = false;
+    } else if (dutchBackup || trialBackup) {
+      if (dutchBackup) {
+        if ($("#tDutch")) $("#tDutch").checked = true;
+        if ($("#tMyShare")) $("#tMyShare").value = dutchBackup.share || "";
+        txnDutchN = dutchBackup.n || null;
+        dutchBackup = null;
+        dutchSyncStep();
+      }
+      if (trialBackup) {
+        if ($("#tTrial")) $("#tTrial").checked = true;
+        if ($("#tPayback")) $("#tPayback").value = trialBackup.pay || "";
+        txnPaybackDone = !!trialBackup.done;
+        txnPaybackAuto = trialBackup.auto !== false;
+        trialBackup = null;
+      }
     }
-    dutchFieldVisible(); renderDutchBox(); renderSplitBox();
+    dutchFieldVisible(); renderDutchBox(); renderSplitBox(); renderTrialBox();
   });
   $("#tFixed").addEventListener("click", () => {
     const t = state.txns.find(x => x.id === editingTxnId);
@@ -4648,10 +5105,11 @@ function bindModals() {
 
 function exportCsv() {
   const list = sortTxDesc(monthTxns(uiMonth));
-  const head = "구분,날짜,내용,분류,고정/변동,결제수단,금액,더치,내몫,기간나누기,이번달반영,할부\n";
+  const head = "구분,날짜,내용,분류,고정/변동,결제수단,금액,더치,내몫,기간나누기,이번달반영,할부,체험단,페이백,페이백입금\n";
   const body = list.map(t => [isIncomeT(t) ? "수입" : "지출", t.date, t.memo, t.cat, t.fixed ? "고정" : "변동", cardLabel(t.cardId),
-      t.amount, dutchOn(t) ? "더치" : "", dutchOn(t) ? spendAmtIn(t, uiMonth) : "",
-      splitOn(t) ? (splitIdx(t, uiMonth) + "/" + splitMonths(t) + "개월") : "", fmt(spendAmtIn(t, uiMonth)), t.installment ? "무이자" : ""]
+      t.amount, dutchOn(t) ? "더치" : "", dutchOn(t) ? dutchShareOfTxn(t) : "",
+      splitOn(t) ? (splitIdx(t, uiMonth) + "/" + splitMonths(t) + "개월") : "", fmt(spendAmtIn(t, uiMonth)), t.installment ? "무이자" : "",
+      trialOn(t) ? "체험단" : "", trialOn(t) ? trialPayback(t) : "", trialOn(t) ? (t.paybackDone ? "입금완료" : "입금대기") : ""]
     .map(v => '"' + String(v).replace(/"/g, '""') + '"').join(",")).join("\n");
   downloadBlob("wallet-" + uiMonth + ".csv", "\ufeff" + head + body, "text/csv;charset=utf-8");
   toast("CSV로 내보냈어요");
@@ -4679,6 +5137,14 @@ function bindDelegates() {
       if (ev.target.closest("button, .mini")) return;
       toggleTxnFixed(t.getAttribute("data-txn"));
     }
+  });
+  document.addEventListener("click", ev => {
+    const b = ev.target.closest ? ev.target.closest("[data-trial],[data-pbtoggle]") : null;
+    if (!b) return;
+    if (b.hasAttribute("data-pbtoggle")) { ev.stopPropagation(); toggleTrialPaid(b.getAttribute("data-pbtoggle")); return; }
+    const act = b.getAttribute("data-trial");
+    if (act === "confirm") { ev.stopPropagation(); confirmTrialPaid(); }
+    else if (act === "list") { ev.stopPropagation(); openAllTrial(); }
   });
   document.addEventListener("click", ev => {
     if (ev.target.closest("#btnGiftAdd2")) openGiftNew();
@@ -5525,6 +5991,590 @@ function bindGiftScan() {
   if (code) code.addEventListener("input", gscanPreview);
 }
 
+/* ==== 47-trial.js ==== */
+/* ============================================================
+   📋 체험단: 관리 탭 · 링크 자동채움 · 복붙/캡처 파싱 · 가계부 연동
+   — 구글 시트(체험단/2026)의 구성(상태·사이트·제품명·기간·링크·
+     금액·방식·방문예정일·원고료)을 그대로 옮겨 왔다. 시트 내용 자체는
+     앱에 넣지 않고, 사용자가 시트를 복사해 붙여넣으면 불러온다.
+   ============================================================ */
+const TRIAL_STATUS = ["진행중", "입금대기", "완료", "취소"];
+const TRIAL_METHODS = ["배송", "방문", "구매", "환급방식", "확인완료", "기타"];
+/* 시트 드롭다운에 쓰던 사이트 이름 — 입력할 때 자동완성 후보 */
+const TRIAL_SITES = ["클라우드리뷰", "택배의여왕", "스타일씨", "리뷰플레이스", "디너의여왕", "강남맛집", "리워딩스", "서울오빠", "리뷰노트", "아싸뷰", "퍼그샵", "데일리뷰", "메일"];
+/* 주소 → 사이트 이름 (모르는 곳은 도메인 앞부분을 쓴다) */
+const SITE_HOSTS = {
+  "cloudreview.co.kr": "클라우드리뷰",
+  "reviewplace.co.kr": "리뷰플레이스",
+  "reviewnote.co.kr": "리뷰노트",
+  "stylec.co.kr": "스타일씨",
+  "dinertory.co.kr": "디너의여왕",
+  "taekbae.co.kr": "택배의여왕",
+  "seouloppa.com": "서울오빠",
+  "rewordings.co.kr": "리워딩스",
+  "assaview.com": "아싸뷰"
+};
+const TRIAL_FILTERS = [
+  { k: "all", t: "전체" },
+  { k: "ing", t: "진행중" },
+  { k: "soon", t: "마감임박" },
+  { k: "wait", t: "입금대기" },
+  { k: "done", t: "완료" }
+];
+let trialFilter = "all";
+let editingTrialId = "";
+
+/* ---------- 정규화 ---------- */
+function normDateLoose(v) {
+  const s = String(v == null ? "" : v).trim();
+  if (!s) return "";
+  let m = s.match(/^(20\d{2})[-./년]\s*(\d{1,2})[-./월]\s*(\d{1,2})/);
+  if (m) return m[1] + "-" + pad2(m[2]) + "-" + pad2(m[3]);
+  m = s.match(/^(\d{1,2})[-./월]\s*(\d{1,2})/);
+  if (m) {
+    const y = new Date().getFullYear();
+    const cand = y + "-" + pad2(m[1]) + "-" + pad2(m[2]);
+    /* 11·12월에 적힌 1·2월 마감은 내년 */
+    if (Number(m[1]) < new Date().getMonth() + 1 - 6) return (y + 1) + "-" + pad2(m[1]) + "-" + pad2(m[2]);
+    return cand;
+  }
+  m = s.match(/^(\d{1,2})\s*일/);
+  if (m) {
+    const d = new Date();
+    return isoDate(new Date(d.getFullYear(), d.getMonth(), Number(m[1])));
+  }
+  return "";
+}
+function normTrial(t) {
+  const o = Object.assign({}, t || {});
+  o.id = o.id || uid("tr");
+  o.status = TRIAL_STATUS.indexOf(o.status) >= 0 ? o.status : "진행중";
+  o.site = String(o.site || "").slice(0, 24);
+  o.product = String(o.product || "").slice(0, 60);
+  o.start = normDateLoose(o.start);
+  o.end = normDateLoose(o.end);
+  /* 마감이 시작보다 앞서면 다음 해로 (12/23 ~ 1/1) */
+  if (o.start && o.end && o.end < o.start) o.end = normDateLoose((Number(o.end.slice(0, 4)) + 1) + "-" + o.end.slice(5));
+  o.link = /^https?:\/\//i.test(o.link || "") ? String(o.link).slice(0, 400) : "";
+  o.amount = Math.abs(num(o.amount));
+  o.fee = Math.abs(num(o.fee));
+  o.method = TRIAL_METHODS.indexOf(o.method) >= 0 ? o.method : (o.method ? "기타" : "");
+  o.visit = normDateLoose(o.visit);
+  o.memo = String(o.memo || "").slice(0, 200);
+  o.txnId = o.txnId || "";
+  o.incomeTxnId = o.incomeTxnId || "";
+  o.paidAt = /^\d{4}-\d{2}-\d{2}$/.test(o.paidAt || "") ? o.paidAt : "";
+  o.createdAt = num(o.createdAt) || Date.now();
+  o.ts = num(o.ts) || o.createdAt;
+  return o;
+}
+function trialById(id) { return state.trials.find(t => t.id === id) || null; }
+function trialTxn(t) { return t && t.txnId ? state.txns.find(x => x.id === t.txnId) || null : null; }
+function trialIncomeTxn(t) { return t && t.incomeTxnId ? state.txns.find(x => x.id === t.incomeTxnId) || null : null; }
+/* 화면에 보이는 상태 — 진행중이어도 마감이 지났거나 3일 안이면 따로 표시 */
+function trialState(t) {
+  if (!t) return { k: "etc", t: "", tone: "" };
+  if (t.status === "취소") return { k: "cancel", t: "취소", tone: "line" };
+  if (t.status === "완료") return { k: "done", t: "✅ 완료", tone: "sage" };
+  const tx = trialTxn(t);
+  if (t.status === "입금대기" || (tx && trialOn(tx) && !tx.paybackDone)) {
+    return { k: "wait", t: "⏳ 입금대기", tone: "amber" };
+  }
+  const d = t.end ? dday(t.end) : null;
+  if (d != null && d < 0) return { k: "end", t: "마감", tone: "line" };
+  if (d != null && d <= 3) return { k: "soon", t: "마감임박 D-" + d, tone: "coral" };
+  return { k: "ing", t: "진행중", tone: "sage" };
+}
+function trialDdayChip(t) {
+  const d = t.end ? dday(t.end) : null;
+  if (d == null) return "";
+  if (d < 0) return '<span class="dd hot">마감</span>';
+  if (d === 0) return '<span class="dd hot">오늘 마감</span>';
+  if (d <= 3) return '<span class="dd hot">D-' + d + "</span>";
+  if (d <= 10) return '<span class="dd mid">D-' + d + "</span>";
+  return '<span class="dd ok">D-' + d + "</span>";
+}
+function trialVisitChip(t) {
+  const d = t.visit ? dday(t.visit) : null;
+  if (d == null) return "";
+  if (d < 0) return '<span class="dd ok">방문 지남</span>';
+  if (d === 0) return '<span class="dd hot">오늘 방문</span>';
+  return '<span class="dd ' + (d <= 3 ? "hot" : "mid") + '">방문 D-' + d + "</span>";
+}
+function trialMatchesFilter(t, k) {
+  if (k === "all") return t.status !== "취소";
+  const st = trialState(t);
+  if (k === "ing") return st.k === "ing" || st.k === "soon";
+  if (k === "soon") return st.k === "soon";
+  if (k === "wait") return st.k === "wait";
+  if (k === "done") return st.k === "done";
+  return true;
+}
+function trialPendingList() { return state.trials.filter(t => trialState(t).k === "wait"); }
+
+/* ---------- 목록 그리기 ---------- */
+function renderTrials() {
+  const list = $("#trialList");
+  if (!list) return;
+  const all = state.trials.slice().sort((a, b) => {
+    const ka = trialState(a).k, kb = trialState(b).k;
+    const order = { soon: 0, wait: 1, ing: 2, end: 3, done: 4, cancel: 5 };
+    if (order[ka] !== order[kb]) return order[ka] - order[kb];
+    if (a.end && b.end && a.end !== b.end) return a.end.localeCompare(b.end);
+    return b.createdAt - a.createdAt;
+  });
+  const shown = all.filter(t => trialMatchesFilter(t, trialFilter));
+  const soon = all.filter(t => trialState(t).k === "soon").length;
+  const ing = all.filter(t => ["ing", "soon"].indexOf(trialState(t).k) >= 0).length;
+  const wait = trialPendingList();
+  const done = all.filter(t => trialState(t).k === "done").length;
+  const waitSum = wait.reduce((s, t) => s + trialFeeOf(t), 0);
+
+  const sum = $("#trialSum");
+  if (sum) {
+    sum.innerHTML =
+      '<div class="trs"><small>진행중</small><b>' + ing + "건</b></div>" +
+      '<div class="trs' + (soon ? " hot" : "") + '"><small>마감임박</small><b>' + soon + "건</b></div>" +
+      '<div class="trs' + (wait.length ? " amber" : "") + '"><small>입금대기</small><b>' + wait.length + "건</b>" +
+        (waitSum ? "<i>" + fmt(waitSum) + "원</i>" : "") + "</div>" +
+      '<div class="trs"><small>완료</small><b>' + done + "건</b></div>";
+  }
+  const chip = $("#trialChip");
+  if (chip) chip.textContent = shown.length + " / " + all.length + "건";
+  const fbox = $("#trialFilters");
+  if (fbox) {
+    fbox.innerHTML = TRIAL_FILTERS.map(f => {
+      const n = all.filter(t => trialMatchesFilter(t, f.k)).length;
+      return '<button data-tf="' + f.k + '" class="' + (trialFilter === f.k ? "on" : "") + '">' + f.t + " " + n + "</button>";
+    }).join("");
+  }
+
+  if (!shown.length) {
+    list.innerHTML = '<div class="pickempty">' + (all.length
+      ? "이 조건에 맞는 체험단이 없어요"
+      : "체험단을 추가하면 마감·방문일·페이백 입금까지 한 화면에서 볼 수 있어요<br>[＋ 체험단]으로 넣거나 [📥 시트 붙여넣기]로 구글 시트를 그대로 가져오세요") + "</div>";
+    return;
+  }
+  list.innerHTML = shown.map(t => {
+    const st = trialState(t);
+    const tx = trialTxn(t);
+    const inc = trialIncomeTxn(t);
+    const fee = trialFeeOf(t);
+    const meta = [];
+    if (t.start || t.end) meta.push("📅 " + (t.start ? t.start.slice(5).replace("-", "/") : "?") + "~" + (t.end ? t.end.slice(5).replace("-", "/") : "?"));
+    if (t.amount) meta.push("💸 선결제 " + won(t.amount));
+    if (t.method) meta.push("🚚 " + t.method);
+    if (t.fee) meta.push("✍️ 원고료 " + won(t.fee));
+    if (tx) meta.push("🎁 페이백 " + won(trialPayback(tx)) + (tx.paybackDone ? " 입금완료" : " 대기"));
+    if (inc) meta.push("＋ 원고료 수입 등록됨");
+    const acts = [];
+    if (t.link) acts.push('<a class="btn ghost sm" href="' + esc(t.link) + '" target="_blank" rel="noopener">↗ 링크</a>');
+    if (!tx && t.amount > 0) acts.push('<button class="btn pri sm" data-trial-ledger="' + esc(t.id) + '">🎁 가계부 등록</button>');
+    if (tx && trialOn(tx) && !tx.paybackDone) acts.push('<button class="btn pri sm" data-trial-paid="' + esc(t.id) + '">⏳ 입금 확인 ✓</button>');
+    if (tx && trialOn(tx) && tx.paybackDone) acts.push('<button class="btn ghost sm" data-trial-paid="' + esc(t.id) + '">✅ 페이백 완료 · 되돌리기</button>');
+    if (!inc && t.fee > 0) acts.push('<button class="btn ghost sm" data-trial-income="' + esc(t.id) + '">＋ 원고료 수입</button>');
+    acts.push('<button class="mini" data-trial-edit="' + esc(t.id) + '" aria-label="수정">✎</button>');
+    return '<div class="tr" data-trial="' + esc(t.id) + '">' +
+      '<div class="tr-top">' +
+        '<span class="trsite">' + esc(t.site || "사이트 미정") + "</span>" +
+        '<b class="trname">' + esc(t.product || "제품명 없음") + "</b>" +
+        '<span class="chip ' + st.tone + '">' + esc(st.t) + "</span>" +
+      "</div>" +
+      '<div class="tr-days">' + trialDdayChip(t) + trialVisitChip(t) + "</div>" +
+      '<div class="tr-meta">' + (meta.length ? meta.map(x => "<span>" + esc(x) + "</span>").join("") : "<span>기간·금액을 채워 두면 마감과 페이백을 챙겨요</span>") + "</div>" +
+      (t.memo ? '<div class="tr-memo">' + esc(t.memo) + "</div>" : "") +
+      '<div class="tr-acts">' + acts.join("") + "</div>" +
+      "</div>";
+  }).join("");
+}
+/* 페이백 금액 — 연결된 가계부 내역이 있으면 그 값, 없으면 금액의 96.7% */
+function trialFeeOf(t) {
+  const tx = trialTxn(t);
+  if (tx && trialOn(tx)) return trialPayback(tx);
+  return trialPaybackDefault(t.amount);
+}
+
+/* ---------- 주소 → 사이트·메타 ---------- */
+function siteFromUrl(url) {
+  let host = "";
+  try { host = new URL(url).hostname.replace(/^www\./, ""); } catch (e) { return ""; }
+  if (SITE_HOSTS[host]) return SITE_HOSTS[host];
+  const keys = Object.keys(SITE_HOSTS);
+  for (const k of keys) if (host === k || host.endsWith("." + k)) return SITE_HOSTS[k];
+  const label = host.split(".")[0];
+  /* 한글 도메인(xn--)은 이름을 알 수 없으니 비워 둔다 */
+  return /[a-z0-9-]{2,}/i.test(label) && !/^xn--/.test(label) ? label : "";
+}
+function guessSiteFromText(text) {
+  const s = String(text || "");
+  const br = s.match(/[\[【(（]\s*([가-힣A-Za-z0-9]{2,12})\s*[\]】)）]/);
+  const known = TRIAL_SITES.find(n => s.indexOf(n) >= 0);
+  if (known) return known;
+  if (br && TRIAL_SITES.indexOf(br[1]) >= 0) return br[1];
+  return br ? br[1] : "";
+}
+/* 공지·톡 복붙 / 캡처 글자 → 체험단 칸 */
+function parseTrialText(text) {
+  const raw = String(text || "");
+  const lines = raw.split(/\n+/).map(l => l.trim()).filter(Boolean);
+  const out = { site: "", product: "", start: "", end: "", link: "", amount: 0, method: "", visit: "", fee: 0, memo: "" };
+  const urlM = raw.match(/https?:\/\/[^\s"'<>]+/);
+  if (urlM) out.link = urlM[0];
+  out.site = guessSiteFromText(raw) || (out.link ? siteFromUrl(out.link) : "");
+
+  /* 기간: 12/23 ~ 1/1 · 12월 23일 ~ 1월 1일 · 2026-12-23 ~ 2027-01-01 */
+  const dateRe = /(20\d{2}[-./]\s*\d{1,2}[-./]\s*\d{1,2}|\d{1,2}\s*[-./]\s*\d{1,2})/g;
+  const dates = [];
+  let mm;
+  while ((mm = dateRe.exec(raw)) !== null) dates.push(mm[1].replace(/\s+/g, ""));
+  if (dates.length >= 2) {
+    out.start = normDateLoose(dates[0]);
+    out.end = normDateLoose(dates[1]);
+  } else if (dates.length === 1) {
+    out.end = normDateLoose(dates[0]);
+  }
+  const visitM = raw.match(/(?:방문\s*(?:예정|일|기간)|방문일)[^\d]{0,8}(20\d{2}[-./]\s*\d{1,2}[-./]\s*\d{1,2}|\d{1,2}\s*[-./]\s*\d{1,2})/);
+  if (visitM) out.visit = normDateLoose(visitM[1].replace(/\s+/g, ""));
+
+  const amountM = raw.match(/(?:선결제|구매가|제공\s*금액|결제\s*금액|금액|가격)[^\d\n]{0,8}([\d,]{3,})\s*원?/);
+  if (amountM) out.amount = num(amountM[1]);
+  const feeM = raw.match(/(?:원고료|페이백|수수료)[^\d\n]{0,8}([\d,]{2,})\s*원?/);
+  if (feeM) out.fee = num(feeM[1]);
+  const methodM = raw.match(/(?:^|\n)\s*(?:체험\s*)?방식\s*[:：]?\s*([가-힣]{2,6})/) || raw.match(/방식\s*[:：]\s*([가-힣]{2,6})/);
+  if (methodM && TRIAL_METHODS.indexOf(methodM[1]) >= 0) out.method = methodM[1];
+  else if (/환급/.test(raw)) out.method = "환급방식";
+  else if (/배송|택배/.test(raw)) out.method = "배송";
+  else if (/방문\s*형|매장\s*방문|방문\s*후기/.test(raw)) out.method = "방문";
+  else if (/구매\s*형|직접\s*구매/.test(raw)) out.method = "구매";
+
+  const prodM = raw.match(/(?:제품\s*명|제품|상품\s*명|업체\s*명|업체)[^\n:：]{0,4}[:：]?\s*([^\n]{2,40})/);
+  if (prodM) out.product = prodM[1].replace(/\[[^\]]*\]|\([^)]*\)/g, " ").replace(/\s+/g, " ").trim();
+  if (!out.product && lines.length) {
+    const first = lines[0]
+      .replace(/\[[^\]]*\]/g, " ")
+      .replace(/체험단|모집|공고|안내|신청/g, " ")
+      .replace(/[|/·]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (first) out.product = first.slice(0, 40);
+  }
+  out.product = String(out.product || "").slice(0, 60);
+  if (!out.product && lines.length > 1) out.product = lines[1].replace(/\[[^\]]*\]/g, "").trim().slice(0, 40);
+  out.memo = raw.length > 400 ? "" : raw.slice(0, 200);
+  return out;
+}
+
+/* 공개 페이지 가져오기 — 직접 → CORS 프록시 순서로 시도 */
+async function fetchTrialMeta(url) {
+  const tries = [
+    { name: "직접", wrap: u => u },
+    { name: "r.jina.ai", wrap: u => "https://r.jina.ai/" + u },
+    { name: "allorigins", wrap: u => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u) }
+  ];
+  for (const t of tries) {
+    try {
+      const ctl = new AbortController();
+      const timer = setTimeout(() => ctl.abort(), 6500);
+      const res = await fetch(t.wrap(url), { signal: ctl.signal, headers: { "Accept": "text/html,text/plain,*/*" } });
+      clearTimeout(timer);
+      if (!res.ok) continue;
+      const text = await res.text();
+      if (!text || text.length < 40) continue;
+      return { via: t.name, text: text.slice(0, 20000) };
+    } catch (e) { /* 다음 방법 */ }
+  }
+  return null;
+}
+function pageMeta(text) {
+  const out = { title: "", body: String(text || "") };
+  const tm = out.body.match(/<title[^>]*>([^<]{2,200})<\/title>/i) || out.body.match(/^\s*(?:Title:\s*)?(.{2,200})$/m);
+  if (tm) out.title = tm[1].replace(/\s+/g, " ").trim();
+  /* CORS 프록시가 돌려준 마크다운의 첫 제목 */
+  if (!out.title) {
+    const h = out.body.match(/^#{1,3}\s+(.{2,120})$/m);
+    if (h) out.title = h[1].trim();
+  }
+  return out;
+}
+
+/* ---------- 모달 ---------- */
+function fillSiteList() {
+  const dl = $("#siteList");
+  if (!dl) return;
+  dl.innerHTML = TRIAL_SITES.map(s => '<option value="' + esc(s) + '"></option>').join("");
+}
+function fillTrialForm(o) {
+  if (!o) return;
+  const set = (sel, v) => { const el = $(sel); if (el && v != null && v !== "") el.value = v; };
+  if (o.site) set("#trSite", o.site);
+  if (o.product) set("#trProduct", o.product);
+  if (o.start) set("#trStart", o.start);
+  if (o.end) set("#trEnd", o.end);
+  if (o.link) set("#trLink", o.link);
+  if (o.amount) set("#trAmount", o.amount);
+  if (o.method) set("#trMethod", o.method);
+  if (o.visit) set("#trVisit", o.visit);
+  if (o.fee) set("#trFee", o.fee);
+  if (o.memo) set("#trMemo", o.memo);
+}
+function openTrialModal(id) {
+  const t = id ? trialById(id) : null;
+  editingTrialId = id || "";
+  fillSiteList();
+  $("#trialModalTitle").textContent = t ? "체험단 수정" : "체험단 추가";
+  $("#trStatus").innerHTML = TRIAL_STATUS.map(s => '<option value="' + esc(s) + '"' + (t && t.status === s ? " selected" : "") + ">" + esc(s) + "</option>").join("");
+  $("#trMethod").innerHTML = '<option value="">선택</option>' + TRIAL_METHODS.map(s => '<option value="' + esc(s) + '"' + (t && t.method === s ? " selected" : "") + ">" + esc(s) + "</option>").join("");
+  $("#trSite").value = t ? t.site : "";
+  $("#trProduct").value = t ? t.product : "";
+  $("#trStart").value = t ? t.start : "";
+  $("#trEnd").value = t ? t.end : "";
+  $("#trLink").value = t ? t.link : "";
+  $("#trAmount").value = t && t.amount ? fmt(t.amount) : "";
+  $("#trVisit").value = t ? t.visit : "";
+  $("#trFee").value = t && t.fee ? fmt(t.fee) : "";
+  $("#trMemo").value = t ? t.memo : "";
+  const msg = $("#tLinkMsg");
+  if (msg) msg.textContent = "주소를 넣고 [🔗 링크로 채우기]를 누르면 사이트·제품명·마감일을 읽어 옵니다 · 로그인·차단 페이지는 복붙/캡처로 채워 주세요";
+  const oc = $("#tOcrMsg");
+  if (oc) oc.textContent = "공지나 카톡 화면을 캡처해 올리면 글자를 읽어 채웁니다 · 사진은 이 기기 밖으로 나가지 않아요";
+  const del = $("#trialDelete");
+  if (del) del.classList.toggle("hidden", !t);
+  openModal("mTrial");
+}
+function saveTrial() {
+  const val = sel => { const el = $(sel); return el ? el.value : ""; };
+  const o = normTrial({
+    id: editingTrialId || undefined,
+    status: val("#trStatus"),
+    site: val("#trSite").trim(),
+    product: val("#trProduct").trim(),
+    start: val("#trStart"),
+    end: val("#trEnd"),
+    link: val("#trLink").trim(),
+    amount: val("#trAmount"),
+    method: val("#trMethod"),
+    visit: val("#trVisit"),
+    fee: val("#trFee"),
+    memo: val("#trMemo").trim()
+  });
+  if (!o.product && !o.site) { toast("사이트나 제품명을 하나는 적어 주세요"); return; }
+  if (editingTrialId) {
+    const old = trialById(editingTrialId);
+    if (old) Object.assign(old, o, { id: old.id, createdAt: old.createdAt, txnId: old.txnId, incomeTxnId: old.incomeTxnId, paidAt: old.paidAt });
+  } else {
+    state.trials.push(o);
+  }
+  touch(); closeModal("mTrial"); renderAll();
+  toast(editingTrialId ? "체험단을 고쳤어요" : "체험단을 추가했어요" + (o.end ? " · " + o.end.slice(5).replace("-", "/") + " 마감" : ""));
+}
+function deleteTrial(id) {
+  const t = trialById(id);
+  if (!t) return;
+  if (!confirm("이 체험단을 목록에서 지울까요?\n가계부에 등록한 내역은 그대로 남습니다.")) return;
+  state.trials = state.trials.filter(x => x.id !== id);
+  touch(); closeModal("mTrial"); renderAll();
+  toast("체험단을 지웠어요");
+}
+
+/* ---------- 가계부 연동 ---------- */
+function trialDefaultCard() {
+  const kb = cardById("kb");
+  if (kb) return kb.id;
+  const first = state.cards.find(c => !c.lowFreq && c.type !== "check");
+  return first ? first.id : PAY_CASH;
+}
+/* 선결제 → 가계부 지출(🎁 체험단 페이백 3.3%) */
+function trialToLedger(id) {
+  const t = trialById(id);
+  if (!t) return null;
+  if (t.txnId && state.txns.some(x => x.id === t.txnId)) { toast("이미 가계부에 등록되어 있어요"); return null; }
+  const amt = t.amount || 0;
+  if (!amt) { toast("선결제·제공 금액을 먼저 적어 주세요"); openTrialModal(id); return null; }
+  const tx = addTxn({
+    date: todayISO(), amount: amt,
+    memo: (t.site ? t.site + " " : "") + (t.product || "체험단"),
+    cat: "쇼핑", cardId: trialDefaultCard(), type: "expense"
+  }, { noDedup: true });
+  if (!tx) return null;
+  tx.isTrial = true;
+  tx.payback = trialPaybackDefault(amt);
+  tx.paybackDone = false;
+  t.txnId = tx.id;
+  if (t.status === "진행중") t.status = "입금대기";
+  touch(); renderAll();
+  toast("🎁 가계부에 등록했어요 · 실적 " + won(amt) + " 전액 / 지출 " + won(Math.max(0, amt - tx.payback)) + "만");
+  return tx;
+}
+/* 원고료 → 가계부 수입 */
+function trialToIncome(id) {
+  const t = trialById(id);
+  if (!t || !t.fee) { toast("원고료를 먼저 적어 주세요"); return null; }
+  if (t.incomeTxnId && state.txns.some(x => x.id === t.incomeTxnId)) { toast("이미 원고료 수입이 등록되어 있어요"); return null; }
+  const tx = addTxn({
+    date: todayISO(), amount: t.fee,
+    memo: (t.site ? t.site + " " : "") + (t.product || "체험단") + " 원고료",
+    cat: "기타", cardId: PAY_ACCOUNT, type: "income"
+  }, { noDedup: true });
+  if (!tx) return null;
+  t.incomeTxnId = tx.id;
+  touch(); renderAll();
+  toast("＋ 원고료 " + won(t.fee) + "을 수입으로 기록했어요");
+  return tx;
+}
+/* 페이백 입금 확인 — 가계부 내역과 체험단 상태를 같이 움직인다 */
+function trialMarkPaid(id) {
+  const t = trialById(id);
+  if (!t) return;
+  const tx = trialTxn(t);
+  if (!tx || !trialOn(tx)) { toast("연결된 가계부 내역이 없어요"); return; }
+  const done = !tx.paybackDone;
+  setTrialPaid(tx.id, done);
+  t.status = done ? "완료" : "입금대기";
+  t.paidAt = done ? todayISO() : "";
+  touch(); renderAll();
+}
+
+/* ---------- 구글 시트 붙여넣기 ---------- */
+/* 시트 열: 상태 · 사이트 · 제품명 · 시작 · ~ · 마감 · 링크 · 금액 · 방식 · 방문예정일 · 원고료 */
+function parseTrialSheet(text) {
+  const raw = String(text || "").replace(/\r/g, "");
+  if (!raw.trim()) return [];
+  const lines = raw.split("\n").filter(l => l.trim());
+  const delim = lines.some(l => l.indexOf("\t") >= 0) ? "\t" : ",";
+  const splitLine = l => {
+    if (delim === "\t") return l.split("\t");
+    const out = [];
+    let cur = "", q = false;
+    for (let i = 0; i < l.length; i++) {
+      const c = l[i];
+      if (c === '"') { if (q && l[i + 1] === '"') { cur += '"'; i++; } else q = !q; }
+      else if (c === "," && !q) { out.push(cur); cur = ""; }
+      else cur += c;
+    }
+    out.push(cur);
+    return out;
+  };
+  const rows = [];
+  lines.forEach((l, idx) => {
+    const c = splitLine(l).map(x => String(x || "").replace(/^"|"$/g, "").trim());
+    if (!c.length) return;
+    if (idx === 0 && /^상태$|상태.*사이트/.test(c[0])) return;   /* 머리줄 */
+    const t = normTrial({
+      status: c[0] === "종료" ? "완료" : c[0] === "취소" ? "취소" : c[0] === "입금대기" ? "입금대기" : "진행중",
+      site: c[1], product: c[2], start: c[3], end: c[5] || c[4], link: c[6],
+      amount: c[7], method: c[8], visit: c[9], fee: c[10]
+    });
+    if (!t.product && !t.site) return;
+    rows.push(t);
+  });
+  return rows;
+}
+function importTrialSheet() {
+  const box = $("#trSheetText");
+  const rows = parseTrialSheet(box ? box.value : "");
+  if (!rows.length) { toast("읽을 행이 없어요 — 시트에서 머리줄까지 복사해 붙여넣어 주세요"); return 0; }
+  let added = 0, dup = 0;
+  rows.forEach(r => {
+    const same = state.trials.some(x => x.site === r.site && x.product === r.product && x.end === r.end);
+    if (same) { dup++; return; }
+    state.trials.push(r);
+    added++;
+  });
+  touch(); closeModal("mTrialSheet"); renderAll();
+  toast(added + "건을 불러왔어요" + (dup ? " · 이미 있던 " + dup + "건은 건너뜀" : ""));
+  return added;
+}
+
+/* ---------- 이벤트 ---------- */
+function bindTrials() {
+  const add = $("#btnTrialAdd");
+  if (add) add.addEventListener("click", () => openTrialModal(""));
+  const save = $("#trialSave");
+  if (save) save.addEventListener("click", saveTrial);
+  const del = $("#trialDelete");
+  if (del) del.addEventListener("click", () => { if (editingTrialId) deleteTrial(editingTrialId); });
+  const filters = $("#trialFilters");
+  if (filters) filters.addEventListener("click", ev => {
+    const b = ev.target.closest("[data-tf]");
+    if (!b) return;
+    trialFilter = b.getAttribute("data-tf");
+    renderTrials();
+  });
+  /* 링크로 채우기 */
+  const fill = $("#btnTrialFetch");
+  if (fill) fill.addEventListener("click", async () => {
+    const url = ($("#trLink").value || "").trim();
+    const msg = $("#tLinkMsg");
+    if (!/^https?:\/\//i.test(url)) { if (msg) msg.textContent = "http:// 또는 https:// 로 시작하는 주소를 넣어 주세요"; return; }
+    const site = siteFromUrl(url);
+    if (site) $("#trSite").value = site;
+    if (msg) msg.innerHTML = '<span class="loader"></span>주소를 읽는 중…';
+    fill.disabled = true;
+    const got = await fetchTrialMeta(url);
+    fill.disabled = false;
+    if (!got) {
+      if (msg) msg.innerHTML = "🔒 이 주소는 앱에서 바로 읽을 수 없어요(로그인·차단). 사이트 이름은 채웠으니 <b>공지 복붙</b>이나 <b>캡처</b>로 나머지를 채워 주세요.";
+      toast("링크를 읽지 못했어요 — 복붙이나 캡처로 채워 주세요");
+      return;
+    }
+    const meta = pageMeta(got.text);
+    const parsed = parseTrialText([meta.title, got.text.slice(0, 4000)].join("\n"));
+    if (!parsed.site && site) parsed.site = site;
+    if (meta.title && !parsed.product) parsed.product = meta.title;
+    fillTrialForm({ site: parsed.site || site, product: parsed.product, start: parsed.start, end: parsed.end, amount: parsed.amount, method: parsed.method, visit: parsed.visit, fee: parsed.fee });
+    if (msg) msg.innerHTML = "🔗 " + (meta.title ? "<b>" + esc(meta.title.slice(0, 60)) + "</b> · " : "") + "제목·기간·금액을 채웠어요 · 틀린 칸만 고쳐 주세요" + (parsed.end ? " (마감 " + parsed.end.slice(5).replace("-", "/") + ")" : "");
+    toast("링크에서 채웠어요 — 확인하고 저장해 주세요");
+  });
+  /* 복붙 파싱 */
+  const paste = $("#btnTrialPaste");
+  if (paste) paste.addEventListener("click", () => {
+    const el = $("#trPasteText");
+    if (el) el.value = "";
+    openModal("mTrialPaste");
+  });
+  const pasteGo = $("#trPasteGo");
+  if (pasteGo) pasteGo.addEventListener("click", () => {
+    const text = ($("#trPasteText").value || "").trim();
+    if (!text) { toast("붙여넣을 공지 내용을 먼저 넣어 주세요"); return; }
+    fillTrialForm(parseTrialText(text));
+    closeModal("mTrialPaste");
+    const msg = $("#tLinkMsg");
+    if (msg) msg.innerHTML = "📋 붙여넣은 내용에서 사이트·제품·기간·금액을 채웠어요 · 틀린 칸만 고쳐 주세요";
+    toast("공지에서 채웠어요");
+  });
+  /* 캡처 */
+  const shot = $("#btnTrialShot");
+  if (shot) shot.addEventListener("click", () => {
+    const f = $("#trialOcrFile");
+    if (f) { f.value = ""; f.click(); }
+  });
+  const file = $("#trialOcrFile");
+  if (file) file.addEventListener("change", ev => {
+    const files = Array.prototype.slice.call(ev.target.files || []);
+    if (files.length) runOcrFiles(files, "trial");
+  });
+  /* 시트 붙여넣기 */
+  const sh = $("#btnTrialSheet");
+  if (sh) sh.addEventListener("click", () => {
+    const el = $("#trSheetText");
+    if (el) el.value = "";
+    const hint = $("#trSheetMsg");
+    if (hint) hint.textContent = "구글 시트에서 값이 있는 줄을 머리줄까지 복사(Ctrl/Cmd+C)해 붙여넣으세요 · 열 순서: 상태·사이트·제품명·시작·~·마감·링크·금액·방식·방문예정일·원고료";
+    openModal("mTrialSheet");
+  });
+  const shGo = $("#trSheetGo");
+  if (shGo) shGo.addEventListener("click", importTrialSheet);
+  /* 카드 안 버튼 */
+  document.addEventListener("click", ev => {
+    const b = ev.target.closest ? ev.target.closest("[data-trial-ledger],[data-trial-income],[data-trial-paid],[data-trial-edit]") : null;
+    if (!b) return;
+    if (b.hasAttribute("data-trial-ledger")) { ev.stopPropagation(); trialToLedger(b.getAttribute("data-trial-ledger")); return; }
+    if (b.hasAttribute("data-trial-income")) { ev.stopPropagation(); trialToIncome(b.getAttribute("data-trial-income")); return; }
+    if (b.hasAttribute("data-trial-paid")) { ev.stopPropagation(); trialMarkPaid(b.getAttribute("data-trial-paid")); return; }
+    if (b.hasAttribute("data-trial-edit")) { ev.stopPropagation(); openTrialModal(b.getAttribute("data-trial-edit")); return; }
+  });
+}
+
 /* ==== 48-pg-merge.js ==== */
 /* ============================================================
    간편결제 중복 자동 합치기 (네이버페이 · 카카오페이 · 토스페이 …)
@@ -5910,6 +6960,9 @@ const SUPPLIER_CAT = {
   "보험": "보험", "세금": "세금", "세금·공과금": "세금", "공공요금": "관리비",
   "대출": "대출", "이자": "대출", "금융": "대출", "카드대금": "대출",
   "포인트": "포인트·할인", "할인": "포인트·할인", "캐시백": "포인트·할인", "페이백": "포인트·할인", "적립": "포인트·할인", "리워드": "포인트·할인",
+  "용돈": "용돈",
+  "기부금": "기부금", "기부": "기부금", "후원": "기부금", "후원금": "기부금", "자선": "기부금", "성금": "기부금",
+  "고향사랑": "기부금", "고향사랑기부": "기부금", "유니세프": "기부금", "세이브더칠드런": "기부금", "월드비전": "기부금", "초록우산": "기부금", "굿네이버스": "기부금",
   "이체": "기타", "수입": "기타", "급여": "기타", "수수료": "기타", "기타": "기타"
 };
 /* 표의 분류 열 → 앱 고정/변동 카테고리 (정확 → 조각 → 포함 순) */
@@ -5929,6 +6982,8 @@ function supplierCat(given) {
 }
 const CAT_GUESS = [
   [/페이백|캐시백|포인트.?적립|적립금|리워드|마일리지.?적립/, "포인트·할인"],
+  [/용돈/, "용돈"],
+  [/기부|고향사랑|후원|유니세프|세이브더칠드런|월드비전|초록우산|굿네이버스|자선|성금|모금/, "기부금"],
   [/관리비|공과금|월세|임대료|전기요금|가스요금|수도요금|도시가스|한전|아파트/, "관리비"],
   [/대출|원리금|이자|상환|카드대금|할부금|중도금/, "대출"],
   [/\bKT\b|\bSKT\b|SK텔레콤|LG\s?U\+|LGU|통신|인터넷|휴대폰|요금제|알뜰폰/, "통신"],
@@ -6017,6 +7072,7 @@ function guessCategory(text, given) {
 /* 수입 행의 분류 — 포인트·할인만 따로, 나머지는 기타 */
 function incomeCat(memo, given) {
   if (supplierCat(given) === "포인트·할인") return "포인트·할인";
+  if (supplierCat(given) === "용돈") return "용돈";
   const s = String(memo || "") + " " + String(given || "");
   if (/페이백|캐시백|포인트.?적립|적립금|리워드|할인/.test(s)) return "포인트·할인";
   return "기타";
@@ -6557,8 +7613,9 @@ function bindOcr() {
 async function runOcrFiles(files, mode) {
   if (ocrBusy) { toast("아직 읽는 중이에요"); return; }
   ocrBusy = true;
-  const msgBox = mode === "pick" ? $("#pocrMsg") : $("#ocrMsg");
+  const msgBox = mode === "pick" ? $("#pocrMsg") : mode === "trial" ? $("#tOcrMsg") : $("#ocrMsg");
   if (mode === "pick") openPickOcr([], "글자 인식 도구를 준비하는 중…");
+  else if (mode === "trial") { if (msgBox) msgBox.textContent = "📷 글자 인식 도구를 준비하는 중…"; }
   else { ocrRows = []; $("#ocrMsg").textContent = "글자 인식 도구를 준비하는 중…"; renderOcr(); openModal("mOcr"); }
   let worker = null;
   try {
@@ -6583,6 +7640,13 @@ async function runOcrFiles(files, mode) {
       openPickOcr(rows, rows.length
         ? "📷 캡처에서 <b>" + rows.length + "건</b>을 읽었어요 · 가맹점·혜택·기간을 확인하고 담아 주세요"
         : "📷 Pick 목록을 찾지 못했어요 · 더 선명한 캡처로 다시 시도하거나 [＋ Pick]으로 직접 담아 주세요");
+    } else if (mode === "trial") {
+      const parsed = parseTrialText(lines.join("\n"));
+      fillTrialForm(parsed);
+      const found = [parsed.site && "사이트", parsed.product && "제품", parsed.end && "마감", parsed.amount && "금액", parsed.method && "방식"].filter(Boolean);
+      if (msgBox) msgBox.innerHTML = found.length
+        ? "📷 캡처에서 <b>" + found.join("·") + "</b>을(를) 읽어 채웠어요 · 틀린 칸만 고쳐 주세요"
+        : "📷 글자는 읽었지만 체험단 내용을 찾지 못했어요 · 더 선명한 캡처나 공지 복붙을 써 주세요";
     } else {
       ocrRows = parseOcrLines(lines);
       $("#ocrMsg").innerHTML = ocrRows.length
@@ -6593,11 +7657,13 @@ async function runOcrFiles(files, mode) {
   } catch (e) {
     console.warn("ocr failed", e);
     const msg = "글자를 읽지 못했어요: " + (e.message || e);
-    if (mode === "pick") openPickOcr([], msg); else { $("#ocrMsg").textContent = msg; }
+    if (mode === "pick") openPickOcr([], msg); else if (msgBox) msgBox.textContent = msg; else { $("#ocrMsg").textContent = msg; }
   } finally {
     if (worker) { try { await worker.terminate(); } catch (e) {} }
     ocrBusy = false;
     $("#fileImg").value = "";
+    const tf = $("#trialOcrFile");
+    if (tf) tf.value = "";
   }
 }
 
@@ -6815,6 +7881,7 @@ function boot() {
   bindPicks();
   bindPickOcr();
   bindGiftScan();
+  bindTrials();
   bindAuth();
   renderAll();
   initAuth();          /* 로그인 확인 → 로그인 뒤에만 DB 연결 */
@@ -6846,6 +7913,34 @@ function boot() {
     onnuriTotal: onnuriTotal,
     onnuriBalance: onnuriBalance,
     onnuriTxns: onnuriTxns,
+    trialOn: trialOn,
+    trialPayback: trialPayback,
+    trialPaybackDefault: trialPaybackDefault,
+    trialPending: trialPending,
+    trialPendingAll: trialPendingAll,
+    trialProfit: trialProfit,
+    setTrialPaid: setTrialPaid,
+    toggleTrialPaid: toggleTrialPaid,
+    confirmTrialPaid: confirmTrialPaid,
+    openAllTrial: openAllTrial,
+    renderTrialBanner: renderTrialBanner,
+    renderTrials: renderTrials,
+    openTrialModal: openTrialModal,
+    saveTrial: saveTrial,
+    deleteTrial: deleteTrial,
+    trialToLedger: trialToLedger,
+    trialToIncome: trialToIncome,
+    trialMarkPaid: trialMarkPaid,
+    trialState: trialState,
+    trialFeeOf: trialFeeOf,
+    trialPendingList: trialPendingList,
+    parseTrialText: parseTrialText,
+    parseTrialSheet: parseTrialSheet,
+    importTrialSheet: importTrialSheet,
+    siteFromUrl: siteFromUrl,
+    pageMeta: pageMeta,
+    normDateLoose: normDateLoose,
+    dutchShareOfTxn: dutchShareOfTxn,
     saveOnnuri: saveOnnuri,
     openOnnuriModal: openOnnuriModal,
     parseSmsText: parseSmsText,
