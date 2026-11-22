@@ -361,8 +361,57 @@ table.tbl tr.off td{color:#C9C0B2;text-decoration:line-through}
 table.tbl td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:800;white-space:nowrap}
 table.tbl input,table.tbl select{padding:4px 6px;font-size:11px;border-radius:7px;min-width:0}
 table.tbl input.w60{width:60px}
-table.tbl input.w90{width:78px}
+table.tbl input.w90{width:92px}
+table.tbl input[type="date"]{padding:5px 4px}
+table.tbl td input[type="checkbox"]{width:16px;height:16px;padding:0;border:0;accent-color:#5C7F68}
 table.tbl td.acts{white-space:nowrap;text-align:right}
+
+/* ============ 모바일(≤640px): 내역 표 → 카드형 행 ============
+   아이폰 390px에서 9개 열 표가 반 글자로 찌그러지는 문제 대응.
+   한 건을 4줄 카드로 펼쳐 내용·분류·결제·금액 입력칸이 온전히 보이게 한다.
+   데스크톱(641px 이상)은 기존 표 레이아웃 그대로. */
+@media(max-width:640px){
+  .sheet .tblwrap.cards-wrap{border:0;border-radius:0;max-height:none;overflow:visible}
+  .sheet.imp .tblwrap.cards-wrap{border:0;border-radius:0;max-height:none;overflow:visible}
+  table.tbl.cards{display:block;min-width:0;width:100%;font-size:12.5px}
+  table.tbl.cards thead{display:none}
+  table.tbl.cards tbody{display:block}
+  table.tbl.cards tbody tr{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto auto auto;
+    grid-template-areas:
+      "date type type del"
+      "memo memo memo memo"
+      "cat  cat  card card"
+      "amt  amt  fix  inst";
+    align-items:center;gap:7px;margin-top:8px;padding:10px 11px;
+    border:1px solid var(--line);border-radius:15px;background:#FFFDFA;
+  }
+  table.tbl.cards tbody tr:first-child{margin-top:0}
+  table.tbl.cards tbody td{display:block;padding:0;border:0;min-width:0;white-space:normal;text-align:left}
+  table.tbl.cards td[data-label]::before{content:attr(data-label);display:block;font-size:9px;font-weight:800;color:var(--mute);letter-spacing:-.2px;margin-bottom:2px}
+  table.tbl.cards td.c-date{grid-area:date;justify-self:start}
+  table.tbl.cards td.c-type{grid-area:type;justify-self:start}
+  table.tbl.cards td.c-memo{grid-area:memo}
+  table.tbl.cards td.c-cat{grid-area:cat}
+  table.tbl.cards td.c-card{grid-area:card}
+  table.tbl.cards td.c-amt{grid-area:amt;text-align:right}
+  table.tbl.cards td.c-fixed{grid-area:fix;justify-self:end}
+  table.tbl.cards td.c-inst{grid-area:inst;justify-self:end;text-align:center}
+  table.tbl.cards td.c-del{grid-area:del;justify-self:end;text-align:right}
+  table.tbl.cards td.c-on{grid-area:del;justify-self:end;text-align:center}
+  table.tbl.cards tbody td[colspan]{grid-area:1/1/-1/-1;text-align:center;color:#B7AC9C;padding:15px 0}
+  table.tbl.cards td input,table.tbl.cards td select{width:100%;padding:8px 9px;font-size:13.5px;border-radius:9px}
+  table.tbl.cards td.c-date input{width:auto;min-width:7.8rem;padding:8px 8px;font-size:12.5px}
+  table.tbl.cards td.c-memo input{font-size:14px;font-weight:700}
+  table.tbl.cards td.c-amt input{min-width:5.5rem;font-size:15px;font-weight:800;text-align:right;font-variant-numeric:tabular-nums;padding:8px 9px}
+  table.tbl.cards td.c-fixed .chip{padding:8px 10px;font-size:11px;border-radius:9px}
+  table.tbl.cards td.c-inst input{width:22px;height:22px;margin-top:2px}
+  table.tbl.cards td .dmin,table.tbl.cards td .smin{margin-top:4px;font-size:9.5px;white-space:normal;line-height:1.35}
+  table.tbl.cards td.c-del .mini,table.tbl.cards td.c-on .mini{width:30px;height:30px;border-radius:9px;font-size:13px}
+  table.tbl.cards td.c-on input{width:22px;height:22px;margin-top:2px}
+  table.tbl.cards td.c-on::before{content:"담기";display:block;font-size:9px;font-weight:800;color:var(--mute);letter-spacing:-.2px;margin-bottom:3px}
+}
 .mini{width:24px;height:24px;border-radius:7px;display:inline-grid;place-items:center;font-size:11px;background:#F6F1E8;color:var(--sub);border:0}
 .mini.del{color:var(--coral-d);background:var(--coral-soft)}
 .seg2{display:flex;background:#F1E9DD;border-radius:9px;padding:2px;gap:2px}
@@ -1100,7 +1149,7 @@ body.locked .app,body.locked .toast{visibility:hidden}
   <div class="sheet-h"><b id="impTitle">가져온 내역 확인</b><button class="x" data-close>✕</button></div>
   <div class="sheet-b">
     <div class="banner info" id="impSummary"></div>
-    <div class="tblwrap"><table class="tbl" id="impTable"></table></div>
+    <div class="tblwrap cards-wrap"><table class="tbl" id="impTable"></table></div>
     <div class="hint" style="margin-top:8px">체크를 끄면 그 줄은 기록하지 않아요 · 지출/수입·내용·금액·카드를 고칠 수 있어요 · <b>본인 계좌 사이 이체만</b> 자동 제외됩니다 · <b>🔗 간편결제 중복</b>은 카드 승인 줄과 가맹점 줄을 한 줄로 자동 합칩니다</div>
     <div class="hint warn" style="margin-top:6px">🤝 <b>더치페이 정산금이 입금(수입)으로 들어온 줄</b>은 체크를 끄거나(권장) 기록 후 지우면 이중 집계가 없어요 · 결제한 지출은 내역 수정에서 <b>더치페이</b>를 켜 내 몫만 반영하세요</div>
   </div>
@@ -1116,7 +1165,7 @@ body.locked .app,body.locked .toast{visibility:hidden}
       </select></div>
       <div class="qf"><select id="allCard" aria-label="카드"></select></div>
     </div>
-    <div class="tblwrap"><table class="tbl" id="allTable"></table></div>
+    <div class="tblwrap cards-wrap"><table class="tbl" id="allTable"></table></div>
     <div class="hint" style="margin-top:8px">날짜·내용·금액을 눌러 고치고, －/＋ 버튼으로 지출↔수입, 🔒/🔁 버튼으로 고정↔변동을 옮길 수 있어요.</div>
   </div>
   <div class="sheet-f"><button class="btn ghost" id="btnCsv">CSV 내보내기</button><button class="btn ghost" data-close>닫기</button></div>
@@ -3731,19 +3780,20 @@ function renderAllTx() {
     const catOpts = CATS.map(c => '<option value="' + esc(c.n) + '"' + (c.n === t.cat ? " selected" : "") + ">" + esc(c.n) + "</option>").join("");
     const cardOpts = cardOptionsHTML(t.cardId);
     return "<tr data-id=\"" + esc(t.id) + "\">" +
-      '<td><button class="chip ' + (inc ? "sage" : "line") + '" data-f="type">' + (inc ? "＋ 수입" : "－ 지출") + "</button></td>" +
-      '<td><input type="date" class="w90" data-f="date" value="' + esc(t.date) + '"></td>' +
-      '<td><input data-f="memo" value="' + esc(t.memo) + '"></td>' +
-      '<td><select data-f="cat">' + catOpts + "</select></td>" +
-      '<td><button class="chip ' + (t.fixed ? "plum" : "sage") + '" data-f="fixed">' + (t.fixed ? "🔒 고정" : "🔁 변동") + "</button></td>" +
-      '<td><select data-f="cardId">' + cardOpts + "</select></td>" +
-      '<td class="num"><input class="w90" data-f="amount" inputmode="numeric" value="' + fmt(t.amount) + '">' +
+      '<td class="c-type"><button class="chip ' + (inc ? "sage" : "line") + '" data-f="type">' + (inc ? "＋ 수입" : "－ 지출") + "</button></td>" +
+      '<td class="c-date"><input type="date" class="w90" data-f="date" value="' + esc(t.date) + '"></td>' +
+      '<td class="c-memo" data-label="내용"><input data-f="memo" value="' + esc(t.memo) + '"></td>' +
+      '<td class="c-cat" data-label="분류"><select data-f="cat">' + catOpts + "</select></td>" +
+      '<td class="c-fixed" data-label="고정/변동"><button class="chip ' + (t.fixed ? "plum" : "sage") + '" data-f="fixed">' + (t.fixed ? "🔒 고정" : "🔁 변동") + "</button></td>" +
+      '<td class="c-card" data-label="결제"><select data-f="cardId">' + cardOpts + "</select></td>" +
+      '<td class="num c-amt" data-label="금액"><input class="w90" data-f="amount" inputmode="numeric" value="' + fmt(t.amount) + '">' +
         (dutchOn(t) ? '<div class="dmin">🤝 내 몫 ' + fmt(spendAmtIn(t, uiMonth)) + (t.dutchN ? " · " + t.dutchN + "명" : "") + "</div>" : "") +
         (splitOn(t) ? '<div class="smin">📆 ' + splitIdx(t, uiMonth) + "/" + splitMonths(t) + " · 이번 달 " + fmt(spendAmtIn(t, uiMonth)) + "</div>" : "") + "</td>" +
-      '<td style="text-align:center"><input type="checkbox" data-f="installment" style="width:16px;height:16px;accent-color:#5C7F68;padding:0;border:0"' + (t.installment ? " checked" : "") + "></td>" +
-      '<td class="acts"><button class="mini del" data-del="' + esc(t.id) + '" aria-label="삭제">✕</button></td></tr>';
+      '<td class="c-inst" data-label="할부" style="text-align:center"><input type="checkbox" data-f="installment" style="accent-color:#5C7F68;padding:0;border:0"' + (t.installment ? " checked" : "") + "></td>" +
+      '<td class="acts c-del"><button class="mini del" data-del="' + esc(t.id) + '" aria-label="삭제">✕</button></td></tr>';
   }).join("");
   tbl.innerHTML = head + "<tbody>" + (rows || '<tr><td colspan="9" style="text-align:center;color:#B7AC9C;padding:18px">기록이 없어요</td></tr>') + "</tbody>";
+  tbl.classList.add("cards");
 }
 function updateTxn(id, field, value) {
   const t = state.txns.find(x => x.id === id);
@@ -5984,19 +6034,20 @@ function renderImport() {
   const body = importRows.map((r, i) => {
     const inc = r.type === "income";
     return '<tr class="' + (r.dup ? "dup" : "") + '" data-i="' + i + '"' + (r.pgMerged ? ' title="간편결제 중복 자동 합침 — 카드 승인 줄 기준 + 가맹점 내용·분류"' : '') + '>' +
-      '<td style="text-align:center"><input type="checkbox" data-f="on" data-i="' + i + '"' + (r.on ? " checked" : "") + ' style="width:16px;height:16px;accent-color:#5C7F68;border:0;padding:0"></td>' +
-      '<td><button class="chip ' + (inc ? "sage" : "line") + '" data-f="typebtn" data-i="' + i + '">' + (inc ? "＋ 수입" : "－ 지출") + "</button></td>" +
-      '<td><input type="date" class="w90" data-f="date" data-i="' + i + '" value="' + esc(r.date) + '"></td>' +
-      '<td><input data-f="memo" data-i="' + i + '" value="' + esc(r.memo) + '" style="min-width:110px"></td>' +
-      '<td><select data-f="cat" data-i="' + i + '">' + CATS.map(c => '<option value="' + esc(c.n) + '"' + (c.n === r.cat ? " selected" : "") + ">" + esc(c.n) + "</option>").join("") + "</select></td>" +
-      '<td>' + (inc
+      '<td class="c-on" style="text-align:center"><input type="checkbox" data-f="on" data-i="' + i + '"' + (r.on ? " checked" : "") + ' style="accent-color:#5C7F68;border:0;padding:0"></td>' +
+      '<td class="c-type"><button class="chip ' + (inc ? "sage" : "line") + '" data-f="typebtn" data-i="' + i + '">' + (inc ? "＋ 수입" : "－ 지출") + "</button></td>" +
+      '<td class="c-date"><input type="date" class="w90" data-f="date" data-i="' + i + '" value="' + esc(r.date) + '"></td>' +
+      '<td class="c-memo" data-label="내용"><input data-f="memo" data-i="' + i + '" value="' + esc(r.memo) + '" style="min-width:110px"></td>' +
+      '<td class="c-cat" data-label="분류"><select data-f="cat" data-i="' + i + '">' + CATS.map(c => '<option value="' + esc(c.n) + '"' + (c.n === r.cat ? " selected" : "") + ">" + esc(c.n) + "</option>").join("") + "</select></td>" +
+      '<td class="c-fixed" data-label="고정/변동">' + (inc
         ? '<span class="chip line">수입</span>'
         : '<button class="chip ' + (r.fixed ? "plum" : "sage") + '" data-f="fixedbtn" data-i="' + i + '">' + (r.fixed ? "🔒 고정" : "🔁 변동") + "</button>") + "</td>" +
-      '<td><select data-f="cardId" data-i="' + i + '">' + cardOptionsHTML(r.cardId) + "</select></td>" +
-      '<td class="num"><input class="w90" data-f="amount" data-i="' + i + '" inputmode="numeric" value="' + fmt(r.amount) + '"></td>' +
+      '<td class="c-card" data-label="결제"><select data-f="cardId" data-i="' + i + '">' + cardOptionsHTML(r.cardId) + "</select></td>" +
+      '<td class="num c-amt" data-label="금액"><input class="w90" data-f="amount" data-i="' + i + '" inputmode="numeric" value="' + fmt(r.amount) + '"></td>' +
     "</tr>";
   }).join("");
   tbl.innerHTML = head + "<tbody>" + (body || '<tr><td colspan="8" style="text-align:center;color:#B7AC9C;padding:18px">가져올 내역이 없어요</td></tr>') + "</tbody>";
+  tbl.classList.add("cards");
   updateImpCount();
 }
 function confirmImport() {
