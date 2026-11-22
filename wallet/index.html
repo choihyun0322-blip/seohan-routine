@@ -537,6 +537,35 @@ body.locked .app,body.locked .toast{visibility:hidden}
 .dquick button{flex:1;min-width:52px;font-size:11.5px;font-weight:800;color:var(--sage-d);background:#fff;border:1px solid var(--sage-line);border-radius:9px;padding:8px 4px;letter-spacing:-.3px}
 .dquick button:active{background:var(--sage-soft)}
 .dquick button.on{background:var(--sage);border-color:var(--sage);color:#fff}
+.dstep{display:flex;align-items:center;gap:7px;margin-top:7px}
+.dstep-cap{flex:0 0 auto;font-size:10.5px;font-weight:800;color:var(--mute);letter-spacing:-.2px}
+.dstep-b{flex:0 0 40px;height:38px;border-radius:10px;background:#fff;border:1px solid var(--sage-line);color:var(--sage-d);font-size:18px;font-weight:800;line-height:1;display:grid;place-items:center;padding:0}
+.dstep-b:active{background:var(--sage-soft)}
+.dstep-b:disabled{opacity:.32}
+.dstep .dstep-n{flex:1 1 0;min-width:0;display:flex;align-items:center;gap:4px;height:38px;background:#fff;border:1px solid var(--sage-line);border-radius:10px;padding:0 10px;margin-bottom:0;overflow:hidden}
+.dstep-n input{flex:1 1 0;width:0;min-width:0;height:100%;border:0;border-radius:0;background:transparent;padding:0;text-align:center;font-size:14.5px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.2px}
+.dstep-n input:focus{outline:none}
+.dstep-n input::placeholder{color:#C6BCAC;font-weight:700}
+.dstep-n span{flex:0 0 auto;white-space:nowrap;font-size:11px;font-weight:800;color:var(--mute)}
+.dstep.on .dstep-n{border-color:var(--sage);background:var(--sage-soft)}
+.dstep-n:focus-within{border-color:var(--sage);box-shadow:0 0 0 2px var(--sage-line)}
+.dstep-hint{margin-top:6px;font-size:9.5px;font-weight:700;color:#B7AC9C;letter-spacing:-.2px}
+.dstep-hint b{font-weight:800;color:var(--sage-d)}
+/* ============ 기간 나누기(안분) ============ */
+.sbox{margin-top:8px;background:#FBF8F1;border:1px solid var(--amber-line);border-radius:12px;padding:9px}
+.sbox .dquick button{color:var(--amber-d);border-color:var(--amber-line)}
+.sbox .dquick button:active{background:var(--amber-soft)}
+.sbox .dquick button.on{background:var(--amber);border-color:var(--amber);color:#fff}
+.sbox .dstep-b{color:var(--amber-d);border-color:var(--amber-line)}
+.sbox .dstep-b:active{background:var(--amber-soft)}
+.sbox .dstep-n{border-color:var(--amber-line)}
+.sbox .dstep.on .dstep-n{border-color:var(--amber);background:var(--amber-soft)}
+.sbox .dstep-n:focus-within{border-color:var(--amber);box-shadow:0 0 0 2px var(--amber-line)}
+.sbox .dprev{background:var(--amber-soft);color:var(--amber-d)}
+.splitnote{margin-top:8px;font-size:9.5px;font-weight:700;color:var(--amber-d);background:var(--amber-soft);border:1px solid var(--amber-line);border-radius:10px;padding:7px 9px;line-height:1.6}
+.splitnote b{font-weight:800}
+.rec .schip{font-size:8.5px;font-weight:800;background:var(--amber-soft);color:var(--amber-d);border-radius:5px;padding:1px 4px;margin-right:2px;font-style:normal}
+.smin{margin-top:4px;font-size:9px;font-weight:800;color:var(--amber-d);background:var(--amber-soft);border-radius:6px;padding:2px 5px;display:inline-block;letter-spacing:-.2px}
 .dmshare{margin-top:8px}
 .dmshare label{display:block;font-size:10.5px;font-weight:800;color:var(--mute);margin-bottom:5px;letter-spacing:-.2px}
 .dprev{margin-top:8px;font-size:10px;font-weight:700;color:var(--sage-d);background:var(--sage-soft);border-radius:9px;padding:7px 9px;line-height:1.55;letter-spacing:-.2px}
@@ -646,6 +675,7 @@ body.locked .app,body.locked .toast{visibility:hidden}
         <div class="bar"><i id="barFix" style="width:0;background:#8E7FB0"></i><i id="barVar" style="width:0;background:#7FA184"></i></div>
         <div class="lg"><span class="fx" id="lgFix">🔒 고정비 0원 · 0%</span><span class="vr" id="lgVar">🔁 변동비 0원 · 0%</span></div>
         <div class="hint dutchnote hidden" id="dutchNote"></div>
+        <div class="hint splitnote hidden" id="splitNote"></div>
       </div>
 
       <div class="fv3">
@@ -938,8 +968,33 @@ body.locked .app,body.locked .toast{visibility:hidden}
           <button type="button" data-n="4">1/4</button>
           <button type="button" data-n="5">1/5</button>
         </div>
+        <div class="dstep" id="tDutchStep">
+          <span class="dstep-cap">인원</span>
+          <button type="button" class="dstep-b" id="tDutchMinus" aria-label="인원 줄이기">−</button>
+          <label class="dstep-n" for="tDutchN"><input id="tDutchN" inputmode="numeric" pattern="[0-9]*" maxlength="2" autocomplete="off" placeholder="2" aria-label="더치페이 인원 수 (2~99명)"><span>명</span></label>
+          <button type="button" class="dstep-b" id="tDutchPlus" aria-label="인원 늘리기">+</button>
+        </div>
+        <div class="dstep-hint">6명 이상은 <b>−</b> <b>+</b> 로 올리거나 숫자를 눌러 바로 적어요 (2~99명)</div>
         <div class="dmshare"><label for="tMyShare">내 몫 금액 (원)</label><input id="tMyShare" inputmode="numeric" placeholder="직접 입력"></div>
         <div class="dprev" id="tDutchPreview"></div>
+      </div>
+    </div>
+    <div class="fld" id="tSplitWrap">
+      <label>기간 나누기 <small style="font-weight:700;color:#B7AC9C">실적은 결제한 달 전액 · 지출만 N개월로</small></label>
+      <div class="sbox">
+        <div class="dquick" id="tSplitBtns">
+          <button type="button" data-n="1">1개월</button>
+          <button type="button" data-n="3">3개월</button>
+          <button type="button" data-n="6">6개월</button>
+          <button type="button" data-n="12">12개월</button>
+        </div>
+        <div class="dstep" id="tSplitStep">
+          <span class="dstep-cap">기간</span>
+          <button type="button" class="dstep-b" id="tSplitMinus" aria-label="개월 줄이기">−</button>
+          <label class="dstep-n" for="tSplitN"><input id="tSplitN" inputmode="numeric" pattern="[0-9]*" maxlength="2" autocomplete="off" placeholder="1" aria-label="나눌 개월 수 (1~60개월)"><span>개월</span></label>
+          <button type="button" class="dstep-b" id="tSplitPlus" aria-label="개월 늘리기">+</button>
+        </div>
+        <div class="dprev" id="tSplitPreview"></div>
       </div>
     </div>
     <label class="qchk" style="margin-top:2px"><input type="checkbox" id="tInstall"> 무이자 할부 <small>실적에서 빼기</small></label>
@@ -1371,14 +1426,52 @@ function num(v) {
 function dutchOn(t) {
   return !!(t && t.type !== "income" && t.isDutch && typeof t.myShare === "number" && isFinite(t.myShare));
 }
-/* 지출 계산용 금액 — 모든 합계(고정/변동·카테고리·일별·월간·순지출)는 이걸 쓴다 */
-function spendAmt(t) {
+/* 지출 계산용 금액 — 모든 합계(고정/변동·카테고리·일별·월간/순지출)는 이걸 쓴다 */
+function ledgerBase(t) {
   if (!t) return 0;
   const full = num(t.amount);
   if (t.type === "income") return full;
   if (dutchOn(t)) return Math.max(0, Math.min(Math.round(t.myShare), full));
   return full;
 }
+/* ---------- 기간 나누기(안분): 결제한 달 실적은 전액, 가계부 지출만 N개월로 ---------- */
+const SPLIT_MAX = 60;
+function monthDiff(a, b) {
+  if (!a || !b) return 0;
+  const [ay, am] = String(a).split("-").map(Number);
+  const [by, bm] = String(b).split("-").map(Number);
+  return (by - ay) * 12 + (bm - am);
+}
+function splitMonths(t) {
+  if (!t || t.type === "income") return 1;
+  const n = Math.round(num(t.splitN));
+  return n >= 2 ? Math.min(SPLIT_MAX, n) : 1;
+}
+function splitOn(t) { return splitMonths(t) >= 2; }
+function splitStartOf(t) { return (t && t.splitStart) || monthOf(t && t.date); }
+/* 이 달이 몇 번째 달인지 (1..N). 안분 범위 밖이면 0 */
+function splitIdx(t, mk) {
+  if (!t) return 0;
+  if (!splitOn(t)) return monthOf(t.date) === mk ? 1 : 0;
+  const i = monthDiff(splitStartOf(t), mk || uiMonth) + 1;
+  return (i >= 1 && i <= splitMonths(t)) ? i : 0;
+}
+/* i번째 달 몫 — 원 단위 내림, 나머지는 첫 달에 합산해 N달 합계 = 원금 */
+function splitShareAt(t, i) {
+  const N = splitMonths(t), base = ledgerBase(t);
+  if (N < 2) return base;
+  const per = Math.floor(base / N);
+  return per + (i === 1 ? base - per * N : 0);
+}
+/* 그 달 가게부에 잡히는 금액 (더치페이·기간 나누기 모두 반영) */
+function spendAmtIn(t, mk) {
+  if (!t) return 0;
+  if (!splitOn(t)) return ledgerBase(t);
+  const i = splitIdx(t, mk || uiMonth);
+  return i ? splitShareAt(t, i) : 0;
+}
+/* 지금 보고 있는 달 기준 */
+function spendAmt(t) { return spendAmtIn(t, uiMonth); }
 function pad2(n) { return String(n).padStart(2, "0"); }
 function isoDate(d) { return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()); }
 function todayISO() { return isoDate(new Date()); }
@@ -1626,6 +1719,14 @@ function normalizeTxn(t) {
     t.myShare = null;
     t.dutchN = null;
   }
+  /* 기간 나누기(안분): amount는 결제 전액 그대로, splitN·splitStart만 따로 저장 */
+  const sn = Math.round(num(t.splitN));
+  if (t.type === "income" || !(sn >= 2)) {
+    t.splitN = null; t.splitStart = null;
+  } else {
+    t.splitN = Math.min(SPLIT_MAX, sn);
+    t.splitStart = /^\d{4}-\d{2}$/.test(t.splitStart || "") ? t.splitStart : monthOf(t.date);
+  }
   return t;
 }
 
@@ -1707,7 +1808,13 @@ function touch() {
 
 /* ---------- derived ---------- */
 function isIncomeT(t) { return !!t && t.type === "income"; }
+/* 가계부 보기용 — 기간 나누기(안분)된 건은 나뉜 달에도 들어온다 */
 function monthTxns(mk) {
+  mk = mk || uiMonth;
+  return state.txns.filter(t => monthOf(t.date) === mk || splitIdx(t, mk) > 0);
+}
+/* 실제 결제가 일어난 달만 — 카드 실적·할부·혜택은 결제한 달 전액 기준 */
+function monthPaidTxns(mk) {
   mk = mk || uiMonth;
   return state.txns.filter(t => monthOf(t.date) === mk);
 }
@@ -1721,15 +1828,19 @@ function monthStats(mk) {
   const expList = list.filter(t => !isIncomeT(t));
   const fixList = expList.filter(t => t.fixed);
   const varList = expList.filter(t => !t.fixed);
-  const sum = arr => arr.reduce((s, t) => s + spendAmt(t), 0);
+  const sum = arr => arr.reduce((s, t) => s + spendAmtIn(t, mk), 0);
   const income = sum(incList), expense = sum(expList), fix = sum(fixList), vr = sum(varList);
   const dutchList = expList.filter(dutchOn);
+  const splitList = expList.filter(splitOn);
   return {
     list: list, income: income, expense: expense, fix: fix, variable: vr, net: income - expense,
     incList: incList, expList: expList, fixList: fixList, varList: varList, count: list.length,
     dutchList: dutchList,
     dutchFull: dutchList.reduce((s, t) => s + num(t.amount), 0),
-    dutchMine: dutchList.reduce((s, t) => s + spendAmt(t), 0)
+    dutchMine: dutchList.reduce((s, t) => s + spendAmtIn(t, mk), 0),
+    splitList: splitList,
+    splitFull: splitList.reduce((s, t) => s + num(t.amount), 0),
+    splitThis: splitList.reduce((s, t) => s + spendAmtIn(t, mk), 0)
   };
 }
 function cardById(id) {
@@ -1744,7 +1855,7 @@ function cardLabel(id) {
   return c ? (c.short || c.name) : "기타";
 }
 function cardStats(card, mk) {
-  const list = monthTxns(mk).filter(t => t.cardId === card.id && !isIncomeT(t));
+  const list = monthPaidTxns(mk).filter(t => t.cardId === card.id && !isIncomeT(t));
   let used = 0, perf = 0, inst = 0;
   list.forEach(t => {
     used += t.amount;
@@ -1756,7 +1867,7 @@ function cardStats(card, mk) {
 /* 카드 혜택 추정: 규칙(가맹점 키워드/카테고리/전체) + 월 한도 */
 function cardSaving(card, mk) {
   if (!card.rules || !card.rules.length) return 0;
-  const list = monthTxns(mk).filter(t => t.cardId === card.id && t.amount > 0 && !isIncomeT(t));
+  const list = monthPaidTxns(mk).filter(t => t.cardId === card.id && t.amount > 0 && !isIncomeT(t));
   let total = 0;
   card.rules.forEach((rule, i) => {
     let sub = 0;
@@ -1800,7 +1911,7 @@ function savedTotal(mk) {
 }
 /* 포인트 페이백·할인을 수입으로 기록한 금액 = 실질 절약액 (카드 실적과 무관) */
 function pointPayback(mk) {
-  return monthTxns(mk).filter(t => isIncomeT(t) && t.cat === "포인트·할인")
+  return monthPaidTxns(mk).filter(t => isIncomeT(t) && t.cat === "포인트·할인")
     .reduce((s, t) => s + num(t.amount), 0);
 }
 function pointTotal() {
@@ -2753,7 +2864,8 @@ function renderCardUse() {
     const s = cardStats(c, mk);
     if (!s.used) return;
     rows.push({ kind: "card", card: c, used: s.used, count: s.count, perf: s.perf, inst: s.inst,
-      dutch: monthTxns(mk).some(t => t.cardId === c.id && !isIncomeT(t) && dutchOn(t)) });
+      dutch: monthPaidTxns(mk).some(t => t.cardId === c.id && !isIncomeT(t) && dutchOn(t)),
+      split: monthPaidTxns(mk).some(t => t.cardId === c.id && !isIncomeT(t) && splitOn(t)) });
   });
   const others = [
     { id: PAY_CASH, label: "현금", emoji: "💵" },
@@ -2764,7 +2876,7 @@ function renderCardUse() {
   others.forEach(o => {
     const list = st.expList.filter(t => t.cardId === o.id);
     if (!list.length) return;
-    rows.push({ kind: "other", id: o.id, label: o.label, emoji: o.emoji, used: list.reduce((s, t) => s + spendAmt(t), 0), count: list.length, dutch: list.some(dutchOn) });
+    rows.push({ kind: "other", id: o.id, label: o.label, emoji: o.emoji, used: list.reduce((s, t) => s + spendAmtIn(t, mk), 0), count: list.length, dutch: list.some(dutchOn) });
   });
   rows.sort((a, b) => b.used - a.used);
   const sum = rows.reduce((s, r) => s + r.used, 0);
@@ -2791,7 +2903,7 @@ function renderCardUse() {
       : "실적 조건 없음";
     return '<div class="userow card">' +
       '<span class="clogo ' + esc(c.color || "cs") + '">' + esc(logoText(c)) + "</span>" +
-      '<div class="un"><b>' + esc(c.name) + "</b><small>" + esc(sub) + (r.inst ? " · 무이자할부 " + man(r.inst) + " 제외" : "") + (r.dutch ? " · 🤝 더치 전액 실적" : "") + "</small>" +
+      '<div class="un"><b>' + esc(c.name) + "</b><small>" + esc(sub) + (r.inst ? " · 무이자할부 " + man(r.inst) + " 제외" : "") + (r.dutch ? " · 🤝 더치 전액 실적" : "") + (r.split ? " · 📆 기간 나누기 전액 실적" : "") + "</small>" +
         (c.target > 0 ? '<div class="gbar mini"><i class="' + (pct >= 100 ? "" : pct >= 60 ? "" : "low") + '" style="width:' + pct + '%"></i></div>' : "") +
       "</div>" +
       '<div class="ua"><b>' + fmt(r.used) + "<i>원</i></b><small>" + r.count + "건</small></div>" +
@@ -2808,7 +2920,8 @@ function renderLedger() {
 
   const chip = $("#ledgerChip");
   if (chip) chip.textContent = st.count + "건 · 지출 " + st.expList.length + " / 수입 " + st.incList.length +
-    (st.dutchList.length ? " · 🤝 " + st.dutchList.length + "건" : "");
+    (st.dutchList.length ? " · 🤝 " + st.dutchList.length + "건" : "") +
+    (st.splitList.length ? " · 📆 " + st.splitList.length + "건" : "");
 
   $("#splitTotal").textContent = won(st.expense);
   $("#barFix").style.width = pctF + "%";
@@ -2838,18 +2951,37 @@ function renderLedger() {
       dn.innerHTML = "";
     }
   }
+  const sn = $("#splitNote");
+  if (sn) {
+    if (st.splitList.length) {
+      sn.classList.remove("hidden");
+      sn.innerHTML = "📆 기간 나누기 " + st.splitList.length + "건 — 결제한 달 실적은 <b>" + won(st.splitFull) + "</b> 전액, " + monthLabel(mk) + " 가계부 지출은 <b>" + won(st.splitThis) + "</b>만 잡혔어요";
+    } else {
+      sn.classList.add("hidden");
+      sn.innerHTML = "";
+    }
+  }
 
   const recent = sortTxDesc(st.list).slice(0, 10);
   $("#recentList").innerHTML = recent.length
     ? recent.map(t => {
       const inc = isIncomeT(t);
       const dt = dutchOn(t);
-      const shown = dt ? spendAmt(t) : t.amount;
-      const small = (dt ? '<span class="dchip">🤝 더치 (결제 ' + fmt(t.amount) + '원)</span> · ' + (inc ? "수입" : esc(t.cat)) : (inc ? "수입" : esc(t.cat))) +
+      const sp = splitOn(t);
+      const si = sp ? splitIdx(t, mk) : 0;
+      const sn = sp ? splitMonths(t) : 1;
+      const shown = spendAmtIn(t, mk);
+      const splitChip = si
+        ? '<span class="schip">📆 ' + si + "/" + sn + " (원금 " + fmt(t.amount) + '원 ÷ ' + sn + '개월)</span> · '
+        : "";
+      const small = splitChip + (dt ? '<span class="dchip">🤝 더치 (결제 ' + fmt(t.amount) + '원)</span> · ' + (inc ? "수입" : esc(t.cat)) : (inc ? "수입" : esc(t.cat))) +
         " · " + esc(cardLabel(t.cardId)) + (t.myShare != null && dt && t.dutchN ? " · " + t.dutchN + "명" : "") + (t.installment ? " · 할부" : "") + " · " + esc(t.date.slice(5).replace("-", "/"));
-      return '<li data-txn="' + esc(t.id) + '" title="' + (dt
-          ? "🤝 더치페이 · 결제 " + won(t.amount) + " · 내 몫 " + won(spendAmt(t)) + (t.dutchN ? " (" + t.dutchN + "명)" : "") + " — 누르면 고정↔변동"
-          : "누르면 고정↔변동") + '">' +
+      const tip = dt && sp
+          ? "🤝 더치페이 " + t.dutchN + "명 · 📆 " + sn + "개월 나눠 담기 · 결제 " + won(t.amount) + " · 이번 달 " + won(shown) + " — 누르면 고정↔변동"
+          : dt ? "🤝 더치페이 · 결제 " + won(t.amount) + " · 내 몫 " + won(shown) + (t.dutchN ? " (" + t.dutchN + "명)" : "") + " — 누르면 고정↔변동"
+          : sp ? "📆 " + sn + "개월 나눠 담기 · 결제 " + won(t.amount) + "(실적 전액) · 이번 달 " + si + "/" + sn + " = " + won(shown) + " — 누르면 고정↔변동"
+          : "누르면 고정↔변동";
+      return '<li data-txn="' + esc(t.id) + '" title="' + tip + '">' +
         '<span class="e">' + (inc ? "💰" : catEmoji(t.cat)) + "</span>" +
         '<span class="n"><b>' + esc(t.memo || t.cat) + "</b><small>" + small + "</small></span>" +
         '<span class="a' + (inc ? " inc" : shown ? "" : " zero") + (dt ? " dt" : "") + '"' + (dt ? ' title="가계부에는 내 몫만 · 카드 실적은 결제 전액"' : "") + '>' + (inc ? "+" : "") + fmt(shown) + "<i>원</i>" + (t.fixed ? '<span class="fx">🔒</span>' : "") + "</span>" +
@@ -2863,8 +2995,7 @@ function renderLedger() {
 function groupRows(list, total) {
   if (!list.length) return '<li style="border:0;justify-content:center;color:#B7AC9C;font-size:9.5px;font-weight:600">아직 없어요</li>';
   const map = {};
-  list.forEach(t => { map[t.cat] = (map[t.cat] || 0) + spendAmt(t); });
-  return Object.keys(map).sort((a, b) => map[b] - map[a]).slice(0, 6).map(cat =>
+  list.forEach(t => { map[t.cat] = (map[t.cat] || 0) + spendAmt(t); });  return Object.keys(map).sort((a, b) => map[b] - map[a]).slice(0, 6).map(cat =>
     "<li><span>" + catEmoji(cat) + " " + esc(cat) + " <i>" + (total ? Math.round(map[cat] / total * 100) : 0) + "%</i></span><b>" + fmt(map[cat]) + "</b></li>"
   ).join("");
 }
@@ -3607,7 +3738,8 @@ function renderAllTx() {
       '<td><button class="chip ' + (t.fixed ? "plum" : "sage") + '" data-f="fixed">' + (t.fixed ? "🔒 고정" : "🔁 변동") + "</button></td>" +
       '<td><select data-f="cardId">' + cardOpts + "</select></td>" +
       '<td class="num"><input class="w90" data-f="amount" inputmode="numeric" value="' + fmt(t.amount) + '">' +
-        (dutchOn(t) ? '<div class="dmin">🤝 내 몫 ' + fmt(spendAmt(t)) + (t.dutchN ? " · " + t.dutchN + "명" : "") + "</div>" : "") + "</td>" +
+        (dutchOn(t) ? '<div class="dmin">🤝 내 몫 ' + fmt(spendAmtIn(t, uiMonth)) + (t.dutchN ? " · " + t.dutchN + "명" : "") + "</div>" : "") +
+        (splitOn(t) ? '<div class="smin">📆 ' + splitIdx(t, uiMonth) + "/" + splitMonths(t) + " · 이번 달 " + fmt(spendAmtIn(t, uiMonth)) + "</div>" : "") + "</td>" +
       '<td style="text-align:center"><input type="checkbox" data-f="installment" style="width:16px;height:16px;accent-color:#5C7F68;padding:0;border:0"' + (t.installment ? " checked" : "") + "></td>" +
       '<td class="acts"><button class="mini del" data-del="' + esc(t.id) + '" aria-label="삭제">✕</button></td></tr>';
   }).join("");
@@ -3624,7 +3756,7 @@ function updateTxn(id, field, value) {
     }
   } else if (field === "type") {
     t.type = isIncomeT(t) ? "expense" : "income";
-    if (t.type === "income") { t.fixed = false; t.installment = false; t.isDutch = false; t.myShare = null; t.dutchN = null; }
+    if (t.type === "income") { t.fixed = false; t.installment = false; t.isDutch = false; t.myShare = null; t.dutchN = null; t.splitN = null; t.splitStart = null; }
     else if (!state.catRules[normKey(t.memo)]) t.fixed = catFixedDefault(t.cat);
   }
   else if (field === "fixed") {
@@ -3647,10 +3779,40 @@ let editingTxnId = "";
 let txnType = "expense";
 let txnDutchN = null;   /* 더치페이 인원 수 (직접 입력하면 null) */
 let dutchBackup = null; /* 수입으로 잠시 바꿀 때 더치 설정을 기억했다 복구 */
+let txnSplitN = 1;      /* 기간 나누기 개월 수 (1 = 나누지 않음) */
+let txnSplitStart = "";  /* 안분 첫 달 (결제한 달) */
+const DUTCH_MIN = 2, DUTCH_MAX = 99;   /* 더치페이 인원 범위 */
 
 function dutchFieldVisible() {
   const wrap = $("#tDutchWrap");
   if (wrap) wrap.classList.toggle("hidden", txnType === "income");
+}
+/* 인원 수 2~99로 정리 (직접 입력·−/+ 공통) */
+function dutchClampN(v) {
+  const n = Math.round(num(v));
+  if (!isFinite(n) || n < DUTCH_MIN) return DUTCH_MIN;
+  return Math.min(DUTCH_MAX, n);
+}
+/* 원금 ÷ 인원 (원 단위 반올림) — 55,000 ÷ 6 = 9,167 */
+function dutchShareOf(n) {
+  const amt = $("#tAmount");
+  return Math.round(Math.abs(num(amt ? amt.value : 0)) / n);
+}
+/* 인원 칸에 현재 인원 수 반영 (타자 중에는 부르지 않는다) */
+function dutchSyncStep() {
+  const el = $("#tDutchN");
+  if (el) el.value = txnDutchN ? String(txnDutchN) : "";
+}
+/* 인원 정하기 — 빠른 버튼·−/+·숫자 입력이 모두 여기로 */
+function dutchApplyN(n) {
+  const clamped = dutchClampN(n);
+  txnDutchN = clamped;
+  const cb = $("#tDutch");
+  if (cb) cb.checked = true;
+  const ms = $("#tMyShare");
+  if (ms) ms.value = fmt(dutchShareOf(clamped));
+  dutchSyncStep();
+  renderDutchBox();
 }
 /* 더치 미리보기: 실적은 전액, 지출은 내 몫 */
 function renderDutchBox() {
@@ -3661,6 +3823,14 @@ function renderDutchBox() {
   box.classList.toggle("hidden", !on);
   $$("#tDutchBtns button").forEach(b =>
     b.classList.toggle("on", on && !!txnDutchN && Number(b.getAttribute("data-n")) === txnDutchN));
+  /* − / 인원 / + 컨트롤 상태 */
+  const step = $("#tDutchStep");
+  if (step) step.classList.toggle("on", on && !!txnDutchN);
+  const minusBtn = $("#tDutchMinus"), plusBtn = $("#tDutchPlus"), nIn = $("#tDutchN");
+  const cur = txnDutchN || DUTCH_MIN;
+  if (minusBtn) minusBtn.disabled = !on || !txnDutchN || cur <= DUTCH_MIN;
+  if (plusBtn) plusBtn.disabled = !on || cur >= DUTCH_MAX;
+  if (nIn) nIn.disabled = !on;
   const pv = $("#tDutchPreview");
   if (!pv) return;
   if (!on) { pv.textContent = ""; return; }
@@ -3676,25 +3846,49 @@ function bindDutch() {
   const cb = $("#tDutch");
   const ms = $("#tMyShare");
   const amt = $("#tAmount");
+  const nIn = $("#tDutchN");
   if (cb) cb.addEventListener("change", () => {
     if (cb.checked && ms && !ms.value) {
       txnDutchN = null;
       ms.value = fmt(Math.abs(num(amt.value)));
+      dutchSyncStep();
     }
     renderDutchBox();
   });
   $$("#tDutchBtns button").forEach(b => b.addEventListener("click", () => {
     const n = Number(b.getAttribute("data-n"));
     if (!(n >= 2)) return;
-    txnDutchN = n;
-    if (cb) cb.checked = true;
-    if (ms) ms.value = fmt(Math.round(Math.abs(num(amt.value)) / n));
-    renderDutchBox();
+    dutchApplyN(n);
   }));
+  /* − / + : 1명씩 (2~99명 안에서) */
+  const minusBtn = $("#tDutchMinus"), plusBtn = $("#tDutchPlus");
+  if (minusBtn) minusBtn.addEventListener("click", () => dutchApplyN((txnDutchN || DUTCH_MIN + 1) - 1));
+  if (plusBtn) plusBtn.addEventListener("click", () => dutchApplyN((txnDutchN || DUTCH_MIN - 1) + 1));
+  /* 숫자 직접 입력: 6명·7명 등 바로 적으면 내 몫 자동 */
+  if (nIn) {
+    nIn.addEventListener("input", () => {
+      const raw = nIn.value.replace(/[^\d]/g, "").slice(0, 2);
+      if (nIn.value !== raw) nIn.value = raw;
+      const n = Number(raw);
+      if (raw && n >= DUTCH_MIN) {
+        txnDutchN = Math.min(DUTCH_MAX, n);
+        if (cb) cb.checked = true;
+        if (ms) ms.value = fmt(dutchShareOf(txnDutchN));
+      } else {
+        txnDutchN = null;   /* 비었거나 2명 미만 */
+      }
+      renderDutchBox();
+    });
+    nIn.addEventListener("blur", () => {
+      if (nIn.value === "") { txnDutchN = null; renderDutchBox(); return; }
+      dutchApplyN(nIn.value);   /* 1 이하로 적었으면 2명으로 */
+    });
+  }
   if (ms) ms.addEventListener("input", () => {
     const raw = ms.value.replace(/[^\d]/g, "").slice(0, 9);
     ms.value = raw ? fmt(raw) : "";
     txnDutchN = null;   /* 직접 고치면 1/N 선택은 풀린다 */
+    dutchSyncStep();
     renderDutchBox();
   });
   if (amt) amt.addEventListener("input", () => {
@@ -3705,6 +3899,90 @@ function bindDutch() {
   });
   const card = $("#tCard");
   if (card) card.addEventListener("change", renderDutchBox);
+}
+
+/* ------------------------------------------------------------------
+   기간 나누기(안분): 결제한 달은 카드 실적 전액, 가계부 지출만 N개월로
+   예) 유치원비 900,000원 · 3개월 → 11·12·1월에 300,000원씩
+   ------------------------------------------------------------------ */
+function splitClampN(v) {
+  const n = Math.round(num(v));
+  if (!isFinite(n) || n <= 1) return 1;
+  return Math.min(SPLIT_MAX, n);
+}
+function splitSyncStep() {
+  const el = $("#tSplitN");
+  if (el) el.value = String(txnSplitN || 1);
+}
+/* 이번 달에 나눠 담길 지출 기준액 (더치페이가 켜져 있으면 내 몫 기준) */
+function splitBaseUI() {
+  const amt = Math.abs(num($("#tAmount").value));
+  const cb = $("#tDutch");
+  const msEl = $("#tMyShare");
+  const ms = Math.abs(num(msEl ? msEl.value : 0));
+  if (cb && cb.checked && txnType !== "income" && ms > 0) return Math.min(ms, amt);
+  return amt;
+}
+function renderSplitBox() {
+  const wrap = $("#tSplitWrap");
+  if (wrap) wrap.classList.toggle("hidden", txnType === "income");
+  const pv = $("#tSplitPreview");
+  if (!pv || txnType === "income") return;
+  const n = splitClampN(txnSplitN);
+  $$("#tSplitBtns button").forEach(b =>
+    b.classList.toggle("on", Number(b.getAttribute("data-n")) === n));
+  const minusBtn = $("#tSplitMinus"), plusBtn = $("#tSplitPlus"), step = $("#tSplitStep");
+  if (minusBtn) minusBtn.disabled = n <= 1;
+  if (plusBtn) plusBtn.disabled = n >= SPLIT_MAX;
+  if (step) step.classList.toggle("on", n >= 2);
+  if (n < 2) { pv.innerHTML = "1개월 — 결제한 달에 한 번에 담아요"; return; }
+  const base = splitBaseUI();
+  const per = Math.floor(base / n), rest = base - per * n;
+  const start = txnSplitStart || monthOf($("#tDate").value || todayISO());
+  const parts = [];
+  for (let i = 0; i < n; i++) {
+    parts.push(monthLabel(shiftMonth(start, i)) + " " + fmt(per + (i === 0 ? rest : 0)));
+    if (n > 12 && i === 2) { parts.push("…"); break; }
+  }
+  if (n > 12) parts.push(monthLabel(shiftMonth(start, n - 1)) + " " + fmt(per));
+  const byCard = !!cardById($("#tCard").value);
+  const fullAmt = Math.abs(num($("#tAmount").value));
+  const cardLine = byCard
+    ? " · 카드 실적은 " + monthLabel(start) + "에 <b>" + won(fullAmt) + "</b> 전액"
+    : " · 실적엔 안 잡힘(결제 " + won(fullAmt) + ")";
+  pv.innerHTML = "📆 " + parts.join(" · ") + " (합계 <b>" + won(base) + "</b>)" + cardLine;
+}
+function splitApplyN(v) {
+  txnSplitN = splitClampN(v);
+  if (txnSplitN >= 2) {
+    if (!txnSplitStart) txnSplitStart = monthOf($("#tDate").value || todayISO());
+  } else txnSplitStart = "";
+  splitSyncStep();
+  renderSplitBox();
+}
+function bindSplit() {
+  $$("#tSplitBtns button").forEach(b => b.addEventListener("click", () => splitApplyN(Number(b.getAttribute("data-n")))));
+  const minusBtn = $("#tSplitMinus"), plusBtn = $("#tSplitPlus"), nIn = $("#tSplitN");
+  if (minusBtn) minusBtn.addEventListener("click", () => splitApplyN((txnSplitN || 2) - 1));
+  if (plusBtn) plusBtn.addEventListener("click", () => splitApplyN((txnSplitN || 1) + 1));
+  if (nIn) {
+    nIn.addEventListener("input", () => {
+      const raw = nIn.value.replace(/[^\d]/g, "").slice(0, 2);
+      if (nIn.value !== raw) nIn.value = raw;
+      const n = Number(raw);
+      txnSplitN = raw && n >= 2 ? Math.min(SPLIT_MAX, n) : 1;
+      if (txnSplitN >= 2 && !txnSplitStart) txnSplitStart = monthOf($("#tDate").value || todayISO());
+      if (txnSplitN < 2) txnSplitStart = "";
+      renderSplitBox();
+    });
+    nIn.addEventListener("blur", () => splitApplyN(txnSplitN));
+  }
+  const amt = $("#tAmount"), ms = $("#tMyShare"), card = $("#tCard"), date = $("#tDate"), cb = $("#tDutch");
+  if (amt) amt.addEventListener("input", renderSplitBox);
+  if (ms) ms.addEventListener("input", renderSplitBox);
+  if (card) card.addEventListener("change", renderSplitBox);
+  if (date) { date.addEventListener("change", renderSplitBox); date.addEventListener("input", renderSplitBox); }
+  if (cb) cb.addEventListener("change", renderSplitBox);
 }
 
 function openTxn(id) {
@@ -3726,9 +4004,16 @@ function openTxn(id) {
   txnDutchN = dt ? (t.dutchN || null) : null;
   dutchBackup = null;
   if ($("#tDutch")) $("#tDutch").checked = dt;
-  if ($("#tMyShare")) $("#tMyShare").value = dt ? fmt(spendAmt(t)) : "";
+  /* 내 몫은 "결제에서 내가 낼 몫" 전체 — 기간 나누기 전 금액으로 보여 준다 */
+  if ($("#tMyShare")) $("#tMyShare").value = dt ? fmt(ledgerBase(t)) : "";
+  dutchSyncStep();
+  /* 기간 나누기 */
+  txnSplitN = splitOn(t) ? splitMonths(t) : 1;
+  txnSplitStart = splitOn(t) ? splitStartOf(t) : "";
+  splitSyncStep();
   dutchFieldVisible();
   renderDutchBox();
+  renderSplitBox();
   const same = state.txns.filter(x => x.id !== t.id && merchantMatch(x.memo, t.memo)).length;
   const bulk = $("#tBulk");
   if (bulk) bulk.innerHTML = "🔁 같은 내역 모두 바꾸기" + (same ? " <b>(" + same + "건 더)</b>" : "");
@@ -3760,6 +4045,13 @@ function saveTxn(opts) {
     t.dutchN = txnDutchN || null;
   } else {
     t.isDutch = false; t.myShare = null; t.dutchN = null;
+  }
+  /* 기간 나누기: 결제 금액(amount)은 그대로, 지출만 N개월에 나눠 담기 */
+  if (txnType === "income" || txnSplitN < 2) {
+    t.splitN = null; t.splitStart = null;
+  } else {
+    t.splitN = txnSplitN;
+    t.splitStart = txnSplitStart || monthOf(t.date);
   }
 
   const bulk = !!(opts && opts.bulk);
@@ -4104,6 +4396,7 @@ function bindModals() {
   $("#useOk").addEventListener("click", confirmUseGift);
   $("#tSave").addEventListener("click", () => saveTxn());
   bindDutch();
+  bindSplit();
   $("#tBulk").addEventListener("click", () => saveTxn({ bulk: true }));
   $("#tDelete").addEventListener("click", () => { if (editingTxnId) { deleteTxn(editingTxnId); closeModal("mTxn"); toast("지웠어요"); } });
   $("#tType").addEventListener("click", ev => {
@@ -4120,8 +4413,9 @@ function bindModals() {
       if ($("#tMyShare")) $("#tMyShare").value = dutchBackup.share || "";
       txnDutchN = dutchBackup.n || null;
       dutchBackup = null;
+      dutchSyncStep();
     }
-    dutchFieldVisible(); renderDutchBox();
+    dutchFieldVisible(); renderDutchBox(); renderSplitBox();
   });
   $("#tFixed").addEventListener("click", () => {
     const t = state.txns.find(x => x.id === editingTxnId);
@@ -4135,9 +4429,10 @@ function bindModals() {
 
 function exportCsv() {
   const list = sortTxDesc(monthTxns(uiMonth));
-  const head = "구분,날짜,내용,분류,고정/변동,결제수단,금액,더치,내몫,할부\n";
+  const head = "구분,날짜,내용,분류,고정/변동,결제수단,금액,더치,내몫,기간나누기,이번달반영,할부\n";
   const body = list.map(t => [isIncomeT(t) ? "수입" : "지출", t.date, t.memo, t.cat, t.fixed ? "고정" : "변동", cardLabel(t.cardId),
-      t.amount, dutchOn(t) ? "더치" : "", dutchOn(t) ? spendAmt(t) : "", t.installment ? "무이자" : ""]
+      t.amount, dutchOn(t) ? "더치" : "", dutchOn(t) ? spendAmtIn(t, uiMonth) : "",
+      splitOn(t) ? (splitIdx(t, uiMonth) + "/" + splitMonths(t) + "개월") : "", fmt(spendAmtIn(t, uiMonth)), t.installment ? "무이자" : ""]
     .map(v => '"' + String(v).replace(/"/g, '""') + '"').join(",")).join("\n");
   downloadBlob("wallet-" + uiMonth + ".csv", "\ufeff" + head + body, "text/csv;charset=utf-8");
   toast("CSV로 내보냈어요");
