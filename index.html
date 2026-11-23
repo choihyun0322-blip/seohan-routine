@@ -17437,6 +17437,7 @@ function iconSVG(key) {
     v.setAttribute('tabindex', '-1');
     v.muted = true;
     v.defaultMuted = true;
+    v.playsInline = true;
     v.loop = true;
     v.autoplay = true;
     v.preload = 'auto';
@@ -17598,6 +17599,9 @@ function iconSVG(key) {
       } else {
         keepAlivePlaying = !v.paused;
       }
+      /* 보조 안전장치: 아주 작은(무음) 오디오 세션도 함께 살려 둬요.
+         영상 재생만으로 잠금이 막히지 않는 iPadOS 버전을 대비한 이중 안전장치. */
+      startAudioKeepAlive();
       return true;
     } catch (e) {
       return startAudioKeepAlive();
