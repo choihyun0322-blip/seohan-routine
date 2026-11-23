@@ -1519,15 +1519,16 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
    루틴 타일 레이아웃 — 상단은 슬림, 루틴은 큼직한 카드 그리드
    ============================================================ */
 
-/* ---- 루틴 카드 = 큼직한 타일 ---- */
-.card-morning, .card-evening{display:flex; flex-direction:column; min-height:0}
-.card-morning .check-list, .card-evening .check-list{
+/* ---- 루틴·숙제 카드 = 큼직한 타일 ---- */
+.card-morning, .card-evening, .card-homework{display:flex; flex-direction:column; min-height:0}
+.card-morning .check-list, .card-evening .check-list, .card-homework .check-list{
   display:grid; gap:.6rem; flex:1 1 auto; min-height:0; align-content:stretch;
 }
 .card-morning .check-list{grid-template-columns:repeat(3,minmax(0,1fr)); grid-auto-rows:minmax(0,1fr)}
 .card-evening .check-list{grid-template-columns:repeat(4,minmax(0,1fr)); grid-auto-rows:minmax(0,1fr)}
+.card-homework .check-list{grid-template-columns:repeat(5,minmax(0,1fr)); grid-auto-rows:minmax(0,1fr)}
 
-.card-morning .check-row, .card-evening .check-row{
+.card-morning .check-row, .card-evening .check-row, .card-homework .check-row{
   display:grid; align-items:center; justify-items:center; gap:.25rem;
   grid-template-columns:2.1rem minmax(0,1fr) 2.1rem;
   grid-template-rows:minmax(0,1fr) auto;
@@ -1536,38 +1537,39 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
   padding:.45rem .45rem .4rem; border-radius:22px; text-align:center;
   background:#fbfaff; border:2px solid #f1eefc;
 }
-.card-morning .check-row .pic, .card-evening .check-row .pic{
+.card-morning .check-row .pic, .card-evening .check-row .pic, .card-homework .check-row .pic{
   grid-area:pic; width:100%; height:100%; border-radius:17px;
   background:#f4f2ff;
 }
-.card-morning .check-row .pic svg, .card-evening .check-row .pic svg{width:70%; height:70%}
-.card-morning .check-row .label, .card-evening .check-row .label{
+.card-morning .check-row .pic svg, .card-evening .check-row .pic svg, .card-homework .check-row .pic svg{width:70%; height:70%}
+.card-morning .check-row .label, .card-evening .check-row .label, .card-homework .check-row .label{
   grid-area:label; font-size:clamp(.72rem,1.02vw,.94rem); font-weight:900; line-height:1.2;
   text-align:center; color:var(--ink); padding:.1rem 0 .05rem; min-width:0; overflow-wrap:anywhere;
 }
-.card-morning .check-row .talk-btn, .card-evening .check-row .talk-btn{
+.card-morning .check-row .talk-btn, .card-evening .check-row .talk-btn, .card-homework .check-row .talk-btn{
   grid-area:talk; align-self:end; justify-self:end; width:1.85rem; height:1.85rem; font-size:.85rem;
 }
-.card-morning .check-row .mark, .card-evening .check-row .mark{
+.card-morning .check-row .mark, .card-evening .check-row .mark, .card-homework .check-row .mark{
   position:absolute; top:.4rem; right:.4rem; width:2rem; height:2rem; background:rgba(255,255,255,.92);
 }
-.card-morning .check-row .mark .nb, .card-evening .check-row .mark .nb{width:1.5rem; height:1.5rem}
-.card-morning .check-row .mark .ok, .card-evening .check-row .mark .ok{width:1rem; height:1rem}
-.card-morning .check-row .now-tag, .card-evening .check-row .now-tag{
+.card-morning .check-row .mark .nb, .card-evening .check-row .mark .nb, .card-homework .check-row .mark .nb{width:1.5rem; height:1.5rem}
+.card-morning .check-row .mark .ok, .card-evening .check-row .mark .ok, .card-homework .check-row .mark .ok{width:1rem; height:1rem}
+.card-morning .check-row .now-tag, .card-evening .check-row .now-tag, .card-homework .check-row .now-tag{
   top:.45rem; left:.45rem; right:auto;
 }
-.card-morning .check-row.done, .card-evening .check-row.done{background:#eafaf0}
-.card-morning .check-row.now, .card-evening .check-row.now{background:#fffbeb}
+.card-morning .check-row.done, .card-evening .check-row.done, .card-homework .check-row.done{background:#eafaf0}
+.card-morning .check-row.now, .card-evening .check-row.now, .card-homework .check-row.now{background:#fffbeb}
 
-/* 루틴 카드 머리말은 한 줄로 슬림하게 */
-.card-morning .card-head, .card-evening .card-head{margin-bottom:.35rem}
-.card-morning .mini-progress, .card-evening .mini-progress{margin-bottom:.45rem}
-.card-morning .done-note, .card-evening .done-note{margin-top:.35rem}
+/* 루틴·숙제 카드 머리말은 한 줄로 슬림하게 */
+.card-morning .card-head, .card-evening .card-head, .card-homework .card-head{margin-bottom:.35rem}
+.card-morning .mini-progress, .card-evening .mini-progress, .card-homework .mini-progress{margin-bottom:.45rem}
+.card-morning .done-note, .card-evening .done-note, .card-homework .done-note{margin-top:.35rem}
 
-/* 방과 후 숙제는 세로 목록 그대로, 조금 크게 */
-.card-homework{display:flex; flex-direction:column; min-height:0}
-.card-homework .check-list{flex:1 1 auto; min-height:0; overflow:auto; gap:.3rem}
-.card-homework .check-row{min-height:2.9rem}
+/* 📚 방과 후 숙제 섹션 (v5.6.3): 루틴과 같은 큰 타일 + 큼직한 제목 */
+.card-homework .card-head h2{font-size:1.06rem}
+.card-homework .check-row .label{font-size:clamp(.82rem,1.16vw,1.06rem)}
+.card-homework .count-pill{font-size:.9rem; padding:.26rem .72rem; background:#ffe9d6; color:#b4530a}
+.card-homework .mini-progress{height:.5rem}
 
 /* ---- 가로 태블릿: 상단 슬림 + 메인 타일 ---- */
 @media (min-width:900px) and (orientation:landscape){
@@ -1593,11 +1595,12 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
 
   .panel-evening .board{
     display:grid;
-    grid-template-columns:minmax(0,1.14fr) minmax(0,.88fr) minmax(0,.92fr) minmax(0,1.16fr);
-    grid-template-rows:clamp(8.2rem,19.5vh,9.6rem) minmax(0,1fr);
+    grid-template-columns:minmax(0,1.18fr) minmax(0,1fr) minmax(0,1fr);
+    grid-template-rows:clamp(8.2rem,19.5vh,9.6rem) minmax(0,1fr) minmax(7.4rem,26vh);
     grid-template-areas:
-      "evehero tomorrow stamps homework"
-      "eveevening eveevening eveevening eveevening";
+      "evehero tomorrow stamps"
+      "eveevening eveevening eveevening"
+      "homework homework homework";
     align-items:stretch; height:100%;
   }
   .panel-evening .card-evening-hero{grid-area:evehero}
@@ -1701,27 +1704,28 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
   .panel-evening .card-week .stamp-empty{font-size:.6rem}
   .panel-evening .card-week .week-head, .panel-evening .card-week .week-strip{display:none}
 
-  .panel-evening .card-homework{padding:.5rem .55rem .55rem}
-  .panel-evening .card-homework .card-head{margin-bottom:.25rem}
-  .panel-evening .card-homework .mini-progress{display:none}
-  .panel-evening .card-homework .check-list{
-    display:grid; grid-template-columns:1fr 1fr; gap:.22rem; overflow:auto;
-  }
-  .panel-evening .card-homework .check-row{
-    min-height:2.05rem; padding:.12rem .28rem .12rem .22rem; border-radius:12px; gap:.3rem;
-    grid-template-columns:1.35rem minmax(0,1fr) auto 1.3rem;
-  }
-  .panel-evening .card-homework .check-row .pic{width:1.35rem; height:1.35rem; border-radius:.45rem; grid-area:auto}
-  .panel-evening .card-homework .check-row .pic svg{width:100%; height:100%}
-  .panel-evening .card-homework .check-row .label{font-size:.62rem; line-height:1.15; text-align:left; grid-area:auto}
-  .panel-evening .card-homework .check-row .mark{position:static; width:1.35rem; height:1.35rem; grid-area:auto}
-  .panel-evening .card-homework .check-row .mark .nb{width:1.02rem; height:1.02rem}
-  .panel-evening .card-homework .check-row .talk-btn{position:static; width:1.25rem; height:1.25rem; font-size:.66rem; grid-area:auto; border-radius:8px; align-self:center; justify-self:center}
+  /* 📚 숙제 섹션: 상단 3칸 아래 큰 타일 한 줄 (v5.6.3) */
+  .panel-evening .card-homework{padding:.6rem .8rem .7rem}
+  .panel-evening .card-homework .card-head{margin-bottom:.3rem}
+  .panel-evening .card-homework .card-head h2{font-size:1.12rem}
+  .panel-evening .card-homework .mini-progress{height:.5rem; margin-bottom:.55rem}
   .panel-evening .card-homework .done-note{display:none}
 
   .card-morning .check-list{gap:.5rem}
   .card-evening .check-list{gap:.5rem}
   .card-morning .check-row .pic svg, .card-evening .check-row .pic svg{width:68%; height:68%}
+}
+
+/* 낮은 가로 화면(768 높이 아이패드 등): 상단·숙제 줄을 조금 줄여 루틴 타일 크기를 지켜요 */
+@media (min-width:900px) and (orientation:landscape) and (max-height:880px){
+  .panel-evening .board{
+    grid-template-rows:clamp(6.4rem,15.5vh,9rem) minmax(0,1fr) minmax(6.6rem,22.5vh);
+  }
+  .panel-evening .card-homework{padding:.42rem .7rem .46rem}
+  .panel-evening .card-homework .card-head{margin-bottom:.18rem}
+  .panel-evening .card-homework .mini-progress{height:.4rem; margin-bottom:.3rem}
+  .panel-evening .card-homework .check-list{gap:.45rem}
+  .panel-evening .card-homework .check-row{padding:.35rem .35rem .3rem}
 }
 
 /* 태블릿 세로: 타일 2열 */
@@ -1731,11 +1735,18 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
   .card-morning .check-row .label, .card-evening .check-row .label{font-size:.95rem}
   .card-morning .check-row .pic svg, .card-evening .check-row .pic svg{width:64%; height:64%}
   .card-morning .check-row .talk-btn, .card-evening .check-row .talk-btn{width:2.1rem; height:2.1rem; font-size:.95rem}
+  .card-homework .check-list{grid-template-columns:repeat(2,minmax(0,1fr)); grid-auto-rows:minmax(8rem,auto)}
+  .card-homework .check-row .label{font-size:.92rem}
+  .card-homework .check-row .pic svg{width:64%; height:64%}
+  .card-homework .check-row .talk-btn{width:2.1rem; height:2.1rem; font-size:.95rem}
 }
 @media (max-width:520px){
   .card-morning .check-list, .card-evening .check-list{grid-auto-rows:minmax(7rem,auto); gap:.45rem}
   .card-morning .check-row .label, .card-evening .check-row .label{font-size:.8rem}
   .card-morning .check-row, .card-evening .check-row{padding:.35rem .3rem .3rem; border-radius:17px}
+  .card-homework .check-list{grid-auto-rows:minmax(6.6rem,auto); gap:.45rem}
+  .card-homework .check-row{padding:.35rem .3rem .3rem; border-radius:17px}
+  .card-homework .check-row .label{font-size:.8rem}
 }
 
 /* 좁은 휴대폰: 탭 라벨이 잘리지 않게 */
@@ -1801,7 +1812,7 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
   .wk-list-card .check-list.big{flex:0 1 auto; min-height:0; overflow:auto}
   .wk-side{grid-area:wkside; overflow:auto; min-height:0}
   .check-list.big .check-row{min-height:3.6rem}
-  .panel-morning .card-morning, .panel-evening .card-homework{overflow:auto}
+  .panel-morning .card-morning{overflow:auto}
   /* 📖 Study 탭: 숙제를 위에 두고 바로 아래에 Sight Words 3열을 이어 붙여요 */
   #panelWs{flex:0 0 auto; min-height:auto}
   #panelWs .wk-board{flex:0 0 auto; grid-template-rows:auto auto; align-items:start}
@@ -1884,7 +1895,7 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
       <button class="refresh-btn" id="btnRefreshApp" type="button" aria-label="최신 버전으로 새로고침" title="최신 버전으로 새로고침">
         <span class="refresh-ico" aria-hidden="true">🔄</span>
       </button>
-      <span class="app-ver" id="appVer" title="앱 버전">v5.6.2</span>
+      <span class="app-ver" id="appVer" title="앱 버전">v5.6.3</span>
       <button class="wake-btn" id="btnWakeQuick" type="button" aria-pressed="false" aria-label="화면 켜짐 유지" title="화면 켜짐 유지">
         <span class="wake-ico" id="wakeQuickIcon" aria-hidden="true">🌙</span><span class="wake-txt" id="wakeQuickText">꺼짐</span>
       </button>
@@ -2159,17 +2170,6 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
 
         <div class="col col-c">
 
-          <!-- 방과 후 숙제 -->
-          <section class="card card-homework" aria-labelledby="homeworkTitle">
-            <div class="card-head">
-              <h2 id="homeworkTitle" data-i18n="homeworkTitle">방과 후 숙제</h2>
-              <span class="count-pill" id="homeworkCount">0 / 5</span>
-            </div>
-            <div class="mini-progress" aria-hidden="true"><span id="homeworkBar"></span></div>
-            <div class="check-list compact" id="homeworkList"></div>
-            <p class="done-note" id="homeworkNote">유치원 다녀와서 하나씩 해봐요!</p>
-          </section>
-
           <!-- 내일 챙길 것 -->
           <section class="card card-tomorrow" aria-labelledby="tomorrowTitle">
             <div class="card-head">
@@ -2182,6 +2182,17 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
           </section>
 
         </div>
+
+        <!-- 방과 후 숙제: 루틴 타일과 같은 큼직한 카드 섹션 (v5.6.3) -->
+        <section class="card card-homework" aria-labelledby="homeworkTitle">
+          <div class="card-head">
+            <h2 id="homeworkTitle" data-i18n="homeworkTitle">📚 방과 후 숙제</h2>
+            <span class="count-pill" id="homeworkCount">0 / 5</span>
+          </div>
+          <div class="mini-progress" aria-hidden="true"><span id="homeworkBar"></span></div>
+          <div class="check-list" id="homeworkList"></div>
+          <p class="done-note" id="homeworkNote">유치원 다녀와서 하나씩 해봐요!</p>
+        </section>
 
       </div>
     </div>
@@ -14077,7 +14088,7 @@ function iconSVG(key) {
   ============================================================ */
   var STORAGE_KEY = 'seohan-numberblocks-routine-v1';
   var STORAGE_VERSION = 6;            /* v6: 🏖️ 주말·공휴일 모드 · 물통·수저통 · 내일 준비물 삭제 */
-  var APP_VERSION = '5.6.2';          /* v5.6.2: 11월 Sight Words put·goes·year·into·yellow 교재 QR 링크 연동 · 저장 목록 qr 비어 있어도 기본 qr 따라가기 */
+  var APP_VERSION = '5.6.3';          /* v5.6.3: 방과 후 숙제를 상단 좁은 칸에서 빼내 루틴과 같은 큰 타일 섹션으로 (상단은 요약·내일 챙길 것·도장 3칸) */
   var APP_BUILT = '2026-11-22';
   var CELEBRATE_UNDO_MS = 10000;      /* 전체 완료 후 10초 안에 취소하면 축하·도감 해금을 되돌려요 */
   var UNDO_TTL = 90 * 1000;           /* 방금 취소한 체크는 90초 동안 원격 상태보다 우선해요 */
@@ -14226,7 +14237,7 @@ function iconSVG(key) {
       dateSentence: '어제는 {y}, 오늘은 {t}, 내일은 {m}이에요.',
       morningTitle: '아침 준비 루틴',
       eveningTitle: '🌙 방과 후 저녁 루틴',
-      homeworkTitle: '방과 후 숙제',
+      homeworkTitle: '📚 방과 후 숙제',
       suppliesTitle: '오늘 챙길 것',
       tomorrowTitle: '내일 챙길 것',
       stampsTitle: '오늘 모은 도장',
@@ -14573,7 +14584,7 @@ function iconSVG(key) {
       dateSentence: 'Yesterday was {y}, today is {t}, tomorrow is {m}.',
       morningTitle: 'Morning Routine',
       eveningTitle: '🌙 After School Mode',
-      homeworkTitle: 'Homework',
+      homeworkTitle: '📚 Homework',
       suppliesTitle: 'Bring Today',
       tomorrowTitle: 'Bring Tomorrow',
       stampsTitle: "Today's Stamps",
