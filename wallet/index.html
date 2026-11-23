@@ -439,6 +439,7 @@ table.tbl td.acts .mini + .mini{margin-left:4px}
   table.tbl.cards td .dmin,table.tbl.cards td .smin{margin-top:4px;font-size:9.5px;white-space:normal;line-height:1.35}
   table.tbl.cards td.c-del .mini,table.tbl.cards td.c-on .mini{width:30px;height:30px;border-radius:9px;font-size:13px}
   table.tbl.cards td.c-on input{width:22px;height:22px;margin-top:2px}
+  table.tbl.cards td label.imptrial input[type="checkbox"],table.tbl.cards td label.impcash input[type="checkbox"]{width:15px;height:15px;min-width:15px;padding:0;border:0;margin:0}
   table.tbl.cards td.c-on::before{content:"담기";display:block;font-size:9px;font-weight:800;color:var(--mute);letter-spacing:-.2px;margin-bottom:3px}
 }
 .mini{width:24px;height:24px;border-radius:7px;display:inline-grid;place-items:center;font-size:11px;background:#F6F1E8;color:var(--sub);border:0}
@@ -681,6 +682,16 @@ label.imptrial,label.impcash{display:inline-flex;align-items:center;gap:4px;bord
 label.imptrial input,label.impcash input{width:14px;height:14px;margin:0;accent-color:#5C7F68;border:0;padding:0}
 label.imptrial.on{border-color:#C9A86A;background:#FBF3E2;color:#8A6A2A}
 label.impcash.on{border-color:var(--sage-line);background:var(--sage-soft);color:var(--sage-d)}
+/* 가져오기 표 — 데스크톱에서는 열마다 최소 폭을 주고, 넘치면 가로로 스크롤 */
+@media(min-width:641px){
+  #impTable{min-width:1020px}
+  #impTable td.c-cat select,#impTable td.c-card select,#impTable td.c-own select{min-width:96px}
+  #impTable td.c-trial{min-width:104px}
+  #impTable td.c-cash{min-width:86px}
+  #impTable td.c-memo input{min-width:130px}
+  #impTable td.c-date input{min-width:8.2rem}
+}
+table.tbl td.c-trial .imphint,table.tbl td.c-cash .imphint{margin-top:3px;white-space:normal;display:block;text-align:center}
 .impdim{font-size:9px;font-weight:800;color:#C6BDAD}
 table.tbl td.c-own select,table.tbl td.c-trial,table.tbl td.c-cash{white-space:nowrap}
 @media(max-width:420px){.onbal .ov b{font-size:21px}.onbal .om{text-align:left}}
@@ -1489,7 +1500,7 @@ table.tbl tr.cx td{background:#FFFBF9}
   <div class="sheet-f"><button class="btn ghost" data-close>취소</button><button class="btn pri" id="passOk">열기</button></div>
 </div></div>
 
-<div class="mask" id="mImport"><div class="sheet imp" style="max-width:900px">
+<div class="mask" id="mImport"><div class="sheet imp" style="max-width:1120px">
   <div class="sheet-h"><b id="impTitle">가져온 내역 확인</b><button class="x" data-close>✕</button></div>
   <div class="sheet-b">
     <div class="banner info" id="impSummary"></div>
@@ -4689,7 +4700,11 @@ function renderLocalHint() {
   const bonus = localBonusUI();
   const rate = amt > 0 ? Math.round(bonus / amt * 1000) / 10 : 0;
   const cur = localBalance();
-  el.innerHTML = "지금 잔액 <b>" + won(cur) + "</b> → 충전 뒤 <b>" + won(cur + amt + bonus) + "</b>";
+  el.innerHTML = "지금 잔액 <b>" + won(cur) + "</b>" + (amt ? " → 충전 뒤 <b>" + won(cur + amt + bonus) + "</b>" : "");
+  if (!amt) {
+    el.innerHTML += "<br>충전 금액을 넣으면 <b>인센티브</b>와 충전 뒤 잔액을 바로 보여 드려요 (기본 10%)";
+    return;
+  }
   el.innerHTML += "<br>충전 <b>" + won(amt) + "</b> + 인센티브 <b>" + won(bonus) + "</b>" + (amt > 0 ? " (" + rate + "%)" : "") +
     " = 잔액 <b>" + won(amt + bonus) + "</b> 만큼 늘어나요 · 인센티브는 수입으로 잡지 않고 잔액에만 더합니다";
 }
@@ -8188,12 +8203,12 @@ function renderImport() {
       '<option value="spouse"' + (r.owner === "spouse" ? " selected" : "") + ">👨 신랑</option></select>";
     const trialCell = inc || r.isCancel
       ? '<span class="impdim">—</span>'
-      : '<label class="imptrial' + (r.isTrial ? " on" : "") + '"><input type="checkbox" data-f="trial" data-i="' + i + '"' + (r.isTrial ? " checked" : "") + "><span>🎁</span></label>" +
-        (r.isTrial ? '<div class="imphint">페이백 ' + fmt(r.payback || trialPaybackDefault(r.amount)) + " · 실질 " + fmt(Math.max(0, Math.abs(r.amount) - (r.payback || trialPaybackDefault(r.amount)))) + "</div>" : "");
+      : '<label class="imptrial' + (r.isTrial ? " on" : "") + '"><input type="checkbox" data-f="trial" data-i="' + i + '"' + (r.isTrial ? " checked" : "") + "></label>" +
+        (r.isTrial ? '<div class="imphint">페이백 ' + fmt(r.payback || trialPaybackDefault(r.amount)) + "</div>" : "");
     const cashCell = inc || r.isCancel
       ? '<span class="impdim">—</span>'
       : (cash
-        ? '<label class="impcash' + (r.cashReceipt ? " on" : "") + '"><input type="checkbox" data-f="cashReceipt" data-i="' + i + '"' + (r.cashReceipt ? " checked" : "") + "><span>🧾</span></label>"
+        ? '<label class="impcash' + (r.cashReceipt ? " on" : "") + '"><input type="checkbox" data-f="cashReceipt" data-i="' + i + '"' + (r.cashReceipt ? " checked" : "") + "></label>"
         : '<span class="impdim">현금만</span>');
     return '<tr class="' + (r.dup ? "dup" : "") + (r.amount < 0 ? " cx" : "") + '" data-i="' + i + '"' + (r.pgMerged ? ' title="간편결제 중복 자동 합침 — 카드 승인 줄 기준 + 가맹점 내용·분류"' : '') + '>' +
       '<td class="c-on" style="text-align:center"><input type="checkbox" data-f="on" data-i="' + i + '"' + (r.on ? " checked" : "") + ' style="accent-color:#5C7F68;border:0;padding:0"></td>' +
