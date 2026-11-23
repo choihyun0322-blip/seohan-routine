@@ -3925,7 +3925,7 @@ function renderLocal() {
   box.innerHTML = '<div class="onbal">' +
     '<div class="onbal-h">' +
       '<div class="ov"><small>🏘️ 남은 잔액</small><b>' + fmt(bal) + "<i>원</i></b></div>" +
-      '<div class="om">충전 기준 <b>' + won(total) + "</b><br>사용 <b>" + won(spent) + "</b> · " + list.length + "건" +
+      '<div class="om">' + (bonusSum ? "충전+인센티브" : "충전 기준") + ' <b>' + won(total) + "</b><br>사용 <b>" + won(spent) + "</b> · " + list.length + "건" +
         (bonusSum ? "<br>🎁 인센티브 <b>" + won(bonusSum) + "</b> 포함" : "") +
         (log.length ? '<br>' + log.map(l => esc((l.memo || (l.kind === "set" ? "현재 잔액 맞춤" : "충전")) + " " + (l.kind === "set" ? "→ " + won(l.after) : "+" + fmt(num(l.amount) + num(l.bonus)) + (num(l.bonus) ? " (인센티브 " + fmt(l.bonus) + ")" : "")))).join(" · ") : "") +
       "</div>" +
