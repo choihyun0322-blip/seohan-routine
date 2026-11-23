@@ -154,6 +154,15 @@ select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,#A
 .ben.amber{background:var(--amber-soft);color:var(--amber-d)}
 .cb-edit{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:8px;background:#fff;border:1px solid var(--line);font-size:11px;color:var(--mute);display:grid;place-items:center;opacity:.55}
 .cb:hover .cb-edit,.cb:focus-within .cb-edit{opacity:1}
+/* 카드 관리: 사용 중 / 숨김 토글 */
+.cb.off{opacity:.62;border-style:dashed}
+.cbsw{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:8px}
+.cbtgl{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--sage-line);background:var(--sage-soft);color:var(--sage-d);border-radius:999px;padding:4px 9px 4px 7px;font-size:9.5px;font-weight:800;letter-spacing:-.2px;line-height:1}
+.cbtgl i{width:7px;height:7px;border-radius:50%;background:var(--sage-d);display:block}
+.cbtgl.off{border-color:var(--line);background:#F4EEE4;color:#A79C8C}
+.cbtgl.off i{background:#C6BDAD}
+.cbow{font-size:9px;font-weight:800;color:var(--plum);background:var(--plum-soft);border-radius:999px;padding:4px 8px;line-height:1}
+.cbtype{font-size:9px;font-weight:800;color:#8C8474;background:#F1E9DD;border-radius:999px;padding:4px 8px;line-height:1}
 .cb-h{padding-right:26px}
 .cb-note{font-size:9px;font-weight:600;color:#B7AC9C;margin-top:6px;letter-spacing:-.2px}
 .ktrow{display:flex;align-items:center;gap:9px;margin-top:10px;border:1px solid var(--line);border-radius:13px;padding:8px 11px;background:#FFFDFA;flex-wrap:wrap}
@@ -233,6 +242,11 @@ select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,#A
 .recc-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;gap:8px}
 .recc-h b{font-size:10.5px;font-weight:800;color:#9C9285}
 .recc-h button{font-size:9.5px;font-weight:800;color:var(--sage-d)}
+/* 최근 내역 분류 필터 */
+.recc-h .recf{flex:0 1 auto;min-width:0;max-width:110px;border:1px solid var(--line);background:#fff;border-radius:8px;font-size:9.5px;font-weight:800;color:var(--ink2);padding:4px 2px;margin-left:auto;margin-right:2px}
+.recsum{margin:5px 0 1px;padding:5px 7px;border-radius:8px;background:var(--sage-soft);color:var(--sage-d);font-size:9.5px;font-weight:700;line-height:1.45;letter-spacing:-.2px}
+.recsum b{font-weight:800;color:var(--sage-d)}
+.tools .qf select{max-width:100%}
 .rec{list-style:none;margin-top:3px;max-height:290px;overflow:auto}
 .rec li{display:flex;align-items:center;gap:7px;padding:6px 0;border-top:1px dashed var(--line-soft);min-width:0}
 .rec li:first-child{border-top:0}
@@ -390,6 +404,15 @@ table.tbl td.acts .mini + .mini{margin-left:4px}
     align-items:center;gap:7px;margin-top:8px;padding:10px 11px;
     border:1px solid var(--line);border-radius:15px;background:#FFFDFA;
   }
+  /* 가져오기 미리보기 카드는 명의·체험단·현금영수증 칸이 한 줄 더 있다 */
+  table.tbl.cards.impcards tbody tr{
+    grid-template-areas:
+      "date type type del"
+      "memo memo memo memo"
+      "cat  cat  card card"
+      "own  trial trial cash"
+      "amt  amt  fix  fix";
+  }
   table.tbl.cards tbody tr:first-child{margin-top:0}
   table.tbl.cards tbody td{display:block;padding:0;border:0;min-width:0;white-space:normal;text-align:left}
   table.tbl.cards td[data-label]::before{content:attr(data-label);display:block;font-size:9px;font-weight:800;color:var(--mute);letter-spacing:-.2px;margin-bottom:2px}
@@ -402,6 +425,9 @@ table.tbl td.acts .mini + .mini{margin-left:4px}
   table.tbl.cards td.c-fixed{grid-area:fix;justify-self:end}
   table.tbl.cards td.c-inst{grid-area:inst;justify-self:end;text-align:center}
   table.tbl.cards td.c-del{grid-area:del;justify-self:end;text-align:right}
+  table.tbl.cards td.c-own{grid-area:own}
+  table.tbl.cards td.c-trial{grid-area:trial}
+  table.tbl.cards td.c-cash{grid-area:cash;justify-self:end}
   table.tbl.cards td.c-on{grid-area:del;justify-self:end;text-align:center}
   table.tbl.cards tbody td[colspan]{grid-area:1/1/-1/-1;text-align:center;color:#B7AC9C;padding:15px 0}
   table.tbl.cards td input,table.tbl.cards td select{width:100%;padding:8px 9px;font-size:13.5px;border-radius:9px}
@@ -647,6 +673,16 @@ body.locked .app,body.locked .toast{visibility:hidden}
 .onbal .onnote{margin-top:8px;font-size:9.5px;font-weight:600;color:#B7AC9C;line-height:1.55;letter-spacing:-.2px}
 .onbal .onnote b{color:var(--sage-d);font-weight:800}
 .imphint{margin-top:3px;font-size:8.5px;font-weight:800;color:var(--amber-d);background:var(--amber-soft);border-radius:5px;padding:2px 5px;display:inline-block;line-height:1.4;letter-spacing:-.2px}
+/* ===== 가져오기: 명의 토글 · 체험단 · 현금영수증 ===== */
+.impown{margin:0 0 9px}
+.impown .seg2{max-width:320px}
+.impown .hint{margin-top:5px;font-size:9.5px}
+label.imptrial,label.impcash{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);background:#fff;border-radius:9px;padding:4px 7px;font-size:11px;font-weight:800;color:#A79C8C;cursor:pointer;line-height:1;white-space:nowrap}
+label.imptrial input,label.impcash input{width:14px;height:14px;margin:0;accent-color:#5C7F68;border:0;padding:0}
+label.imptrial.on{border-color:#C9A86A;background:#FBF3E2;color:#8A6A2A}
+label.impcash.on{border-color:var(--sage-line);background:var(--sage-soft);color:var(--sage-d)}
+.impdim{font-size:9px;font-weight:800;color:#C6BDAD}
+table.tbl td.c-own select,table.tbl td.c-trial,table.tbl td.c-cash{white-space:nowrap}
 @media(max-width:420px){.onbal .ov b{font-size:21px}.onbal .om{text-align:left}}
 @media(min-width:760px){.onbal-btns{max-width:460px}}
 
@@ -936,7 +972,8 @@ table.tbl tr.cx td{background:#FFFBF9}
           <ul class="fvl" id="varList"></ul>
         </div>
         <div class="recc">
-          <div class="recc-h"><b>최근 내역</b><button id="btnAllTx">전체 보기 →</button></div>
+          <div class="recc-h"><b>최근 내역</b><select id="recentCat" class="recf" aria-label="분류 필터"></select><button id="btnAllTx">전체 보기 →</button></div>
+          <div class="recsum hidden" id="recentSum"></div>
           <ul class="rec" id="recentList"></ul>
         </div>
       </div>
@@ -959,6 +996,7 @@ table.tbl tr.cx td{background:#FFFBF9}
       <div class="card-h">
         <h2><span class="secnum">1</span>보유 카드 · 실적 · 혜택</h2>
         <div class="right">
+          <span class="chip sage" id="cardHideChip">사용</span>
           <span class="chip line" id="cardMonthChip">이번 달</span>
           <button class="btn ghost sm" id="btnCardAdd">＋ 카드</button>
         </div>
@@ -1018,9 +1056,19 @@ table.tbl tr.cx td{background:#FFFBF9}
       <div id="onnuriBox"></div>
     </section>
 
+    <section class="card" id="secLocal">
+      <div class="card-h">
+        <h2><span class="secnum">2</span>🏘️ 지역화폐</h2>
+        <div class="right">
+          <span class="chip sage" id="localChip">0원</span>
+        </div>
+      </div>
+      <div id="localBox"></div>
+    </section>
+
     <section class="card" id="secGifts">
       <div class="card-h">
-        <h2><span class="secnum">2</span>기프티콘 지갑</h2>
+        <h2><span class="secnum">3</span>기프티콘 지갑</h2>
         <div class="right">
           <span class="chip amber" id="giftChip">0개</span>
           <button class="btn ghost sm" id="btnGiftAdd">＋ 기프티콘</button>
@@ -1033,7 +1081,7 @@ table.tbl tr.cx td{background:#FFFBF9}
 
     <section class="card" id="secPoints">
       <div class="card-h">
-        <h2><span class="secnum">3</span>보유 포인트</h2>
+        <h2><span class="secnum">4</span>보유 포인트</h2>
         <div class="right">
           <span class="chip line" id="pointChip">0원</span>
           <button class="btn ghost sm" id="btnPointAdd">＋ 포인트</button>
@@ -1079,12 +1127,18 @@ table.tbl tr.cx td{background:#FFFBF9}
       <div><label>순위</label><select id="cRank"><option value="1">1순위</option><option value="2">2순위</option><option value="3">3순위</option><option value="0">순위 없음</option></select></div>
       <div><label>색</label><select id="cColor"><option value="kb">KB 노랑</option><option value="nv">네이버 초록</option><option value="hn">하나 파랑</option><option value="nh">농협 초록</option><option value="sh">신한 파랑</option><option value="wo">우리 남색</option><option value="kk">카카오 노랑</option><option value="ts">토스 파랑</option><option value="sc">SC 파랑</option><option value="cs">기타</option></select></div>
     </div></div>
+    <div class="fld"><div class="row3">
+      <div><label>신용/체크</label><select id="cType"><option value="credit">신용카드</option><option value="check">체크카드</option></select></div>
+      <div><label>명의</label><select id="cOwner"><option value="me">👩 나</option><option value="spouse">👨 신랑</option></select></div>
+      <div><label>끝 4자리</label><input id="cLast4" inputmode="numeric" maxlength="4" placeholder="9402"></div>
+    </div></div>
     <div class="fld"><label>목표 실적 (원) · 0이면 실적 없음</label><input id="cTarget" inputmode="numeric" placeholder="300000"></div>
     <div class="fld"><label>카드 설명</label><input id="cSub" placeholder="예: KB국민 · 실적 1순위"></div>
     <div class="fld"><label>혜택 (한 줄에 하나 · <b>혜택명|적립율%|한도원</b> 형태로 쓰면 아낀 금액 계산에 들어가요)</label><textarea id="cBen" rows="4" placeholder="편의점 · 카페 2%|2|&#10;일반 1%|1|"></textarea>
       <div class="hint">예) <code>스벅 · 택시 · OTT 50%|50|10000</code> → 그 카테고리 결제액의 50%, 월 1만원까지</div>
     </div>
     <div class="fld"><label>혜택 계산 카테고리 (쉼표)</label><input id="cBenCats" placeholder="식비,생활"></div>
+    <div class="fld"><label class="qchk" style="border:0;padding:0"><input type="checkbox" id="cActive" checked> 사용 중 <small>끄면 내역 입력·가져오기 선택지에서 숨깁니다 (기록은 그대로)</small></label></div>
     <div class="fld"><label class="qchk" style="border:0;padding:0"><input type="checkbox" id="cLowFreq"> 사용 빈도 낮은 카드로 접어 두기</label></div>
   </div>
   <div class="sheet-f"><button class="btn ghost" data-close>취소</button><button class="btn pri" id="cardSave">저장</button></div>
@@ -1143,6 +1197,31 @@ table.tbl tr.cx td{background:#FFFBF9}
     <div class="fld"><label>메모 (선택)</label><input id="onMemo" placeholder="예: 디지털온누리 충전"></div>
   </div>
   <div class="sheet-f"><button class="btn ghost" data-close>취소</button><button class="btn pri" id="onSave">저장</button></div>
+</div></div>
+
+<div class="mask" id="mLocal"><div class="sheet" style="max-width:420px">
+  <div class="sheet-h"><b id="localModalTitle">지역화폐 충전</b><button class="x" data-close>✕</button></div>
+  <div class="sheet-b">
+    <div class="fld"><label id="loAmtLabel">충전 금액 (원)</label><input id="loAmount" inputmode="numeric" placeholder="100000">
+      <div class="hint" id="loHint"></div>
+    </div>
+    <div class="fld" id="loBonusWrap">
+      <label>인센티브 <small style="font-weight:700;color:#B7AC9C">기본 10% · 직접 고쳐도 돼요</small></label>
+      <div class="dquick" id="loRates" style="margin-bottom:7px">
+        <button type="button" data-r="0">0%</button>
+        <button type="button" data-r="5">5%</button>
+        <button type="button" data-r="10" class="on">10%</button>
+        <button type="button" data-r="15">15%</button>
+      </div>
+      <div class="row2">
+        <div><label>인센티브율 (%)</label><input id="loRate" inputmode="decimal" value="10"></div>
+        <div><label>인센티브 (원)</label><input id="loBonus" inputmode="numeric" placeholder="자동 계산"></div>
+      </div>
+    </div>
+    <div class="fld"><label>메모 (선택)</label><input id="loMemo" placeholder="예: 수원페이 10% 충전"></div>
+    <div class="hint">인센티브는 <b>잔액에만</b> 더해요 — 수입으로 잡지 않고, 지역화폐로 결제할 때 그 금액만 지출과 연말정산 30% 공제에 들어갑니다 · 내 통장에서 나가는 충전금은 지출이 아니에요</div>
+  </div>
+  <div class="sheet-f"><button class="btn ghost" data-close>취소</button><button class="btn pri" id="loSave">저장</button></div>
 </div></div>
 
 <div class="mask" id="mShortcut"><div class="sheet">
@@ -1244,6 +1323,13 @@ table.tbl tr.cx td{background:#FFFBF9}
       <div><label>분류</label><select id="tCat"></select></div>
       <div><label>결제</label><select id="tCard"></select></div>
     </div></div>
+    <div class="fld"><label>명의</label>
+      <div class="seg2" id="tOwner"><button type="button" data-o="me" class="on">👩 나</button><button type="button" data-o="spouse">👨 신랑</button></div>
+    </div>
+    <div class="fld hidden" id="tCashWrap">
+      <label class="qchk" style="border-radius:10px"><input type="checkbox" id="tCashReceipt"> 🧾 현금영수증 발행 <small>연말정산 30% 소득공제에 포함</small></label>
+      <div class="hint">끄면 현금으로 낸 돈이어도 공제에는 안 들어가요 — 더치페이 내 몫·소상공인 미발행분 과다 공제 방지</div>
+    </div>
     <div class="fld"><label>고정 / 변동</label>
       <button id="tFixed" class="seg2" style="width:100%;padding:10px;font-size:11.5px;font-weight:800">변동비</button>
     </div>
@@ -1407,8 +1493,16 @@ table.tbl tr.cx td{background:#FFFBF9}
   <div class="sheet-h"><b id="impTitle">가져온 내역 확인</b><button class="x" data-close>✕</button></div>
   <div class="sheet-b">
     <div class="banner info" id="impSummary"></div>
+    <div class="impown">
+      <div class="seg2" id="impOwner" role="group" aria-label="가져올 내역 명의">
+        <button type="button" data-own="me" class="on">👩 내 내역</button>
+        <button type="button" data-own="spouse">👨 신랑 내 내역</button>
+      </div>
+      <div class="hint" id="impOwnerHint">지금부터 담는 행은 모두 ‘👩 나’ 명의로 들어가요 · 행마다 명의를 따로 바꿀 수도 있어요</div>
+    </div>
     <div class="tblwrap cards-wrap"><table class="tbl" id="impTable"></table></div>
-    <div class="hint" style="margin-top:8px">체크를 끄면 그 줄은 기록하지 않아요 · 지출/수입·내용·금액·카드를 고칠 수 있어요 · <b>본인 계좌 사이 이체만</b> 자동 제외됩니다 · <b>🔗 간편결제 중복</b>은 카드 승인 줄과 가맹점 줄을 한 줄로 자동 합칩니다</div>
+    <div class="hint" style="margin-top:8px">체크를 끄면 그 줄은 기록하지 않아요 · 지출/수입·내용·금액·카드·<b>명의(나/신랑)</b>를 고칠 수 있어요 · <b>본인 계좌 사이 이체만</b> 자동 제외됩니다 · <b>🔗 간편결제 중복</b>은 카드 승인 줄과 가맹점 줄을 한 줄로 자동 합칩니다</div>
+    <div class="hint" style="margin-top:6px">🎁 <b>체험단</b>을 체크하면 3.3%를 뗀 96.7%를 페이백으로 잡고 <b>📋 체험단</b>에 입금대기로 함께 등록해요 (📋 체험단의 날짜 ±3일·금액이 맞으면 미리 체크해 둡니다) · 🧾 <b>현금영수증</b>은 현금 결제 줄에서만 켜지고, 켜 둔 건만 연말정산 30% 소득공제에 들어가요</div>
     <div class="hint warn" style="margin-top:6px">🤝 <b>더치페이 정산금이 입금(수입)으로 들어온 줄</b>은 체크를 끄거나(권장) 기록 후 지우면 이중 집계가 없어요 · 결제한 지출은 내역 수정에서 <b>더치페이</b>를 켜 내 몫만 반영하세요</div>
   </div>
   <div class="sheet-f"><button class="btn ghost" data-close>취소</button><button class="btn pri" id="impConfirm">선택한 <span id="impCount">0</span>건 기록</button></div>
@@ -1417,11 +1511,12 @@ table.tbl tr.cx td{background:#FFFBF9}
 <div class="mask" id="mAll"><div class="sheet" style="max-width:900px">
   <div class="sheet-h"><b id="allTitle">전체 내역</b><button class="x" data-close>✕</button></div>
   <div class="sheet-b">
-    <div class="tools" style="grid-template-columns:1fr 1fr;margin-bottom:9px">
+    <div class="tools" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:9px">
       <div class="qf"><select id="allFilter" aria-label="필터">
         <option value="all">전체</option><option value="expense">지출</option><option value="income">수입</option><option value="fix">고정비</option><option value="var">변동비</option><option value="trial">🎁 페이백 대기</option>
       </select></div>
       <div class="qf"><select id="allCard" aria-label="카드"></select></div>
+      <div class="qf"><select id="allCat" aria-label="분류"><option value="all">분류 전체</option></select></div>
     </div>
     <div class="tblwrap cards-wrap"><table class="tbl" id="allTable"></table></div>
     <div class="hint" style="margin-top:8px">날짜·내용·금액을 눌러 고치고, －/＋ 버튼으로 지출↔수입, 🔒/🔁 버튼으로 고정↔변동을 옮길 수 있어요.</div>
@@ -1528,6 +1623,11 @@ table.tbl tr.cx td{background:#FFFBF9}
 <div class="mask" id="mTax"><div class="sheet" style="max-width:560px">
   <div class="sheet-h"><b>📊 연말정산 요약</b><button class="x" data-close>✕</button></div>
   <div class="sheet-b">
+    <div class="seg2 taxown" id="taxOwner" role="group" aria-label="연말정산 명의">
+      <button type="button" data-own="me" class="on">👩 나</button>
+      <button type="button" data-own="spouse">👨 신랑</button>
+      <button type="button" data-own="all">👪 부부 합산</button>
+    </div>
     <div class="taxhead">
       <div class="qf" style="height:36px"><span class="w">📅</span><select id="taxYear" aria-label="연도"></select></div>
       <div class="taxchip" id="taxChip">0건</div>
@@ -1541,7 +1641,7 @@ table.tbl tr.cx td{background:#FFFBF9}
       <div class="taxbar-wrap" id="taxBarWrap"></div>
     </div>
     <div class="taxlist" id="taxList"></div>
-    <div class="hint" style="margin-top:8px">가계부에 적힌 내역을 결제한 날 기준으로 모은 <b>참고용 요약</b>이에요 · 더치페이·기간 나누기와 상관없이 결제 전액으로 잡고, 🚇 대중교통은 40%로 따로 빼 중복되지 않게 했습니다 · 실제 공제는 부양가족·소득 조건에 따라 달라집니다</div>
+    <div class="hint" style="margin-top:8px">가계부에 적힌 내역을 결제한 날 기준으로 모은 <b>참고용 요약</b>이에요 · <b>👩 나 / 👨 신랑 / 👪 부부 합산</b>으로 명의별로 나눠 볼 수 있고, 더치페이·기간 나누기와 상관없이 결제 전액으로 잡습니다 · 🚇 대중교통은 40%로 따로 빼 중복되지 않게 했고, 🧾 현금은 <b>현금영수증을 발행한 건만</b> 30%에 넣었습니다 · 실제 공제는 부양가족·소득 조건에 따라 달라집니다</div>
   </div>
   <div class="sheet-f"><button class="btn ghost" data-close>닫기</button><button class="btn pri" id="taxCsv">CSV로 내보내기</button></div>
 </div></div>
@@ -1723,6 +1823,16 @@ const PAY_ACCOUNT = "account";
 /* 온누리상품권: 가계부 지출에는 그대로, 카드 실적에서는 완전히 빠지고 잔액에서 차감된다 */
 const PAY_ONNURI = "onnuri";
 const ONNURI_LABEL = "🎟️ 온누리상품권";
+/* 지역화폐(수원페이·경기지역화폐·서울사랑·제로페이 등): 온누리처럼 잔액을 관리하고
+   카드 실적에서는 빠지지만, 연말정산에서는 체크카드와 같은 30% 소득공제 대상이다 */
+const PAY_LOCAL = "local";
+const LOCAL_LABEL = "🏘️ 지역화폐";
+const LOCAL_RE = /지역화폐|지역사랑|수원페이|경기지역화폐|서울사랑|제로페이|인천e음|고양페이|부천페이|용인와이페이|성남사랑|안양사랑|화성페이|안산페이/i;
+/* 명의 — 부부가 한 장부를 함께 쓰면서 연말정산은 각자/합산으로 나눠 본다 */
+const OWNERS = ["me", "spouse"];
+const OWNER_LABEL = { me: "👩 나", spouse: "👨 신랑" };
+function ownerLabel(o) { return OWNER_LABEL[o === "spouse" ? "spouse" : "me"]; }
+function ownerShort(o) { return o === "spouse" ? "신랑" : "나"; }
 /* '온누리'는 상품권 이름이지만 온누리약국·온누리교회 같은 상호도 있다 — 그런 상호는 상품권으로 보지 않는다 */
 const ONNURI_RE = /온누리/;
 const ONNURI_OTHER_RE = /온누리\s*(?:약국|교회|안과|치과|병원|의원|한의원|내과|소아과|산부인과|피부과|정형외과|약손)/;
@@ -2142,6 +2252,8 @@ function blankState() {
     points: seedPoints(),
     /* 온누리상품권: total = 누적 충전(기준)액 — 잔액 = total − onnuri 결제 합계 */
     onnuri: { total: 0, updatedAt: 0, log: [] },
+    /* 지역화폐: 온누리와 같은 방식 — 잔액 = total − local 결제 합계 */
+    local: { total: 0, updatedAt: 0, log: [] },
     txns: [],
     trials: [],
     giftUses: [],
@@ -2191,6 +2303,10 @@ function normalizeTxn(t) {
   t.cat = CAT_BY[t.cat] ? t.cat : "기타";
   t.fixed = t.type === "income" ? false : (typeof t.fixed === "boolean" ? t.fixed : catFixedDefault(t.cat));
   t.cardId = t.cardId || PAY_CASH;
+  /* 명의 — 부부가 함께 쓰는 장부. 모르면 '나' */
+  t.owner = t.owner === "spouse" ? "spouse" : "me";
+  /* 현금영수증 발행 여부 — 현금 결제만 의미가 있고 기본은 미발행(과다 공제 방지) */
+  t.cashReceipt = (t.type !== "income" && t.cardId === PAY_CASH) ? t.cashReceipt === true : false;
   t.memo = String(t.memo || "").slice(0, 80);
   t.installment = (t.type === "income" || t.isCancel) ? false : !!t.installment;
   /* 더치페이: amount(결제 전액)는 그대로 두고 myShare(내 몫)만 따로 저장 */
@@ -2266,6 +2382,10 @@ function normalizeState(raw) {
   s.onnuri.total = num(s.onnuri.total);
   s.onnuri.updatedAt = num(s.onnuri.updatedAt);
   s.onnuri.log = Array.isArray(s.onnuri.log) ? s.onnuri.log.slice(-20) : [];
+  s.local = s.local && typeof s.local === "object" ? s.local : {};
+  s.local.total = num(s.local.total);
+  s.local.updatedAt = num(s.local.updatedAt);
+  s.local.log = Array.isArray(s.local.log) ? s.local.log.slice(-20) : [];
   s.points.forEach(p => {
     p.id = p.id || uid("pt");
     p.name = String(p.name || "포인트").slice(0, 20);
@@ -2283,6 +2403,10 @@ function normalizeState(raw) {
     c.rules = Array.isArray(c.rules) ? c.rules : [];
     c.checks = Array.isArray(c.checks) ? c.checks : [];
     c.lowFreq = !!c.lowFreq;
+    /* 사용 중(active) — 숨긴 카드는 선택지에서만 빼고 과거 내역의 라벨은 그대로 둔다 */
+    c.active = c.active !== false;
+    c.owner = c.owner === "spouse" ? "spouse" : "me";
+    c.type = c.type === "check" ? "check" : "credit";
   });
   s.gifts.forEach(g => {
     g.id = g.id || uid("g");
@@ -2373,6 +2497,7 @@ function cardLabel(id) {
   if (id === PAY_POINT) return "포인트";
   if (id === PAY_ACCOUNT) return "계좌";
   if (id === PAY_ONNURI) return "온누리상품권";
+  if (id === PAY_LOCAL) return "지역화폐";
   const c = cardById(id);
   return c ? (c.short || c.name) : "기타";
 }
@@ -2458,6 +2583,21 @@ function onnuriBalance() {
 function pointTotal() {
   return state.points.reduce((s, p) => s + num(p.balance), 0);
 }
+/* ---------- 지역화폐 잔액 ----------
+   온누리상품권과 같은 계산: 잔액 = 누적 충전(기준)액 − 지역화폐 결제 합계(전체 기간) */
+function localTxns() {
+  return state.txns.filter(t => !isIncomeT(t) && t.cardId === PAY_LOCAL);
+}
+function localSpent() {
+  return localTxns().reduce((s, t) => s + num(t.amount), 0);
+}
+function localTotal() {
+  return num(state.local && state.local.total);
+}
+function localBalance() {
+  return localTotal() - localSpent();
+}
+function isLocalTxn(t) { return !!t && t.cardId === PAY_LOCAL && !isIncomeT(t); }
 function pointById(id) { return state.points.find(p => p.id === id) || null; }
 
 /* 고정/변동·분류·결제수단·유형 기억 */
@@ -3260,6 +3400,7 @@ function renderAll() {
   renderTrials();
   renderPoints();
   renderOnnuri();
+  renderLocal();
   renderFoot();
   syncMonthNav();
   setTab(uiTab, true);
@@ -3345,8 +3486,9 @@ function cardHTML(c, mk) {
   const st = cardStats(c, mk);
   const pct = c.target > 0 ? Math.min(100, Math.round(st.perf / c.target * 100)) : 0;
   const remain = c.target - st.perf;
-  let cls = "";
-  if (c.target > 0) {
+  const off = c.active === false;
+  let cls = off ? "off" : "";
+  if (!off && c.target > 0) {
     if (remain <= 0) cls = "main";
     else if (daysInMonthLeft(mk) <= 12) cls = "lag";
   }
@@ -3369,6 +3511,11 @@ function cardHTML(c, mk) {
     (st.inst > 0 ? '<div class="cb-note">무이자 할부 ' + fmt(st.inst) + "원은 실적에서 빠져요 → 실적 반영 " + fmt(st.perf) + "원</div>" : "") +
     '<div class="bens">' + c.benefits.map(b => '<span class="ben ' + esc(b.tone || "") + '">' + esc(b.t) + "</span>").join("") + "</div>" +
     (saving > 0 ? '<div class="cb-note">이번 달 혜택 추정 ' + won(saving) + "</div>" : "") +
+    '<div class="cbsw">' +
+      '<button class="cbtgl' + (off ? " off" : "") + '" data-cactive="' + esc(c.id) + '" aria-pressed="' + (off ? "false" : "true") + '" title="' + (off ? "입력 선택지에 다시 보이기" : "내역 입력·가져오기 선택지에서 숨기기 (기록은 그대로)") + '"><i></i>' + (off ? "숨김" : "사용 중") + "</button>" +
+      (c.owner === "spouse" ? '<span class="cbow">👨 신랑</span>' : '') +
+      (c.type === "check" ? '<span class="cbtype">체크</span>' : '') +
+    "</div>" +
     "</div>";
 }
 
@@ -3393,6 +3540,12 @@ function renderCards() {
   cards.forEach(c => { const s = cardStats(c, mk); if (s.used > 0) { usedSum += s.used; usedCards++; } });
   const chip = $("#cardMonthChip");
   if (chip) chip.textContent = monthTitle(mk) + " · " + usedCards + "장 " + fmt(usedSum) + "원";
+  const hideN = cards.filter(c => c.active === false).length;
+  const hc = $("#cardHideChip");
+  if (hc) {
+    hc.textContent = hideN ? "숨김 " + hideN + "장" : "사용 " + cards.length + "장";
+    hc.classList.toggle("line", !!hideN);
+  }
 
   const tip = $("#tipRoute");
   if (tip) {
@@ -3449,6 +3602,7 @@ function renderCardUse() {
   });
   const others = [
     { id: PAY_ONNURI, label: "온누리상품권", emoji: "🎟️" },
+    { id: PAY_LOCAL, label: "지역화폐", emoji: "🏘️" },
     { id: PAY_CASH, label: "현금", emoji: "💵" },
     { id: PAY_GIFT, label: "기프티콘", emoji: "🎁" },
     { id: PAY_POINT, label: "포인트", emoji: "🪙" },
@@ -3475,7 +3629,9 @@ function renderCardUse() {
         '<span class="clogo cs">' + r.emoji + "</span>" +
         '<div class="un"><b>' + esc(r.label) + "</b><small>" + (r.dutch ? "🤝 더치페이는 내 몫만 · " : "") +
           (r.cancel ? "↩️ 취소 " + man(r.cancel) + "원 차감 · " : "") +
-          (r.id === PAY_ONNURI ? "🎟️ 잔액 " + won(onnuriBalance()) + " 남음 · 카드 실적 제외" : "카드 실적에 들어가지 않아요") + "</small></div>" +
+          (r.id === PAY_ONNURI ? "🎟️ 잔액 " + won(onnuriBalance()) + " 남음 · 카드 실적 제외"
+            : r.id === PAY_LOCAL ? "🏘️ 잔액 " + won(localBalance()) + " 남음 · 카드 실적 제외"
+            : "카드 실적에 들어가지 않아요") + "</small></div>" +
         '<div class="ua"><b>' + fmt(r.used) + "<i>원</i></b><small>" + r.count + "건</small></div>" +
       "</div>";
     }
@@ -3497,6 +3653,7 @@ function renderCardUse() {
 
 /* ---------- 가계부 ---------- */
 let fvShowAll = false;   /* 고정비·변동비 목록을 전부 펼쳤는지 */
+let recentCat = "";      /* 최근 내역 분류 필터 */
 function renderLedger() {
   const mk = uiMonth;
   const st = monthStats(mk);
@@ -3559,7 +3716,20 @@ function renderLedger() {
     }
   }
 
-  const recent = sortTxDesc(st.list).slice(0, 10);
+  const recent = sortTxDesc(recentCat ? st.list.filter(t => t.cat === recentCat) : st.list).slice(0, recentCat ? 30 : 10);
+  const rs = $("#recentSum");
+  if (rs) {
+    if (recentCat) {
+      const pick = st.list.filter(t => t.cat === recentCat);
+      const sum = pick.reduce((s, t) => s + spendAmtIn(t, mk), 0);
+      rs.classList.remove("hidden");
+      rs.innerHTML = catEmoji(recentCat) + " <b>" + esc(recentCat) + "</b> · " + pick.length + "건 · 합계 <b>" + won(sum) + "</b>" +
+        (pick.length > 30 ? " · 최근 30건만 보여 줘요" : "");
+    } else {
+      rs.classList.add("hidden");
+      rs.innerHTML = "";
+    }
+  }
   $("#recentList").innerHTML = recent.length
     ? recent.map(t => {
       const inc = isIncomeT(t);
@@ -3721,6 +3891,45 @@ function renderOnnuri() {
       '<button class="btn ghost sm" data-onnuri="set">현재 잔액 입력</button>' +
     "</div>" +
     '<div class="onnote">가계부에서 결제수단을 <b>🎟️ 온누리상품권</b>으로 적으면 지출·카테고리에는 그대로 잡히고 <b>카드 실적에서는 빠진 채</b> 이 잔액에서 자동으로 줄어들어요 · 내역을 지우면 잔액이 다시 돌아와요</div>' +
+  "</div>";
+}
+
+/* ---------- 🏘️ 지역화폐 (수원페이·경기지역화폐·서울사랑·제로페이) ----------
+   온누리상품권과 같은 잔액 관리. 충전할 때는 인센티브(기본 10%, 수정 가능)를 잔액에 함께 더하고,
+   실제 지역화폐로 결제한 금액만 지출·연말정산 30% 공제로 그대로 기록한다(인센티브는 수입으로 잡지 않는다). */
+function localBonusLog() {
+  const log = (state.local && Array.isArray(state.local.log)) ? state.local.log : [];
+  return log.reduce((s, l) => s + num(l.bonus), 0);
+}
+function renderLocal() {
+  const box = $("#localBox");
+  if (!box) return;
+  const total = localTotal(), spent = localSpent(), bal = total - spent;
+  const list = localTxns();
+  const pct = total > 0 ? Math.max(0, Math.min(100, Math.round(bal / total * 100))) : 0;
+  const chip = $("#localChip");
+  if (chip) chip.textContent = won(bal);
+  const log = (state.local && Array.isArray(state.local.log)) ? state.local.log.slice(-2).reverse() : [];
+  const bonusSum = localBonusLog();
+  box.innerHTML = '<div class="onbal">' +
+    '<div class="onbal-h">' +
+      '<div class="ov"><small>🏘️ 남은 잔액</small><b>' + fmt(bal) + "<i>원</i></b></div>" +
+      '<div class="om">충전 기준 <b>' + won(total) + "</b><br>사용 <b>" + won(spent) + "</b> · " + list.length + "건" +
+        (bonusSum ? "<br>🎁 인센티브 <b>" + won(bonusSum) + "</b> 포함" : "") +
+        (log.length ? '<br>' + log.map(l => esc((l.memo || (l.kind === "set" ? "현재 잔액 맞춤" : "충전")) + " " + (l.kind === "set" ? "→ " + won(l.after) : "+" + fmt(num(l.amount) + num(l.bonus)) + (num(l.bonus) ? " (인센티브 " + fmt(l.bonus) + ")" : "")))).join(" · ") : "") +
+      "</div>" +
+    "</div>" +
+    '<div class="bbar"><i class="' + (bal <= 0 ? "amber" : "") + '" style="width:' + pct + '%"></i></div>' +
+    (bal < 0
+      ? '<div class="onwarn">내역상 사용이 충전(기준)보다 <b>' + won(-bal) + '</b> 많아요 — [현재 잔액 입력]으로 지금 잔액에 맞춰 주세요</div>'
+      : (total > 0 && bal === 0
+        ? '<div class="onwarn">잔액을 다 썼어요 — 충전했으면 [＋ 충전]으로 더해 주세요</div>'
+        : (total === 0 ? '<div class="onwarn">충전한 금액이나 지금 남은 잔액을 먼저 넣어 주세요</div>' : ""))) +
+    '<div class="onbal-btns">' +
+      '<button class="btn pri sm" data-local="charge">＋ 충전 (인센티브 10%)</button>' +
+      '<button class="btn ghost sm" data-local="set">현재 잔액 입력</button>' +
+    "</div>" +
+    '<div class="onnote">결제수단을 <b>🏘️ 지역화폐</b>로 적으면 지출·카테고리에는 그대로 잡히고 <b>카드 실적에서는 빠진 채</b> 잔액에서 자동으로 줄어들어요 · 충전할 때 받은 인센티브는 <b>잔액에만 더하고</b> 수입으로는 잡지 않아요</div>' +
   "</div>";
 }
 
@@ -3919,16 +4128,23 @@ function bindSubCards() {
   });
 }
 
-/* ---------- 선택지 채우기 ---------- */
-function cardOptionsHTML(sel) {
-  const main = state.cards.filter(c => !c.lowFreq);
-  const sub = state.cards.filter(c => c.lowFreq);
-  const opt = c => '<option value="' + esc(c.id) + '"' + (c.id === sel ? " selected" : "") + ">" + esc(c.short || c.name) + "</option>";
+/* ---------- 선택지 채우기 ----------
+   카드 관리: active === false 인 카드는 새 입력·가져오기 선택지에서 뺀다.
+   다만 이미 그 카드로 저장된 내역을 열었을 때는 기존 라벨이 보여야 하므로 sel 은 살려 둔다. */
+function activeCards() { return state.cards.filter(c => c.active !== false); }
+/* strict=true 면 숨긴 카드를 아예 뺀다 (새 입력·필터 선택지)
+   strict=false 면 지금 값으로 잡혀 있는 카드는 '숨김' 표시로 남긴다 (내역 수정·가져오기) */
+function cardOptionsHTML(sel, strict) {
+  const show = c => c.active !== false || (!strict && c.id === sel);
+  const main = state.cards.filter(c => !c.lowFreq && show(c));
+  const sub = state.cards.filter(c => c.lowFreq && show(c));
+  const opt = c => '<option value="' + esc(c.id) + '"' + (c.id === sel ? " selected" : "") + ">" + esc(c.short || c.name) + (c.active === false ? " · 숨김" : "") + "</option>";
   let html = "";
   if (main.length) html += '<optgroup label="주력 카드">' + main.map(opt).join("") + "</optgroup>";
   if (sub.length) html += '<optgroup label="저빈도 카드">' + sub.map(opt).join("") + "</optgroup>";
   html += '<optgroup label="카드 외">' +
     '<option value="' + PAY_ONNURI + '"' + (sel === PAY_ONNURI ? " selected" : "") + ">" + ONNURI_LABEL + "</option>" +
+    '<option value="' + PAY_LOCAL + '"' + (sel === PAY_LOCAL ? " selected" : "") + ">" + LOCAL_LABEL + "</option>" +
     '<option value="' + PAY_ACCOUNT + '"' + (sel === PAY_ACCOUNT ? " selected" : "") + ">계좌이체</option>" +
     '<option value="' + PAY_CASH + '"' + (sel === PAY_CASH ? " selected" : "") + ">현금</option>" +
     '<option value="' + PAY_POINT + '"' + (sel === PAY_POINT ? " selected" : "") + ">포인트</option>" +
@@ -3944,17 +4160,32 @@ function fillSelects() {
     const gf = CATS.filter(c => c.fixed).map(c => '<option value="' + esc(c.n) + '">' + c.e + " " + esc(c.n) + "</option>").join("");
     cat.innerHTML = '<optgroup label="변동비">' + gv + '</optgroup><optgroup label="고정비">' + gf + "</optgroup>";
   }
+  /* 분류 필터 — 전체 내역 · 최근 내역 */
+  const catOpts = CATS.map(c => '<option value="' + esc(c.n) + '">' + c.e + " " + esc(c.n) + "</option>").join("");
+  const allCat = $("#allCat");
+  if (allCat) {
+    const cur = allCat.value || "all";
+    allCat.innerHTML = '<option value="all">분류 전체</option>' + catOpts;
+    allCat.value = cur;
+    if (!allCat.value) allCat.value = "all";
+  }
+  const recCat = $("#recentCat");
+  if (recCat) {
+    const cur = recCat.value || "";
+    recCat.innerHTML = '<option value="">분류 전체</option>' + catOpts;
+    recCat.value = cur;
+  }
   const sel = $("#qCard");
   if (sel) {
     const cur = sel.value;
-    sel.innerHTML = cardOptionsHTML(cur);
-    if (cur) sel.value = cur;
-    if (!sel.value) sel.value = state.cards.length ? state.cards[0].id : PAY_CASH;
+    sel.innerHTML = cardOptionsHTML(cur, true);
+    if (cur && Array.prototype.some.call(sel.options, o => o.value === cur)) sel.value = cur;
+    if (!sel.value) sel.value = activeCards().length ? activeCards()[0].id : PAY_CASH;
   }
   const allCard = $("#allCard");
   if (allCard) {
     const cur = allCard.value || "all";
-    allCard.innerHTML = '<option value="all">결제수단 전체</option>' + cardOptionsHTML("");
+    allCard.innerHTML = '<option value="all">결제수단 전체</option>' + cardOptionsHTML("", true);
     allCard.value = cur;
     if (!allCard.value) allCard.value = "all";
   }
@@ -4074,6 +4305,9 @@ function openCardModal(id) {
   $("#cBen").value = c ? c.benefits.map(b => b.t + (b.rate ? "|" + b.rate + "|" + (b.cap || "") : "")).join("\n") : "";
   $("#cBenCats").value = c ? [].concat.apply([], c.rules.filter(r => r.cats && r.cats.indexOf("*") < 0).map(r => r.cats)).join(",") : "";
   $("#cLowFreq").checked = c ? !!c.lowFreq : false;
+  if ($("#cType")) $("#cType").value = c && c.type === "check" ? "check" : "credit";
+  if ($("#cOwner")) $("#cOwner").value = c && c.owner === "spouse" ? "spouse" : "me";
+  if ($("#cActive")) $("#cActive").checked = c ? c.active !== false : true;
   let del = $("#cDelete");
   if (!del) {
     del = document.createElement("button");
@@ -4093,6 +4327,17 @@ function openCardModal(id) {
   openModal("mCard");
 }
 function openCardNew() { openCardModal(""); }
+
+/* 사용 중 ↔ 숨김 — 숨긴 카드는 입력·가져오기 선택지에서만 빠지고 기록은 그대로 */
+function toggleCardActive(id) {
+  const c = cardById(id);
+  if (!c) return;
+  c.active = c.active === false;
+  touch(); fillSelects(); renderAll();
+  toast((c.short || c.name) + (c.active === false
+    ? " → 숨겼어요 · 입력·가져오기 선택지에서 빠지고 기록은 그대로 남아요"
+    : " → 다시 사용 중으로 보여요"));
+}
 
 function saveCard() {
   const id = editingCardId();
@@ -4126,7 +4371,9 @@ function saveCard() {
     benefits: benefits,
     rules: rules,
     lowFreq: $("#cLowFreq").checked,
-    type: prev ? prev.type || "credit" : "credit",
+    type: $("#cType") ? ($("#cType").value === "check" ? "check" : "credit") : (prev ? prev.type || "credit" : "credit"),
+    owner: $("#cOwner") ? ($("#cOwner").value === "spouse" ? "spouse" : "me") : (prev ? prev.owner || "me" : "me"),
+    active: $("#cActive") ? !!$("#cActive").checked : true,
     checks: prev ? prev.checks || [] : []
   };
   data.short = name.replace(/\s+/g, " ").split(" ")[0].slice(0, 8);
@@ -4416,11 +4663,114 @@ function bindOnnuri() {
   });
 }
 
+/* ---------- 🏘️ 지역화폐 잔액 충전·맞추기 (인센티브 기본 10%) ----------
+   충전 100,000 + 인센티브 10,000 → 잔액 110,000.
+   인센티브는 잔액에만 더하고 수입으로는 잡지 않는다 — 실제 결제 금액만 지출·30% 공제로 기록된다. */
+let localMode = "charge";
+const LOCAL_BONUS_RATE = 10;
+
+function localRateUI() { return Math.max(0, Math.min(100, num($("#loRate") ? $("#loRate").value : LOCAL_BONUS_RATE))); }
+function localBonusUI() { return Math.abs(num($("#loBonus") ? $("#loBonus").value : 0)); }
+function localSetBonusFromRate() {
+  const amt = Math.abs(num($("#loAmount") ? $("#loAmount").value : 0));
+  const bonus = Math.round(amt * localRateUI() / 100);
+  const el = $("#loBonus");
+  if (el) el.value = bonus ? fmt(bonus) : "";
+}
+function renderLocalHint() {
+  const el = $("#loHint");
+  if (!el) return;
+  const amt = Math.abs(num($("#loAmount").value));
+  if (localMode === "set") {
+    const spent = localSpent();
+    el.innerHTML = "기준액을 <b>" + won(amt + spent) + "</b>으로 맞춤 (= 입력 잔액 " + won(amt) + " + 지금까지 사용 " + won(spent) + ") · 앞으로 지역화폐 결제가 생기면 여기서 자동으로 빠져요";
+    return;
+  }
+  const bonus = localBonusUI();
+  const rate = amt > 0 ? Math.round(bonus / amt * 1000) / 10 : 0;
+  const cur = localBalance();
+  el.innerHTML = "지금 잔액 <b>" + won(cur) + "</b> → 충전 뒤 <b>" + won(cur + amt + bonus) + "</b>";
+  el.innerHTML += "<br>충전 <b>" + won(amt) + "</b> + 인센티브 <b>" + won(bonus) + "</b>" + (amt > 0 ? " (" + rate + "%)" : "") +
+    " = 잔액 <b>" + won(amt + bonus) + "</b> 만큼 늘어나요 · 인센티브는 수입으로 잡지 않고 잔액에만 더합니다";
+}
+function openLocalModal(mode) {
+  localMode = mode === "set" ? "set" : "charge";
+  if (!state.local || typeof state.local !== "object") state.local = { total: 0, updatedAt: 0, log: [] };
+  $("#localModalTitle").textContent = localMode === "set" ? "지역화폐 현재 잔액" : "지역화폐 충전";
+  $("#loAmtLabel").textContent = localMode === "set" ? "지금 남은 잔액 (원)" : "충전 금액 (원)";
+  $("#loAmount").value = "";
+  $("#loAmount").placeholder = localMode === "set" ? fmt(Math.max(0, localBalance())) : "100000";
+  $("#loBonusWrap").classList.toggle("hidden", localMode === "set");
+  $("#loRate").value = String(LOCAL_BONUS_RATE);
+  $("#loBonus").value = "";
+  $("#loMemo").value = "";
+  $$("#loRates button").forEach(b => b.classList.toggle("on", b.getAttribute("data-r") === String(LOCAL_BONUS_RATE)));
+  renderLocalHint();
+  openModal("mLocal");
+  if (window.innerWidth > 760) setTimeout(() => $("#loAmount").focus(), 60);
+}
+function saveLocalBal() {
+  const amt = Math.abs(num($("#loAmount").value));
+  if (localMode === "charge" && !amt) { toast("충전 금액을 넣어 주세요"); $("#loAmount").focus(); return; }
+  if (!state.local || typeof state.local !== "object") state.local = { total: 0, updatedAt: 0, log: [] };
+  const bonus = localMode === "set" ? 0 : localBonusUI();
+  const before = localBalance();
+  if (localMode === "set") state.local.total = amt + localSpent();
+  else state.local.total = localTotal() + amt + bonus;
+  const after = localBalance();
+  state.local.updatedAt = Date.now();
+  state.local.log = (Array.isArray(state.local.log) ? state.local.log : [])
+    .concat([{ ts: Date.now(), kind: localMode, amount: amt, bonus: bonus, before: before, after: after, memo: ($("#loMemo").value || "").trim().slice(0, 40) }])
+    .slice(-20);
+  touch(); closeModal("mLocal"); renderAll();
+  toast(localMode === "set"
+    ? "현재 잔액을 " + won(after) + "으로 맞췄어요"
+    : "충전 " + won(amt) + (bonus ? " + 인센티브 " + won(bonus) : "") + " · 잔액 " + won(after));
+}
+function bindLocal() {
+  const amt = $("#loAmount");
+  if (amt) amt.addEventListener("input", () => {
+    const raw = amt.value.replace(/[^\d]/g, "");
+    if (amt.value !== raw) amt.value = raw;
+    if (localMode === "charge") localSetBonusFromRate();
+    renderLocalHint();
+  });
+  const rate = $("#loRate");
+  if (rate) rate.addEventListener("input", () => {
+    const raw = rate.value.replace(/[^\d.]/g, "").slice(0, 5);
+    if (rate.value !== raw) rate.value = raw;
+    localSetBonusFromRate();
+    renderLocalHint();
+  });
+  const bonus = $("#loBonus");
+  if (bonus) bonus.addEventListener("input", () => {
+    const raw = bonus.value.replace(/[^\d]/g, "");
+    if (bonus.value !== raw) bonus.value = raw;
+    renderLocalHint();
+  });
+  const rates = $("#loRates");
+  if (rates) rates.addEventListener("click", ev => {
+    const b = ev.target.closest("[data-r]");
+    if (!b) return;
+    $("#loRate").value = b.getAttribute("data-r");
+    $$("#loRates button").forEach(x => x.classList.toggle("on", x === b));
+    localSetBonusFromRate();
+    renderLocalHint();
+  });
+  const save = $("#loSave");
+  if (save) save.addEventListener("click", saveLocalBal);
+  document.addEventListener("click", ev => {
+    const b = ev.target.closest ? ev.target.closest("[data-local]") : null;
+    if (!b) return;
+    ev.preventDefault();
+    openLocalModal(b.getAttribute("data-local"));
+  });
+}
+
 /* ---------- 전체 내역 ---------- */
 function openAll() {
   renderAllTx(); fillSelects(); openModal("mAll");
-}
-function renderAllTx() {
+}function renderAllTx() {
   const tbl = $("#allTable");
   if (!tbl) return;
   const filter = $("#allFilter").value || "all";
@@ -4436,10 +4786,14 @@ function renderAllTx() {
     if (filter === "var") list = list.filter(t => !isIncomeT(t) && !t.fixed);
   }
   if (cf !== "all") list = list.filter(t => t.cardId === cf);
+  const cfCat = ($("#allCat") && $("#allCat").value) || "all";
+  if (cfCat !== "all") list = list.filter(t => t.cat === cfCat);
   list = sortTxDesc(list);
+  const sumAmt = list.reduce((s, t) => s + spendAmtIn(t, uiMonth), 0);
   $("#allTitle").textContent = filter === "trial"
     ? "🎁 체험단 페이백 대기 " + list.length + "건 · 총 " + won(list.reduce((s, t) => s + trialPayback(t), 0))
-    : monthTitle(uiMonth) + " 내역 " + list.length + "건";
+    : monthTitle(uiMonth) + " 내역 " + list.length + "건" +
+      (cfCat !== "all" ? " · " + catEmoji(cfCat) + " " + cfCat + " 합계 " + won(sumAmt) : "");
   const head = "<thead><tr><th>구분</th><th>날짜</th><th>내용</th><th>분류</th><th>고정/변동</th><th>결제</th><th>금액</th><th>할부</th><th></th></tr></thead>";
   const rows = list.map(t => {
     const inc = isIncomeT(t);
@@ -4490,7 +4844,7 @@ function updateTxn(id, field, value) {
     t.type = isIncomeT(t) ? "expense" : "income";
     if (t.type === "income") {
       t.amount = Math.abs(t.amount); t.isCancel = false;
-      t.fixed = false; t.installment = false; t.isDutch = false; t.myShare = null; t.dutchN = null; t.splitN = null; t.splitStart = null; t.isTrial = false; t.payback = null; t.paybackDone = false; t.paybackAt = null;
+      t.fixed = false; t.installment = false; t.isDutch = false; t.myShare = null; t.dutchN = null; t.splitN = null; t.splitStart = null; t.isTrial = false; t.payback = null; t.paybackDone = false; t.paybackAt = null; t.cashReceipt = false;
     }
     else if (!state.catRules[normKey(t.memo)]) t.fixed = catFixedDefault(t.cat);
   }
@@ -4501,7 +4855,9 @@ function updateTxn(id, field, value) {
   else if (field === "date") t.date = value || t.date;
   else if (field === "memo") { t.memo = String(value).slice(0, 80); if (state.catRules[normKey(t.memo)]) applyRule(t); }
   else if (field === "cat") { t.cat = CAT_BY[value] ? value : t.cat; if (!state.catRules[normKey(t.memo)] && !isIncomeT(t)) t.fixed = catFixedDefault(t.cat); }
-  else if (field === "cardId") t.cardId = value;
+  else if (field === "cardId") { t.cardId = value; if (t.cardId !== PAY_CASH || isIncomeT(t) || num(t.amount) < 0) t.cashReceipt = false; }
+  else if (field === "owner") t.owner = value === "spouse" ? "spouse" : "me";
+  else if (field === "cashReceipt") t.cashReceipt = t.cardId === PAY_CASH && t.type !== "income" && num(t.amount) > 0 ? !!value : false;
   touch(); renderAll(); renderAllTx();
 }
 function deleteTxn(id) {
@@ -4545,12 +4901,16 @@ function confirmTrialPaid() {
 function openAllTrial() {
   openAll();
   const f = $("#allFilter");
-  if (f) { f.value = "trial"; renderAllTx(); }
+  if (f) f.value = "trial";
+  const c = $("#allCat");
+  if (c) c.value = "all";
+  renderAllTx();
 }
 
 /* ---------- 내역 상세 편집 ---------- */
 let editingTxnId = "";
 let txnType = "expense";
+let txnOwner = "me";       /* 명의 — 나 / 신랑 (다음에도 같은 곳은 기억하지 않고 내역별로) */
 let txnCancel = false;   /* 결제 취소 — 지출을 마이너스로 차감 */
 let txnDutchN = null;   /* 더치페이 인원 수 (직접 입력하면 null) */
 let dutchBackup = null; /* 수입으로 잠시 바꿀 때 더치 설정을 기억했다 복구 */
@@ -4561,6 +4921,18 @@ const DUTCH_MIN = 2, DUTCH_MAX = 99;   /* 더치페이 인원 범위 */
 function dutchFieldVisible() {
   const wrap = $("#tDutchWrap");
   if (wrap) wrap.classList.toggle("hidden", txnType === "income");
+}
+/* 명의 바꾸기 · 현금영수증 칸은 현금 결제일 때만 */
+function paintTxnOwner() {
+  $$("#tOwner button").forEach(b => b.classList.toggle("on", b.getAttribute("data-o") === txnOwner));
+}
+function syncCashReceiptUI() {
+  const card = $("#tCard");
+  const wrap = $("#tCashWrap");
+  if (!wrap) return;
+  const cash = !!card && card.value === PAY_CASH && txnType !== "income" && !txnCancel;
+  wrap.classList.toggle("hidden", !cash);
+  if (!cash && $("#tCashReceipt")) $("#tCashReceipt").checked = false;
 }
 /* 결제 취소 — 지출을 마이너스로 차감하는 줄 */
 function renderCancelBox() {
@@ -4880,6 +5252,11 @@ function openTxn(id) {
   $("#tDate").value = t.date;
   $("#tCat").innerHTML = CATS.map(c => '<option value="' + esc(c.n) + '"' + (c.n === t.cat ? " selected" : "") + ">" + esc(c.n) + "</option>").join("");
   $("#tCard").innerHTML = cardOptionsHTML(t.cardId);
+  /* 명의 */
+  txnOwner = t.owner === "spouse" ? "spouse" : "me";
+  paintTxnOwner();
+  if ($("#tCashReceipt")) $("#tCashReceipt").checked = t.cashReceipt === true;
+  syncCashReceiptUI();
   $("#tFixed").textContent = t.fixed ? "🔒 고정비" : "🔁 변동비";
   $("#tFixed").className = "seg2 " + (t.fixed ? "plum" : "");
   $("#tInstall").checked = !!t.installment;
@@ -4929,6 +5306,8 @@ function saveTxn(opts) {
   t.cat = $("#tCat").value;
   if (oldCat !== t.cat && !state.catRules[normKey(t.memo)] && txnType !== "income") t.fixed = catFixedDefault(t.cat);
   t.cardId = $("#tCard").value;
+  t.owner = txnOwner === "spouse" ? "spouse" : "me";
+  t.cashReceipt = (txnType !== "income" && !txnCancel && t.cardId === PAY_CASH) ? !!($("#tCashReceipt") && $("#tCashReceipt").checked) : false;
   t.installment = (txnType === "income" || txnCancel) ? false : $("#tInstall").checked;
   if (txnType === "income") t.fixed = false;
   /* 더치페이: amount는 결제 전액 그대로, myShare만 따로 */
@@ -5317,14 +5696,27 @@ function bindModals() {
   $("#btnAllTx").addEventListener("click", openAll);
   $("#allFilter").addEventListener("change", renderAllTx);
   $("#allCard").addEventListener("change", renderAllTx);
+  const allCatSel = $("#allCat");
+  if (allCatSel) allCatSel.addEventListener("change", renderAllTx);
+  const recCatSel = $("#recentCat");
+  if (recCatSel) recCatSel.addEventListener("change", () => { recentCat = recCatSel.value || ""; renderLedger(); });
   $("#quickForm").addEventListener("keydown", ev => { if (ev.key === "Enter" && ev.target.tagName === "INPUT") { ev.preventDefault(); $("#quickForm").requestSubmit ? $("#quickForm").requestSubmit() : $("#quickForm").dispatchEvent(new Event("submit")); } });
   $("#useOk").addEventListener("click", confirmUseGift);
   $("#tSave").addEventListener("click", () => saveTxn());
   bindDutch();
   bindSplit();
   bindTrial();
+  const ownBox = $("#tOwner");
+  if (ownBox) ownBox.addEventListener("click", ev => {
+    const b = ev.target.closest("[data-o]");
+    if (!b) return;
+    txnOwner = b.getAttribute("data-o") === "spouse" ? "spouse" : "me";
+    paintTxnOwner();
+  });
+  const tCardSel = $("#tCard");
+  if (tCardSel) tCardSel.addEventListener("change", syncCashReceiptUI);
   const cxl = $("#tCancel");
-  if (cxl) cxl.addEventListener("change", () => { txnCancel = txnType !== "income" && !!cxl.checked; renderCancelBox(); });
+  if (cxl) cxl.addEventListener("change", () => { txnCancel = txnType !== "income" && !!cxl.checked; renderCancelBox(); syncCashReceiptUI(); });
   const cxlAmt = $("#tAmount");
   if (cxlAmt) cxlAmt.addEventListener("input", renderCancelBox);
   $("#tBulk").addEventListener("click", () => saveTxn({ bulk: true }));
@@ -5360,7 +5752,7 @@ function bindModals() {
         trialBackup = null;
       }
     }
-    dutchFieldVisible(); renderDutchBox(); renderSplitBox(); renderTrialBox(); renderCancelBox();
+    dutchFieldVisible(); renderDutchBox(); renderSplitBox(); renderTrialBox(); renderCancelBox(); syncCashReceiptUI();
   });
   $("#tFixed").addEventListener("click", () => {
     const t = state.txns.find(x => x.id === editingTxnId);
@@ -5374,11 +5766,13 @@ function bindModals() {
 
 function exportCsv() {
   const list = sortTxDesc(monthTxns(uiMonth));
-  const head = "구분,날짜,내용,분류,고정/변동,결제수단,금액,더치,내몫,기간나누기,이번달반영,할부,체험단,페이백,페이백입금\n";
+  const head = "구분,날짜,내용,분류,고정/변동,결제수단,명의,금액,더치,내몫,기간나누기,이번달반영,할부,체험단,페이백,페이백입금,현금영수증\n";
   const body = list.map(t => [isIncomeT(t) ? "수입" : "지출", t.date, t.memo, t.cat, t.fixed ? "고정" : "변동", cardLabel(t.cardId),
+      ownerShort(t.owner),
       t.amount, dutchOn(t) ? "더치" : "", dutchOn(t) ? dutchShareOfTxn(t) : "",
       splitOn(t) ? (splitIdx(t, uiMonth) + "/" + splitMonths(t) + "개월") : "", fmt(spendAmtIn(t, uiMonth)), t.installment ? "무이자" : "",
-      trialOn(t) ? "체험단" : "", trialOn(t) ? trialPayback(t) : "", trialOn(t) ? (t.paybackDone ? "입금완료" : "입금대기") : ""]
+      trialOn(t) ? "체험단" : "", trialOn(t) ? trialPayback(t) : "", trialOn(t) ? (t.paybackDone ? "입금완료" : "입금대기") : "",
+      t.cashReceipt === true ? "발행" : (t.cardId === PAY_CASH ? "미발행" : "")]
     .map(v => '"' + String(v).replace(/"/g, '""') + '"').join(",")).join("\n");
   downloadBlob("wallet-" + uiMonth + ".csv", "\ufeff" + head + body, "text/csv;charset=utf-8");
   toast("CSV로 내보냈어요");
@@ -5387,8 +5781,9 @@ function exportCsv() {
 /* ---------- 이벤트 위임 ---------- */
 function bindDelegates() {
   document.addEventListener("click", ev => {
-    const t = ev.target.closest ? ev.target.closest("[data-edit-card],[data-edit-gift],[data-big],[data-use],[data-unuse],[data-gift-bal],[data-kt],[data-txn],[data-open-txn],[data-del],[data-pick-use],[data-pick-unuse],[data-pick-edit],[data-edit-pt],[data-fvcat],[data-fvmore]") : null;
+    const t = ev.target.closest ? ev.target.closest("[data-edit-card],[data-edit-gift],[data-big],[data-use],[data-unuse],[data-gift-bal],[data-kt],[data-txn],[data-open-txn],[data-del],[data-pick-use],[data-pick-unuse],[data-pick-edit],[data-edit-pt],[data-fvcat],[data-fvmore],[data-cactive]") : null;
     if (!t) return;
+    if (t.hasAttribute("data-cactive")) { ev.stopPropagation(); toggleCardActive(t.getAttribute("data-cactive")); return; }
     if (t.hasAttribute("data-fvmore")) { ev.stopPropagation(); fvShowAll = !fvShowAll; renderLedger(); return; }
     if (t.hasAttribute("data-fvcat")) { ev.stopPropagation(); openFvDetail(t.getAttribute("data-fvcat"), t.getAttribute("data-fvfix") === "1"); return; }
     if (t.hasAttribute("data-edit-pt")) { ev.stopPropagation(); openPointModal(t.getAttribute("data-edit-pt")); return; }
@@ -6922,6 +7317,7 @@ function mergePgPairs(rows) {
     if (!(num(r.amount) > 0)) return;
     if (r.isDutch) return;                   /* 더치페이(내 몫) 기록은 건드리지 않는다 */
     if (r.cardId === PAY_ONNURI) return;     /* 온누리상품권 결제는 카드+가맹점 두 줄 구조가 아니다 */
+    if (r.cardId === PAY_LOCAL) return;      /* 지역화폐(수원페이·제로페이) 결제도 두 줄 구조가 아니다 */
     const memo = String(r.memo || "").trim();
     if (!memo) return;
     if (isHeldCardId(r.cardId)) {
@@ -7045,6 +7441,97 @@ function bindPgMerge() {
    ============================================================ */
 let importRows = [];
 let imgMode = "txn";
+/* 가져오기 명의 — 기본 '나'. 토글하면 미리보기 전체 행의 명의가 바뀐다 */
+let impOwner = "me";
+function setImpOwner(o) {
+  impOwner = o === "spouse" ? "spouse" : "me";
+  importRows.forEach(r => { r.owner = impOwner; });
+  $$("#impOwner button").forEach(b => b.classList.toggle("on", b.getAttribute("data-own") === impOwner));
+  const el = $("#impOwnerHint");
+  if (el) el.textContent = impOwner === "spouse" ? "지금부터 담는 행은 모두 ‘👨 신랑’ 명의로 들어가요" : "지금부터 담는 행은 모두 ‘👩 나’ 명의로 들어가요";
+}
+function rowOwnerSet(i, o) {
+  if (!importRows[i]) return;
+  importRows[i].owner = o === "spouse" ? "spouse" : "me";
+}
+
+/* ---------- 🎁 체험단 자동 추천 ----------
+   📋 체험단에 적어 둔 진행중·입금대기 건과 날짜(±3일)·글액이 맞으면 미리 체크해 준다. */
+const TRIAL_AUTO_DAYS = 3;
+function trialAutoCandidates() {
+  return (state.trials || []).filter(t => {
+    if (!t) return false;
+    if (t.status === "완료" || t.status === "취소") return false;
+    if (t.txnId && state.txns.some(x => x.id === t.txnId)) return false;
+    return num(t.amount) > 0;
+  });
+}
+function trialDateOf(t) {
+  return normDateLoose((t && (t.visit || t.start || t.end)) || "");
+}
+function dayGap(a, b) {
+  if (!a || !b) return 9999;
+  const da = new Date(a + "T00:00:00"), db = new Date(b + "T00:00:00");
+  if (isNaN(da) || isNaN(db)) return 9999;
+  return Math.round(Math.abs(db - da) / 86400000);
+}
+/* 그 행에 맞는 체험단 찾기 — 날짜·금액이 가장 가까운 1건 */
+function trialMatchForRow(date, amount) {
+  let best = null, bestScore = 9999;
+  trialAutoCandidates().forEach(t => {
+    if (num(t.amount) !== Math.abs(num(amount))) return;
+    const gap = dayGap(date, trialDateOf(t));
+    if (gap > TRIAL_AUTO_DAYS) return;
+    if (gap < bestScore) { bestScore = gap; best = t; }
+  });
+  return best ? { trial: best, gap: bestScore } : null;
+}
+/* 미리보기 행에 자동 추천 체험단을 붙인다 (사용자가 체크를 풀면 그대로 존중) */
+function autoFlagTrials(rows) {
+  let n = 0;
+  rows.forEach(r => {
+    if (!r || r.type === "income" || r.isCancel) return;
+    const hit = trialMatchForRow(r.date, r.amount);
+    if (!hit) return;
+    r.isTrial = true;
+    r.payback = trialPaybackDefault(r.amount);
+    r.trialId = hit.trial.id;
+    r.trialAuto = true;
+    r.hint = r.hint || ("🎁 체험단 자동 추천 · " + (hit.trial.product || hit.trial.site || "체험단") + " (" + (hit.gap ? "날짜 " + hit.gap + "일 차이" : "같은 날") + ")");
+    n++;
+  });
+  return n;
+}
+/* 🎁 체험단 체크 → 3.3% 뗀 96.7% 페이백 기본값 */
+function setRowTrial(i, on) {
+  const r = importRows[i];
+  if (!r) return;
+  r.isTrial = !!on;
+  if (r.isTrial) {
+    if (!r.trialId) {
+      const hit = trialMatchForRow(r.date, r.amount);
+      if (hit) r.trialId = hit.trial.id;
+    }
+    r.payback = trialPaybackDefault(r.amount);
+  } else {
+    r.payback = null;
+    r.trialId = "";
+    if (r.trialAuto) { r.hint = ""; r.trialAuto = false; }
+  }
+}
+function rowIsCash(r) {
+  return !!r && r.type !== "income" && r.cardId === PAY_CASH && !r.isCancel;
+}
+/* 더치페이 정산금이 입금(수입)으로 들어온 줄 — 권장 힌트만 달고 체크는 건드리지 않는다.
+   급여·이자·환불은 정산금이 아니므로 빼고, 정산·더치·회비 같은 글자가 있을 때만 */
+const SETTLE_HINT = "🤝 정산금 — 이중 집계 방지로 체크 해제 권장";
+const SETTLE_RE = /더치|정산|각출|회비|더치페이|나눔|받은\s?돈|돌려받|반환|일부|몫/;
+function isSettlementIncome(r) {
+  if (!r || r.type !== "income") return false;
+  const s = String(r.memo || "") + " " + String(r.cat || "");
+  if (/급여|월급|상여|이자|배당|환불|캐시백|페이백|리워드|지원금|보험금|원고료|판매/.test(s)) return false;
+  return SETTLE_RE.test(s);
+}
 
 function isPk(b) { return b.length > 3 && b[0] === 0x50 && b[1] === 0x4B; }
 function isCfb(b) { return b.length > 3 && b[0] === 0xD0 && b[1] === 0xCF && b[2] === 0x11 && b[3] === 0xE0; }
@@ -7064,17 +7551,35 @@ function bindImport() {
     if (f) handleSpreadsheet(f);
   });
   $("#impConfirm").addEventListener("click", confirmImport);
+  const ownWrap = $("#impOwner");
+  if (ownWrap) ownWrap.addEventListener("click", ev => {
+    const b = ev.target.closest("[data-own]");
+    if (!b) return;
+    setImpOwner(b.getAttribute("data-own"));
+    renderImport();
+  });
   $("#impTable").addEventListener("change", ev => {
     const i = Number(ev.target.getAttribute("data-i"));
     const f = ev.target.getAttribute("data-f");
     if (isNaN(i) || !f || !importRows[i]) return;
     if (f === "on") importRows[i].on = ev.target.checked;
     else if (f === "fixed") importRows[i].fixed = ev.target.value === "fix";
+    else if (f === "trial") { setRowTrial(i, ev.target.checked); renderImport(); return; }
+    else if (f === "cashReceipt") importRows[i].cashReceipt = !!ev.target.checked;
+    else if (f === "owner") { rowOwnerSet(i, ev.target.value); return; }
     else if (f === "amount") {
       const v = num(ev.target.value);
-      importRows[i].amount = importRows[i].isCancel ? -Math.abs(v) : Math.abs(v);
+      const row = importRows[i];
+      row.amount = row.isCancel ? -Math.abs(v) : Math.abs(v);
+      if (row.isTrial) row.payback = trialPaybackDefault(row.amount);
+      renderImport(); return;
     }
     else importRows[i][f] = ev.target.value;
+    if (f === "cardId") {
+      /* 결제수단을 바꾸면 현금영수증 체크는 현금 결제일 때만 남긴다 */
+      if (importRows[i].cardId !== PAY_CASH) importRows[i].cashReceipt = false;
+      if (importRows[i].isCancel || importRows[i].type === "income") importRows[i].cashReceipt = false;
+    }
     updateImpCount();
   });
   $("#impTable").addEventListener("click", ev => {
@@ -7093,6 +7598,8 @@ function bindImport() {
         importRows[i].installment = false;
         importRows[i].cat = "기타";
         if (!importRows[i].cardId) importRows[i].cardId = PAY_ACCOUNT;
+        importRows[i].isTrial = false; importRows[i].payback = null; importRows[i].trialId = "";
+        importRows[i].cashReceipt = false;
       }
     } else {
       importRows[i].fixed = !importRows[i].fixed;
@@ -7229,6 +7736,11 @@ async function openEncryptedWorkbook(bytes) {
 }
 
 /* ---------- 표 해석 ---------- */
+/* 내역 키워드가 표의 분류보다 확실한 것 — 쿠팡이츠는 '쿠팡'(생활·쇼핑)보다 먼저 걸려야
+   배달 음식이 쇼핑/생활로 새지 않는다. 표에 적힌 다른 분류는 그대로 존중한다. */
+const CAT_PRIORITY = [
+  [/쿠팡\s?이츠|쿠팡이츠|이츠\(주\)/, "외식·배달"]
+];
 /* 대분류·소분류 이름 → 앱 카테고리. 식비·교통은 세분류가 생겼지만
    기존 이름 그대로 들어오는 표도 있어 '식분'·'교통' 키는 그대로 둔다 */
 const SUPPLIER_CAT = {
@@ -7335,6 +7847,8 @@ function matchCardId(text, extra) {
   if (/현금/.test(s) && !hasCard) return PAY_CASH;
   /* 온누리상품권 — '온누리상품권'은 '상품권'보다 먼저 걸러 기프티콘으로 새지 않게 */
   if (isOnnuriText(s) && !hasCard && !/충전/.test(s)) return PAY_ONNURI;
+  /* 지역화폐 — 수원페이·경기지역화폐·서울사랑·제로페이는 충전 줄이 아니면 결제로 본다 */
+  if (LOCAL_RE.test(s) && !hasCard && !/충전/.test(s)) return PAY_LOCAL;
   if (/기프티콘|상품권|쿠폰/.test(s) && !hasCard) return PAY_GIFT;
   /* 결제수단에 카드 단어가 없으면, 결제수단+내역에 은행/계좌 표기가 있는지 먼저 본다
      — '대출금: KB 계좌이체'(결제수단 KB국민)는 kb 카드가 아니라 계좌 */
@@ -7342,6 +7856,7 @@ function matchCardId(text, extra) {
     /* 내역 문구에 '온누리'가 있으면 상품권 결제 (결제수단 칸이 비었거나 카드가 아닐 때)
        — '충전'이 붙은 줄은 상품권을 채운 것이므로 카드/계좌 결제수단을 그대로 둔다 */
     if (isOnnuriText(ctx) && !/충전/.test(ctx)) return PAY_ONNURI;
+    if (LOCAL_RE.test(ctx) && !/충전/.test(ctx)) return PAY_LOCAL;
     if (/포인트|페이백|캐시백|적립금|마일리지/.test(s)) return PAY_POINT;
     if (ACCOUNT_HINT_RE.test(ctx)) return PAY_ACCOUNT;
   }
@@ -7362,6 +7877,13 @@ function isOnnuriCharge(memo, catVal, typeVal) {
   return isOnnuriText(s) && /충전/.test(s);
 }
 function onnuriChargeHint() { return "충전 · 이중지출 방지"; }
+/* 지역화폐 충전(수원페이 충전 등)도 통장에서 돈이 빠져나가는 이체일 뿐 지출이 아니다.
+   잔액은 🏘️ 지역화폐 카드의 [＋ 충전]으로 넣고, 충전 줄은 체크를 풀어 둔다. */
+const LOCAL_CHARGE_HINT = "🏘️ 지역화폐 충전 · 잔액에 넣고 지출에서는 빼기";
+function isLocalCharge(memo, catVal, typeVal) {
+  const s = [memo, catVal, typeVal].join(" ");
+  return LOCAL_RE.test(s) && /충전/.test(s);
+}
 
 /* ---------- 카드 결제 취소 (뱅크샐러드) ----------
    일반 지출은 금액이 -55,000처럼 음수로 오고,
@@ -7415,6 +7937,8 @@ function offsetCancelPairs(list) {
 }
 
 function guessCategory(text, given) {
+  const s0 = String(text || "");
+  for (const [re, cat] of CAT_PRIORITY) if (re.test(s0)) return cat;
   const mapped = supplierCat(given);
   if (mapped) return mapped;
   const s = String(text || "");
@@ -7590,16 +8114,21 @@ function parseWorkbook(wb) {
     } else cardId = matchCardId(cardRaw, memo);
     if (!cardId) cardId = /계좌|은행|이체/.test(String(cardRaw)) ? PAY_ACCOUNT : PAY_CASH;
     const chargeRow = !cancel && type !== "income" && isOnnuriCharge(memo, catVal, typeVal);
+    const localChargeRow = !cancel && type !== "income" && !chargeRow && isLocalCharge(memo, catVal, typeVal);
     const item = {
-      on: chargeRow ? false : !existing[key],
+      on: (chargeRow || localChargeRow) ? false : !existing[key],
       date: date, memo: memo || (type === "income" ? "수입" : cat), amount: amount, type: type, cat: cat,
       isCancel: cancel,
       fixed: type === "income" ? false : catFixedDefault(cat),
       cardId: cardId,
+      owner: "me",
+      isTrial: false, payback: null, trialId: "",
+      cashReceipt: false,
       installment: cancel ? false : (type === "income" ? false : (idx.inst != null ? /무이자|할부/.test(String(row[idx.inst])) && !/일시불/.test(String(row[idx.inst])) : false)),
-      hint: cancel ? CANCEL_HINT : (chargeRow ? onnuriChargeHint() : ""),
+      hint: cancel ? CANCEL_HINT : (chargeRow ? onnuriChargeHint() : (localChargeRow ? LOCAL_CHARGE_HINT : "")),
       dup: !!existing[key]
     };
+    if (isSettlementIncome(item)) item.hint = item.hint || SETTLE_HINT;
     if (type === "income") income++;
     if (item.dup) dup++;
     out.push(item);
@@ -7608,9 +8137,11 @@ function parseWorkbook(wb) {
   const pg = mergePgDuplicates(out, existing);
   /* 같은 파일 안 원결제 + 취소는 둘 다 체크를 풀어 자동 상쇄 */
   const offsetPairs = offsetCancelPairs(pg.rows);
+  /* 📋 체험단에 적힌 날짜(±3일)·금액과 맞는 줄은 🎁 체험단을 미리 체크 */
+  const autoTrials = autoFlagTrials(pg.rows);
   return {
     rows: pg.rows, excluded: excluded, dup: pg.dup, income: income, sheet: best.name,
-    pgMerged: pg.count, offsetPairs: offsetPairs,
+    pgMerged: pg.count, offsetPairs: offsetPairs, autoTrials: autoTrials,
     cancels: pg.rows.filter(r => r && r.isCancel).length
   };
 }
@@ -7621,17 +8152,24 @@ function openImport(parsed) {
   const inc = parsed.rows.filter(r => r.type === "income").length;
   $("#impTitle").textContent = "가져온 내역 확인 (" + parsed.rows.length + "건)";
   const fresh = parsed.rows.filter(r => r.on).length;
-  const chargeN = parsed.rows.filter(r => r.hint && r.hint.indexOf("↩️") !== 0).length;
+  const chargeN = parsed.rows.filter(r => r.hint === onnuriChargeHint()).length;
   const cancelN = parsed.cancels || 0;
   const offsetN = parsed.offsetPairs || 0;
+  const autoN = parsed.autoTrials || 0;
+  const settleN = parsed.rows.filter(isSettlementIncome).length;
+  const localChargeN = parsed.rows.filter(r => r.hint === LOCAL_CHARGE_HINT).length;
+  setImpOwner("me");
   $("#impSummary").innerHTML = "📄 <b>" + esc(parsed.sheet || "표") + "</b>에서 " + parsed.rows.length + "건을 읽었어요 · " +
     "새 내역 <b>" + fresh + "건</b>" +
     (inc ? " (수입 " + inc + "건 포함)" : "") +
     (parsed.pgMerged ? " · <b>🔗 간편결제 중복 " + parsed.pgMerged + "건 자동 합침</b>" : "") +
     (cancelN ? " · <b>↩️ 결제 취소 " + cancelN + "건은 마이너스로 차감</b>" : "") +
     (offsetN ? " · <b>↩️ 원결제와 상쇄된 " + offsetN + "쌍은 체크를 풀어 뒀어요</b>" : "") +
+    (autoN ? " · <b>🎁 체험단 자동 추천 " + autoN + "건</b>" : "") +
+    (settleN ? " · <b>🤝 정산 수입 " + settleN + "건은 체크 해제 권장</b>" : "") +
     (parsed.dup ? " · 이미 있는 " + parsed.dup + "건은 체크를 풀어 뒀어요" : "") +
     (chargeN ? " · <b>🎟️ 온누리 충전 " + chargeN + "건은 이중지출 방지로 체크를 풀어 뒀어요</b>" : "") +
+    (localChargeN ? " · <b>🏘️ 지역화폐 충전 " + localChargeN + "건도 체크를 풀어 뒀어요</b>" : "") +
     (parsed.excluded ? " · <b>본인 계좌 이체</b> " + parsed.excluded + "건만 제외" : "");
   renderImport();
   openModal("mImport");
@@ -7641,9 +8179,22 @@ function updateImpCount() {
 }
 function renderImport() {
   const tbl = $("#impTable");
-  const head = "<thead><tr><th>담기</th><th>지출/수입</th><th>날짜</th><th>내용</th><th>분류</th><th>고정/변동</th><th>결제</th><th>금액</th></tr></thead>";
+  const head = "<thead><tr><th>담기</th><th>지출/수입</th><th>날짜</th><th>내용</th><th>분류</th><th>고정/변동</th><th>결제</th><th>명의</th><th>🎁 체험단</th><th>🧾 현금영수증</th><th>금액</th></tr></thead>";
   const body = importRows.map((r, i) => {
     const inc = r.type === "income";
+    const cash = rowIsCash(r);
+    const ownSel = '<select data-f="owner" data-i="' + i + '" aria-label="명의">' +
+      '<option value="me"' + (r.owner !== "spouse" ? " selected" : "") + ">👩 나</option>" +
+      '<option value="spouse"' + (r.owner === "spouse" ? " selected" : "") + ">👨 신랑</option></select>";
+    const trialCell = inc || r.isCancel
+      ? '<span class="impdim">—</span>'
+      : '<label class="imptrial' + (r.isTrial ? " on" : "") + '"><input type="checkbox" data-f="trial" data-i="' + i + '"' + (r.isTrial ? " checked" : "") + "><span>🎁</span></label>" +
+        (r.isTrial ? '<div class="imphint">페이백 ' + fmt(r.payback || trialPaybackDefault(r.amount)) + " · 실질 " + fmt(Math.max(0, Math.abs(r.amount) - (r.payback || trialPaybackDefault(r.amount)))) + "</div>" : "");
+    const cashCell = inc || r.isCancel
+      ? '<span class="impdim">—</span>'
+      : (cash
+        ? '<label class="impcash' + (r.cashReceipt ? " on" : "") + '"><input type="checkbox" data-f="cashReceipt" data-i="' + i + '"' + (r.cashReceipt ? " checked" : "") + "><span>🧾</span></label>"
+        : '<span class="impdim">현금만</span>');
     return '<tr class="' + (r.dup ? "dup" : "") + (r.amount < 0 ? " cx" : "") + '" data-i="' + i + '"' + (r.pgMerged ? ' title="간편결제 중복 자동 합침 — 카드 승인 줄 기준 + 가맹점 내용·분류"' : '') + '>' +
       '<td class="c-on" style="text-align:center"><input type="checkbox" data-f="on" data-i="' + i + '"' + (r.on ? " checked" : "") + ' style="accent-color:#5C7F68;border:0;padding:0"></td>' +
       '<td class="c-type"><button class="chip ' + (inc ? "sage" : "line") + '" data-f="typebtn" data-i="' + i + '">' + (inc ? "＋ 수입" : "－ 지출") + "</button></td>" +
@@ -7655,25 +8206,55 @@ function renderImport() {
         ? '<span class="chip line">수입</span>'
         : '<button class="chip ' + (r.fixed ? "plum" : "sage") + '" data-f="fixedbtn" data-i="' + i + '">' + (r.fixed ? "🔒 고정" : "🔁 변동") + "</button>") + "</td>" +
       '<td class="c-card" data-label="결제"><select data-f="cardId" data-i="' + i + '">' + cardOptionsHTML(r.cardId) + "</select></td>" +
+      '<td class="c-own" data-label="명의">' + ownSel + "</td>" +
+      '<td class="c-trial" data-label="체험단">' + trialCell + "</td>" +
+      '<td class="c-cash" data-label="현금영수증">' + cashCell + "</td>" +
       '<td class="num c-amt" data-label="금액"><input class="w90" data-f="amount" data-i="' + i + '" inputmode="numeric" value="' + fmt(r.amount) + '"></td>' +
     "</tr>";
   }).join("");
-  tbl.innerHTML = head + "<tbody>" + (body || '<tr><td colspan="8" style="text-align:center;color:#B7AC9C;padding:18px">가져올 내역이 없어요</td></tr>') + "</tbody>";
-  tbl.classList.add("cards");
+  tbl.innerHTML = head + "<tbody>" + (body || '<tr><td colspan="11" style="text-align:center;color:#B7AC9C;padding:18px">가져올 내역이 없어요</td></tr>') + "</tbody>";
+  tbl.classList.add("cards", "impcards");
   updateImpCount();
 }
-function confirmImport() {
+/* 🎁 체험단 체크한 줄을 📋 체험단과 이어 준다 — 새 건은 입금대기로 추가, 기존 건은 txnId 연결 */
+function linkImportTrial(r, tx) {
+  if (!r || !r.isTrial || !tx) return;
+  let tr = r.trialId ? (state.trials || []).find(x => x.id === r.trialId) : null;
+  if (tr && tr.txnId && tr.txnId !== tx.id && state.txns.some(x => x.id === tr.txnId)) tr = null;
+  if (!tr) {
+    tr = normTrial({
+      site: String(r.memo || "").slice(0, 24), product: String(r.memo || "체험단").slice(0, 60),
+      start: r.date, visit: r.date, amount: Math.abs(num(tx.amount)), status: "입금대기",
+      method: "", memo: "뱅크샐러드 가져오기에서 자동 연결", txnId: tx.id
+    });
+    state.trials.push(tr);
+    r.trialId = tr.id;
+  } else {
+    tr.txnId = tx.id;
+    if (tr.status === "진행중") tr.status = "입금대기";
+  }
+  tx.trialsRef = tr.id;
+}function confirmImport() {
   const sel = importRows.filter(r => r.on);
-  let added = 0;
+  let added = 0, trialN = 0, spouseN = 0;
   sel.forEach(r => {
     const t = addTxn({
       date: r.date, amount: r.amount, memo: r.memo, cat: r.cat, type: r.type || "expense",
-      fixed: r.fixed, cardId: r.cardId || PAY_CASH, installment: r.installment
+      fixed: r.fixed, cardId: r.cardId || PAY_CASH, installment: r.installment,
+      owner: r.owner === "spouse" ? "spouse" : "me",
+      cashReceipt: r.cashReceipt === true,
+      isTrial: !!r.isTrial, payback: r.isTrial ? (r.payback != null ? r.payback : trialPaybackDefault(r.amount)) : null
     });
-    if (t) added++;
+    if (!t) return;
+    added++;
+    if (t.owner === "spouse") spouseN++;
+    if (r.isTrial && trialOn(t)) { linkImportTrial(r, t); trialN++; }
   });
   touch(); closeModal("mImport"); renderAll();
-  toast(added + "건을 가계부에 담았어요" + (sel.length - added ? " (중복 " + (sel.length - added) + "건 제외)" : ""));
+  toast(added + "건을 가계부에 담았어요" +
+    (trialN ? " · 🎁 체험단 " + trialN + "건은 📋 체험단에 입금대기로 등록" : "") +
+    (spouseN ? " · 👨 신랑 명의 " + spouseN + "건" : "") +
+    (sel.length - added ? " (중복 " + (sel.length - added) + "건 제외)" : ""));
 }
 
 /* ==== 52-tax.js ==== */
@@ -7684,6 +8265,20 @@ function confirmImport() {
 const TAX_RATE = { credit: 0.15, check: 0.30, onnuri: 0.40, transit: 0.40, edu: 0.15, med: 0.15, don: 0.15 };
 const EDU_CAP = 3000000;   /* 취학전 아동 교육비 세액공제 한도 (연 300만) */
 const DON_HOMELOVE = 100000; /* 고향사랑기부금 10만 원 전액 공제 참고값 */
+
+/* 연말정산 명의 — 👩 나 / 👨 신랑 / 👪 부부 합산 */
+const TAX_OWNERS = ["me", "spouse", "all"];
+const TAX_OWNER_LABEL = { me: "👩 나", spouse: "👨 신랑", all: "👪 부부 합산" };
+function taxOwnerNow() {
+  const o = state.tax && String(state.tax.owner || "");
+  return TAX_OWNERS.indexOf(o) >= 0 ? o : "me";
+}
+function setTaxOwner(o) {
+  if (TAX_OWNERS.indexOf(o) < 0) return;
+  state.tax = Object.assign({ gross: taxGross(), year: taxYearNow() }, state.tax, { owner: o });
+  touch();
+  renderTax();
+}
 
 function taxYears() {
   const set = {};
@@ -7705,22 +8300,28 @@ function taxGross() {
   return state.tax && typeof state.tax.gross === "number" ? state.tax.gross : 0;
 }
 
-/* 한 해 집계 — 공제는 '결제한 날' 기준, 금액은 결제 전액(더치·기간나누기와 무관) */
-function taxSummary(year) {
+/* 한 해 집계 — 공제는 '결제한 날' 기준, 금액은 결제 전액(더치·기간나누기와 무관)
+   owner: "me" | "spouse" | "all" — 부부가 같이 쓰는 장부를 명의별로 나눠 본다 */
+function taxSummary(year, owner) {
   const y = String(year || taxYearNow());
+  const who = TAX_OWNERS.indexOf(owner) >= 0 ? owner : taxOwnerNow();
   /* 결제 취소(마이너스)도 넣어서 연간 합계에서 차감한다 */
-  const list = state.txns.filter(t => t.type !== "income" && String(t.date || "").slice(0, 4) === y && num(t.amount) !== 0);
-  const s = { year: y, count: list.length, total: 0, credit: 0, check: 0, onnuri: 0, transit: 0, edu: 0, med: 0, don: 0, account: 0, etc: 0 };
+  const list = state.txns.filter(t => t.type !== "income" && String(t.date || "").slice(0, 4) === y && num(t.amount) !== 0 &&
+    (who === "all" || (t.owner === "spouse" ? "spouse" : "me") === who));
+  const s = { year: y, owner: who, count: list.length, total: 0, credit: 0, check: 0, cash: 0, cashNo: 0, local: 0, onnuri: 0, transit: 0, edu: 0, med: 0, don: 0, account: 0, etc: 0 };
   list.forEach(t => {
     const amt = num(t.amount);
     s.total += amt;
     if (t.cardId === PAY_ACCOUNT) { s.account += amt; return; }
     if (t.cardId === PAY_ONNURI) { s.onnuri += amt; return; }
+    /* 지역화폐는 카드 실적은 아니지만 체크카드와 같은 30% 소득공제 대상 */
+    if (t.cardId === PAY_LOCAL) { s.local += amt; return; }
     if (isTransitTxn(t)) { s.transit += amt; return; }
     const c = cardById(t.cardId);
     if (c && c.type === "check") { s.check += amt; return; }
     if (c) { s.credit += amt; return; }
-    if (t.cardId === PAY_CASH) { s.check += amt; return; }
+    /* 현금은 현금영수증을 발행한 건만 공제 — 미발행분은 과다 공제 방지로 뺀다 */
+    if (t.cardId === PAY_CASH) { if (t.cashReceipt === true) s.cash += amt; else s.cashNo += amt; return; }
     s.etc += amt;   /* 기프티콘·포인트 결제 — 카드 공제 대상 아님 */
   });
   /* 세액공제 항목 — 결제수단과 상관없이 분류로 모은다 */
@@ -7729,10 +8330,12 @@ function taxSummary(year) {
     else if (t.cat === "의료") s.med += num(t.amount);
     else if (t.cat === "기부금") s.don += num(t.amount);
   });
-  /* 25% 문턱에 들어가는 사용액 (카드·현금·전통시장·대중교통) */
-  s.thresholdUse = s.credit + s.check + s.onnuri + s.transit;
+  /* 30% 묶음 (체크카드 · 현금영수증 · 지역화폐) — 표에는 한 줄로 보여 주고 내역을 나눠 적는다 */
+  s.check30 = s.check + s.cash + s.local;
+  /* 25% 문턱에 들어가는 사용액 (카드·현금·전통시장·지역화폐·대중교통) */
+  s.thresholdUse = s.credit + s.check30 + s.onnuri + s.transit;
   s.deduct = Math.round(
-    s.credit * TAX_RATE.credit + s.check * TAX_RATE.check + s.onnuri * TAX_RATE.onnuri + s.transit * TAX_RATE.transit
+    s.credit * TAX_RATE.credit + s.check30 * TAX_RATE.check + s.onnuri * TAX_RATE.onnuri + s.transit * TAX_RATE.transit
   );
   s.taxCredit = Math.round(
     Math.min(s.edu, EDU_CAP) * TAX_RATE.edu + s.med * TAX_RATE.med + s.don * TAX_RATE.don
@@ -7759,9 +8362,11 @@ function renderTax() {
   if (state.tax && state.tax.year !== year) {
     state.tax = Object.assign({ gross: taxGross() }, state.tax, { year: year });
   }
-  const s = taxSummary(year);
+  const who = taxOwnerNow();
+  $$("#taxOwner button").forEach(b => b.classList.toggle("on", b.getAttribute("data-own") === who));
+  const s = taxSummary(year, who);
   const chip = $("#taxChip");
-  if (chip) chip.textContent = s.count + "건 · 지출 " + fmt(s.total) + "원";
+  if (chip) chip.textContent = TAX_OWNER_LABEL[who] + " · " + s.count + "건 · 지출 " + fmt(s.total) + "원";
 
   /* 총급여 25% 문턱 게이지 */
   const gross = taxGross();
@@ -7786,7 +8391,9 @@ function renderTax() {
 
   const rows = [
     { e: "💳", t: "신용카드", sub: "공제율 15%", amt: s.credit, rate: TAX_RATE.credit },
-    { e: "🏧", t: "체크카드·현금", sub: "공제율 30%", amt: s.check, rate: TAX_RATE.check },
+    { e: "🏧", t: "체크카드 · 현금영수증 · 지역화폐", sub: "공제율 30%" +
+        (s.check30 ? " · 체크 " + fmt(s.check) + " · 현금영수증 " + fmt(s.cash) + " · 지역화폐 " + fmt(s.local) : ""),
+      amt: s.check30, rate: TAX_RATE.check },
     { e: "🎟️", t: "온누리상품권", sub: "전통시장 40%", amt: s.onnuri, rate: TAX_RATE.onnuri },
     { e: "🚇", t: "대중교통", sub: "40% · 신용·체크 합계에서 빼 중복 없음", amt: s.transit, rate: TAX_RATE.transit },
     { e: "🏫", t: "교육·유치원비", sub: "세액공제 15% · 취학전 아동 연 300만 한도", amt: s.edu, rate: TAX_RATE.edu, cap: EDU_CAP },
@@ -7813,8 +8420,9 @@ function renderTax() {
       '<div><span>예상 세액공제 (교육·의료·기부)</span><b>' + won(s.taxCredit) + "</b></div>" +
     "</div>" +
     (s.account ? '<div class="hint">🏦 계좌이체 ' + won(s.account) + "은 카드 공제 대상이 아니에요</div>" : "") +
+    (s.cashNo ? '<div class="hint">🧾 현금영수증 없는 현금 ' + won(s.cashNo) + "은 공제에서 빠졌어요 — 내역 수정에서 <b>🧾 현금영수증</b>을 켠 건만 30%에 들어갑니다</div>" : "") +
     (s.etc ? '<div class="hint">🎁 기프티콘·포인트 결제 ' + won(s.etc) + "도 카드 공제 대상이 아니에요</div>" : "") +
-    (s.count ? "" : '<div class="pickempty">' + esc(year) + "년 지출 내역이 아직 없어요</div>");
+    (s.count ? "" : '<div class="pickempty">' + esc(year) + "년 " + esc(who === "all" ? "" : ownerShort(who) + " ") + "지출 내역이 아직 없어요</div>");
 }
 
 function saveTaxGross() {
@@ -7825,20 +8433,24 @@ function saveTaxGross() {
   toast(v ? "총급여 " + won(v) + " 저장 · 25% 문턱을 계산했어요" : "총급여를 비웠어요");
 }
 function exportTaxCsv() {
-  const s = taxSummary(taxYearNow());
-  const head = "연도,항목,금액,공제율,예상공제\n";
+  const who = taxOwnerNow();
+  const s = taxSummary(taxYearNow(), who);
+  const head = "연도,명의,항목,금액,공제율,예상공제\n";
+  const ownerTxt = TAX_OWNER_LABEL[who].replace(/[^가-힣]/g, "") || who;
   const rows = [
     ["신용카드", s.credit, "15%", Math.round(s.credit * TAX_RATE.credit)],
-    ["체크카드·현금", s.check, "30%", Math.round(s.check * TAX_RATE.check)],
+    ["체크카드", s.check, "30%", Math.round(s.check * TAX_RATE.check)],
+    ["현금(현금영수증)", s.cash, "30%", Math.round(s.cash * TAX_RATE.check)],
+    ["지역화폐", s.local, "30%", Math.round(s.local * TAX_RATE.check)],
     ["온누리상품권", s.onnuri, "40%", Math.round(s.onnuri * TAX_RATE.onnuri)],
     ["대중교통", s.transit, "40%", Math.round(s.transit * TAX_RATE.transit)],
     ["교육·유치원비", s.edu, "15%", Math.round(Math.min(s.edu, EDU_CAP) * TAX_RATE.edu)],
     ["의료비", s.med, "15%", Math.round(s.med * TAX_RATE.med)],
     ["기부금", s.don, "15%", Math.round(s.don * TAX_RATE.don)]
   ];
-  const body = rows.map(r => '"' + s.year + '","' + r[0] + '",' + r[1] + ',"' + r[2] + '",' + r[3]).join("\n");
-  downloadBlob("yeonmal-" + s.year + ".csv", "\ufeff" + head + body, "text/csv;charset=utf-8");
-  toast(s.year + "년 연말정산 요약을 CSV로 내보냈어요");
+  const body = rows.map(r => '"' + s.year + '","' + ownerTxt + '","' + r[0] + '",' + r[1] + ',"' + r[2] + '",' + r[3]).join("\n");
+  downloadBlob("yeonmal-" + s.year + "-" + who + ".csv", "\ufeff" + head + body, "text/csv;charset=utf-8");
+  toast(s.year + "년 " + TAX_OWNER_LABEL[who] + " 연말정산 요약을 CSV로 내보냈어요");
 }
 
 function bindTax() {
@@ -7846,6 +8458,12 @@ function bindTax() {
   if (btn) btn.addEventListener("click", () => openTax());
   const sel = $("#taxYear");
   if (sel) sel.addEventListener("change", () => { renderTax(); });
+  const own = $("#taxOwner");
+  if (own) own.addEventListener("click", ev => {
+    const b = ev.target.closest("[data-own]");
+    if (!b) return;
+    setTaxOwner(b.getAttribute("data-own"));
+  });
   const gs = $("#taxGrossSave");
   if (gs) gs.addEventListener("click", saveTaxGross);
   const gi = $("#taxGross");
@@ -8986,6 +9604,7 @@ function boot() {
   bindMonthNav();
   bindQuick();
   bindOnnuri();
+  bindLocal();
   bindModals();
   bindDelegates();
   bindSettings();
@@ -9032,6 +9651,14 @@ function boot() {
     onnuriTotal: onnuriTotal,
     onnuriBalance: onnuriBalance,
     onnuriTxns: onnuriTxns,
+    localSpent: localSpent,
+    localTotal: localTotal,
+    localBalance: localBalance,
+    localTxns: localTxns,
+    renderLocal: renderLocal,
+    openLocalModal: openLocalModal,
+    saveLocalBal: saveLocalBal,
+    LOCAL_RE: LOCAL_RE,
     trialOn: trialOn,
     trialPayback: trialPayback,
     trialPaybackDefault: trialPaybackDefault,
@@ -9114,6 +9741,25 @@ function boot() {
     renderFvDetail: renderFvDetail,
     isTransitTxn: isTransitTxn,
     parseWorkbook: parseWorkbook,
+    renderImport: renderImport,
+    confirmImport: confirmImport,
+    openImport: openImport,
+    setImportRows: function (rows) { importRows = rows; },
+    getImportRows: function () { return importRows; },
+    setImpOwner: setImpOwner,
+    setRowTrial: setRowTrial,
+    autoFlagTrials: autoFlagTrials,
+    trialMatchForRow: trialMatchForRow,
+    isSettlementIncome: isSettlementIncome,
+    linkImportTrial: linkImportTrial,
+    cardOptionsHTML: cardOptionsHTML,
+    activeCards: activeCards,
+    toggleCardActive: toggleCardActive,
+    renderAllTx: renderAllTx,
+    openAll: openAll,
+    renderLedger: renderLedger,
+    setRecentCat: function (c) { recentCat = c || ""; renderLedger(); },
+    get recentCat() { return recentCat; },
     mergePgPairs: mergePgPairs,
     mergePgDuplicates: mergePgDuplicates,
     planPgMergeTxns: planPgMergeTxns,
