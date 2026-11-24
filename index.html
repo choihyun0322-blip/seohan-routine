@@ -1526,7 +1526,7 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
 }
 .card-morning .check-list{grid-template-columns:repeat(3,minmax(0,1fr)); grid-auto-rows:minmax(0,1fr)}
 .card-evening .check-list{grid-template-columns:repeat(4,minmax(0,1fr)); grid-auto-rows:minmax(0,1fr)}
-.card-homework .check-list{grid-template-columns:repeat(5,minmax(0,1fr)); grid-auto-rows:minmax(0,1fr)}
+.card-homework .check-list{grid-template-columns:repeat(6,minmax(0,1fr)); grid-auto-rows:minmax(0,1fr)}
 
 .card-morning .check-row, .card-evening .check-row, .card-homework .check-row{
   display:grid; align-items:center; justify-items:center; gap:.25rem;
@@ -2137,7 +2137,7 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
               <span class="depart-chip" id="eveStampChip">오늘 도장 0개</span>
             </div>
             <div class="hero-big" id="eveBig">저녁 루틴 0 / 7</div>
-            <div class="hero-sub" id="eveSub">숙제 0 / 5 · 하나씩 해볼까요?</div>
+            <div class="hero-sub" id="eveSub">숙제 0 / 6 · 하나씩 해볼까요?</div>
             <div class="progress">
               <div class="progress-track"><div class="progress-fill" id="eveFill"></div></div>
               <div class="progress-meta">
@@ -2187,7 +2187,7 @@ main{flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; -webkit-ov
         <section class="card card-homework" aria-labelledby="homeworkTitle">
           <div class="card-head">
             <h2 id="homeworkTitle" data-i18n="homeworkTitle">📚 방과 후 숙제</h2>
-            <span class="count-pill" id="homeworkCount">0 / 5</span>
+            <span class="count-pill" id="homeworkCount">0 / 6</span>
           </div>
           <div class="mini-progress" aria-hidden="true"><span id="homeworkBar"></span></div>
           <div class="check-list" id="homeworkList"></div>
@@ -14087,8 +14087,8 @@ function iconSVG(key) {
      기본 상수
   ============================================================ */
   var STORAGE_KEY = 'seohan-numberblocks-routine-v1';
-  var STORAGE_VERSION = 6;            /* v6: 🏖️ 주말·공휴일 모드 · 물통·수저통 · 내일 준비물 삭제 */
-  var APP_VERSION = '5.6.4';          /* v5.6.4: 아이패드 awake — Wake Lock 과 함께 무음 <video> 루프를 자동 재생해 화면 꺼짐 방지 */
+  var STORAGE_VERSION = 7;            /* v7: 📖 북클럽 책 읽기 — 방과 후 숙제 6개 */
+  var APP_VERSION = '5.6.5';          /* v5.6.5: 📖 방과 후 숙제에 북클럽 책 읽기를 더해 6개 (아이패드 가로 한 줄 6칸) */
   var APP_BUILT = '2026-11-24';
   var CELEBRATE_UNDO_MS = 10000;      /* 전체 완료 후 10초 안에 취소하면 축하·도감 해금을 되돌려요 */
   var UNDO_TTL = 90 * 1000;           /* 방금 취소한 체크는 90초 동안 원격 상태보다 우선해요 */
@@ -14923,13 +14923,22 @@ function iconSVG(key) {
     var t = String((it && (it.ko || it.label || it.en)) || '').toLowerCase();
     return t.indexOf('물통') >= 0 || t.indexOf('수저통') >= 0 || t.indexOf('bottle') >= 0;
   }
+  /* 📖 북클럽 책 읽기 — 기본으로 늘 보이는 숙제 */
+  function isBookClubItem(it) {
+    var t = String((it && (it.ko || it.label || it.en)) || '').replace(/\s+/g, '').toLowerCase();
+    return t.indexOf('북클럽') >= 0 || t.indexOf('bookclub') >= 0 || t.indexOf('반납도서') >= 0;
+  }
   var DEFAULT_HOMEWORK = [
     { id: 'h1', num: 8, icon: 'book', ko: 'EOS Daily homework', en: 'EOS Daily Homework' },
     { id: 'h2', num: 9, icon: 'abc', ko: 'Sight word', en: 'Sight Words' },
     { id: 'h3', num: 10, icon: 'math', ko: '소마셈 1장', en: 'Soma Math (1p)' },
     { id: 'h4', num: 1, icon: 'shapes', ko: '소마도형 1장', en: 'Soma Shapes (1p)' },
-    { id: 'h5', num: 2, icon: 'puzzle', ko: '팩토슐레 1장', en: 'Facto Schule (1p)' }
+    { id: 'h5', num: 2, icon: 'puzzle', ko: '팩토슐레 1장', en: 'Facto Schule (1p)' },
+    /* v7: 📖 북클럽 책 읽기 — 책 더미 아이콘 · 넘버블럭스 3 */
+    { id: 'h6', num: 3, icon: 'bookclub', ko: '북클럽 책 읽기', en: 'Book Club' }
   ];
+  /* v6 까지의 숙제 5개 — 저장된 예전 데이터를 알아보는 데만 써요 */
+  var OLD_DEFAULT_HOMEWORK = DEFAULT_HOMEWORK.slice(0, 5).map(function (it) { return clone(it); });
   var DEFAULT_SUPPLIES = {
     mon: { ko: '원복 + 실내화 가방', en: 'Uniform + Indoor Shoes' },
     tue: { ko: '발레복 또는 체육복', en: 'Ballet or Gym Clothes' },
@@ -15492,6 +15501,27 @@ function iconSVG(key) {
       s.evening = s.evening.filter(function (it) { return !isPrepItem(it); });
       if (!s.evening.length) s.evening = clone(DEFAULT_EVENING);
     }
+    /* v7: 방과 후 숙제에 '📖 북클럽 책 읽기'를 더해요 */
+    if (Array.isArray(s.homework)) {
+      var hwOld = s.homework.length === OLD_DEFAULT_HOMEWORK.length;
+      if (hwOld) {
+        for (var hi = 0; hi < s.homework.length; hi++) {
+          var hIt = s.homework[hi] || {};
+          if (String(hIt.id) !== OLD_DEFAULT_HOMEWORK[hi].id ||
+              String(hIt.label || hIt.ko || '').replace(/\s+/g, '') !== OLD_DEFAULT_HOMEWORK[hi].ko.replace(/\s+/g, '')) {
+            hwOld = false;
+            break;
+          }
+        }
+      }
+      if (hwOld) {
+        s.homework = clone(DEFAULT_HOMEWORK);
+      } else if (s.homework.length) {
+        var hasClub = false;
+        for (var ci = 0; ci < s.homework.length; ci++) if (isBookClubItem(s.homework[ci])) hasClub = true;
+        if (!hasClub) s.homework.push(clone(DEFAULT_HOMEWORK[DEFAULT_HOMEWORK.length - 1]));
+      }
+    }
     out.v = STORAGE_VERSION;
     return out;
   }
@@ -15521,13 +15551,13 @@ function iconSVG(key) {
     { icon: 'math', re: /소마셈|수학|math|셈/ },
     { icon: 'shapes', re: /도형|shape/ },
     { icon: 'puzzle', re: /팩토|퍼즐|puzzle|facto/ },
+    { icon: 'bookclub', re: /북클럽|bookclub|북클럽책|반납도서/ },
     { icon: 'book', re: /책|독서|eos|book/ },
     { icon: 'uniform', re: /원복|uniform|교복/ },
     { icon: 'indoor', re: /실내화|indoor/ },
     { icon: 'ballet', re: /발레|ballet/ },
     { icon: 'sneakers', re: /운동화|sneaker|sneakers/ },
-    { icon: 'gym', re: /체육|gym|맨투맨/ },
-    { icon: 'bookclub', re: /북클럽|bookclub|bookclub|반납도서/ }
+    { icon: 'gym', re: /체육|gym|맨투맨/ }
   ];
 
   function guessIcon(text) {
@@ -15785,7 +15815,13 @@ function iconSVG(key) {
     if (kind === 'we') return DEFAULT_W_EVENING;
     if (kind === 'ws') return DEFAULT_W_STUDY;
     if (kind === 'evening') return state.settings.evening;
-    if (kind === 'homework') return state.settings.homework;
+    if (kind === 'homework') {
+      /* 📖 북클럽 책 읽기는 늘 마지막에 있어요 (구름 상태에 없어도 보이게) */
+      var hwList = state.settings.homework;
+      if (!hwList || !hwList.length) return clone(DEFAULT_HOMEWORK);
+      for (var hwi = 0; hwi < hwList.length; hwi++) if (isBookClubItem(hwList[hwi])) return hwList;
+      return hwList.concat([clone(DEFAULT_HOMEWORK[DEFAULT_HOMEWORK.length - 1])]);
+    }
     /* 등원 준비 '물통·수저통 챙기기'는 언제나 마지막에 있어요 (구름 상태에 없어도 보이게) */
     var list = state.settings.morning;
     if (!list || !list.length) return clone(DEFAULT_MORNING);
@@ -16513,7 +16549,7 @@ function iconSVG(key) {
   }
 
   function renderEveningHero() {
-    var et = state.settings.evening.length, ht = state.settings.homework.length;
+    var et = state.settings.evening.length, ht = itemsOf('homework').length;
     var eDone = checkedCount('evening'), hDone = checkedCount('homework');
     var total = et + ht, done = eDone + hDone;
     $('eveBig').textContent = Lf('eveBig', { d: eDone, t: et });
@@ -20093,6 +20129,16 @@ function iconSVG(key) {
         k: ['I need one more minute.', '일 분만 더 필요해!'] },
       { m: ['You solved it all by yourself!', '혼자서 다 풀었네!'],
         k: ['That was fun!', '재미있었어!'] }
+    ],
+    h6: [
+      { m: ["It's book club day! Let's read your book.", '북클럽 날이야! 책 읽어 볼까?'],
+        k: ['Yay! I love my book club book!', '와! 북클럽 책이 제일 좋아!'] },
+      { m: ['Can you read the title for me?', '제목 읽어 줄래?'],
+        k: ['I can read it! Look!', '읽을 수 있어! 봐!'] },
+      { m: ["Let's read one page together.", '한 장 같이 읽어 보자.'],
+        k: ["I'll point at the words!", '내가 글자 짚을래!'] },
+      { m: ['What happened in the story?', '이야기에서 무슨 일이 있었어?'],
+        k: ['The bear found a friend!', '곰이 친구를 만났어!'] }
     ]
   };
 
