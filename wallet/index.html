@@ -9666,6 +9666,9 @@ function applyOcrLines() {
   if (ocrMode === "coupang") syncCpDateFromLines();
   syncOcrModeUI();
   if (ocrMode === "banksalad") {
+    /* 'N일'만 있는 헤더의 연·월을 화면에 보여 준다 (비어 있으면 오늘/보고 있는 달 기준) */
+    const dp = $("#cpDate");
+    if (dp && !dp.value) dp.value = dateForMonth(uiMonth);
     const parsed = parseBanksaladLines(ocrLines, { base: cpDateValue(), cardId: cpCardValue() });
     ocrRows = parsed.rows;
     const picked = ocrRows.filter(r => r.on && num(r.amount) > 0);
