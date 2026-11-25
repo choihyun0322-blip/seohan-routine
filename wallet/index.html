@@ -183,6 +183,23 @@ select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,#A
 
 /* ============ ledger ============ */
 .tools{display:grid;grid-template-columns:1fr;gap:7px;margin-bottom:10px}
+/* 메인 도구 3버튼 (뱅크샐러드 · 쿠팡 · 일반·단축어) — 누르면 가져오기 메뉴가 열린다 */
+.tools3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:10px}
+.tools3 .tool{flex-direction:column;align-items:flex-start;gap:5px;padding:8px 9px 9px;position:relative}
+.tools3 .tool::after{content:"⌄";position:absolute;top:6px;right:8px;font-size:10px;font-weight:800;color:#B7AC9C}
+.tools3 .tool .tic{width:26px;height:26px;border-radius:9px;font-size:14px}
+.tools3 .tool .ttx b{font-size:11px}
+.tools3 .tool .ttx small{font-size:8.5px;line-height:1.3;margin-top:1px}
+@media(min-width:760px){.tools3{gap:10px}.tools3 .tool{flex-direction:row;align-items:center;gap:9px;padding:11px 12px}.tools3 .tool .ttx b{font-size:12px}.tools3 .tool .ttx small{font-size:9.5px}}
+/* 가져오기 메뉴 시트 */
+.impmenu{display:flex;flex-direction:column;gap:8px}
+.impmenu .impitem{display:flex;align-items:center;gap:10px;border:1.5px solid var(--sage-line);background:#fff;border-radius:14px;padding:11px 12px;width:100%;text-align:left}
+.impmenu .impitem:active{background:#F6FAF2}
+.impmenu .impitem .tic{width:30px;height:30px;border-radius:10px;background:#F6FAF2;border:1px solid var(--sage-line);display:grid;place-items:center;font-size:15px;flex:0 0 auto}
+.impmenu .impitem .ttx{flex:1;min-width:0}
+.impmenu .impitem b{display:block;font-size:12.5px;font-weight:800;letter-spacing:-.3px}
+.impmenu .impitem small{display:block;font-size:10px;font-weight:600;color:#8FA089;margin-top:2px;line-height:1.35}
+.impmenu .impitem .zero{font-size:9px;font-weight:800;background:var(--sage);color:#fff;border-radius:6px;padding:2px 6px;white-space:nowrap}
 .tool{display:flex;align-items:center;gap:9px;border:1.5px dashed #CFDCC9;background:#F6FAF2;border-radius:14px;padding:9px 11px;width:100%;text-align:left}
 .tool .tic{width:30px;height:30px;border-radius:10px;background:#fff;border:1px solid var(--sage-line);display:grid;place-items:center;font-size:15px;flex:0 0 auto}
 .tool .ttx{flex:1;min-width:0}
@@ -913,7 +930,21 @@ table.tbl tr.cx td{background:#FFFBF9}
         </div>
       </div>
 
-      <div class="tools">
+      <div class="tools3" id="tools3">
+        <button class="tool" id="btnToolBs" aria-haspopup="dialog">
+          <span class="tic">🏦</span>
+          <span class="ttx"><b>뱅크샐러드</b><small>엑셀 · 캡처 · 글자</small></span>
+        </button>
+        <button class="tool" id="btnToolCoupang" aria-haspopup="dialog">
+          <span class="tic">🛒</span>
+          <span class="ttx"><b>쿠팡</b><small>품목 캡처 · 글자</small></span>
+        </button>
+        <button class="tool" id="btnToolEtc" aria-haspopup="dialog">
+          <span class="tic">📷</span>
+          <span class="ttx"><b>일반·단축어</b><small>결제 캡처 · 자동</small></span>
+        </button>
+      </div>
+      <div class="tools hidden" id="toolsLegacy" aria-hidden="true">
         <button class="tool" id="btnXlsx">
           <span class="tic">📂</span>
           <span class="ttx"><b>뱅크샐러드 엑셀 · ZIP</b><small>수입·지출 함께 · 본인 이체만 제외</small></span>
@@ -936,7 +967,7 @@ table.tbl tr.cx td{background:#FFFBF9}
         </button>
         <button class="tool" id="btnCpPaste">
           <span class="tic">📋</span>
-          <span class="ttx"><b>쿠팡 텍스트로 붙여넣기</b><small>주문내역 글자를 그대로 나누기 (사진 인식 없이)</small></span>
+          <span class="ttx"><b>텍스트로 붙여넣기</b><small>쿠팡·뱅크샐러드 글자 그대로 나누기 (정확 100%)</small></span>
           <span class="zero">정확 100%</span>
         </button>
         <button class="tool" id="btnShortcut2">
@@ -1614,8 +1645,14 @@ table.tbl tr.cx td{background:#FFFBF9}
   <div class="sheet-f"><button class="btn ghost" data-close>취소</button><button class="btn pri" id="trSheetGo">📥 불러오기</button></div>
 </div></div>
 
+<div class="mask" id="mToolMenu"><div class="sheet" style="max-width:460px">
+  <div class="sheet-h"><b id="mToolTitle">가져오기</b><button class="x" data-close>✕</button></div>
+  <div class="sheet-b"><div class="impmenu" id="mToolList"></div></div>
+  <div class="sheet-f"><button class="btn ghost" data-close>취소</button></div>
+</div></div>
+
 <div class="mask" id="mOcr"><div class="sheet" style="max-width:860px">
-  <div class="sheet-h"><b>📷 캡처에서 읽은 내역</b><button class="x" data-close>✕</button></div>
+  <div class="sheet-h"><b id="mOcrTitle">📷 캡처에서 읽은 내역</b><button class="x" data-close>✕</button></div>
   <div class="sheet-b">
     <div class="seg2 ocrmode three" id="ocrMode" role="tablist">
       <button type="button" data-m="txn" class="on">📄 결제 내역</button>
@@ -1630,7 +1667,7 @@ table.tbl tr.cx td{background:#FFFBF9}
       <button type="button" class="btn ghost sm cppastebtn" id="cpPasteBtn">📋 텍스트로 붙여넣기</button>
       <div class="cppaste hidden" id="cpPasteWrap">
         <textarea id="cpPasteText" rows="5" placeholder="쿠팡 주문내역 글자를 그대로 붙여넣으세요&#10;2026. 11. 6&#10;메르시 파이니스트 셀렉션 레드 9,630원&#10;2026. 11. 9&#10;삼겹살 1kg 15,900원" aria-label="쿠팡 주문내역 텍스트"></textarea>
-        <div class="cppastef"><small>날짜 줄(2026. 11. 6)이 있으면 그 뒤 품목은 그 날짜로 담겨요</small><button type="button" class="btn pri sm" id="cpPasteGo">나누기</button></div>
+        <div class="cppastef"><small id="cpPasteFoot">날짜 줄(2026. 11. 6)이 있으면 그 뒤 품목은 그 날짜로 담겨요</small><button type="button" class="btn pri sm" id="cpPasteGo">나누기</button></div>
       </div>
       <label class="qchk hidden cpreplace" id="cpReplaceWrap" style="border-radius:10px"><input type="checkbox" id="cpReplace"> <span id="cpReplaceTxt"></span></label>
     </div>
@@ -9265,8 +9302,6 @@ function syncOcrModeUI() {
   $$("#ocrMode button").forEach(b => b.classList.toggle("on", b.getAttribute("data-m") === ocrMode));
   const bar = $("#cpBar");
   if (bar) bar.classList.toggle("hidden", ocrMode === "txn");
-  const paste = $("#cpPasteBtn");
-  if (paste) paste.classList.toggle("hidden", ocrMode !== "coupang" && ocrMode !== "banksalad");
   const dateLb = $("#cpDate");
   if (dateLb) dateLb.setAttribute("aria-label", ocrMode === "banksalad" ? "뱅크샐러드 캡처 연·월 기준 날짜" : "쿠팡 결제 날짜");
   const cardLb = $("#cpCard");
@@ -9277,6 +9312,57 @@ function syncOcrModeUI() {
     : ocrMode === "banksalad"
     ? "뱅크샐러드 <b>일별 내역</b> 캡처를 읽어요 · <b>결제 취소</b>·<b>중복</b>은 체크를 풀어 두고, <b>가승인·선승인</b>은 배지로 표시해요 · 날짜는 <b>N일 ○요일</b> 줄에서 읽습니다"
     : "잘못 읽힌 숫자만 고쳐 주세요 · 내 계좌 이체로 보이는 줄은 미리 꺼 두었어요";
+  syncCpPasteUI();
+}
+
+/* ---------- 📋 글자 그대로 붙여넣기 (모드별 안내·입력창) ----------
+   버그: '#cpPasteWrap'으로 텍스트를 붙여넣는 중에 모드 탭을 누르면 '아직 읽은 사진이 없다'는 이유로
+   사진 고르기 창(pickOcrFile)이 대신 떠서 iOS에서는 입력창을 덮어 버렸다. */
+const CP_PASTE_PH = {
+  coupang: "쿠팡 주문내역 글자를 그대로 붙여넣으세요\n2026. 11. 6\n메르시 파이니스트 셀렉션 레드 9,630원\n2026. 11. 9\n삼겹살 1kg 15,900원",
+  banksalad: "뱅크샐러드 일별 내역 글자를 그대로 붙여넣으세요\n23일 월요일\nKT5370321111 -49,110원\n증권/투자 | KB마이핏통장\n카카오T택시_가승인 -5,700원\n택시 | JADE Classic"
+};
+function cpPasteKey() { return ocrMode === "banksalad" ? "banksalad" : "coupang"; }
+function cpPasteOpen() {
+  const wrap = $("#cpPasteWrap");
+  return !!(wrap && !wrap.classList.contains("hidden"));
+}
+function syncCpPasteUI() {
+  const barMode = ocrMode === "coupang" || ocrMode === "banksalad";
+  const open = cpPasteOpen();
+  const btn = $("#cpPasteBtn");
+  if (btn) {
+    btn.classList.toggle("hidden", !barMode);
+    btn.textContent = open ? "📋 텍스트 입력 접기" : "📋 텍스트로 붙여넣기";
+  }
+  const ta = $("#cpPasteText");
+  if (ta) {
+    ta.placeholder = CP_PASTE_PH[cpPasteKey()];
+    ta.setAttribute("aria-label", (ocrMode === "banksalad" ? "뱅크샐러드" : "쿠팡") + " 내역 텍스트");
+  }
+  const foot = $("#cpPasteFoot");
+  if (foot) foot.innerHTML = ocrMode === "banksalad"
+    ? "‘23일 월요일’ 같은 날짜 줄 아래 내역을 그 달로 담아요 · 결제 취소 줄은 체크를 풀어 둬요"
+    : "날짜 줄(2026. 11. 6)이 있으면 그 뒤 품목은 그 날짜로 담겨요";
+}
+/* 텍스트 입력창을 연 상태의 머리말 — 고른 모드의 붙여넣기 안내로 바뀐다 */
+function cpPasteGuide() {
+  const bs = ocrMode === "banksalad";
+  const msg = $("#ocrMsg");
+  if (msg) msg.innerHTML = bs
+    ? "🏦 <b>뱅크샐러드 일별 내역</b> 글자를 그대로 붙여넣고 <b>나누기</b>를 누르면 사진 인식 없이 그대로 나눠요 · <b>23일 월요일</b> 같은 날짜 줄 아래 내역을 그 달로 담아요"
+    : "📋 <b>쿠팡 주문내역</b> 글자를 그대로 붙여넣고 <b>나누기</b>를 누르면 사진 인식 없이 그대로 나눠요 · <b>2026. 11. 6</b> 같은 날짜 줄 뒤 품목은 그 날짜로 담겨요";
+  const note = $("#cpNote");
+  if (note) note.textContent = bs
+    ? "위 날짜의 연·월로 담아요 · 결제수단을 못 읽은 줄만 위 결제수단을 써요"
+    : "품목마다 한 줄로 담깁니다 · 날짜·결제수단은 바꾸면 전체에 바로 적용돼요";
+  const title = $("#mOcrTitle");
+  if (title) title.innerHTML = bs ? "🏦 뱅크샐러드 글자 그대로 나누기" : "📋 글자 그대로 나누기";
+  const hint = $("#ocrHint");
+  if (hint) hint.innerHTML = bs
+    ? "붙여넣은 글자를 줄 단위로 나눠요 · <b>결제 취소</b>·<b>가승인·선승인</b>은 글자 그대로 알아보고, 담은 뒤에도 표에서 고칠 수 있어요"
+    : "붙여넣은 글자를 품목 단위로 나눠요 · 담은 뒤에도 표에서 분류·금액을 고칠 수 있어요";
+  syncCpPasteUI();
 }
 
 /* ---------- 🛒 쿠팡 주문서 파싱 ----------
@@ -9499,6 +9585,66 @@ function parseCoupangLines(lines, opts) {
   return { rows: rows.slice(0, 60), total: total, dropped: dropped, dates: Object.keys(datesSeen) };
 }
 
+/* ============================================================
+   메인 도구 3버튼 → 가져오기 메뉴
+   ------------------------------------------------------------
+   화면을 차지하던 6줄 버튼을 🏦 뱅크샐러드 / 🛒 쿠팡 / 📷 일반·단축어 3개로 묶고,
+   누르면 시트에서 가져오기 방법을 고른다. 실제 동작은 예전 버튼(#btnXlsx·#btnOcr·
+   #btnBsCap·#btnCoupang·#btnCpPaste·#btnShortcut2)을 그대로 눌러 준다 (하위 호환).
+   텍스트 붙여넣기는 사진 고르기 창 없이 바로 글자 입력창이 열린다.
+   ============================================================ */
+const TOOL_MENUS = {
+  bs: { title: "🏦 뱅크샐러드에서 가져오기", items: [
+    { act: "xlsx", ic: "📁", t: "엑셀 · ZIP", d: "뱅크샐러드에서 내려받은 파일로 한 번에 · 본인 이체만 제외", badge: "한도 0%" },
+    { act: "bsCap", ic: "📷", t: "일별 캡처", d: "일별 내역 화면을 그대로 표로 · 여러 장 한 번에", badge: "한도 0%" },
+    { act: "bsPaste", ic: "📋", t: "텍스트로 붙여넣기", d: "글자를 그대로 붙여 넣어 정확 100% · 사진 인식 없이", badge: "정확 100%" }
+  ]},
+  coupang: { title: "🛒 쿠팡에서 가져오기", items: [
+    { act: "cpCap", ic: "📷", t: "품목 캡처", d: "주문서·영수증을 품목마다 한 줄로", badge: "한도 0%" },
+    { act: "cpPaste", ic: "📋", t: "텍스트로 붙여넣기", d: "주문내역 글자를 그대로 나누기 · 사진 인식 없이", badge: "정확 100%" }
+  ]},
+  etc: { title: "📷 그 밖에 가져오기", items: [
+    { act: "ocr", ic: "📷", t: "일반 결제 캡처", d: "카드결제·은행 화면을 읽어 표로", badge: "한도 0%" },
+    { act: "shortcut", ic: "📱", t: "아이폰 단축어 자동", d: "결제 문자를 자동으로 기록", badge: "한도 0%" }
+  ]}
+};
+let toolMenuKey = "bs";
+function renderToolMenu() {
+  const m = TOOL_MENUS[toolMenuKey] || TOOL_MENUS.bs;
+  const tt = $("#mToolTitle");
+  if (tt) tt.innerHTML = m.title;
+  const box = $("#mToolList");
+  if (box) box.innerHTML = m.items.map(it =>
+    '<button type="button" class="impitem" data-act="' + esc(it.act) + '">' +
+      '<span class="tic">' + it.ic + "</span>" +
+      '<span class="ttx"><b>' + esc(it.t) + "</b><small>" + esc(it.d) + "</small></span>" +
+      (it.badge ? '<span class="zero">' + esc(it.badge) + "</span>" : "") +
+    "</button>").join("");
+}
+function openToolMenu(key) {
+  toolMenuKey = key;
+  renderToolMenu();
+  openModal("mToolMenu");
+}
+function runToolChoice(act) {
+  closeModal("mToolMenu");
+  const old = { xlsx: "#btnXlsx", bsCap: "#btnBsCap", cpCap: "#btnCoupang", ocr: "#btnOcr", shortcut: "#btnShortcut2" }[act];
+  if (old) { const b = $(old); if (b) b.click(); return; }
+  if (act === "bsPaste") { openCpPaste("banksalad"); return; }   /* 강제 사진 팝업 없이 글자 창부터 */
+  if (act === "cpPaste") { openCpPaste("coupang"); return; }
+}
+function bindTools3() {
+  const map = { btnToolBs: "bs", btnToolCoupang: "coupang", btnToolEtc: "etc" };
+  Object.keys(map).forEach(id => {
+    const b = $("#" + id);
+    if (b) b.addEventListener("click", () => openToolMenu(map[id]));
+  });
+  const list = $("#mToolList");
+  if (list) list.addEventListener("click", ev => {
+    const b = ev.target.closest("[data-act]");
+    if (b) runToolChoice(b.getAttribute("data-act"));
+  });
+}
 function bindOcr() {
   $("#btnOcr").addEventListener("click", () => { ocrMode = "txn"; pickOcrFile("txn"); });
   const bc = $("#btnCoupang");
@@ -9506,7 +9652,8 @@ function bindOcr() {
   const bb = $("#btnBsCap");
   if (bb) bb.addEventListener("click", () => { ocrMode = "banksalad"; pickOcrFile("banksalad"); });
   const bp = $("#btnCpPaste");
-  if (bp) bp.addEventListener("click", openCpPaste);
+  if (bp) bp.addEventListener("click", () => openCpPaste("coupang"));   /* 숨은 옛 버튼도 같은 동작 */
+  bindTools3();
   const pb = $("#cpPasteBtn");
   if (pb) pb.addEventListener("click", toggleCpPaste);
   const pgo = $("#cpPasteGo");
@@ -9525,6 +9672,10 @@ function bindOcr() {
     const files = Array.prototype.slice.call(ev.target.files || []);
     if (files.length) runOcrFiles(files, "banksalad");
   });
+  const mOcrBox = $("#mOcr");
+  if (mOcrBox) mOcrBox.addEventListener("click", ev => {
+    if (ev.target.closest("[data-close]")) cpPasteMode = false;   /* 창을 닫으면 붙여넣기 모드도 끝 */
+  });
   const modeBox = $("#ocrMode");
   if (modeBox) modeBox.addEventListener("click", ev => {
     const b = ev.target.closest("[data-m]");
@@ -9532,8 +9683,27 @@ function bindOcr() {
     const m = b.getAttribute("data-m");
     if (m !== "coupang" && m !== "banksalad" && m !== "txn") return;
     if (m === ocrMode && ocrLines.length) { syncOcrModeUI(); return; }
+    /* 📋 텍스트로 붙여넣기로 들어온 상태 — 탭을 바꿔도 사진 고르기 창을 띄우지 않는다.
+       (iOS에서 사진 보관함 팝업이 텍스트 입력창을 덮어 버리는 버그)
+       모드와 안내 글자만 바꾸고 텍스트 입력창은 열린 채로 둔다. */
+    const keepPaste = cpPasteOpen() || cpPasteMode;
     ocrMode = m;
-    if (m === "txn") { const pw = $("#cpPasteWrap"); if (pw) pw.classList.add("hidden"); }
+    if (keepPaste) {
+      if (m !== "txn") cpPasteMode = true;
+      syncOcrModeUI();
+      if (ocrLines.length) {
+        cpAutoSwitchOff = true;      /* 직접 고른 모드는 그대로 둔다 */
+        try { applyOcrLines(); } finally { cpAutoSwitchOff = false; }
+      }
+      else if (m !== "txn") {
+        cpPasteGuide();              /* 고른 모도의 붙여넣기 안내·입력창을 그대로 보여 준다 */
+        renderOcr();
+        const ta = $("#cpPasteText");
+        if (ta) { try { ta.focus(); } catch (e) {} }
+      }
+      else renderOcr();
+      return;
+    }
     if (ocrLines.length) {
       cpAutoSwitchOff = true;      /* 직접 고른 모드는 그대로 둔다 */
       try { applyOcrLines(); } finally { cpAutoSwitchOff = false; }
@@ -9597,8 +9767,8 @@ function bindOcr() {
 
 /* 모드에 맞게 읽은 줄을 다시 나눈다 (OCR은 한 번만 돌린다) */
 /* ---------- 📋 주문내역 텍스트 붙여넣기 (사진 인식 없이 100% 정확) ---------- */
-function openCpPaste() {
-  ocrMode = "coupang";
+function openCpPaste(mode) {
+  ocrMode = mode === "banksalad" ? "banksalad" : "coupang";
   cpPasteMode = true;
   ocrLines = [];
   ocrRows = [];
@@ -9612,13 +9782,11 @@ function openCpPaste() {
   if (dp && !dp.value) { dp.value = dateForMonth(uiMonth); cpDateAuto = true; }
   const rw = $("#cpReplaceWrap"); if (rw) rw.classList.add("hidden");
   const rc = $("#cpReplace"); if (rc) rc.checked = false;
-  const msg = $("#ocrMsg");
-  if (msg) msg.innerHTML = "📋 쿠팡 주문내역 글자를 붙여넣고 <b>나누기</b>를 누르면 사진 인식 없이 그대로 나눠요 · <b>2026. 11. 6</b> 같은 날짜 줄 뒤 품목은 그 날짜로 담겨요";
-  const note = $("#cpNote");
-  if (note) note.textContent = "품목마다 한 줄로 담깁니다 · 날짜·결제수단은 바꾸면 전체에 바로 적용돼요";
+  cpPasteGuide();
   renderOcr();
   openModal("mOcr");
   const wrap = $("#cpPasteWrap"); if (wrap) wrap.classList.remove("hidden");
+  syncCpPasteUI();
   const ta = $("#cpPasteText");
   if (ta) { ta.value = ""; setTimeout(() => { try { ta.focus(); } catch (e) {} }, 140); }
 }
@@ -9628,15 +9796,15 @@ function toggleCpPaste() {
   const show = wrap.classList.contains("hidden");
   wrap.classList.toggle("hidden", !show);
   if (show) {
+    cpPasteMode = true;
+    if (!ocrLines.length) cpPasteGuide();   /* 뱅크샐러드 탭에서 열면 뱅크샐러드 안내·예시로 바뀐다 */
     const ta = $("#cpPasteText");
     if (ta) {
-      ta.placeholder = ocrMode === "banksalad"
-        ? "뱅크샐러드 일별 내역 글자를 그대로 붙여넣으세요\n23일 월요일\nKT5370321111 -49,110원\n증권/투자 | KB마이핏통장\n카카오T택시_가승인 -5,700원\n결제 취소"
-        : "쿠팡 주문내역 글자를 그대로 붙여넣으세요\n2026. 11. 6\n메르시 파이니스트 셀렉션 레드 9,630원\n2026. 11. 9\n삼겹상 1kg 15,900원";
       if (!ta.value && ocrLines.length) ta.value = ocrLines.join("\n");
       try { ta.focus(); } catch (e) {}
     }
   }
+  syncCpPasteUI();
 }
 function runCpPaste() {
   const ta = $("#cpPasteText");
@@ -9649,6 +9817,7 @@ function runCpPaste() {
   const wrap = $("#cpPasteWrap"); if (wrap) wrap.classList.add("hidden");
   applyOcrLines();
   const n = ocrRows.length;
+  syncCpPasteUI();   /* 입력창이 접히면 버튼 이름도 '텍스트로 붙여넣기'로 돌아온다 */
   toast(n
     ? (bs ? "🏦 " + n + "건으로 나눴어요" : "📋 " + n + "개 품목으로 나눴어요")
     : (bs ? "내역을 찾지 못했어요 — '23일 월요일' 날짜 줄과 상호·금액을 함께 넣어 주세요" : "품목을 찾지 못했어요 — 상품명과 금액이 함께 있는 글을 붙여넣어 주세요"));
@@ -9843,6 +10012,8 @@ async function runOcrFiles(files, mode) {
     const rc0 = $("#cpReplace");
     if (rc0) rc0.checked = false;
     ocrMode = mode === "coupang" ? "coupang" : mode === "banksalad" ? "banksalad" : "txn";
+    const tt = $("#mOcrTitle");
+    if (tt) tt.textContent = "📷 캡처에서 읽은 내역";
     fillCpCard();
     const dp = $("#cpDate");
     if (dp && !dp.value) { dp.value = dateForMonth(uiMonth); cpDateAuto = true; }
