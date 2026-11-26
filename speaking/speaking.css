@@ -1,0 +1,191 @@
+/* ============================================================
+   🗣️ 서한이 루틴 · 따라 말하기 카드 — 스타일 (speaking.css)
+   ------------------------------------------------------------
+   · 모든 선택자가 .sp- / #sp 로 시작해요 → 다른 화면을 건드리지 않아요.
+   · 색은 앱의 Sight Words 히어로 카드(#a01a5f · #5b46c9 · #f472b6)를 따릅니다.
+   ============================================================ */
+
+/* ---------- Sight Words 카드에 붙는 [따라 말하기] 버튼 ---------- */
+.sp-entry { margin-top: .55rem; }
+.sp-open {
+  width: 100%; display: flex; align-items: center; gap: .5rem;
+  padding: .55rem .7rem; border-radius: 16px; cursor: pointer;
+  border: 2px solid #ffd0e5; background: linear-gradient(180deg, #ffe9f4, #ffd6ea);
+  color: #a01a5f; font-size: .92rem; font-weight: 900; letter-spacing: -.02em;
+  box-shadow: 0 3px 0 #f3a8cd;
+  transition: transform .1s ease, box-shadow .1s ease;
+}
+.sp-open:active { transform: translateY(2px); box-shadow: 0 1px 0 #f3a8cd; }
+.sp-open-emoji { font-size: 1.2rem; line-height: 1; flex: 0 0 auto; }
+.sp-open-text { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sp-open-sub {
+  margin-left: auto; flex: 0 0 auto;
+  font-size: .68rem; font-weight: 900; padding: .14rem .5rem; border-radius: 999px;
+  background: #fff; color: #a01a5f;
+}
+
+/* ---------- 모달 껍데기 ---------- */
+.sp-panel { width: min(96vw, 40rem); }
+.sp-head { gap: .5rem; }
+.sp-head h2 { display: flex; align-items: center; gap: .35rem; min-width: 0; }
+.sp-head h2 #spTitleText { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sp-stagepill {
+  flex: 0 0 auto; font-size: .68rem; font-weight: 900; padding: .14rem .45rem;
+  border-radius: 999px; background: #ffe3f0; color: #a01a5f; letter-spacing: 0;
+}
+.sp-headright { display: flex; align-items: center; gap: .45rem; flex: 0 0 auto; }
+.sp-stars {
+  font-size: .8rem; font-weight: 900; color: #96650a; background: #fff4d6;
+  padding: .18rem .5rem; border-radius: 999px; font-variant-numeric: tabular-nums;
+}
+.sp-stars.is-pop { animation: spPop .5s cubic-bezier(.2, 1.6, .4, 1); }
+@keyframes spPop { 0% { transform: scale(1); } 40% { transform: scale(1.28); } 100% { transform: scale(1); } }
+.sp-x {
+  width: 2.2rem; height: 2.2rem; border-radius: 12px; cursor: pointer;
+  background: #f4f2ff; color: #5b46c9; font-size: 1rem; font-weight: 900;
+  display: grid; place-items: center;
+}
+.sp-x:active { transform: translateY(1px); }
+
+/* ---------- 1·2·3 단계 ---------- */
+.sp-steps { display: flex; gap: .3rem; padding: .55rem 1.1rem .1rem; }
+.sp-step {
+  flex: 1 1 0; min-width: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: .25rem;
+  padding: .38rem .3rem; border-radius: 13px; border: 2px solid #ece9f7; background: #faf9ff;
+  font-size: .74rem; font-weight: 900; color: #8d8da6; letter-spacing: -.02em;
+  transition: background .16s ease, color .16s ease, border-color .16s ease;
+}
+.sp-step .sp-step-emoji { font-size: .9rem; line-height: 1; }
+.sp-step .sp-step-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sp-step.is-on { background: #fff; border-color: #f3a8cd; color: #a01a5f; box-shadow: 0 2px 0 rgba(42, 42, 60, .08); }
+.sp-step.is-done { color: #16a34a; border-color: #bbf7d0; background: #f0fdf4; }
+.sp-step.is-on.is-done { color: #a01a5f; border-color: #f3a8cd; background: #fff; }
+
+/* ---------- 본문 ---------- */
+.sp-body { align-items: stretch; text-align: center; gap: .65rem !important; }
+.sp-guide {
+  font-size: .78rem; font-weight: 800; line-height: 1.45; color: #6b6880;
+  background: #f7f4ff; border-radius: 12px; padding: .45rem .6rem;
+}
+.sp-card {
+  width: 100%; min-height: 8.6rem;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .3rem;
+  padding: .8rem .7rem; border-radius: 20px; border: 2px solid #ffd9ec;
+  background: linear-gradient(160deg, #fff 0%, #fff8fc 100%);
+}
+.sp-pic { font-size: 3.4rem; line-height: 1.05; }
+.sp-sent {
+  font-size: 1.14rem; font-weight: 900; letter-spacing: -.01em; line-height: 1.45;
+  color: #3b2b52; word-break: keep-all;
+}
+.sp-sent .sp-blank {
+  display: inline-block; min-width: 3.1em; margin: 0 .1em;
+  border-bottom: 3px solid #f472b6; color: transparent;
+}
+.sp-sent .sp-known { color: #a01a5f; }
+.sp-sent .sp-mask { color: #cfcae4; letter-spacing: .06em; }
+.sp-hint {
+  font-size: .78rem; font-weight: 900; color: #5b46c9; background: #efecff;
+  padding: .16rem .55rem; border-radius: 999px;
+}
+.sp-hint[hidden] { display: none; }
+.sp-word {
+  font-size: 1.05rem; font-weight: 900; color: #16a34a;
+  background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 12px; padding: .18rem .6rem;
+}
+.sp-word[hidden] { display: none; }
+
+/* ---------- "이제 따라 말해 봐!" ---------- */
+.sp-turn {
+  display: flex; align-items: center; justify-content: center; gap: .4rem; min-height: 2rem;
+  font-size: .95rem; font-weight: 900; color: #a01a5f;
+}
+.sp-turn[hidden] { display: none; }
+.sp-turn .sp-turn-ico { font-size: 1.15rem; }
+.sp-turn.is-live { animation: spBreathe 1.6s ease-in-out infinite; }
+@keyframes spBreathe { 0%, 100% { opacity: .78; } 50% { opacity: 1; } }
+.sp-wait {
+  width: 80%; max-width: 20rem; height: 7px; border-radius: 999px;
+  background: #f1eeff; overflow: hidden;
+}
+.sp-wait[hidden] { display: none; }
+.sp-wait-bar {
+  display: block; height: 100%; width: 100%;
+  background: linear-gradient(90deg, #f472b6, #a855f7);
+  transform-origin: left center; transform: scaleX(0);
+}
+.sp-wait.is-run .sp-wait-bar { transition: transform linear; transform: scaleX(1); }
+
+/* ---------- 버튼 ---------- */
+.sp-actions { display: flex; gap: .45rem; width: 100%; }
+.sp-big {
+  flex: 1 1 0; min-width: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: .3rem;
+  padding: .62rem .5rem; border-radius: 15px; border: 2px solid #e6e2f3; background: #fff;
+  font-size: .86rem; font-weight: 900; color: #4b3fa8;
+  box-shadow: 0 3px 0 rgba(42, 42, 60, .07);
+  transition: transform .1s ease, box-shadow .1s ease;
+}
+.sp-big:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(42, 42, 60, .07); }
+.sp-big[hidden] { display: none; }
+.sp-big.is-listen { border-color: #f3a8cd; color: #a01a5f; background: #fff7fb; }
+.sp-big.is-listen .sp-dot { animation: spBreathe 1s ease-in-out infinite; }
+.sp-check { display: flex; gap: .45rem; width: 100%; }
+.sp-ok {
+  flex: 1.35 1 0; cursor: pointer; padding: .7rem .5rem; border-radius: 16px; border: none;
+  background: linear-gradient(180deg, #4ade80, #16a34a); color: #fff;
+  font-size: .95rem; font-weight: 900; box-shadow: 0 4px 0 #15803d;
+}
+.sp-ok:active { transform: translateY(2px); box-shadow: 0 2px 0 #15803d; }
+.sp-again {
+  flex: 1 1 0; cursor: pointer; padding: .7rem .5rem; border-radius: 16px;
+  border: 2px solid #e6e2f3; background: #fff; color: #4b3fa8;
+  font-size: .9rem; font-weight: 900;
+}
+.sp-again:active { transform: translateY(1px); }
+
+.sp-asrnote {
+  font-size: .72rem; font-weight: 800; line-height: 1.45; text-align: left;
+  color: #8a5a00; background: #fff7e0; border: 1px solid #ffe6a8; border-radius: 12px;
+  padding: .4rem .55rem;
+}
+.sp-asrnote[hidden] { display: none; }
+.sp-asrnote b { color: #7a4a00; }
+
+/* ---------- 아래 줄: 이전 · 점 · 녹음 · 건너뛰기 ---------- */
+.sp-foot-row {
+  display: flex; align-items: center; gap: .4rem; flex-wrap: wrap;
+  font-size: .74rem; font-weight: 900; color: #8d8da6;
+}
+.sp-mini {
+  cursor: pointer; padding: .3rem .55rem; border-radius: 11px;
+  border: 2px solid #ece9f7; background: #fff; color: #6b6880;
+  font-size: .72rem; font-weight: 900;
+}
+.sp-mini:active { transform: translateY(1px); }
+.sp-mini[hidden] { display: none; }
+.sp-mini.is-rec { border-color: #fecaca; background: #fff5f5; color: #c81e1e; }
+.sp-dots { letter-spacing: .08em; font-size: .82rem; color: #c9c4dd; }
+.sp-dots .is-on { color: #f5b100; }
+.sp-count { font-variant-numeric: tabular-nums; }
+.sp-spacer { flex: 1 1 auto; }
+
+/* ---------- 끝났어요 ---------- */
+.sp-done {
+  width: 100%; text-align: center; font-size: .9rem; font-weight: 900; color: #16a34a;
+  background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 14px; padding: .5rem .6rem;
+}
+.sp-done[hidden] { display: none; }
+
+/* ---------- 좁은 화면 ---------- */
+@media (max-width: 420px) {
+  .sp-sent { font-size: 1.04rem; }
+  .sp-pic { font-size: 2.9rem; }
+  .sp-step { font-size: .68rem; padding: .34rem .2rem; }
+  .sp-step .sp-step-emoji { display: none; }
+  .sp-big { font-size: .8rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sp-stars.is-pop, .sp-turn.is-live, .sp-big.is-listen .sp-dot { animation: none; }
+}

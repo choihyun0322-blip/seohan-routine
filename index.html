@@ -18835,7 +18835,7 @@ function iconSVG(key) {
     /* 사용자가 [다음 문제] 등을 직접 눌렀을 때만 소리가 나요 (탭 진입·자동 넘김은 조용히) */
     if (allowSpeak === true && sightOnScreen()) {
       if (mode === 'listen') speakWord(target.w, 0.9);
-      else if (ex) speakEn(sentenceWithout(ex[0], target.w) || ex[0], 0.9);  /* 빈칸 놀이: 답은 빼고 문장만 */
+      else if (ex) speakEn(ex[0], 0.9);  /* 빈칸 놀이: 문장 전체를 먼저 들려줘요 (들린 문장을 입으로 옮기는 게 먼저) */
     }
   }
 
@@ -19024,8 +19024,8 @@ function iconSVG(key) {
     if (!sightQ) return;
     voiceAudioPrime();
     if (sightQ.mode === 'fill' && sightQ.ex) {
-      /* 빈칸 놀이에서는 정답 단어를 빼고 읽어요 (답을 미리 들려주면 안 되니까요) */
-      speakEn(sentenceWithout(sightQ.ex[0], sightQ.key) || sightQ.ex[0], 0.9);
+      /* 빈칸 놀이: 정답 단어까지 포함한 문장 전체를 들려줘요 (빈 노출은 화면의 빈칸이 담당) */
+      speakEn(sightQ.ex[0], 0.9);
     } else {
       speakWord(sightQ.key, 0.9);
     }
@@ -22440,5 +22440,9 @@ function iconSVG(key) {
 <link rel="stylesheet" href="./bookclub/bookclub.css">
 <script src="./bookclub/bookclub.data.js" defer></script>
 <script src="./bookclub/bookclub.js" defer></script>
+<!-- 🗣️ 따라 말하기 카드 패치 (speaking, APPLY-SPEAKING.md 참고) -->
+<link rel="stylesheet" href="./speaking/speaking.css">
+<script src="./speaking/speaking.data.js" defer></script>
+<script src="./speaking/speaking.js" defer></script>
 </body>
 </html>
