@@ -189,3 +189,85 @@
 @media (prefers-reduced-motion: reduce) {
   .sp-stars.is-pop, .sp-turn.is-live, .sp-big.is-listen .sp-dot { animation: none; }
 }
+
+/* ============================================================
+   v0.2 — ❄️ 12월 겨울 Q&A · 🔤 겨울 단어 파닉스
+   ============================================================ */
+
+/* ---------- 히어로 카드 아래 바로 열기 칩 ---------- */
+.sp-quick { display: flex; gap: .35rem; margin-top: .4rem; flex-wrap: wrap; }
+.sp-quick-chip {
+  flex: 1 1 auto; min-width: 0; cursor: pointer;
+  padding: .42rem .55rem; border-radius: 13px;
+  border: 2px solid #d9e6ff; background: #f1f7ff; color: #2b5fb0;
+  font-size: .76rem; font-weight: 900; letter-spacing: -.02em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sp-quick-chip:active { transform: translateY(1px); }
+
+/* ---------- 모달 위 세트 칩 ---------- */
+.sp-sets { display: flex; gap: .3rem; padding: .55rem 1.1rem 0; }
+.sp-sets[hidden] { display: none; }
+.sp-set {
+  flex: 1 1 0; min-width: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: .22rem;
+  padding: .34rem .3rem; border-radius: 12px;
+  border: 2px solid #ece9f7; background: #faf9ff; color: #8d8da6;
+  font-size: .72rem; font-weight: 900; letter-spacing: -.02em;
+}
+.sp-set .sp-set-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sp-set .sp-set-n {
+  flex: 0 0 auto; font-size: .62rem; font-weight: 900; padding: 0 .32rem;
+  border-radius: 999px; background: #fff; color: #a0a0bb;
+}
+.sp-set.is-on { background: #fff; border-color: #f3a8cd; color: #a01a5f; box-shadow: 0 2px 0 rgba(42, 42, 60, .08); }
+.sp-set.is-on .sp-set-n { background: #ffe3f0; color: #a01a5f; }
+
+/* ---------- ❓ 질문 줄 ---------- */
+.sp-q {
+  font-size: .98rem; font-weight: 900; line-height: 1.4; color: #2b5fb0;
+  background: #eef5ff; border-radius: 12px; padding: .28rem .6rem;
+  word-break: keep-all;
+}
+.sp-q[hidden] { display: none; }
+
+/* 단어 카드의 큰 글씨 */
+.sp-sent.is-word {
+  font-size: 2.2rem; letter-spacing: .01em; color: #a01a5f;
+  font-family: ui-rounded, "SF Pro Rounded", system-ui, sans-serif;
+}
+.sp-ph {
+  font-size: .84rem; font-weight: 900; color: #2b5fb0;
+  background: #eef5ff; border: 1px solid #d9e6ff; border-radius: 10px;
+  padding: .18rem .55rem; letter-spacing: .02em; word-break: keep-all;
+}
+.sp-ph[hidden] { display: none; }
+
+/* ---------- ❄️ 대답 보기 · 빈칸 보기 칩 ---------- */
+.sp-choices { display: flex; flex-direction: column; gap: .35rem; width: 100%; }
+.sp-choices[hidden] { display: none; }
+.sp-choice { display: flex; align-items: stretch; gap: .3rem; }
+.sp-choice-main {
+  flex: 1 1 auto; min-width: 0; cursor: pointer; text-align: left;
+  padding: .5rem .65rem; border-radius: 13px;
+  border: 2px solid #dbe7ff; background: #fff; color: #33417a;
+  font-size: .88rem; font-weight: 900; letter-spacing: -.01em;
+  box-shadow: 0 2px 0 rgba(42, 42, 60, .06);
+  transition: transform .1s ease, border-color .15s ease, background .15s ease;
+}
+.sp-choice-main:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(42, 42, 60, .06); }
+.sp-choice.is-on .sp-choice-main { border-color: #7aa7f0; background: #eef5ff; color: #1f4c9c; }
+.sp-choice-ph {
+  flex: 0 0 auto; cursor: pointer; width: 2.5rem;
+  border-radius: 13px; border: 2px solid #ffe0b0; background: #fff8e8; color: #a4650a;
+  font-size: .92rem; font-weight: 900;
+}
+.sp-choice-ph:active { transform: translateY(1px); }
+
+@media (max-width: 420px) {
+  .sp-set { font-size: .66rem; }
+  .sp-set .sp-set-emoji { display: none; }
+  .sp-q { font-size: .9rem; }
+  .sp-sent.is-word { font-size: 1.9rem; }
+  .sp-choice-main { font-size: .82rem; }
+}
