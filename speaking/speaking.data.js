@@ -140,6 +140,10 @@ window.SPEAKING_DATA = {
     ]
   },
 
+  /* 🔤 파닉스 카드 순서 — 핵심 겨울 단어 15개를 먼저, 나머지 보기 단어는 뒤에 */
+  phonicsCore: ['snow', 'cookies', 'oranges', 'soup', 'jackets', 'mittens', 'boots',
+    'doll', 'toy', 'robot', 'gift', 'cake', 'sleep', 'christmas', 'santa'],
+
   /* ============================================================
      🔤 겨울 단어 파닉스 — 소리 묶음(chunks) 과 그림
      ------------------------------------------------------------

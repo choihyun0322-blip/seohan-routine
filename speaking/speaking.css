@@ -49,6 +49,7 @@
 
 /* ---------- 1·2·3 단계 ---------- */
 .sp-steps { display: flex; gap: .3rem; padding: .55rem 1.1rem .1rem; }
+.sp-steps[hidden] { display: none; }
 .sp-step {
   flex: 1 1 0; min-width: 0; cursor: pointer;
   display: flex; align-items: center; justify-content: center; gap: .25rem;
@@ -167,6 +168,7 @@
 .sp-mini[hidden] { display: none; }
 .sp-mini.is-rec { border-color: #fecaca; background: #fff5f5; color: #c81e1e; }
 .sp-dots { letter-spacing: .08em; font-size: .82rem; color: #c9c4dd; }
+.sp-dots[hidden] { display: none; }
 .sp-dots .is-on { color: #f5b100; }
 .sp-count { font-variant-numeric: tabular-nums; }
 .sp-spacer { flex: 1 1 auto; }

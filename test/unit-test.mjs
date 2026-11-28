@@ -179,6 +179,7 @@ for (const it of ITEMS) {
   }
 }
 t.eq('4~10번 보기 단어가 모두 파닉스 표에 있음', missing, []);
+t.eq('파닉스 카드 순서 — 핵심 겨울 단어 15개가 먼저', PH.slice(0, 15), CORE);
 t.eq('파닉스 카드에 snow 가 있음', PH.indexOf('snow') >= 0, true);
 t.eq('파닉스 카드에 christmas 가 있음', PH.indexOf('christmas') >= 0, true);
 const phCards = SP.phonicsCards();

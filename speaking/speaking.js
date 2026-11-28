@@ -190,7 +190,8 @@
     var e = phonicsDict()[normWord(word)];
     return (e && e.chunks && e.chunks.length) ? e.chunks.slice() : [];
   }
-  /* 보기 단어 뭉치에서 낱말만 (파닉스 표에 있는 것만) */
+  /* 보기 단어 뭉치에서 낱말만 (파닉스 표에 있는 것만)
+     순서: phonicsCore(핵심 겨울 단어 15개) → 나머지 보기 단어 */
   function phonicsWords() {
     var dict = phonicsDict(), items = winterItems(), seen = {}, out = [];
     function add(tok) {
@@ -199,6 +200,8 @@
       seen[k] = 1;
       out.push(k);
     }
+    var core = data().phonicsCore || [];
+    for (var c = 0; c < core.length; c++) add(core[c]);
     for (var i = 0; i < items.length; i++) {
       var opts = ((items[i] || {}).fill || {}).options || [];
       for (var j = 0; j < opts.length; j++) {
@@ -1255,6 +1258,7 @@
     /* 아래 줄 */
     var dots = $('spDots');
     if (dots) {
+      dots.hidden = !!wd || n > 12;          /* 34장 단어 카드는 점이 너무 길어요 */
       var html = '';
       for (var k = 0; k < n; k++) html += (isDone(k, SP.stage) ? '<span class="is-on">★</span>' : '☆');
       dots.innerHTML = html;
